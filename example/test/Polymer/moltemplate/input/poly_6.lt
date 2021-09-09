@@ -1,0 +1,43 @@
+import "oplsaa.lt"
+import "PEAAle.lt"
+import "PEAAi.lt"
+import "PEAAre.lt"
+
+poly_6 inherits OPLSAA {
+
+    create_var {$mol}
+
+    monomer[0] = new PEAAle
+    monomer[1] = new PEAAi.rot(90.0,1,0,0).move(3.5174,0,0)
+    monomer[2] = new PEAAi.rot(0.0,1,0,0).move(7.0332,0,0)
+    monomer[3] = new PEAAi.rot(90.0,1,0,0).move(10.5490,0,0)
+    monomer[4] = new PEAAi.rot(0.0,1,0,0).move(14.0648,0,0)
+    monomer[5] = new PEAAi.rot(90.0,1,0,0).move(17.5805,0,0)
+    monomer[6] = new PEAAi.rot(0.0,1,0,0).move(21.0963,0,0)
+    monomer[7] = new PEAAi.rot(90.0,1,0,0).move(24.6121,0,0)
+    monomer[8] = new PEAAi.rot(0.0,1,0,0).move(28.1279,0,0)
+    monomer[9] = new PEAAi.rot(90.0,1,0,0).move(31.6436,0,0)
+    monomer[10] = new PEAAi.rot(0.0,1,0,0).move(35.1594,0,0)
+    monomer[11] = new PEAAi.rot(90.0,1,0,0).move(38.6752,0,0)
+    monomer[12] = new PEAAi.rot(0.0,1,0,0).move(42.1910,0,0)
+    monomer[13] = new PEAAi.rot(90.0,1,0,0).move(45.7067,0,0)
+    monomer[14] = new PEAAre.rot(0.0,1,0,0).move(49.2225,0,0)
+
+    write('Data Bond List') {
+      $bond:b1  $atom:monomer[0]/C2  $atom:monomer[1]/C1  
+      $bond:b2  $atom:monomer[1]/C2  $atom:monomer[2]/C1  
+      $bond:b3  $atom:monomer[2]/C2  $atom:monomer[3]/C1  
+      $bond:b4  $atom:monomer[3]/C2  $atom:monomer[4]/C1  
+      $bond:b5  $atom:monomer[4]/C2  $atom:monomer[5]/C1  
+      $bond:b6  $atom:monomer[5]/C2  $atom:monomer[6]/C1  
+      $bond:b7  $atom:monomer[6]/C2  $atom:monomer[7]/C1  
+      $bond:b8  $atom:monomer[7]/C2  $atom:monomer[8]/C1  
+      $bond:b9  $atom:monomer[8]/C2  $atom:monomer[9]/C1  
+      $bond:b10  $atom:monomer[9]/C2  $atom:monomer[10]/C1  
+      $bond:b11  $atom:monomer[10]/C2  $atom:monomer[11]/C1  
+      $bond:b12  $atom:monomer[11]/C2  $atom:monomer[12]/C1  
+      $bond:b13  $atom:monomer[12]/C2  $atom:monomer[13]/C1  
+      $bond:b14  $atom:monomer[13]/C2  $atom:monomer[14]/C1  
+    }
+
+} # poly_6

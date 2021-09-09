@@ -1,0 +1,29 @@
+import gaff.lt
+
+PAXle inherits GAFF {
+
+    # atom-id mol-id atom-type charge X Y Z # comments
+   write("Data Atoms") {
+        $atom:C1  $mol:...  @atom:c1  -0.1      -2.22663      -0.77677      -0.36654  #
+        $atom:C2  $mol:...  @atom:c3  -0.3      -0.71217      -0.77779      -0.09985  #
+        $atom:H3  $mol:...  @atom:hc  0.1      -2.57180       0.23367      -0.59635  #
+        $atom:H4  $mol:...  @atom:hc  0.1      -2.76471      -1.13624       0.51325  #
+        $atom:H5  $mol:...  @atom:hc  0.1      -2.46360      -1.42797      -1.20975  #
+        $atom:C6  $mol:...  @atom:c  0.14      -0.35383       0.18459       1.00914  #
+        $atom:H7  $mol:...  @atom:hc  0.1      -0.16667      -0.52117      -1.01101  #
+        $atom:O8  $mol:...  @atom:o  -0.57      -0.54097      -0.18637       2.14960  #
+        $atom:O9  $mol:...  @atom:o  -0.57       0.06518       1.27909       0.68973  #
+    }
+
+    # bond-id atom-id1 atom-id2
+    write("Data Bond List") {
+        $bond:1  $atom:C1  $atom:C2
+        $bond:2  $atom:C1  $atom:H3
+        $bond:3  $atom:C1  $atom:H4
+        $bond:4  $atom:C1  $atom:H5
+        $bond:5  $atom:C2  $atom:C6
+        $bond:6  $atom:C2  $atom:H7
+        $bond:7  $atom:C6  $atom:O8
+        $bond:8  $atom:C6  $atom:O9
+    }
+}

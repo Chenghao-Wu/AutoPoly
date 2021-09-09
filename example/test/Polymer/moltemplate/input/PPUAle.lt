@@ -1,0 +1,18 @@
+import "oplsaa.lt"
+
+PPUAle inherits OPLSAA {
+
+    # atom-id mol-id atom-type charge X Y Z # comments
+    
+   write("Data Atoms") {
+        $atom:C1  $mol:...  @atom:13  0.00  0.000000  0.000000  0.000000  # C
+        $atom:C2  $mol:...  @atom:13  0.00  1.490842  -0.000000  -0.000000  # C
+        $atom:C6  $mol:...  @atom:10  0.00  -0.569277  1.281395  -0.585632  # C
+    }
+
+    # bond-id atom-id1 atom-id2 # comments
+    write("Data Bond List") {
+        $bond:1  $atom:C2  $atom:C1  # order:1
+        $bond:5  $atom:C1  $atom:C6  # order:1
+    }
+}

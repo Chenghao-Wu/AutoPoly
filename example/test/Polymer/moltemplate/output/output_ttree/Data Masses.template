@@ -1,0 +1,6 @@
+    @/atom:OPLSAA/10 15.035 #C3 "N-Alkane CH3- (UA)" 6 partial charge=0.0
+    @/atom:OPLSAA/13 14.027 #C2 "Alkanes -CH2- (UA)" 6 partial charge=0.0
+    @/atom:OPLSAA/15 13.019 #CH "Isobutane CH (UA)" 6 partial charge=0.0
+    @/atom:OPLSAA/80 12.011 #CT "Alkane CH3-" 6 partial charge=-0.18
+    @/atom:OPLSAA/81 12.011 #CT "Alkane -CH2-" 6 partial charge=-0.12
+    @/atom:OPLSAA/85 1.008 #HC "Alkane H-C" 1 partial charge=0.06

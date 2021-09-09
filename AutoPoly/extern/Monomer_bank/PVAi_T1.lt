@@ -1,0 +1,25 @@
+import oplsaa.lt
+
+PVAi_T1 inherits OPLSAA {
+
+    # atom-id mol-id atom-type charge X Y Z # comments
+   write("Data Atoms") {
+        $atom:C1  $mol:...  @atom:81   0.00      -4.16657       0.97815      -0.07156  #
+        $atom:C2  $mol:...  @atom:100  0.00      -2.76321       1.37976      -0.48446  #
+        $atom:H3  $mol:...  @atom:85   0.00      -4.36770      -0.06328      -0.39820  #
+        $atom:H4  $mol:...  @atom:85   0.00      -4.26743       1.03825       1.03243  #
+        $atom:H5  $mol:...  @atom:85   0.00      -2.64344       1.30424      -1.58553  #
+        $atom:O6  $mol:...  @atom:96   0.00      -2.50234       2.68701      -0.07346  #
+        $atom:H7  $mol:...  @atom:97   0.00      -1.72103       2.60820       0.53049  #
+    }
+
+    # bond-id atom-id1 atom-id2
+    write("Data Bond List") {
+        $bond:1  $atom:C1  $atom:C2
+        $bond:2  $atom:C1  $atom:H3
+        $bond:3  $atom:C1  $atom:H4
+        $bond:4  $atom:C2  $atom:H5
+        $bond:5  $atom:C2  $atom:O6
+        $bond:6  $atom:O6  $atom:H7
+    }
+}
