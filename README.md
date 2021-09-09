@@ -9,6 +9,7 @@ import AutoPoly
 ```
 
 Then, you can try AutoPoly.py
+
 ```python
 
 # Define the system
@@ -25,3 +26,5 @@ PEAA=AutoPoly.Polymer(ChainNum=3,Sequence=["PEAA"]*15)
 # Name is the output folder for this polymer
 poly=AutoPoly.Polymerization(Name="Polymer",System=system,Model=[PPUA,PEUA,PEAA],run=True)
 ```
+you will get something looks like this using Visual Molecular Dynamics:
+![hPF-MD](./example/example.png)
