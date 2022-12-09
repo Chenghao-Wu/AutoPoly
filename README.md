@@ -10,6 +10,7 @@ import AutoPoly
 
 Then, you can try AutoPoly.py
 
+### Create polymer system with PP PE chains at AA, UA levels
 ```python
 
 # Define the system
@@ -29,6 +30,25 @@ poly=AutoPoly.Polymerization(Name="Polymer",System=system,Model=[PPUA,PEUA,PEAA]
 you will get something looks like this using Visual Molecular Dynamics:
 ![hPF-MD](./example/example.png)
 
+### Create molecular system with 50 benzenes
+```python
+
+# Define the system
+# out is the folder name for the output
+system=AutoPoly.System(out="test_molecule")
+
+# create polymers
+# Just an example of polypropylene and polyethylene with all-atom and united-atom resolutions
+
+benzene=AutoPoly.Polymer(ChainNum=50,Sequence=["Benzene"])
+
+# polymerization
+# Name is the output folder for this polymer
+poly=AutoPoly.Polymerization(Name="Benzene",System=system,Model=[benzene],run=True)
+```
+you will get something looks like this using Visual Molecular Dynamics:
+![hPF-MD](./example/benzene.png)
+
 ## Monomer Bank
 
 Monomer data is created by Avogadra [https://avogadro.cc/]
@@ -40,5 +60,4 @@ Monomer data is created by Avogadra [https://avogadro.cc/]
 
 ## To-do list
 * Support tacticity of polymers
-* Support inclusion of small molecules
 * Support creation of coarse-grained polymers
