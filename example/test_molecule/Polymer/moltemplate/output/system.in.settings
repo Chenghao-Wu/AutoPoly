@@ -1,0 +1,14 @@
+    pair_coeff 1 1 0.07 3.55 
+    pair_coeff 2 2 0.03 2.42 
+    bond_coeff 1 harmonic 469.0 1.4
+    bond_coeff 2 harmonic 367.0 1.08
+    angle_coeff 1 harmonic 63.0 120.0
+    angle_coeff 2 harmonic 35.0 120.0
+    dihedral_coeff 1 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 2 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 3 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 4 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 5 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 6 opls 0.0 7.25 0.0 0.0
+    improper_coeff 1 harmonic 2.5 180 
+

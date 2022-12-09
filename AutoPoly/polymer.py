@@ -44,15 +44,22 @@ class Polymer:
         for chainii in range(self.ChainNum):
             merSet=[]
             merSet_=[]
-            for merii in range(self.SequnceLen):
-                if merii==0:
-                    merSet.append(sequence[merii]+"le.lt")
-                    merSet_.append(sequence[merii]+"le")
-                elif merii == self.SequnceLen-1:
-                    merSet.append(sequence[merii]+"re.lt")
-                    merSet_.append(sequence[merii]+"re")
-                else:
-                    merSet.append(sequence[merii]+"i.lt")
-                    merSet_.append(sequence[merii]+"i")
-            self.sequenceSet.append(merSet)
-            self.sequenceName.append(merSet_)
+            if self.SequnceLen>1:
+                for merii in range(self.SequnceLen):
+                    if merii==0:
+                        merSet.append(sequence[merii]+"le.lt")
+                        merSet_.append(sequence[merii]+"le")
+                    elif merii == self.SequnceLen-1:
+                        merSet.append(sequence[merii]+"re.lt")
+                        merSet_.append(sequence[merii]+"re")
+                    else:
+                        merSet.append(sequence[merii]+"i.lt")
+                        merSet_.append(sequence[merii]+"i")
+                self.sequenceSet.append(merSet)
+                self.sequenceName.append(merSet_)
+            elif self.SequnceLen==1:
+                for merii in range(self.SequnceLen):
+                    merSet.append(sequence[merii]+".lt")
+                    merSet_.append(sequence[merii])
+                self.sequenceSet.append(merSet)
+                self.sequenceName.append(merSet_)

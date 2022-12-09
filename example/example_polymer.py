@@ -6,7 +6,7 @@ Created on Fri Dec 21 12:19:08 2018
 @author: zwu
 """
 import sys
-sys.path.append('/home/zwu/AutoPoly')
+sys.path.append('/home/zwq2834/development/AutoPoly')
 import AutoPoly
 
 # Define the system

@@ -200,12 +200,13 @@ class Polymerization(object):
                         polyindex=polyindex+1
                     write_f.write("\n")
                 else:
-                    if len(self.merSet)>1:
-                        logger.error(' '.join(["sequenceLen = "+str(self.DOP)+", "
+                    if len(modelii.merSet)>1:
+                        logger.error(' '.join(["sequenceLen = "+str(modelii.DOP)+", "
                                                     , " merSet should only have one mer type! Please check.\n"]))
                         sys.exit()
                     #import constituent monomer.lt's
-                    unique_Sequence=list(dict.fromkeys(self.sequenceSet))
+                    unique_Sequence=[i[0] for i in modelii.sequenceSet]
+                    print(unique_Sequence)
                     for sequenceii in range(len(unique_Sequence)):
                         write_f.write("import \""+unique_Sequence[sequenceii]+"\"\n")
                     write_f.write("\n")

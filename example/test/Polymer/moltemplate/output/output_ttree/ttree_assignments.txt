@@ -1,0 +1,3121 @@
+@/atom:OPLSAA/10   1       #"oplsaa.lt", line 8
+@/atom:OPLSAA/13   2       #"oplsaa.lt", line 9
+@/atom:OPLSAA/15   3       #"oplsaa.lt", line 10
+@/atom:OPLSAA/80   4       #"oplsaa.lt", line 11
+@/atom:OPLSAA/81   5       #"oplsaa.lt", line 12
+@/atom:OPLSAA/85   6       #"oplsaa.lt", line 13
+@/bond:OPLSAA/13-13   1       #"oplsaa.lt", line 35
+@/bond:OPLSAA/13-10   2       #"oplsaa.lt", line 36
+@/bond:OPLSAA/13-15   3       #"oplsaa.lt", line 37
+@/bond:OPLSAA/13-80   4       #"oplsaa.lt", line 38
+@/bond:OPLSAA/13-81   5       #"oplsaa.lt", line 39
+@/bond:OPLSAA/10-10   6       #"oplsaa.lt", line 40
+@/bond:OPLSAA/10-15   7       #"oplsaa.lt", line 41
+@/bond:OPLSAA/10-80   8       #"oplsaa.lt", line 42
+@/bond:OPLSAA/10-81   9       #"oplsaa.lt", line 43
+@/bond:OPLSAA/15-15   10       #"oplsaa.lt", line 44
+@/bond:OPLSAA/80-80   11       #"oplsaa.lt", line 45
+@/bond:OPLSAA/80-81   12       #"oplsaa.lt", line 46
+@/bond:OPLSAA/81-80   13       #"oplsaa.lt", line 47
+@/bond:OPLSAA/81-81   14       #"oplsaa.lt", line 48
+@/bond:OPLSAA/80-85   15       #"oplsaa.lt", line 49
+@/bond:OPLSAA/81-85   16       #"oplsaa.lt", line 50
+@/angle:OPLSAA/13-13-13   1       #"oplsaa.lt", line 73
+@/angle:OPLSAA/13-13-10   2       #"oplsaa.lt", line 74
+@/angle:OPLSAA/10-13-10   3       #"oplsaa.lt", line 75
+@/angle:OPLSAA/13-13-15   4       #"oplsaa.lt", line 76
+@/angle:OPLSAA/10-13-15   5       #"oplsaa.lt", line 77
+@/angle:OPLSAA/15-13-15   6       #"oplsaa.lt", line 78
+@/angle:OPLSAA/10-13-80   7       #"oplsaa.lt", line 79
+@/angle:OPLSAA/10-13-81   8       #"oplsaa.lt", line 80
+@/angle:OPLSAA/13-15-13   9       #"oplsaa.lt", line 81
+@/angle:OPLSAA/10-15-10   10       #"oplsaa.lt", line 82
+@/angle:OPLSAA/13-15-10   11       #"oplsaa.lt", line 83
+@/angle:OPLSAA/13-15-15   12       #"oplsaa.lt", line 84
+@/angle:OPLSAA/10-15-15   13       #"oplsaa.lt", line 85
+@/angle:OPLSAA/15-15-15   14       #"oplsaa.lt", line 86
+@/angle:OPLSAA/13-80-13   15       #"oplsaa.lt", line 87
+@/angle:OPLSAA/13-81-13   16       #"oplsaa.lt", line 88
+@/angle:OPLSAA/13-80-10   17       #"oplsaa.lt", line 89
+@/angle:OPLSAA/13-81-10   18       #"oplsaa.lt", line 90
+@/angle:OPLSAA/10-80-10   19       #"oplsaa.lt", line 91
+@/angle:OPLSAA/10-81-10   20       #"oplsaa.lt", line 92
+@/angle:OPLSAA/80-80-80   21       #"oplsaa.lt", line 93
+@/angle:OPLSAA/80-80-81   22       #"oplsaa.lt", line 94
+@/angle:OPLSAA/80-81-80   23       #"oplsaa.lt", line 95
+@/angle:OPLSAA/80-81-81   24       #"oplsaa.lt", line 96
+@/angle:OPLSAA/81-80-80   25       #"oplsaa.lt", line 97
+@/angle:OPLSAA/81-80-81   26       #"oplsaa.lt", line 98
+@/angle:OPLSAA/81-81-80   27       #"oplsaa.lt", line 99
+@/angle:OPLSAA/81-81-81   28       #"oplsaa.lt", line 100
+@/angle:OPLSAA/85-80-85   29       #"oplsaa.lt", line 101
+@/angle:OPLSAA/85-81-85   30       #"oplsaa.lt", line 102
+@/angle:OPLSAA/13-80-85   31       #"oplsaa.lt", line 103
+@/angle:OPLSAA/13-81-85   32       #"oplsaa.lt", line 104
+@/angle:OPLSAA/80-80-85   33       #"oplsaa.lt", line 105
+@/angle:OPLSAA/80-81-85   34       #"oplsaa.lt", line 106
+@/angle:OPLSAA/81-80-85   35       #"oplsaa.lt", line 107
+@/angle:OPLSAA/81-81-85   36       #"oplsaa.lt", line 108
+@/dihedral:OPLSAA/0-13-13-13   1       #"oplsaa.lt", line 151
+@/dihedral:OPLSAA/0-13-13-10   2       #"oplsaa.lt", line 152
+@/dihedral:OPLSAA/13-13-13-13   3       #"oplsaa.lt", line 153
+@/dihedral:OPLSAA/13-13-13-10   4       #"oplsaa.lt", line 154
+@/dihedral:OPLSAA/13-13-13-15   5       #"oplsaa.lt", line 155
+@/dihedral:OPLSAA/13-13-13-80   6       #"oplsaa.lt", line 156
+@/dihedral:OPLSAA/13-13-13-81   7       #"oplsaa.lt", line 157
+@/dihedral:OPLSAA/10-13-13-10   8       #"oplsaa.lt", line 158
+@/dihedral:OPLSAA/15-13-13-15   9       #"oplsaa.lt", line 159
+@/dihedral:OPLSAA/0-13-15-13   10       #"oplsaa.lt", line 160
+@/dihedral:OPLSAA/13-13-15-13   11       #"oplsaa.lt", line 161
+@/dihedral:OPLSAA/13-13-80-13   12       #"oplsaa.lt", line 162
+@/dihedral:OPLSAA/13-13-81-13   13       #"oplsaa.lt", line 163
+@/dihedral:OPLSAA/0-80-80-80   14       #"oplsaa.lt", line 164
+@/dihedral:OPLSAA/0-80-80-81   15       #"oplsaa.lt", line 165
+@/dihedral:OPLSAA/0-80-81-80   16       #"oplsaa.lt", line 166
+@/dihedral:OPLSAA/0-80-81-81   17       #"oplsaa.lt", line 167
+@/dihedral:OPLSAA/0-81-80-80   18       #"oplsaa.lt", line 168
+@/dihedral:OPLSAA/0-81-80-81   19       #"oplsaa.lt", line 169
+@/dihedral:OPLSAA/0-81-81-80   20       #"oplsaa.lt", line 170
+@/dihedral:OPLSAA/0-81-81-81   21       #"oplsaa.lt", line 171
+@/dihedral:OPLSAA/80-80-80-80   22       #"oplsaa.lt", line 172
+@/dihedral:OPLSAA/80-80-80-81   23       #"oplsaa.lt", line 173
+@/dihedral:OPLSAA/80-80-81-80   24       #"oplsaa.lt", line 174
+@/dihedral:OPLSAA/80-80-81-81   25       #"oplsaa.lt", line 175
+@/dihedral:OPLSAA/80-81-80-80   26       #"oplsaa.lt", line 176
+@/dihedral:OPLSAA/80-81-80-81   27       #"oplsaa.lt", line 177
+@/dihedral:OPLSAA/80-81-81-80   28       #"oplsaa.lt", line 178
+@/dihedral:OPLSAA/80-81-81-81   29       #"oplsaa.lt", line 179
+@/dihedral:OPLSAA/81-80-80-80   30       #"oplsaa.lt", line 180
+@/dihedral:OPLSAA/81-80-80-81   31       #"oplsaa.lt", line 181
+@/dihedral:OPLSAA/81-80-81-80   32       #"oplsaa.lt", line 182
+@/dihedral:OPLSAA/81-80-81-81   33       #"oplsaa.lt", line 183
+@/dihedral:OPLSAA/81-81-80-80   34       #"oplsaa.lt", line 184
+@/dihedral:OPLSAA/81-81-80-81   35       #"oplsaa.lt", line 185
+@/dihedral:OPLSAA/81-81-81-80   36       #"oplsaa.lt", line 186
+@/dihedral:OPLSAA/81-81-81-81   37       #"oplsaa.lt", line 187
+@/dihedral:OPLSAA/80-80-80-85   38       #"oplsaa.lt", line 188
+@/dihedral:OPLSAA/80-80-81-85   39       #"oplsaa.lt", line 189
+@/dihedral:OPLSAA/80-81-80-85   40       #"oplsaa.lt", line 190
+@/dihedral:OPLSAA/80-81-81-85   41       #"oplsaa.lt", line 191
+@/dihedral:OPLSAA/81-80-80-85   42       #"oplsaa.lt", line 192
+@/dihedral:OPLSAA/81-80-81-85   43       #"oplsaa.lt", line 193
+@/dihedral:OPLSAA/81-81-80-85   44       #"oplsaa.lt", line 194
+@/dihedral:OPLSAA/81-81-81-85   45       #"oplsaa.lt", line 195
+@/dihedral:OPLSAA/85-80-80-85   46       #"oplsaa.lt", line 196
+@/dihedral:OPLSAA/85-80-81-85   47       #"oplsaa.lt", line 197
+@/dihedral:OPLSAA/85-81-80-85   48       #"oplsaa.lt", line 198
+@/dihedral:OPLSAA/85-81-81-85   49       #"oplsaa.lt", line 199
+$/mol:polymer_1   1       #"poly_1.lt", line 8
+$/mol:polymer_2   2       #"poly_2.lt", line 8
+$/mol:polymer_3   3       #"poly_3.lt", line 8
+$/mol:polymer_4   4       #"poly_4.lt", line 8
+$/mol:polymer_5   5       #"poly_5.lt", line 8
+$/mol:polymer_6   6       #"poly_6.lt", line 8
+$/mol:polymer_7   7       #"poly_7.lt", line 8
+$/atom:polymer_1/monomer[0]/C1   1       #"PPUAle.lt", line 8
+$/atom:polymer_1/monomer[0]/C2   2       #"PPUAle.lt", line 9
+$/atom:polymer_1/monomer[0]/C6   3       #"PPUAle.lt", line 10
+$/atom:polymer_1/monomer[1]/C1   4       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[1]/C2   5       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[1]/C6   6       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[2]/C1   7       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[2]/C2   8       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[2]/C6   9       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[3]/C1   10       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[3]/C2   11       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[3]/C6   12       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[4]/C1   13       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[4]/C2   14       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[4]/C6   15       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[5]/C1   16       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[5]/C2   17       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[5]/C6   18       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[6]/C1   19       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[6]/C2   20       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[6]/C6   21       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[7]/C1   22       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[7]/C2   23       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[7]/C6   24       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[8]/C1   25       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[8]/C2   26       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[8]/C6   27       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[9]/C1   28       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[9]/C2   29       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[9]/C6   30       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[10]/C1   31       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[10]/C2   32       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[10]/C6   33       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[11]/C1   34       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[11]/C2   35       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[11]/C6   36       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[12]/C1   37       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[12]/C2   38       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[12]/C6   39       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[13]/C1   40       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[13]/C2   41       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[13]/C6   42       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[14]/C1   43       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[14]/C2   44       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[14]/C6   45       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[15]/C1   46       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[15]/C2   47       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[15]/C6   48       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[16]/C1   49       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[16]/C2   50       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[16]/C6   51       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[17]/C1   52       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[17]/C2   53       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[17]/C6   54       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[18]/C1   55       #"PPUAi.lt", line 8
+$/atom:polymer_1/monomer[18]/C2   56       #"PPUAi.lt", line 9
+$/atom:polymer_1/monomer[18]/C6   57       #"PPUAi.lt", line 10
+$/atom:polymer_1/monomer[19]/C1   58       #"PPUAre.lt", line 8
+$/atom:polymer_1/monomer[19]/C2   59       #"PPUAre.lt", line 9
+$/atom:polymer_1/monomer[19]/C6   60       #"PPUAre.lt", line 10
+$/atom:polymer_2/monomer[0]/C1   61       #"PPUAle.lt", line 8
+$/atom:polymer_2/monomer[0]/C2   62       #"PPUAle.lt", line 9
+$/atom:polymer_2/monomer[0]/C6   63       #"PPUAle.lt", line 10
+$/atom:polymer_2/monomer[1]/C1   64       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[1]/C2   65       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[1]/C6   66       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[2]/C1   67       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[2]/C2   68       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[2]/C6   69       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[3]/C1   70       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[3]/C2   71       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[3]/C6   72       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[4]/C1   73       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[4]/C2   74       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[4]/C6   75       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[5]/C1   76       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[5]/C2   77       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[5]/C6   78       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[6]/C1   79       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[6]/C2   80       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[6]/C6   81       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[7]/C1   82       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[7]/C2   83       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[7]/C6   84       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[8]/C1   85       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[8]/C2   86       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[8]/C6   87       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[9]/C1   88       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[9]/C2   89       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[9]/C6   90       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[10]/C1   91       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[10]/C2   92       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[10]/C6   93       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[11]/C1   94       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[11]/C2   95       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[11]/C6   96       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[12]/C1   97       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[12]/C2   98       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[12]/C6   99       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[13]/C1   100       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[13]/C2   101       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[13]/C6   102       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[14]/C1   103       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[14]/C2   104       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[14]/C6   105       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[15]/C1   106       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[15]/C2   107       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[15]/C6   108       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[16]/C1   109       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[16]/C2   110       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[16]/C6   111       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[17]/C1   112       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[17]/C2   113       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[17]/C6   114       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[18]/C1   115       #"PPUAi.lt", line 8
+$/atom:polymer_2/monomer[18]/C2   116       #"PPUAi.lt", line 9
+$/atom:polymer_2/monomer[18]/C6   117       #"PPUAi.lt", line 10
+$/atom:polymer_2/monomer[19]/C1   118       #"PPUAre.lt", line 8
+$/atom:polymer_2/monomer[19]/C2   119       #"PPUAre.lt", line 9
+$/atom:polymer_2/monomer[19]/C6   120       #"PPUAre.lt", line 10
+$/atom:polymer_3/monomer[0]/C1   121       #"PEUAle.lt", line 8
+$/atom:polymer_3/monomer[0]/C2   122       #"PEUAle.lt", line 9
+$/atom:polymer_3/monomer[1]/C1   123       #"PEUAi.lt", line 8
+$/atom:polymer_3/monomer[1]/C2   124       #"PEUAi.lt", line 9
+$/atom:polymer_3/monomer[2]/C1   125       #"PEUAi.lt", line 8
+$/atom:polymer_3/monomer[2]/C2   126       #"PEUAi.lt", line 9
+$/atom:polymer_3/monomer[3]/C1   127       #"PEUAi.lt", line 8
+$/atom:polymer_3/monomer[3]/C2   128       #"PEUAi.lt", line 9
+$/atom:polymer_3/monomer[4]/C1   129       #"PEUAi.lt", line 8
+$/atom:polymer_3/monomer[4]/C2   130       #"PEUAi.lt", line 9
+$/atom:polymer_3/monomer[5]/C1   131       #"PEUAi.lt", line 8
+$/atom:polymer_3/monomer[5]/C2   132       #"PEUAi.lt", line 9
+$/atom:polymer_3/monomer[6]/C1   133       #"PEUAi.lt", line 8
+$/atom:polymer_3/monomer[6]/C2   134       #"PEUAi.lt", line 9
+$/atom:polymer_3/monomer[7]/C1   135       #"PEUAi.lt", line 8
+$/atom:polymer_3/monomer[7]/C2   136       #"PEUAi.lt", line 9
+$/atom:polymer_3/monomer[8]/C1   137       #"PEUAi.lt", line 8
+$/atom:polymer_3/monomer[8]/C2   138       #"PEUAi.lt", line 9
+$/atom:polymer_3/monomer[9]/C1   139       #"PEUAre.lt", line 8
+$/atom:polymer_3/monomer[9]/C2   140       #"PEUAre.lt", line 9
+$/atom:polymer_4/monomer[0]/C1   141       #"PEUAle.lt", line 8
+$/atom:polymer_4/monomer[0]/C2   142       #"PEUAle.lt", line 9
+$/atom:polymer_4/monomer[1]/C1   143       #"PEUAi.lt", line 8
+$/atom:polymer_4/monomer[1]/C2   144       #"PEUAi.lt", line 9
+$/atom:polymer_4/monomer[2]/C1   145       #"PEUAi.lt", line 8
+$/atom:polymer_4/monomer[2]/C2   146       #"PEUAi.lt", line 9
+$/atom:polymer_4/monomer[3]/C1   147       #"PEUAi.lt", line 8
+$/atom:polymer_4/monomer[3]/C2   148       #"PEUAi.lt", line 9
+$/atom:polymer_4/monomer[4]/C1   149       #"PEUAi.lt", line 8
+$/atom:polymer_4/monomer[4]/C2   150       #"PEUAi.lt", line 9
+$/atom:polymer_4/monomer[5]/C1   151       #"PEUAi.lt", line 8
+$/atom:polymer_4/monomer[5]/C2   152       #"PEUAi.lt", line 9
+$/atom:polymer_4/monomer[6]/C1   153       #"PEUAi.lt", line 8
+$/atom:polymer_4/monomer[6]/C2   154       #"PEUAi.lt", line 9
+$/atom:polymer_4/monomer[7]/C1   155       #"PEUAi.lt", line 8
+$/atom:polymer_4/monomer[7]/C2   156       #"PEUAi.lt", line 9
+$/atom:polymer_4/monomer[8]/C1   157       #"PEUAi.lt", line 8
+$/atom:polymer_4/monomer[8]/C2   158       #"PEUAi.lt", line 9
+$/atom:polymer_4/monomer[9]/C1   159       #"PEUAre.lt", line 8
+$/atom:polymer_4/monomer[9]/C2   160       #"PEUAre.lt", line 9
+$/atom:polymer_5/monomer[0]/C1   161       #"PEAAle.lt", line 8
+$/atom:polymer_5/monomer[0]/C2   162       #"PEAAle.lt", line 9
+$/atom:polymer_5/monomer[0]/H3   163       #"PEAAle.lt", line 10
+$/atom:polymer_5/monomer[0]/H4   164       #"PEAAle.lt", line 11
+$/atom:polymer_5/monomer[0]/H5   165       #"PEAAle.lt", line 12
+$/atom:polymer_5/monomer[0]/H6   166       #"PEAAle.lt", line 13
+$/atom:polymer_5/monomer[0]/H7   167       #"PEAAle.lt", line 14
+$/atom:polymer_5/monomer[1]/C1   168       #"PEAAi.lt", line 8
+$/atom:polymer_5/monomer[1]/C2   169       #"PEAAi.lt", line 9
+$/atom:polymer_5/monomer[1]/H3   170       #"PEAAi.lt", line 10
+$/atom:polymer_5/monomer[1]/H4   171       #"PEAAi.lt", line 11
+$/atom:polymer_5/monomer[1]/H5   172       #"PEAAi.lt", line 12
+$/atom:polymer_5/monomer[1]/H6   173       #"PEAAi.lt", line 13
+$/atom:polymer_5/monomer[2]/C1   174       #"PEAAi.lt", line 8
+$/atom:polymer_5/monomer[2]/C2   175       #"PEAAi.lt", line 9
+$/atom:polymer_5/monomer[2]/H3   176       #"PEAAi.lt", line 10
+$/atom:polymer_5/monomer[2]/H4   177       #"PEAAi.lt", line 11
+$/atom:polymer_5/monomer[2]/H5   178       #"PEAAi.lt", line 12
+$/atom:polymer_5/monomer[2]/H6   179       #"PEAAi.lt", line 13
+$/atom:polymer_5/monomer[3]/C1   180       #"PEAAi.lt", line 8
+$/atom:polymer_5/monomer[3]/C2   181       #"PEAAi.lt", line 9
+$/atom:polymer_5/monomer[3]/H3   182       #"PEAAi.lt", line 10
+$/atom:polymer_5/monomer[3]/H4   183       #"PEAAi.lt", line 11
+$/atom:polymer_5/monomer[3]/H5   184       #"PEAAi.lt", line 12
+$/atom:polymer_5/monomer[3]/H6   185       #"PEAAi.lt", line 13
+$/atom:polymer_5/monomer[4]/C1   186       #"PEAAi.lt", line 8
+$/atom:polymer_5/monomer[4]/C2   187       #"PEAAi.lt", line 9
+$/atom:polymer_5/monomer[4]/H3   188       #"PEAAi.lt", line 10
+$/atom:polymer_5/monomer[4]/H4   189       #"PEAAi.lt", line 11
+$/atom:polymer_5/monomer[4]/H5   190       #"PEAAi.lt", line 12
+$/atom:polymer_5/monomer[4]/H6   191       #"PEAAi.lt", line 13
+$/atom:polymer_5/monomer[5]/C1   192       #"PEAAi.lt", line 8
+$/atom:polymer_5/monomer[5]/C2   193       #"PEAAi.lt", line 9
+$/atom:polymer_5/monomer[5]/H3   194       #"PEAAi.lt", line 10
+$/atom:polymer_5/monomer[5]/H4   195       #"PEAAi.lt", line 11
+$/atom:polymer_5/monomer[5]/H5   196       #"PEAAi.lt", line 12
+$/atom:polymer_5/monomer[5]/H6   197       #"PEAAi.lt", line 13
+$/atom:polymer_5/monomer[6]/C1   198       #"PEAAi.lt", line 8
+$/atom:polymer_5/monomer[6]/C2   199       #"PEAAi.lt", line 9
+$/atom:polymer_5/monomer[6]/H3   200       #"PEAAi.lt", line 10
+$/atom:polymer_5/monomer[6]/H4   201       #"PEAAi.lt", line 11
+$/atom:polymer_5/monomer[6]/H5   202       #"PEAAi.lt", line 12
+$/atom:polymer_5/monomer[6]/H6   203       #"PEAAi.lt", line 13
+$/atom:polymer_5/monomer[7]/C1   204       #"PEAAi.lt", line 8
+$/atom:polymer_5/monomer[7]/C2   205       #"PEAAi.lt", line 9
+$/atom:polymer_5/monomer[7]/H3   206       #"PEAAi.lt", line 10
+$/atom:polymer_5/monomer[7]/H4   207       #"PEAAi.lt", line 11
+$/atom:polymer_5/monomer[7]/H5   208       #"PEAAi.lt", line 12
+$/atom:polymer_5/monomer[7]/H6   209       #"PEAAi.lt", line 13
+$/atom:polymer_5/monomer[8]/C1   210       #"PEAAi.lt", line 8
+$/atom:polymer_5/monomer[8]/C2   211       #"PEAAi.lt", line 9
+$/atom:polymer_5/monomer[8]/H3   212       #"PEAAi.lt", line 10
+$/atom:polymer_5/monomer[8]/H4   213       #"PEAAi.lt", line 11
+$/atom:polymer_5/monomer[8]/H5   214       #"PEAAi.lt", line 12
+$/atom:polymer_5/monomer[8]/H6   215       #"PEAAi.lt", line 13
+$/atom:polymer_5/monomer[9]/C1   216       #"PEAAi.lt", line 8
+$/atom:polymer_5/monomer[9]/C2   217       #"PEAAi.lt", line 9
+$/atom:polymer_5/monomer[9]/H3   218       #"PEAAi.lt", line 10
+$/atom:polymer_5/monomer[9]/H4   219       #"PEAAi.lt", line 11
+$/atom:polymer_5/monomer[9]/H5   220       #"PEAAi.lt", line 12
+$/atom:polymer_5/monomer[9]/H6   221       #"PEAAi.lt", line 13
+$/atom:polymer_5/monomer[10]/C1   222       #"PEAAi.lt", line 8
+$/atom:polymer_5/monomer[10]/C2   223       #"PEAAi.lt", line 9
+$/atom:polymer_5/monomer[10]/H3   224       #"PEAAi.lt", line 10
+$/atom:polymer_5/monomer[10]/H4   225       #"PEAAi.lt", line 11
+$/atom:polymer_5/monomer[10]/H5   226       #"PEAAi.lt", line 12
+$/atom:polymer_5/monomer[10]/H6   227       #"PEAAi.lt", line 13
+$/atom:polymer_5/monomer[11]/C1   228       #"PEAAi.lt", line 8
+$/atom:polymer_5/monomer[11]/C2   229       #"PEAAi.lt", line 9
+$/atom:polymer_5/monomer[11]/H3   230       #"PEAAi.lt", line 10
+$/atom:polymer_5/monomer[11]/H4   231       #"PEAAi.lt", line 11
+$/atom:polymer_5/monomer[11]/H5   232       #"PEAAi.lt", line 12
+$/atom:polymer_5/monomer[11]/H6   233       #"PEAAi.lt", line 13
+$/atom:polymer_5/monomer[12]/C1   234       #"PEAAi.lt", line 8
+$/atom:polymer_5/monomer[12]/C2   235       #"PEAAi.lt", line 9
+$/atom:polymer_5/monomer[12]/H3   236       #"PEAAi.lt", line 10
+$/atom:polymer_5/monomer[12]/H4   237       #"PEAAi.lt", line 11
+$/atom:polymer_5/monomer[12]/H5   238       #"PEAAi.lt", line 12
+$/atom:polymer_5/monomer[12]/H6   239       #"PEAAi.lt", line 13
+$/atom:polymer_5/monomer[13]/C1   240       #"PEAAi.lt", line 8
+$/atom:polymer_5/monomer[13]/C2   241       #"PEAAi.lt", line 9
+$/atom:polymer_5/monomer[13]/H3   242       #"PEAAi.lt", line 10
+$/atom:polymer_5/monomer[13]/H4   243       #"PEAAi.lt", line 11
+$/atom:polymer_5/monomer[13]/H5   244       #"PEAAi.lt", line 12
+$/atom:polymer_5/monomer[13]/H6   245       #"PEAAi.lt", line 13
+$/atom:polymer_5/monomer[14]/C1   246       #"PEAAre.lt", line 8
+$/atom:polymer_5/monomer[14]/C2   247       #"PEAAre.lt", line 9
+$/atom:polymer_5/monomer[14]/H3   248       #"PEAAre.lt", line 10
+$/atom:polymer_5/monomer[14]/H4   249       #"PEAAre.lt", line 11
+$/atom:polymer_5/monomer[14]/H5   250       #"PEAAre.lt", line 12
+$/atom:polymer_5/monomer[14]/H6   251       #"PEAAre.lt", line 13
+$/atom:polymer_5/monomer[14]/H7   252       #"PEAAre.lt", line 14
+$/atom:polymer_6/monomer[0]/C1   253       #"PEAAle.lt", line 8
+$/atom:polymer_6/monomer[0]/C2   254       #"PEAAle.lt", line 9
+$/atom:polymer_6/monomer[0]/H3   255       #"PEAAle.lt", line 10
+$/atom:polymer_6/monomer[0]/H4   256       #"PEAAle.lt", line 11
+$/atom:polymer_6/monomer[0]/H5   257       #"PEAAle.lt", line 12
+$/atom:polymer_6/monomer[0]/H6   258       #"PEAAle.lt", line 13
+$/atom:polymer_6/monomer[0]/H7   259       #"PEAAle.lt", line 14
+$/atom:polymer_6/monomer[1]/C1   260       #"PEAAi.lt", line 8
+$/atom:polymer_6/monomer[1]/C2   261       #"PEAAi.lt", line 9
+$/atom:polymer_6/monomer[1]/H3   262       #"PEAAi.lt", line 10
+$/atom:polymer_6/monomer[1]/H4   263       #"PEAAi.lt", line 11
+$/atom:polymer_6/monomer[1]/H5   264       #"PEAAi.lt", line 12
+$/atom:polymer_6/monomer[1]/H6   265       #"PEAAi.lt", line 13
+$/atom:polymer_6/monomer[2]/C1   266       #"PEAAi.lt", line 8
+$/atom:polymer_6/monomer[2]/C2   267       #"PEAAi.lt", line 9
+$/atom:polymer_6/monomer[2]/H3   268       #"PEAAi.lt", line 10
+$/atom:polymer_6/monomer[2]/H4   269       #"PEAAi.lt", line 11
+$/atom:polymer_6/monomer[2]/H5   270       #"PEAAi.lt", line 12
+$/atom:polymer_6/monomer[2]/H6   271       #"PEAAi.lt", line 13
+$/atom:polymer_6/monomer[3]/C1   272       #"PEAAi.lt", line 8
+$/atom:polymer_6/monomer[3]/C2   273       #"PEAAi.lt", line 9
+$/atom:polymer_6/monomer[3]/H3   274       #"PEAAi.lt", line 10
+$/atom:polymer_6/monomer[3]/H4   275       #"PEAAi.lt", line 11
+$/atom:polymer_6/monomer[3]/H5   276       #"PEAAi.lt", line 12
+$/atom:polymer_6/monomer[3]/H6   277       #"PEAAi.lt", line 13
+$/atom:polymer_6/monomer[4]/C1   278       #"PEAAi.lt", line 8
+$/atom:polymer_6/monomer[4]/C2   279       #"PEAAi.lt", line 9
+$/atom:polymer_6/monomer[4]/H3   280       #"PEAAi.lt", line 10
+$/atom:polymer_6/monomer[4]/H4   281       #"PEAAi.lt", line 11
+$/atom:polymer_6/monomer[4]/H5   282       #"PEAAi.lt", line 12
+$/atom:polymer_6/monomer[4]/H6   283       #"PEAAi.lt", line 13
+$/atom:polymer_6/monomer[5]/C1   284       #"PEAAi.lt", line 8
+$/atom:polymer_6/monomer[5]/C2   285       #"PEAAi.lt", line 9
+$/atom:polymer_6/monomer[5]/H3   286       #"PEAAi.lt", line 10
+$/atom:polymer_6/monomer[5]/H4   287       #"PEAAi.lt", line 11
+$/atom:polymer_6/monomer[5]/H5   288       #"PEAAi.lt", line 12
+$/atom:polymer_6/monomer[5]/H6   289       #"PEAAi.lt", line 13
+$/atom:polymer_6/monomer[6]/C1   290       #"PEAAi.lt", line 8
+$/atom:polymer_6/monomer[6]/C2   291       #"PEAAi.lt", line 9
+$/atom:polymer_6/monomer[6]/H3   292       #"PEAAi.lt", line 10
+$/atom:polymer_6/monomer[6]/H4   293       #"PEAAi.lt", line 11
+$/atom:polymer_6/monomer[6]/H5   294       #"PEAAi.lt", line 12
+$/atom:polymer_6/monomer[6]/H6   295       #"PEAAi.lt", line 13
+$/atom:polymer_6/monomer[7]/C1   296       #"PEAAi.lt", line 8
+$/atom:polymer_6/monomer[7]/C2   297       #"PEAAi.lt", line 9
+$/atom:polymer_6/monomer[7]/H3   298       #"PEAAi.lt", line 10
+$/atom:polymer_6/monomer[7]/H4   299       #"PEAAi.lt", line 11
+$/atom:polymer_6/monomer[7]/H5   300       #"PEAAi.lt", line 12
+$/atom:polymer_6/monomer[7]/H6   301       #"PEAAi.lt", line 13
+$/atom:polymer_6/monomer[8]/C1   302       #"PEAAi.lt", line 8
+$/atom:polymer_6/monomer[8]/C2   303       #"PEAAi.lt", line 9
+$/atom:polymer_6/monomer[8]/H3   304       #"PEAAi.lt", line 10
+$/atom:polymer_6/monomer[8]/H4   305       #"PEAAi.lt", line 11
+$/atom:polymer_6/monomer[8]/H5   306       #"PEAAi.lt", line 12
+$/atom:polymer_6/monomer[8]/H6   307       #"PEAAi.lt", line 13
+$/atom:polymer_6/monomer[9]/C1   308       #"PEAAi.lt", line 8
+$/atom:polymer_6/monomer[9]/C2   309       #"PEAAi.lt", line 9
+$/atom:polymer_6/monomer[9]/H3   310       #"PEAAi.lt", line 10
+$/atom:polymer_6/monomer[9]/H4   311       #"PEAAi.lt", line 11
+$/atom:polymer_6/monomer[9]/H5   312       #"PEAAi.lt", line 12
+$/atom:polymer_6/monomer[9]/H6   313       #"PEAAi.lt", line 13
+$/atom:polymer_6/monomer[10]/C1   314       #"PEAAi.lt", line 8
+$/atom:polymer_6/monomer[10]/C2   315       #"PEAAi.lt", line 9
+$/atom:polymer_6/monomer[10]/H3   316       #"PEAAi.lt", line 10
+$/atom:polymer_6/monomer[10]/H4   317       #"PEAAi.lt", line 11
+$/atom:polymer_6/monomer[10]/H5   318       #"PEAAi.lt", line 12
+$/atom:polymer_6/monomer[10]/H6   319       #"PEAAi.lt", line 13
+$/atom:polymer_6/monomer[11]/C1   320       #"PEAAi.lt", line 8
+$/atom:polymer_6/monomer[11]/C2   321       #"PEAAi.lt", line 9
+$/atom:polymer_6/monomer[11]/H3   322       #"PEAAi.lt", line 10
+$/atom:polymer_6/monomer[11]/H4   323       #"PEAAi.lt", line 11
+$/atom:polymer_6/monomer[11]/H5   324       #"PEAAi.lt", line 12
+$/atom:polymer_6/monomer[11]/H6   325       #"PEAAi.lt", line 13
+$/atom:polymer_6/monomer[12]/C1   326       #"PEAAi.lt", line 8
+$/atom:polymer_6/monomer[12]/C2   327       #"PEAAi.lt", line 9
+$/atom:polymer_6/monomer[12]/H3   328       #"PEAAi.lt", line 10
+$/atom:polymer_6/monomer[12]/H4   329       #"PEAAi.lt", line 11
+$/atom:polymer_6/monomer[12]/H5   330       #"PEAAi.lt", line 12
+$/atom:polymer_6/monomer[12]/H6   331       #"PEAAi.lt", line 13
+$/atom:polymer_6/monomer[13]/C1   332       #"PEAAi.lt", line 8
+$/atom:polymer_6/monomer[13]/C2   333       #"PEAAi.lt", line 9
+$/atom:polymer_6/monomer[13]/H3   334       #"PEAAi.lt", line 10
+$/atom:polymer_6/monomer[13]/H4   335       #"PEAAi.lt", line 11
+$/atom:polymer_6/monomer[13]/H5   336       #"PEAAi.lt", line 12
+$/atom:polymer_6/monomer[13]/H6   337       #"PEAAi.lt", line 13
+$/atom:polymer_6/monomer[14]/C1   338       #"PEAAre.lt", line 8
+$/atom:polymer_6/monomer[14]/C2   339       #"PEAAre.lt", line 9
+$/atom:polymer_6/monomer[14]/H3   340       #"PEAAre.lt", line 10
+$/atom:polymer_6/monomer[14]/H4   341       #"PEAAre.lt", line 11
+$/atom:polymer_6/monomer[14]/H5   342       #"PEAAre.lt", line 12
+$/atom:polymer_6/monomer[14]/H6   343       #"PEAAre.lt", line 13
+$/atom:polymer_6/monomer[14]/H7   344       #"PEAAre.lt", line 14
+$/atom:polymer_7/monomer[0]/C1   345       #"PEAAle.lt", line 8
+$/atom:polymer_7/monomer[0]/C2   346       #"PEAAle.lt", line 9
+$/atom:polymer_7/monomer[0]/H3   347       #"PEAAle.lt", line 10
+$/atom:polymer_7/monomer[0]/H4   348       #"PEAAle.lt", line 11
+$/atom:polymer_7/monomer[0]/H5   349       #"PEAAle.lt", line 12
+$/atom:polymer_7/monomer[0]/H6   350       #"PEAAle.lt", line 13
+$/atom:polymer_7/monomer[0]/H7   351       #"PEAAle.lt", line 14
+$/atom:polymer_7/monomer[1]/C1   352       #"PEAAi.lt", line 8
+$/atom:polymer_7/monomer[1]/C2   353       #"PEAAi.lt", line 9
+$/atom:polymer_7/monomer[1]/H3   354       #"PEAAi.lt", line 10
+$/atom:polymer_7/monomer[1]/H4   355       #"PEAAi.lt", line 11
+$/atom:polymer_7/monomer[1]/H5   356       #"PEAAi.lt", line 12
+$/atom:polymer_7/monomer[1]/H6   357       #"PEAAi.lt", line 13
+$/atom:polymer_7/monomer[2]/C1   358       #"PEAAi.lt", line 8
+$/atom:polymer_7/monomer[2]/C2   359       #"PEAAi.lt", line 9
+$/atom:polymer_7/monomer[2]/H3   360       #"PEAAi.lt", line 10
+$/atom:polymer_7/monomer[2]/H4   361       #"PEAAi.lt", line 11
+$/atom:polymer_7/monomer[2]/H5   362       #"PEAAi.lt", line 12
+$/atom:polymer_7/monomer[2]/H6   363       #"PEAAi.lt", line 13
+$/atom:polymer_7/monomer[3]/C1   364       #"PEAAi.lt", line 8
+$/atom:polymer_7/monomer[3]/C2   365       #"PEAAi.lt", line 9
+$/atom:polymer_7/monomer[3]/H3   366       #"PEAAi.lt", line 10
+$/atom:polymer_7/monomer[3]/H4   367       #"PEAAi.lt", line 11
+$/atom:polymer_7/monomer[3]/H5   368       #"PEAAi.lt", line 12
+$/atom:polymer_7/monomer[3]/H6   369       #"PEAAi.lt", line 13
+$/atom:polymer_7/monomer[4]/C1   370       #"PEAAi.lt", line 8
+$/atom:polymer_7/monomer[4]/C2   371       #"PEAAi.lt", line 9
+$/atom:polymer_7/monomer[4]/H3   372       #"PEAAi.lt", line 10
+$/atom:polymer_7/monomer[4]/H4   373       #"PEAAi.lt", line 11
+$/atom:polymer_7/monomer[4]/H5   374       #"PEAAi.lt", line 12
+$/atom:polymer_7/monomer[4]/H6   375       #"PEAAi.lt", line 13
+$/atom:polymer_7/monomer[5]/C1   376       #"PEAAi.lt", line 8
+$/atom:polymer_7/monomer[5]/C2   377       #"PEAAi.lt", line 9
+$/atom:polymer_7/monomer[5]/H3   378       #"PEAAi.lt", line 10
+$/atom:polymer_7/monomer[5]/H4   379       #"PEAAi.lt", line 11
+$/atom:polymer_7/monomer[5]/H5   380       #"PEAAi.lt", line 12
+$/atom:polymer_7/monomer[5]/H6   381       #"PEAAi.lt", line 13
+$/atom:polymer_7/monomer[6]/C1   382       #"PEAAi.lt", line 8
+$/atom:polymer_7/monomer[6]/C2   383       #"PEAAi.lt", line 9
+$/atom:polymer_7/monomer[6]/H3   384       #"PEAAi.lt", line 10
+$/atom:polymer_7/monomer[6]/H4   385       #"PEAAi.lt", line 11
+$/atom:polymer_7/monomer[6]/H5   386       #"PEAAi.lt", line 12
+$/atom:polymer_7/monomer[6]/H6   387       #"PEAAi.lt", line 13
+$/atom:polymer_7/monomer[7]/C1   388       #"PEAAi.lt", line 8
+$/atom:polymer_7/monomer[7]/C2   389       #"PEAAi.lt", line 9
+$/atom:polymer_7/monomer[7]/H3   390       #"PEAAi.lt", line 10
+$/atom:polymer_7/monomer[7]/H4   391       #"PEAAi.lt", line 11
+$/atom:polymer_7/monomer[7]/H5   392       #"PEAAi.lt", line 12
+$/atom:polymer_7/monomer[7]/H6   393       #"PEAAi.lt", line 13
+$/atom:polymer_7/monomer[8]/C1   394       #"PEAAi.lt", line 8
+$/atom:polymer_7/monomer[8]/C2   395       #"PEAAi.lt", line 9
+$/atom:polymer_7/monomer[8]/H3   396       #"PEAAi.lt", line 10
+$/atom:polymer_7/monomer[8]/H4   397       #"PEAAi.lt", line 11
+$/atom:polymer_7/monomer[8]/H5   398       #"PEAAi.lt", line 12
+$/atom:polymer_7/monomer[8]/H6   399       #"PEAAi.lt", line 13
+$/atom:polymer_7/monomer[9]/C1   400       #"PEAAi.lt", line 8
+$/atom:polymer_7/monomer[9]/C2   401       #"PEAAi.lt", line 9
+$/atom:polymer_7/monomer[9]/H3   402       #"PEAAi.lt", line 10
+$/atom:polymer_7/monomer[9]/H4   403       #"PEAAi.lt", line 11
+$/atom:polymer_7/monomer[9]/H5   404       #"PEAAi.lt", line 12
+$/atom:polymer_7/monomer[9]/H6   405       #"PEAAi.lt", line 13
+$/atom:polymer_7/monomer[10]/C1   406       #"PEAAi.lt", line 8
+$/atom:polymer_7/monomer[10]/C2   407       #"PEAAi.lt", line 9
+$/atom:polymer_7/monomer[10]/H3   408       #"PEAAi.lt", line 10
+$/atom:polymer_7/monomer[10]/H4   409       #"PEAAi.lt", line 11
+$/atom:polymer_7/monomer[10]/H5   410       #"PEAAi.lt", line 12
+$/atom:polymer_7/monomer[10]/H6   411       #"PEAAi.lt", line 13
+$/atom:polymer_7/monomer[11]/C1   412       #"PEAAi.lt", line 8
+$/atom:polymer_7/monomer[11]/C2   413       #"PEAAi.lt", line 9
+$/atom:polymer_7/monomer[11]/H3   414       #"PEAAi.lt", line 10
+$/atom:polymer_7/monomer[11]/H4   415       #"PEAAi.lt", line 11
+$/atom:polymer_7/monomer[11]/H5   416       #"PEAAi.lt", line 12
+$/atom:polymer_7/monomer[11]/H6   417       #"PEAAi.lt", line 13
+$/atom:polymer_7/monomer[12]/C1   418       #"PEAAi.lt", line 8
+$/atom:polymer_7/monomer[12]/C2   419       #"PEAAi.lt", line 9
+$/atom:polymer_7/monomer[12]/H3   420       #"PEAAi.lt", line 10
+$/atom:polymer_7/monomer[12]/H4   421       #"PEAAi.lt", line 11
+$/atom:polymer_7/monomer[12]/H5   422       #"PEAAi.lt", line 12
+$/atom:polymer_7/monomer[12]/H6   423       #"PEAAi.lt", line 13
+$/atom:polymer_7/monomer[13]/C1   424       #"PEAAi.lt", line 8
+$/atom:polymer_7/monomer[13]/C2   425       #"PEAAi.lt", line 9
+$/atom:polymer_7/monomer[13]/H3   426       #"PEAAi.lt", line 10
+$/atom:polymer_7/monomer[13]/H4   427       #"PEAAi.lt", line 11
+$/atom:polymer_7/monomer[13]/H5   428       #"PEAAi.lt", line 12
+$/atom:polymer_7/monomer[13]/H6   429       #"PEAAi.lt", line 13
+$/atom:polymer_7/monomer[14]/C1   430       #"PEAAre.lt", line 8
+$/atom:polymer_7/monomer[14]/C2   431       #"PEAAre.lt", line 9
+$/atom:polymer_7/monomer[14]/H3   432       #"PEAAre.lt", line 10
+$/atom:polymer_7/monomer[14]/H4   433       #"PEAAre.lt", line 11
+$/atom:polymer_7/monomer[14]/H5   434       #"PEAAre.lt", line 12
+$/atom:polymer_7/monomer[14]/H6   435       #"PEAAre.lt", line 13
+$/atom:polymer_7/monomer[14]/H7   436       #"PEAAre.lt", line 14
+$/bond:polymer_1/monomer[0]/1   1       #"PPUAle.lt", line 15
+$/bond:polymer_1/monomer[0]/5   2       #"PPUAle.lt", line 16
+$/bond:polymer_1/monomer[1]/1   3       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[1]/5   4       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[2]/1   5       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[2]/5   6       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[3]/1   7       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[3]/5   8       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[4]/1   9       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[4]/5   10       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[5]/1   11       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[5]/5   12       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[6]/1   13       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[6]/5   14       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[7]/1   15       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[7]/5   16       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[8]/1   17       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[8]/5   18       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[9]/1   19       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[9]/5   20       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[10]/1   21       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[10]/5   22       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[11]/1   23       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[11]/5   24       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[12]/1   25       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[12]/5   26       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[13]/1   27       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[13]/5   28       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[14]/1   29       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[14]/5   30       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[15]/1   31       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[15]/5   32       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[16]/1   33       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[16]/5   34       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[17]/1   35       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[17]/5   36       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[18]/1   37       #"PPUAi.lt", line 15
+$/bond:polymer_1/monomer[18]/5   38       #"PPUAi.lt", line 16
+$/bond:polymer_1/monomer[19]/1   39       #"PPUAre.lt", line 14
+$/bond:polymer_1/monomer[19]/5   40       #"PPUAre.lt", line 15
+$/bond:polymer_1/b1   41       #"poly_1.lt", line 32
+$/bond:polymer_1/b2   42       #"poly_1.lt", line 33
+$/bond:polymer_1/b3   43       #"poly_1.lt", line 34
+$/bond:polymer_1/b4   44       #"poly_1.lt", line 35
+$/bond:polymer_1/b5   45       #"poly_1.lt", line 36
+$/bond:polymer_1/b6   46       #"poly_1.lt", line 37
+$/bond:polymer_1/b7   47       #"poly_1.lt", line 38
+$/bond:polymer_1/b8   48       #"poly_1.lt", line 39
+$/bond:polymer_1/b9   49       #"poly_1.lt", line 40
+$/bond:polymer_1/b10   50       #"poly_1.lt", line 41
+$/bond:polymer_1/b11   51       #"poly_1.lt", line 42
+$/bond:polymer_1/b12   52       #"poly_1.lt", line 43
+$/bond:polymer_1/b13   53       #"poly_1.lt", line 44
+$/bond:polymer_1/b14   54       #"poly_1.lt", line 45
+$/bond:polymer_1/b15   55       #"poly_1.lt", line 46
+$/bond:polymer_1/b16   56       #"poly_1.lt", line 47
+$/bond:polymer_1/b17   57       #"poly_1.lt", line 48
+$/bond:polymer_1/b18   58       #"poly_1.lt", line 49
+$/bond:polymer_1/b19   59       #"poly_1.lt", line 50
+$/bond:polymer_2/monomer[0]/1   60       #"PPUAle.lt", line 15
+$/bond:polymer_2/monomer[0]/5   61       #"PPUAle.lt", line 16
+$/bond:polymer_2/monomer[1]/1   62       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[1]/5   63       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[2]/1   64       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[2]/5   65       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[3]/1   66       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[3]/5   67       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[4]/1   68       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[4]/5   69       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[5]/1   70       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[5]/5   71       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[6]/1   72       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[6]/5   73       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[7]/1   74       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[7]/5   75       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[8]/1   76       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[8]/5   77       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[9]/1   78       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[9]/5   79       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[10]/1   80       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[10]/5   81       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[11]/1   82       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[11]/5   83       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[12]/1   84       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[12]/5   85       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[13]/1   86       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[13]/5   87       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[14]/1   88       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[14]/5   89       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[15]/1   90       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[15]/5   91       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[16]/1   92       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[16]/5   93       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[17]/1   94       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[17]/5   95       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[18]/1   96       #"PPUAi.lt", line 15
+$/bond:polymer_2/monomer[18]/5   97       #"PPUAi.lt", line 16
+$/bond:polymer_2/monomer[19]/1   98       #"PPUAre.lt", line 14
+$/bond:polymer_2/monomer[19]/5   99       #"PPUAre.lt", line 15
+$/bond:polymer_2/b1   100       #"poly_2.lt", line 32
+$/bond:polymer_2/b2   101       #"poly_2.lt", line 33
+$/bond:polymer_2/b3   102       #"poly_2.lt", line 34
+$/bond:polymer_2/b4   103       #"poly_2.lt", line 35
+$/bond:polymer_2/b5   104       #"poly_2.lt", line 36
+$/bond:polymer_2/b6   105       #"poly_2.lt", line 37
+$/bond:polymer_2/b7   106       #"poly_2.lt", line 38
+$/bond:polymer_2/b8   107       #"poly_2.lt", line 39
+$/bond:polymer_2/b9   108       #"poly_2.lt", line 40
+$/bond:polymer_2/b10   109       #"poly_2.lt", line 41
+$/bond:polymer_2/b11   110       #"poly_2.lt", line 42
+$/bond:polymer_2/b12   111       #"poly_2.lt", line 43
+$/bond:polymer_2/b13   112       #"poly_2.lt", line 44
+$/bond:polymer_2/b14   113       #"poly_2.lt", line 45
+$/bond:polymer_2/b15   114       #"poly_2.lt", line 46
+$/bond:polymer_2/b16   115       #"poly_2.lt", line 47
+$/bond:polymer_2/b17   116       #"poly_2.lt", line 48
+$/bond:polymer_2/b18   117       #"poly_2.lt", line 49
+$/bond:polymer_2/b19   118       #"poly_2.lt", line 50
+$/bond:polymer_3/monomer[0]/1   119       #"PEUAle.lt", line 14
+$/bond:polymer_3/monomer[1]/1   120       #"PEUAi.lt", line 14
+$/bond:polymer_3/monomer[2]/1   121       #"PEUAi.lt", line 14
+$/bond:polymer_3/monomer[3]/1   122       #"PEUAi.lt", line 14
+$/bond:polymer_3/monomer[4]/1   123       #"PEUAi.lt", line 14
+$/bond:polymer_3/monomer[5]/1   124       #"PEUAi.lt", line 14
+$/bond:polymer_3/monomer[6]/1   125       #"PEUAi.lt", line 14
+$/bond:polymer_3/monomer[7]/1   126       #"PEUAi.lt", line 14
+$/bond:polymer_3/monomer[8]/1   127       #"PEUAi.lt", line 14
+$/bond:polymer_3/monomer[9]/1   128       #"PEUAre.lt", line 13
+$/bond:polymer_3/b1   129       #"poly_3.lt", line 22
+$/bond:polymer_3/b2   130       #"poly_3.lt", line 23
+$/bond:polymer_3/b3   131       #"poly_3.lt", line 24
+$/bond:polymer_3/b4   132       #"poly_3.lt", line 25
+$/bond:polymer_3/b5   133       #"poly_3.lt", line 26
+$/bond:polymer_3/b6   134       #"poly_3.lt", line 27
+$/bond:polymer_3/b7   135       #"poly_3.lt", line 28
+$/bond:polymer_3/b8   136       #"poly_3.lt", line 29
+$/bond:polymer_3/b9   137       #"poly_3.lt", line 30
+$/bond:polymer_4/monomer[0]/1   138       #"PEUAle.lt", line 14
+$/bond:polymer_4/monomer[1]/1   139       #"PEUAi.lt", line 14
+$/bond:polymer_4/monomer[2]/1   140       #"PEUAi.lt", line 14
+$/bond:polymer_4/monomer[3]/1   141       #"PEUAi.lt", line 14
+$/bond:polymer_4/monomer[4]/1   142       #"PEUAi.lt", line 14
+$/bond:polymer_4/monomer[5]/1   143       #"PEUAi.lt", line 14
+$/bond:polymer_4/monomer[6]/1   144       #"PEUAi.lt", line 14
+$/bond:polymer_4/monomer[7]/1   145       #"PEUAi.lt", line 14
+$/bond:polymer_4/monomer[8]/1   146       #"PEUAi.lt", line 14
+$/bond:polymer_4/monomer[9]/1   147       #"PEUAre.lt", line 13
+$/bond:polymer_4/b1   148       #"poly_4.lt", line 22
+$/bond:polymer_4/b2   149       #"poly_4.lt", line 23
+$/bond:polymer_4/b3   150       #"poly_4.lt", line 24
+$/bond:polymer_4/b4   151       #"poly_4.lt", line 25
+$/bond:polymer_4/b5   152       #"poly_4.lt", line 26
+$/bond:polymer_4/b6   153       #"poly_4.lt", line 27
+$/bond:polymer_4/b7   154       #"poly_4.lt", line 28
+$/bond:polymer_4/b8   155       #"poly_4.lt", line 29
+$/bond:polymer_4/b9   156       #"poly_4.lt", line 30
+$/bond:polymer_5/monomer[0]/1   157       #"PEAAle.lt", line 19
+$/bond:polymer_5/monomer[0]/2   158       #"PEAAle.lt", line 20
+$/bond:polymer_5/monomer[0]/3   159       #"PEAAle.lt", line 21
+$/bond:polymer_5/monomer[0]/4   160       #"PEAAle.lt", line 22
+$/bond:polymer_5/monomer[0]/5   161       #"PEAAle.lt", line 23
+$/bond:polymer_5/monomer[0]/6   162       #"PEAAle.lt", line 24
+$/bond:polymer_5/monomer[1]/1   163       #"PEAAi.lt", line 18
+$/bond:polymer_5/monomer[1]/2   164       #"PEAAi.lt", line 19
+$/bond:polymer_5/monomer[1]/3   165       #"PEAAi.lt", line 20
+$/bond:polymer_5/monomer[1]/4   166       #"PEAAi.lt", line 21
+$/bond:polymer_5/monomer[1]/5   167       #"PEAAi.lt", line 22
+$/bond:polymer_5/monomer[2]/1   168       #"PEAAi.lt", line 18
+$/bond:polymer_5/monomer[2]/2   169       #"PEAAi.lt", line 19
+$/bond:polymer_5/monomer[2]/3   170       #"PEAAi.lt", line 20
+$/bond:polymer_5/monomer[2]/4   171       #"PEAAi.lt", line 21
+$/bond:polymer_5/monomer[2]/5   172       #"PEAAi.lt", line 22
+$/bond:polymer_5/monomer[3]/1   173       #"PEAAi.lt", line 18
+$/bond:polymer_5/monomer[3]/2   174       #"PEAAi.lt", line 19
+$/bond:polymer_5/monomer[3]/3   175       #"PEAAi.lt", line 20
+$/bond:polymer_5/monomer[3]/4   176       #"PEAAi.lt", line 21
+$/bond:polymer_5/monomer[3]/5   177       #"PEAAi.lt", line 22
+$/bond:polymer_5/monomer[4]/1   178       #"PEAAi.lt", line 18
+$/bond:polymer_5/monomer[4]/2   179       #"PEAAi.lt", line 19
+$/bond:polymer_5/monomer[4]/3   180       #"PEAAi.lt", line 20
+$/bond:polymer_5/monomer[4]/4   181       #"PEAAi.lt", line 21
+$/bond:polymer_5/monomer[4]/5   182       #"PEAAi.lt", line 22
+$/bond:polymer_5/monomer[5]/1   183       #"PEAAi.lt", line 18
+$/bond:polymer_5/monomer[5]/2   184       #"PEAAi.lt", line 19
+$/bond:polymer_5/monomer[5]/3   185       #"PEAAi.lt", line 20
+$/bond:polymer_5/monomer[5]/4   186       #"PEAAi.lt", line 21
+$/bond:polymer_5/monomer[5]/5   187       #"PEAAi.lt", line 22
+$/bond:polymer_5/monomer[6]/1   188       #"PEAAi.lt", line 18
+$/bond:polymer_5/monomer[6]/2   189       #"PEAAi.lt", line 19
+$/bond:polymer_5/monomer[6]/3   190       #"PEAAi.lt", line 20
+$/bond:polymer_5/monomer[6]/4   191       #"PEAAi.lt", line 21
+$/bond:polymer_5/monomer[6]/5   192       #"PEAAi.lt", line 22
+$/bond:polymer_5/monomer[7]/1   193       #"PEAAi.lt", line 18
+$/bond:polymer_5/monomer[7]/2   194       #"PEAAi.lt", line 19
+$/bond:polymer_5/monomer[7]/3   195       #"PEAAi.lt", line 20
+$/bond:polymer_5/monomer[7]/4   196       #"PEAAi.lt", line 21
+$/bond:polymer_5/monomer[7]/5   197       #"PEAAi.lt", line 22
+$/bond:polymer_5/monomer[8]/1   198       #"PEAAi.lt", line 18
+$/bond:polymer_5/monomer[8]/2   199       #"PEAAi.lt", line 19
+$/bond:polymer_5/monomer[8]/3   200       #"PEAAi.lt", line 20
+$/bond:polymer_5/monomer[8]/4   201       #"PEAAi.lt", line 21
+$/bond:polymer_5/monomer[8]/5   202       #"PEAAi.lt", line 22
+$/bond:polymer_5/monomer[9]/1   203       #"PEAAi.lt", line 18
+$/bond:polymer_5/monomer[9]/2   204       #"PEAAi.lt", line 19
+$/bond:polymer_5/monomer[9]/3   205       #"PEAAi.lt", line 20
+$/bond:polymer_5/monomer[9]/4   206       #"PEAAi.lt", line 21
+$/bond:polymer_5/monomer[9]/5   207       #"PEAAi.lt", line 22
+$/bond:polymer_5/monomer[10]/1   208       #"PEAAi.lt", line 18
+$/bond:polymer_5/monomer[10]/2   209       #"PEAAi.lt", line 19
+$/bond:polymer_5/monomer[10]/3   210       #"PEAAi.lt", line 20
+$/bond:polymer_5/monomer[10]/4   211       #"PEAAi.lt", line 21
+$/bond:polymer_5/monomer[10]/5   212       #"PEAAi.lt", line 22
+$/bond:polymer_5/monomer[11]/1   213       #"PEAAi.lt", line 18
+$/bond:polymer_5/monomer[11]/2   214       #"PEAAi.lt", line 19
+$/bond:polymer_5/monomer[11]/3   215       #"PEAAi.lt", line 20
+$/bond:polymer_5/monomer[11]/4   216       #"PEAAi.lt", line 21
+$/bond:polymer_5/monomer[11]/5   217       #"PEAAi.lt", line 22
+$/bond:polymer_5/monomer[12]/1   218       #"PEAAi.lt", line 18
+$/bond:polymer_5/monomer[12]/2   219       #"PEAAi.lt", line 19
+$/bond:polymer_5/monomer[12]/3   220       #"PEAAi.lt", line 20
+$/bond:polymer_5/monomer[12]/4   221       #"PEAAi.lt", line 21
+$/bond:polymer_5/monomer[12]/5   222       #"PEAAi.lt", line 22
+$/bond:polymer_5/monomer[13]/1   223       #"PEAAi.lt", line 18
+$/bond:polymer_5/monomer[13]/2   224       #"PEAAi.lt", line 19
+$/bond:polymer_5/monomer[13]/3   225       #"PEAAi.lt", line 20
+$/bond:polymer_5/monomer[13]/4   226       #"PEAAi.lt", line 21
+$/bond:polymer_5/monomer[13]/5   227       #"PEAAi.lt", line 22
+$/bond:polymer_5/monomer[14]/1   228       #"PEAAre.lt", line 18
+$/bond:polymer_5/monomer[14]/2   229       #"PEAAre.lt", line 19
+$/bond:polymer_5/monomer[14]/3   230       #"PEAAre.lt", line 20
+$/bond:polymer_5/monomer[14]/4   231       #"PEAAre.lt", line 21
+$/bond:polymer_5/monomer[14]/5   232       #"PEAAre.lt", line 22
+$/bond:polymer_5/monomer[14]/6   233       #"PEAAre.lt", line 23
+$/bond:polymer_5/b1   234       #"poly_5.lt", line 27
+$/bond:polymer_5/b2   235       #"poly_5.lt", line 28
+$/bond:polymer_5/b3   236       #"poly_5.lt", line 29
+$/bond:polymer_5/b4   237       #"poly_5.lt", line 30
+$/bond:polymer_5/b5   238       #"poly_5.lt", line 31
+$/bond:polymer_5/b6   239       #"poly_5.lt", line 32
+$/bond:polymer_5/b7   240       #"poly_5.lt", line 33
+$/bond:polymer_5/b8   241       #"poly_5.lt", line 34
+$/bond:polymer_5/b9   242       #"poly_5.lt", line 35
+$/bond:polymer_5/b10   243       #"poly_5.lt", line 36
+$/bond:polymer_5/b11   244       #"poly_5.lt", line 37
+$/bond:polymer_5/b12   245       #"poly_5.lt", line 38
+$/bond:polymer_5/b13   246       #"poly_5.lt", line 39
+$/bond:polymer_5/b14   247       #"poly_5.lt", line 40
+$/bond:polymer_6/monomer[0]/1   248       #"PEAAle.lt", line 19
+$/bond:polymer_6/monomer[0]/2   249       #"PEAAle.lt", line 20
+$/bond:polymer_6/monomer[0]/3   250       #"PEAAle.lt", line 21
+$/bond:polymer_6/monomer[0]/4   251       #"PEAAle.lt", line 22
+$/bond:polymer_6/monomer[0]/5   252       #"PEAAle.lt", line 23
+$/bond:polymer_6/monomer[0]/6   253       #"PEAAle.lt", line 24
+$/bond:polymer_6/monomer[1]/1   254       #"PEAAi.lt", line 18
+$/bond:polymer_6/monomer[1]/2   255       #"PEAAi.lt", line 19
+$/bond:polymer_6/monomer[1]/3   256       #"PEAAi.lt", line 20
+$/bond:polymer_6/monomer[1]/4   257       #"PEAAi.lt", line 21
+$/bond:polymer_6/monomer[1]/5   258       #"PEAAi.lt", line 22
+$/bond:polymer_6/monomer[2]/1   259       #"PEAAi.lt", line 18
+$/bond:polymer_6/monomer[2]/2   260       #"PEAAi.lt", line 19
+$/bond:polymer_6/monomer[2]/3   261       #"PEAAi.lt", line 20
+$/bond:polymer_6/monomer[2]/4   262       #"PEAAi.lt", line 21
+$/bond:polymer_6/monomer[2]/5   263       #"PEAAi.lt", line 22
+$/bond:polymer_6/monomer[3]/1   264       #"PEAAi.lt", line 18
+$/bond:polymer_6/monomer[3]/2   265       #"PEAAi.lt", line 19
+$/bond:polymer_6/monomer[3]/3   266       #"PEAAi.lt", line 20
+$/bond:polymer_6/monomer[3]/4   267       #"PEAAi.lt", line 21
+$/bond:polymer_6/monomer[3]/5   268       #"PEAAi.lt", line 22
+$/bond:polymer_6/monomer[4]/1   269       #"PEAAi.lt", line 18
+$/bond:polymer_6/monomer[4]/2   270       #"PEAAi.lt", line 19
+$/bond:polymer_6/monomer[4]/3   271       #"PEAAi.lt", line 20
+$/bond:polymer_6/monomer[4]/4   272       #"PEAAi.lt", line 21
+$/bond:polymer_6/monomer[4]/5   273       #"PEAAi.lt", line 22
+$/bond:polymer_6/monomer[5]/1   274       #"PEAAi.lt", line 18
+$/bond:polymer_6/monomer[5]/2   275       #"PEAAi.lt", line 19
+$/bond:polymer_6/monomer[5]/3   276       #"PEAAi.lt", line 20
+$/bond:polymer_6/monomer[5]/4   277       #"PEAAi.lt", line 21
+$/bond:polymer_6/monomer[5]/5   278       #"PEAAi.lt", line 22
+$/bond:polymer_6/monomer[6]/1   279       #"PEAAi.lt", line 18
+$/bond:polymer_6/monomer[6]/2   280       #"PEAAi.lt", line 19
+$/bond:polymer_6/monomer[6]/3   281       #"PEAAi.lt", line 20
+$/bond:polymer_6/monomer[6]/4   282       #"PEAAi.lt", line 21
+$/bond:polymer_6/monomer[6]/5   283       #"PEAAi.lt", line 22
+$/bond:polymer_6/monomer[7]/1   284       #"PEAAi.lt", line 18
+$/bond:polymer_6/monomer[7]/2   285       #"PEAAi.lt", line 19
+$/bond:polymer_6/monomer[7]/3   286       #"PEAAi.lt", line 20
+$/bond:polymer_6/monomer[7]/4   287       #"PEAAi.lt", line 21
+$/bond:polymer_6/monomer[7]/5   288       #"PEAAi.lt", line 22
+$/bond:polymer_6/monomer[8]/1   289       #"PEAAi.lt", line 18
+$/bond:polymer_6/monomer[8]/2   290       #"PEAAi.lt", line 19
+$/bond:polymer_6/monomer[8]/3   291       #"PEAAi.lt", line 20
+$/bond:polymer_6/monomer[8]/4   292       #"PEAAi.lt", line 21
+$/bond:polymer_6/monomer[8]/5   293       #"PEAAi.lt", line 22
+$/bond:polymer_6/monomer[9]/1   294       #"PEAAi.lt", line 18
+$/bond:polymer_6/monomer[9]/2   295       #"PEAAi.lt", line 19
+$/bond:polymer_6/monomer[9]/3   296       #"PEAAi.lt", line 20
+$/bond:polymer_6/monomer[9]/4   297       #"PEAAi.lt", line 21
+$/bond:polymer_6/monomer[9]/5   298       #"PEAAi.lt", line 22
+$/bond:polymer_6/monomer[10]/1   299       #"PEAAi.lt", line 18
+$/bond:polymer_6/monomer[10]/2   300       #"PEAAi.lt", line 19
+$/bond:polymer_6/monomer[10]/3   301       #"PEAAi.lt", line 20
+$/bond:polymer_6/monomer[10]/4   302       #"PEAAi.lt", line 21
+$/bond:polymer_6/monomer[10]/5   303       #"PEAAi.lt", line 22
+$/bond:polymer_6/monomer[11]/1   304       #"PEAAi.lt", line 18
+$/bond:polymer_6/monomer[11]/2   305       #"PEAAi.lt", line 19
+$/bond:polymer_6/monomer[11]/3   306       #"PEAAi.lt", line 20
+$/bond:polymer_6/monomer[11]/4   307       #"PEAAi.lt", line 21
+$/bond:polymer_6/monomer[11]/5   308       #"PEAAi.lt", line 22
+$/bond:polymer_6/monomer[12]/1   309       #"PEAAi.lt", line 18
+$/bond:polymer_6/monomer[12]/2   310       #"PEAAi.lt", line 19
+$/bond:polymer_6/monomer[12]/3   311       #"PEAAi.lt", line 20
+$/bond:polymer_6/monomer[12]/4   312       #"PEAAi.lt", line 21
+$/bond:polymer_6/monomer[12]/5   313       #"PEAAi.lt", line 22
+$/bond:polymer_6/monomer[13]/1   314       #"PEAAi.lt", line 18
+$/bond:polymer_6/monomer[13]/2   315       #"PEAAi.lt", line 19
+$/bond:polymer_6/monomer[13]/3   316       #"PEAAi.lt", line 20
+$/bond:polymer_6/monomer[13]/4   317       #"PEAAi.lt", line 21
+$/bond:polymer_6/monomer[13]/5   318       #"PEAAi.lt", line 22
+$/bond:polymer_6/monomer[14]/1   319       #"PEAAre.lt", line 18
+$/bond:polymer_6/monomer[14]/2   320       #"PEAAre.lt", line 19
+$/bond:polymer_6/monomer[14]/3   321       #"PEAAre.lt", line 20
+$/bond:polymer_6/monomer[14]/4   322       #"PEAAre.lt", line 21
+$/bond:polymer_6/monomer[14]/5   323       #"PEAAre.lt", line 22
+$/bond:polymer_6/monomer[14]/6   324       #"PEAAre.lt", line 23
+$/bond:polymer_6/b1   325       #"poly_6.lt", line 27
+$/bond:polymer_6/b2   326       #"poly_6.lt", line 28
+$/bond:polymer_6/b3   327       #"poly_6.lt", line 29
+$/bond:polymer_6/b4   328       #"poly_6.lt", line 30
+$/bond:polymer_6/b5   329       #"poly_6.lt", line 31
+$/bond:polymer_6/b6   330       #"poly_6.lt", line 32
+$/bond:polymer_6/b7   331       #"poly_6.lt", line 33
+$/bond:polymer_6/b8   332       #"poly_6.lt", line 34
+$/bond:polymer_6/b9   333       #"poly_6.lt", line 35
+$/bond:polymer_6/b10   334       #"poly_6.lt", line 36
+$/bond:polymer_6/b11   335       #"poly_6.lt", line 37
+$/bond:polymer_6/b12   336       #"poly_6.lt", line 38
+$/bond:polymer_6/b13   337       #"poly_6.lt", line 39
+$/bond:polymer_6/b14   338       #"poly_6.lt", line 40
+$/bond:polymer_7/monomer[0]/1   339       #"PEAAle.lt", line 19
+$/bond:polymer_7/monomer[0]/2   340       #"PEAAle.lt", line 20
+$/bond:polymer_7/monomer[0]/3   341       #"PEAAle.lt", line 21
+$/bond:polymer_7/monomer[0]/4   342       #"PEAAle.lt", line 22
+$/bond:polymer_7/monomer[0]/5   343       #"PEAAle.lt", line 23
+$/bond:polymer_7/monomer[0]/6   344       #"PEAAle.lt", line 24
+$/bond:polymer_7/monomer[1]/1   345       #"PEAAi.lt", line 18
+$/bond:polymer_7/monomer[1]/2   346       #"PEAAi.lt", line 19
+$/bond:polymer_7/monomer[1]/3   347       #"PEAAi.lt", line 20
+$/bond:polymer_7/monomer[1]/4   348       #"PEAAi.lt", line 21
+$/bond:polymer_7/monomer[1]/5   349       #"PEAAi.lt", line 22
+$/bond:polymer_7/monomer[2]/1   350       #"PEAAi.lt", line 18
+$/bond:polymer_7/monomer[2]/2   351       #"PEAAi.lt", line 19
+$/bond:polymer_7/monomer[2]/3   352       #"PEAAi.lt", line 20
+$/bond:polymer_7/monomer[2]/4   353       #"PEAAi.lt", line 21
+$/bond:polymer_7/monomer[2]/5   354       #"PEAAi.lt", line 22
+$/bond:polymer_7/monomer[3]/1   355       #"PEAAi.lt", line 18
+$/bond:polymer_7/monomer[3]/2   356       #"PEAAi.lt", line 19
+$/bond:polymer_7/monomer[3]/3   357       #"PEAAi.lt", line 20
+$/bond:polymer_7/monomer[3]/4   358       #"PEAAi.lt", line 21
+$/bond:polymer_7/monomer[3]/5   359       #"PEAAi.lt", line 22
+$/bond:polymer_7/monomer[4]/1   360       #"PEAAi.lt", line 18
+$/bond:polymer_7/monomer[4]/2   361       #"PEAAi.lt", line 19
+$/bond:polymer_7/monomer[4]/3   362       #"PEAAi.lt", line 20
+$/bond:polymer_7/monomer[4]/4   363       #"PEAAi.lt", line 21
+$/bond:polymer_7/monomer[4]/5   364       #"PEAAi.lt", line 22
+$/bond:polymer_7/monomer[5]/1   365       #"PEAAi.lt", line 18
+$/bond:polymer_7/monomer[5]/2   366       #"PEAAi.lt", line 19
+$/bond:polymer_7/monomer[5]/3   367       #"PEAAi.lt", line 20
+$/bond:polymer_7/monomer[5]/4   368       #"PEAAi.lt", line 21
+$/bond:polymer_7/monomer[5]/5   369       #"PEAAi.lt", line 22
+$/bond:polymer_7/monomer[6]/1   370       #"PEAAi.lt", line 18
+$/bond:polymer_7/monomer[6]/2   371       #"PEAAi.lt", line 19
+$/bond:polymer_7/monomer[6]/3   372       #"PEAAi.lt", line 20
+$/bond:polymer_7/monomer[6]/4   373       #"PEAAi.lt", line 21
+$/bond:polymer_7/monomer[6]/5   374       #"PEAAi.lt", line 22
+$/bond:polymer_7/monomer[7]/1   375       #"PEAAi.lt", line 18
+$/bond:polymer_7/monomer[7]/2   376       #"PEAAi.lt", line 19
+$/bond:polymer_7/monomer[7]/3   377       #"PEAAi.lt", line 20
+$/bond:polymer_7/monomer[7]/4   378       #"PEAAi.lt", line 21
+$/bond:polymer_7/monomer[7]/5   379       #"PEAAi.lt", line 22
+$/bond:polymer_7/monomer[8]/1   380       #"PEAAi.lt", line 18
+$/bond:polymer_7/monomer[8]/2   381       #"PEAAi.lt", line 19
+$/bond:polymer_7/monomer[8]/3   382       #"PEAAi.lt", line 20
+$/bond:polymer_7/monomer[8]/4   383       #"PEAAi.lt", line 21
+$/bond:polymer_7/monomer[8]/5   384       #"PEAAi.lt", line 22
+$/bond:polymer_7/monomer[9]/1   385       #"PEAAi.lt", line 18
+$/bond:polymer_7/monomer[9]/2   386       #"PEAAi.lt", line 19
+$/bond:polymer_7/monomer[9]/3   387       #"PEAAi.lt", line 20
+$/bond:polymer_7/monomer[9]/4   388       #"PEAAi.lt", line 21
+$/bond:polymer_7/monomer[9]/5   389       #"PEAAi.lt", line 22
+$/bond:polymer_7/monomer[10]/1   390       #"PEAAi.lt", line 18
+$/bond:polymer_7/monomer[10]/2   391       #"PEAAi.lt", line 19
+$/bond:polymer_7/monomer[10]/3   392       #"PEAAi.lt", line 20
+$/bond:polymer_7/monomer[10]/4   393       #"PEAAi.lt", line 21
+$/bond:polymer_7/monomer[10]/5   394       #"PEAAi.lt", line 22
+$/bond:polymer_7/monomer[11]/1   395       #"PEAAi.lt", line 18
+$/bond:polymer_7/monomer[11]/2   396       #"PEAAi.lt", line 19
+$/bond:polymer_7/monomer[11]/3   397       #"PEAAi.lt", line 20
+$/bond:polymer_7/monomer[11]/4   398       #"PEAAi.lt", line 21
+$/bond:polymer_7/monomer[11]/5   399       #"PEAAi.lt", line 22
+$/bond:polymer_7/monomer[12]/1   400       #"PEAAi.lt", line 18
+$/bond:polymer_7/monomer[12]/2   401       #"PEAAi.lt", line 19
+$/bond:polymer_7/monomer[12]/3   402       #"PEAAi.lt", line 20
+$/bond:polymer_7/monomer[12]/4   403       #"PEAAi.lt", line 21
+$/bond:polymer_7/monomer[12]/5   404       #"PEAAi.lt", line 22
+$/bond:polymer_7/monomer[13]/1   405       #"PEAAi.lt", line 18
+$/bond:polymer_7/monomer[13]/2   406       #"PEAAi.lt", line 19
+$/bond:polymer_7/monomer[13]/3   407       #"PEAAi.lt", line 20
+$/bond:polymer_7/monomer[13]/4   408       #"PEAAi.lt", line 21
+$/bond:polymer_7/monomer[13]/5   409       #"PEAAi.lt", line 22
+$/bond:polymer_7/monomer[14]/1   410       #"PEAAre.lt", line 18
+$/bond:polymer_7/monomer[14]/2   411       #"PEAAre.lt", line 19
+$/bond:polymer_7/monomer[14]/3   412       #"PEAAre.lt", line 20
+$/bond:polymer_7/monomer[14]/4   413       #"PEAAre.lt", line 21
+$/bond:polymer_7/monomer[14]/5   414       #"PEAAre.lt", line 22
+$/bond:polymer_7/monomer[14]/6   415       #"PEAAre.lt", line 23
+$/bond:polymer_7/b1   416       #"poly_7.lt", line 27
+$/bond:polymer_7/b2   417       #"poly_7.lt", line 28
+$/bond:polymer_7/b3   418       #"poly_7.lt", line 29
+$/bond:polymer_7/b4   419       #"poly_7.lt", line 30
+$/bond:polymer_7/b5   420       #"poly_7.lt", line 31
+$/bond:polymer_7/b6   421       #"poly_7.lt", line 32
+$/bond:polymer_7/b7   422       #"poly_7.lt", line 33
+$/bond:polymer_7/b8   423       #"poly_7.lt", line 34
+$/bond:polymer_7/b9   424       #"poly_7.lt", line 35
+$/bond:polymer_7/b10   425       #"poly_7.lt", line 36
+$/bond:polymer_7/b11   426       #"poly_7.lt", line 37
+$/bond:polymer_7/b12   427       #"poly_7.lt", line 38
+$/bond:polymer_7/b13   428       #"poly_7.lt", line 39
+$/bond:polymer_7/b14   429       #"poly_7.lt", line 40
+$/angle:bytype1  1
+$/angle:bytype2  2
+$/angle:bytype3  3
+$/angle:bytype4  4
+$/angle:bytype5  5
+$/angle:bytype6  6
+$/angle:bytype7  7
+$/angle:bytype8  8
+$/angle:bytype9  9
+$/angle:bytype10  10
+$/angle:bytype11  11
+$/angle:bytype12  12
+$/angle:bytype13  13
+$/angle:bytype14  14
+$/angle:bytype15  15
+$/angle:bytype16  16
+$/angle:bytype17  17
+$/angle:bytype18  18
+$/angle:bytype19  19
+$/angle:bytype20  20
+$/angle:bytype21  21
+$/angle:bytype22  22
+$/angle:bytype23  23
+$/angle:bytype24  24
+$/angle:bytype25  25
+$/angle:bytype26  26
+$/angle:bytype27  27
+$/angle:bytype28  28
+$/angle:bytype29  29
+$/angle:bytype30  30
+$/angle:bytype31  31
+$/angle:bytype32  32
+$/angle:bytype33  33
+$/angle:bytype34  34
+$/angle:bytype35  35
+$/angle:bytype36  36
+$/angle:bytype37  37
+$/angle:bytype38  38
+$/angle:bytype39  39
+$/angle:bytype40  40
+$/angle:bytype41  41
+$/angle:bytype42  42
+$/angle:bytype43  43
+$/angle:bytype44  44
+$/angle:bytype45  45
+$/angle:bytype46  46
+$/angle:bytype47  47
+$/angle:bytype48  48
+$/angle:bytype49  49
+$/angle:bytype50  50
+$/angle:bytype51  51
+$/angle:bytype52  52
+$/angle:bytype53  53
+$/angle:bytype54  54
+$/angle:bytype55  55
+$/angle:bytype56  56
+$/angle:bytype57  57
+$/angle:bytype58  58
+$/angle:bytype59  59
+$/angle:bytype60  60
+$/angle:bytype61  61
+$/angle:bytype62  62
+$/angle:bytype63  63
+$/angle:bytype64  64
+$/angle:bytype65  65
+$/angle:bytype66  66
+$/angle:bytype67  67
+$/angle:bytype68  68
+$/angle:bytype69  69
+$/angle:bytype70  70
+$/angle:bytype71  71
+$/angle:bytype72  72
+$/angle:bytype73  73
+$/angle:bytype74  74
+$/angle:bytype75  75
+$/angle:bytype76  76
+$/angle:bytype77  77
+$/angle:bytype78  78
+$/angle:bytype79  79
+$/angle:bytype80  80
+$/angle:bytype81  81
+$/angle:bytype82  82
+$/angle:bytype83  83
+$/angle:bytype84  84
+$/angle:bytype85  85
+$/angle:bytype86  86
+$/angle:bytype87  87
+$/angle:bytype88  88
+$/angle:bytype89  89
+$/angle:bytype90  90
+$/angle:bytype91  91
+$/angle:bytype92  92
+$/angle:bytype93  93
+$/angle:bytype94  94
+$/angle:bytype95  95
+$/angle:bytype96  96
+$/angle:bytype97  97
+$/angle:bytype98  98
+$/angle:bytype99  99
+$/angle:bytype100  100
+$/angle:bytype101  101
+$/angle:bytype102  102
+$/angle:bytype103  103
+$/angle:bytype104  104
+$/angle:bytype105  105
+$/angle:bytype106  106
+$/angle:bytype107  107
+$/angle:bytype108  108
+$/angle:bytype109  109
+$/angle:bytype110  110
+$/angle:bytype111  111
+$/angle:bytype112  112
+$/angle:bytype113  113
+$/angle:bytype114  114
+$/angle:bytype115  115
+$/angle:bytype116  116
+$/angle:bytype117  117
+$/angle:bytype118  118
+$/angle:bytype119  119
+$/angle:bytype120  120
+$/angle:bytype121  121
+$/angle:bytype122  122
+$/angle:bytype123  123
+$/angle:bytype124  124
+$/angle:bytype125  125
+$/angle:bytype126  126
+$/angle:bytype127  127
+$/angle:bytype128  128
+$/angle:bytype129  129
+$/angle:bytype130  130
+$/angle:bytype131  131
+$/angle:bytype132  132
+$/angle:bytype133  133
+$/angle:bytype134  134
+$/angle:bytype135  135
+$/angle:bytype136  136
+$/angle:bytype137  137
+$/angle:bytype138  138
+$/angle:bytype139  139
+$/angle:bytype140  140
+$/angle:bytype141  141
+$/angle:bytype142  142
+$/angle:bytype143  143
+$/angle:bytype144  144
+$/angle:bytype145  145
+$/angle:bytype146  146
+$/angle:bytype147  147
+$/angle:bytype148  148
+$/angle:bytype149  149
+$/angle:bytype150  150
+$/angle:bytype151  151
+$/angle:bytype152  152
+$/angle:bytype153  153
+$/angle:bytype154  154
+$/angle:bytype155  155
+$/angle:bytype156  156
+$/angle:bytype157  157
+$/angle:bytype158  158
+$/angle:bytype159  159
+$/angle:bytype160  160
+$/angle:bytype161  161
+$/angle:bytype162  162
+$/angle:bytype163  163
+$/angle:bytype164  164
+$/angle:bytype165  165
+$/angle:bytype166  166
+$/angle:bytype167  167
+$/angle:bytype168  168
+$/angle:bytype169  169
+$/angle:bytype170  170
+$/angle:bytype171  171
+$/angle:bytype172  172
+$/angle:bytype173  173
+$/angle:bytype174  174
+$/angle:bytype175  175
+$/angle:bytype176  176
+$/angle:bytype177  177
+$/angle:bytype178  178
+$/angle:bytype179  179
+$/angle:bytype180  180
+$/angle:bytype181  181
+$/angle:bytype182  182
+$/angle:bytype183  183
+$/angle:bytype184  184
+$/angle:bytype185  185
+$/angle:bytype186  186
+$/angle:bytype187  187
+$/angle:bytype188  188
+$/angle:bytype189  189
+$/angle:bytype190  190
+$/angle:bytype191  191
+$/angle:bytype192  192
+$/angle:bytype193  193
+$/angle:bytype194  194
+$/angle:bytype195  195
+$/angle:bytype196  196
+$/angle:bytype197  197
+$/angle:bytype198  198
+$/angle:bytype199  199
+$/angle:bytype200  200
+$/angle:bytype201  201
+$/angle:bytype202  202
+$/angle:bytype203  203
+$/angle:bytype204  204
+$/angle:bytype205  205
+$/angle:bytype206  206
+$/angle:bytype207  207
+$/angle:bytype208  208
+$/angle:bytype209  209
+$/angle:bytype210  210
+$/angle:bytype211  211
+$/angle:bytype212  212
+$/angle:bytype213  213
+$/angle:bytype214  214
+$/angle:bytype215  215
+$/angle:bytype216  216
+$/angle:bytype217  217
+$/angle:bytype218  218
+$/angle:bytype219  219
+$/angle:bytype220  220
+$/angle:bytype221  221
+$/angle:bytype222  222
+$/angle:bytype223  223
+$/angle:bytype224  224
+$/angle:bytype225  225
+$/angle:bytype226  226
+$/angle:bytype227  227
+$/angle:bytype228  228
+$/angle:bytype229  229
+$/angle:bytype230  230
+$/angle:bytype231  231
+$/angle:bytype232  232
+$/angle:bytype233  233
+$/angle:bytype234  234
+$/angle:bytype235  235
+$/angle:bytype236  236
+$/angle:bytype237  237
+$/angle:bytype238  238
+$/angle:bytype239  239
+$/angle:bytype240  240
+$/angle:bytype241  241
+$/angle:bytype242  242
+$/angle:bytype243  243
+$/angle:bytype244  244
+$/angle:bytype245  245
+$/angle:bytype246  246
+$/angle:bytype247  247
+$/angle:bytype248  248
+$/angle:bytype249  249
+$/angle:bytype250  250
+$/angle:bytype251  251
+$/angle:bytype252  252
+$/angle:bytype253  253
+$/angle:bytype254  254
+$/angle:bytype255  255
+$/angle:bytype256  256
+$/angle:bytype257  257
+$/angle:bytype258  258
+$/angle:bytype259  259
+$/angle:bytype260  260
+$/angle:bytype261  261
+$/angle:bytype262  262
+$/angle:bytype263  263
+$/angle:bytype264  264
+$/angle:bytype265  265
+$/angle:bytype266  266
+$/angle:bytype267  267
+$/angle:bytype268  268
+$/angle:bytype269  269
+$/angle:bytype270  270
+$/angle:bytype271  271
+$/angle:bytype272  272
+$/angle:bytype273  273
+$/angle:bytype274  274
+$/angle:bytype275  275
+$/angle:bytype276  276
+$/angle:bytype277  277
+$/angle:bytype278  278
+$/angle:bytype279  279
+$/angle:bytype280  280
+$/angle:bytype281  281
+$/angle:bytype282  282
+$/angle:bytype283  283
+$/angle:bytype284  284
+$/angle:bytype285  285
+$/angle:bytype286  286
+$/angle:bytype287  287
+$/angle:bytype288  288
+$/angle:bytype289  289
+$/angle:bytype290  290
+$/angle:bytype291  291
+$/angle:bytype292  292
+$/angle:bytype293  293
+$/angle:bytype294  294
+$/angle:bytype295  295
+$/angle:bytype296  296
+$/angle:bytype297  297
+$/angle:bytype298  298
+$/angle:bytype299  299
+$/angle:bytype300  300
+$/angle:bytype301  301
+$/angle:bytype302  302
+$/angle:bytype303  303
+$/angle:bytype304  304
+$/angle:bytype305  305
+$/angle:bytype306  306
+$/angle:bytype307  307
+$/angle:bytype308  308
+$/angle:bytype309  309
+$/angle:bytype310  310
+$/angle:bytype311  311
+$/angle:bytype312  312
+$/angle:bytype313  313
+$/angle:bytype314  314
+$/angle:bytype315  315
+$/angle:bytype316  316
+$/angle:bytype317  317
+$/angle:bytype318  318
+$/angle:bytype319  319
+$/angle:bytype320  320
+$/angle:bytype321  321
+$/angle:bytype322  322
+$/angle:bytype323  323
+$/angle:bytype324  324
+$/angle:bytype325  325
+$/angle:bytype326  326
+$/angle:bytype327  327
+$/angle:bytype328  328
+$/angle:bytype329  329
+$/angle:bytype330  330
+$/angle:bytype331  331
+$/angle:bytype332  332
+$/angle:bytype333  333
+$/angle:bytype334  334
+$/angle:bytype335  335
+$/angle:bytype336  336
+$/angle:bytype337  337
+$/angle:bytype338  338
+$/angle:bytype339  339
+$/angle:bytype340  340
+$/angle:bytype341  341
+$/angle:bytype342  342
+$/angle:bytype343  343
+$/angle:bytype344  344
+$/angle:bytype345  345
+$/angle:bytype346  346
+$/angle:bytype347  347
+$/angle:bytype348  348
+$/angle:bytype349  349
+$/angle:bytype350  350
+$/angle:bytype351  351
+$/angle:bytype352  352
+$/angle:bytype353  353
+$/angle:bytype354  354
+$/angle:bytype355  355
+$/angle:bytype356  356
+$/angle:bytype357  357
+$/angle:bytype358  358
+$/angle:bytype359  359
+$/angle:bytype360  360
+$/angle:bytype361  361
+$/angle:bytype362  362
+$/angle:bytype363  363
+$/angle:bytype364  364
+$/angle:bytype365  365
+$/angle:bytype366  366
+$/angle:bytype367  367
+$/angle:bytype368  368
+$/angle:bytype369  369
+$/angle:bytype370  370
+$/angle:bytype371  371
+$/angle:bytype372  372
+$/angle:bytype373  373
+$/angle:bytype374  374
+$/angle:bytype375  375
+$/angle:bytype376  376
+$/angle:bytype377  377
+$/angle:bytype378  378
+$/angle:bytype379  379
+$/angle:bytype380  380
+$/angle:bytype381  381
+$/angle:bytype382  382
+$/angle:bytype383  383
+$/angle:bytype384  384
+$/angle:bytype385  385
+$/angle:bytype386  386
+$/angle:bytype387  387
+$/angle:bytype388  388
+$/angle:bytype389  389
+$/angle:bytype390  390
+$/angle:bytype391  391
+$/angle:bytype392  392
+$/angle:bytype393  393
+$/angle:bytype394  394
+$/angle:bytype395  395
+$/angle:bytype396  396
+$/angle:bytype397  397
+$/angle:bytype398  398
+$/angle:bytype399  399
+$/angle:bytype400  400
+$/angle:bytype401  401
+$/angle:bytype402  402
+$/angle:bytype403  403
+$/angle:bytype404  404
+$/angle:bytype405  405
+$/angle:bytype406  406
+$/angle:bytype407  407
+$/angle:bytype408  408
+$/angle:bytype409  409
+$/angle:bytype410  410
+$/angle:bytype411  411
+$/angle:bytype412  412
+$/angle:bytype413  413
+$/angle:bytype414  414
+$/angle:bytype415  415
+$/angle:bytype416  416
+$/angle:bytype417  417
+$/angle:bytype418  418
+$/angle:bytype419  419
+$/angle:bytype420  420
+$/angle:bytype421  421
+$/angle:bytype422  422
+$/angle:bytype423  423
+$/angle:bytype424  424
+$/angle:bytype425  425
+$/angle:bytype426  426
+$/angle:bytype427  427
+$/angle:bytype428  428
+$/angle:bytype429  429
+$/angle:bytype430  430
+$/angle:bytype431  431
+$/angle:bytype432  432
+$/angle:bytype433  433
+$/angle:bytype434  434
+$/angle:bytype435  435
+$/angle:bytype436  436
+$/angle:bytype437  437
+$/angle:bytype438  438
+$/angle:bytype439  439
+$/angle:bytype440  440
+$/angle:bytype441  441
+$/angle:bytype442  442
+$/angle:bytype443  443
+$/angle:bytype444  444
+$/angle:bytype445  445
+$/angle:bytype446  446
+$/angle:bytype447  447
+$/angle:bytype448  448
+$/angle:bytype449  449
+$/angle:bytype450  450
+$/angle:bytype451  451
+$/angle:bytype452  452
+$/angle:bytype453  453
+$/angle:bytype454  454
+$/angle:bytype455  455
+$/angle:bytype456  456
+$/angle:bytype457  457
+$/angle:bytype458  458
+$/angle:bytype459  459
+$/angle:bytype460  460
+$/angle:bytype461  461
+$/angle:bytype462  462
+$/angle:bytype463  463
+$/angle:bytype464  464
+$/angle:bytype465  465
+$/angle:bytype466  466
+$/angle:bytype467  467
+$/angle:bytype468  468
+$/angle:bytype469  469
+$/angle:bytype470  470
+$/angle:bytype471  471
+$/angle:bytype472  472
+$/angle:bytype473  473
+$/angle:bytype474  474
+$/angle:bytype475  475
+$/angle:bytype476  476
+$/angle:bytype477  477
+$/angle:bytype478  478
+$/angle:bytype479  479
+$/angle:bytype480  480
+$/angle:bytype481  481
+$/angle:bytype482  482
+$/angle:bytype483  483
+$/angle:bytype484  484
+$/angle:bytype485  485
+$/angle:bytype486  486
+$/angle:bytype487  487
+$/angle:bytype488  488
+$/angle:bytype489  489
+$/angle:bytype490  490
+$/angle:bytype491  491
+$/angle:bytype492  492
+$/angle:bytype493  493
+$/angle:bytype494  494
+$/angle:bytype495  495
+$/angle:bytype496  496
+$/angle:bytype497  497
+$/angle:bytype498  498
+$/angle:bytype499  499
+$/angle:bytype500  500
+$/angle:bytype501  501
+$/angle:bytype502  502
+$/angle:bytype503  503
+$/angle:bytype504  504
+$/angle:bytype505  505
+$/angle:bytype506  506
+$/angle:bytype507  507
+$/angle:bytype508  508
+$/angle:bytype509  509
+$/angle:bytype510  510
+$/angle:bytype511  511
+$/angle:bytype512  512
+$/angle:bytype513  513
+$/angle:bytype514  514
+$/angle:bytype515  515
+$/angle:bytype516  516
+$/angle:bytype517  517
+$/angle:bytype518  518
+$/angle:bytype519  519
+$/angle:bytype520  520
+$/angle:bytype521  521
+$/angle:bytype522  522
+$/angle:bytype523  523
+$/angle:bytype524  524
+$/angle:bytype525  525
+$/angle:bytype526  526
+$/angle:bytype527  527
+$/angle:bytype528  528
+$/angle:bytype529  529
+$/angle:bytype530  530
+$/angle:bytype531  531
+$/angle:bytype532  532
+$/angle:bytype533  533
+$/angle:bytype534  534
+$/angle:bytype535  535
+$/angle:bytype536  536
+$/angle:bytype537  537
+$/angle:bytype538  538
+$/angle:bytype539  539
+$/angle:bytype540  540
+$/angle:bytype541  541
+$/angle:bytype542  542
+$/angle:bytype543  543
+$/angle:bytype544  544
+$/angle:bytype545  545
+$/angle:bytype546  546
+$/angle:bytype547  547
+$/angle:bytype548  548
+$/angle:bytype549  549
+$/angle:bytype550  550
+$/angle:bytype551  551
+$/angle:bytype552  552
+$/angle:bytype553  553
+$/angle:bytype554  554
+$/angle:bytype555  555
+$/angle:bytype556  556
+$/angle:bytype557  557
+$/angle:bytype558  558
+$/angle:bytype559  559
+$/angle:bytype560  560
+$/angle:bytype561  561
+$/angle:bytype562  562
+$/angle:bytype563  563
+$/angle:bytype564  564
+$/angle:bytype565  565
+$/angle:bytype566  566
+$/angle:bytype567  567
+$/angle:bytype568  568
+$/angle:bytype569  569
+$/angle:bytype570  570
+$/angle:bytype571  571
+$/angle:bytype572  572
+$/angle:bytype573  573
+$/angle:bytype574  574
+$/angle:bytype575  575
+$/angle:bytype576  576
+$/angle:bytype577  577
+$/angle:bytype578  578
+$/angle:bytype579  579
+$/angle:bytype580  580
+$/angle:bytype581  581
+$/angle:bytype582  582
+$/angle:bytype583  583
+$/angle:bytype584  584
+$/angle:bytype585  585
+$/angle:bytype586  586
+$/angle:bytype587  587
+$/angle:bytype588  588
+$/angle:bytype589  589
+$/angle:bytype590  590
+$/angle:bytype591  591
+$/angle:bytype592  592
+$/angle:bytype593  593
+$/angle:bytype594  594
+$/angle:bytype595  595
+$/angle:bytype596  596
+$/angle:bytype597  597
+$/angle:bytype598  598
+$/angle:bytype599  599
+$/angle:bytype600  600
+$/angle:bytype601  601
+$/angle:bytype602  602
+$/angle:bytype603  603
+$/angle:bytype604  604
+$/angle:bytype605  605
+$/angle:bytype606  606
+$/angle:bytype607  607
+$/angle:bytype608  608
+$/angle:bytype609  609
+$/angle:bytype610  610
+$/angle:bytype611  611
+$/angle:bytype612  612
+$/angle:bytype613  613
+$/angle:bytype614  614
+$/angle:bytype615  615
+$/angle:bytype616  616
+$/angle:bytype617  617
+$/angle:bytype618  618
+$/angle:bytype619  619
+$/angle:bytype620  620
+$/angle:bytype621  621
+$/angle:bytype622  622
+$/angle:bytype623  623
+$/angle:bytype624  624
+$/angle:bytype625  625
+$/angle:bytype626  626
+$/angle:bytype627  627
+$/angle:bytype628  628
+$/angle:bytype629  629
+$/angle:bytype630  630
+$/angle:bytype631  631
+$/angle:bytype632  632
+$/angle:bytype633  633
+$/angle:bytype634  634
+$/angle:bytype635  635
+$/angle:bytype636  636
+$/angle:bytype637  637
+$/angle:bytype638  638
+$/angle:bytype639  639
+$/angle:bytype640  640
+$/angle:bytype641  641
+$/angle:bytype642  642
+$/angle:bytype643  643
+$/angle:bytype644  644
+$/angle:bytype645  645
+$/angle:bytype646  646
+$/angle:bytype647  647
+$/angle:bytype648  648
+$/angle:bytype649  649
+$/angle:bytype650  650
+$/angle:bytype651  651
+$/angle:bytype652  652
+$/angle:bytype653  653
+$/angle:bytype654  654
+$/angle:bytype655  655
+$/angle:bytype656  656
+$/angle:bytype657  657
+$/angle:bytype658  658
+$/angle:bytype659  659
+$/angle:bytype660  660
+$/angle:bytype661  661
+$/angle:bytype662  662
+$/angle:bytype663  663
+$/angle:bytype664  664
+$/angle:bytype665  665
+$/angle:bytype666  666
+$/angle:bytype667  667
+$/angle:bytype668  668
+$/angle:bytype669  669
+$/angle:bytype670  670
+$/angle:bytype671  671
+$/angle:bytype672  672
+$/angle:bytype673  673
+$/angle:bytype674  674
+$/angle:bytype675  675
+$/angle:bytype676  676
+$/angle:bytype677  677
+$/angle:bytype678  678
+$/angle:bytype679  679
+$/angle:bytype680  680
+$/angle:bytype681  681
+$/angle:bytype682  682
+$/angle:bytype683  683
+$/angle:bytype684  684
+$/angle:bytype685  685
+$/angle:bytype686  686
+$/angle:bytype687  687
+$/angle:bytype688  688
+$/angle:bytype689  689
+$/angle:bytype690  690
+$/angle:bytype691  691
+$/angle:bytype692  692
+$/angle:bytype693  693
+$/angle:bytype694  694
+$/angle:bytype695  695
+$/angle:bytype696  696
+$/angle:bytype697  697
+$/angle:bytype698  698
+$/angle:bytype699  699
+$/angle:bytype700  700
+$/angle:bytype701  701
+$/angle:bytype702  702
+$/angle:bytype703  703
+$/angle:bytype704  704
+$/angle:bytype705  705
+$/angle:bytype706  706
+$/angle:bytype707  707
+$/angle:bytype708  708
+$/angle:bytype709  709
+$/angle:bytype710  710
+$/angle:bytype711  711
+$/angle:bytype712  712
+$/angle:bytype713  713
+$/angle:bytype714  714
+$/angle:bytype715  715
+$/angle:bytype716  716
+$/angle:bytype717  717
+$/angle:bytype718  718
+$/angle:bytype719  719
+$/angle:bytype720  720
+$/angle:bytype721  721
+$/angle:bytype722  722
+$/angle:bytype723  723
+$/angle:bytype724  724
+$/angle:bytype725  725
+$/angle:bytype726  726
+$/angle:bytype727  727
+$/angle:bytype728  728
+$/angle:bytype729  729
+$/angle:bytype730  730
+$/angle:bytype731  731
+$/angle:bytype732  732
+$/angle:bytype733  733
+$/angle:bytype734  734
+$/angle:bytype735  735
+$/angle:bytype736  736
+$/dihedral:bytype1  1
+$/dihedral:bytype2  2
+$/dihedral:bytype3  3
+$/dihedral:bytype4  4
+$/dihedral:bytype5  5
+$/dihedral:bytype6  6
+$/dihedral:bytype7  7
+$/dihedral:bytype8  8
+$/dihedral:bytype9  9
+$/dihedral:bytype10  10
+$/dihedral:bytype11  11
+$/dihedral:bytype12  12
+$/dihedral:bytype13  13
+$/dihedral:bytype14  14
+$/dihedral:bytype15  15
+$/dihedral:bytype16  16
+$/dihedral:bytype17  17
+$/dihedral:bytype18  18
+$/dihedral:bytype19  19
+$/dihedral:bytype20  20
+$/dihedral:bytype21  21
+$/dihedral:bytype22  22
+$/dihedral:bytype23  23
+$/dihedral:bytype24  24
+$/dihedral:bytype25  25
+$/dihedral:bytype26  26
+$/dihedral:bytype27  27
+$/dihedral:bytype28  28
+$/dihedral:bytype29  29
+$/dihedral:bytype30  30
+$/dihedral:bytype31  31
+$/dihedral:bytype32  32
+$/dihedral:bytype33  33
+$/dihedral:bytype34  34
+$/dihedral:bytype35  35
+$/dihedral:bytype36  36
+$/dihedral:bytype37  37
+$/dihedral:bytype38  38
+$/dihedral:bytype39  39
+$/dihedral:bytype40  40
+$/dihedral:bytype41  41
+$/dihedral:bytype42  42
+$/dihedral:bytype43  43
+$/dihedral:bytype44  44
+$/dihedral:bytype45  45
+$/dihedral:bytype46  46
+$/dihedral:bytype47  47
+$/dihedral:bytype48  48
+$/dihedral:bytype49  49
+$/dihedral:bytype50  50
+$/dihedral:bytype51  51
+$/dihedral:bytype52  52
+$/dihedral:bytype53  53
+$/dihedral:bytype54  54
+$/dihedral:bytype55  55
+$/dihedral:bytype56  56
+$/dihedral:bytype57  57
+$/dihedral:bytype58  58
+$/dihedral:bytype59  59
+$/dihedral:bytype60  60
+$/dihedral:bytype61  61
+$/dihedral:bytype62  62
+$/dihedral:bytype63  63
+$/dihedral:bytype64  64
+$/dihedral:bytype65  65
+$/dihedral:bytype66  66
+$/dihedral:bytype67  67
+$/dihedral:bytype68  68
+$/dihedral:bytype69  69
+$/dihedral:bytype70  70
+$/dihedral:bytype71  71
+$/dihedral:bytype72  72
+$/dihedral:bytype73  73
+$/dihedral:bytype74  74
+$/dihedral:bytype75  75
+$/dihedral:bytype76  76
+$/dihedral:bytype77  77
+$/dihedral:bytype78  78
+$/dihedral:bytype79  79
+$/dihedral:bytype80  80
+$/dihedral:bytype81  81
+$/dihedral:bytype82  82
+$/dihedral:bytype83  83
+$/dihedral:bytype84  84
+$/dihedral:bytype85  85
+$/dihedral:bytype86  86
+$/dihedral:bytype87  87
+$/dihedral:bytype88  88
+$/dihedral:bytype89  89
+$/dihedral:bytype90  90
+$/dihedral:bytype91  91
+$/dihedral:bytype92  92
+$/dihedral:bytype93  93
+$/dihedral:bytype94  94
+$/dihedral:bytype95  95
+$/dihedral:bytype96  96
+$/dihedral:bytype97  97
+$/dihedral:bytype98  98
+$/dihedral:bytype99  99
+$/dihedral:bytype100  100
+$/dihedral:bytype101  101
+$/dihedral:bytype102  102
+$/dihedral:bytype103  103
+$/dihedral:bytype104  104
+$/dihedral:bytype105  105
+$/dihedral:bytype106  106
+$/dihedral:bytype107  107
+$/dihedral:bytype108  108
+$/dihedral:bytype109  109
+$/dihedral:bytype110  110
+$/dihedral:bytype111  111
+$/dihedral:bytype112  112
+$/dihedral:bytype113  113
+$/dihedral:bytype114  114
+$/dihedral:bytype115  115
+$/dihedral:bytype116  116
+$/dihedral:bytype117  117
+$/dihedral:bytype118  118
+$/dihedral:bytype119  119
+$/dihedral:bytype120  120
+$/dihedral:bytype121  121
+$/dihedral:bytype122  122
+$/dihedral:bytype123  123
+$/dihedral:bytype124  124
+$/dihedral:bytype125  125
+$/dihedral:bytype126  126
+$/dihedral:bytype127  127
+$/dihedral:bytype128  128
+$/dihedral:bytype129  129
+$/dihedral:bytype130  130
+$/dihedral:bytype131  131
+$/dihedral:bytype132  132
+$/dihedral:bytype133  133
+$/dihedral:bytype134  134
+$/dihedral:bytype135  135
+$/dihedral:bytype136  136
+$/dihedral:bytype137  137
+$/dihedral:bytype138  138
+$/dihedral:bytype139  139
+$/dihedral:bytype140  140
+$/dihedral:bytype141  141
+$/dihedral:bytype142  142
+$/dihedral:bytype143  143
+$/dihedral:bytype144  144
+$/dihedral:bytype145  145
+$/dihedral:bytype146  146
+$/dihedral:bytype147  147
+$/dihedral:bytype148  148
+$/dihedral:bytype149  149
+$/dihedral:bytype150  150
+$/dihedral:bytype151  151
+$/dihedral:bytype152  152
+$/dihedral:bytype153  153
+$/dihedral:bytype154  154
+$/dihedral:bytype155  155
+$/dihedral:bytype156  156
+$/dihedral:bytype157  157
+$/dihedral:bytype158  158
+$/dihedral:bytype159  159
+$/dihedral:bytype160  160
+$/dihedral:bytype161  161
+$/dihedral:bytype162  162
+$/dihedral:bytype163  163
+$/dihedral:bytype164  164
+$/dihedral:bytype165  165
+$/dihedral:bytype166  166
+$/dihedral:bytype167  167
+$/dihedral:bytype168  168
+$/dihedral:bytype169  169
+$/dihedral:bytype170  170
+$/dihedral:bytype171  171
+$/dihedral:bytype172  172
+$/dihedral:bytype173  173
+$/dihedral:bytype174  174
+$/dihedral:bytype175  175
+$/dihedral:bytype176  176
+$/dihedral:bytype177  177
+$/dihedral:bytype178  178
+$/dihedral:bytype179  179
+$/dihedral:bytype180  180
+$/dihedral:bytype181  181
+$/dihedral:bytype182  182
+$/dihedral:bytype183  183
+$/dihedral:bytype184  184
+$/dihedral:bytype185  185
+$/dihedral:bytype186  186
+$/dihedral:bytype187  187
+$/dihedral:bytype188  188
+$/dihedral:bytype189  189
+$/dihedral:bytype190  190
+$/dihedral:bytype191  191
+$/dihedral:bytype192  192
+$/dihedral:bytype193  193
+$/dihedral:bytype194  194
+$/dihedral:bytype195  195
+$/dihedral:bytype196  196
+$/dihedral:bytype197  197
+$/dihedral:bytype198  198
+$/dihedral:bytype199  199
+$/dihedral:bytype200  200
+$/dihedral:bytype201  201
+$/dihedral:bytype202  202
+$/dihedral:bytype203  203
+$/dihedral:bytype204  204
+$/dihedral:bytype205  205
+$/dihedral:bytype206  206
+$/dihedral:bytype207  207
+$/dihedral:bytype208  208
+$/dihedral:bytype209  209
+$/dihedral:bytype210  210
+$/dihedral:bytype211  211
+$/dihedral:bytype212  212
+$/dihedral:bytype213  213
+$/dihedral:bytype214  214
+$/dihedral:bytype215  215
+$/dihedral:bytype216  216
+$/dihedral:bytype217  217
+$/dihedral:bytype218  218
+$/dihedral:bytype219  219
+$/dihedral:bytype220  220
+$/dihedral:bytype221  221
+$/dihedral:bytype222  222
+$/dihedral:bytype223  223
+$/dihedral:bytype224  224
+$/dihedral:bytype225  225
+$/dihedral:bytype226  226
+$/dihedral:bytype227  227
+$/dihedral:bytype228  228
+$/dihedral:bytype229  229
+$/dihedral:bytype230  230
+$/dihedral:bytype231  231
+$/dihedral:bytype232  232
+$/dihedral:bytype233  233
+$/dihedral:bytype234  234
+$/dihedral:bytype235  235
+$/dihedral:bytype236  236
+$/dihedral:bytype237  237
+$/dihedral:bytype238  238
+$/dihedral:bytype239  239
+$/dihedral:bytype240  240
+$/dihedral:bytype241  241
+$/dihedral:bytype242  242
+$/dihedral:bytype243  243
+$/dihedral:bytype244  244
+$/dihedral:bytype245  245
+$/dihedral:bytype246  246
+$/dihedral:bytype247  247
+$/dihedral:bytype248  248
+$/dihedral:bytype249  249
+$/dihedral:bytype250  250
+$/dihedral:bytype251  251
+$/dihedral:bytype252  252
+$/dihedral:bytype253  253
+$/dihedral:bytype254  254
+$/dihedral:bytype255  255
+$/dihedral:bytype256  256
+$/dihedral:bytype257  257
+$/dihedral:bytype258  258
+$/dihedral:bytype259  259
+$/dihedral:bytype260  260
+$/dihedral:bytype261  261
+$/dihedral:bytype262  262
+$/dihedral:bytype263  263
+$/dihedral:bytype264  264
+$/dihedral:bytype265  265
+$/dihedral:bytype266  266
+$/dihedral:bytype267  267
+$/dihedral:bytype268  268
+$/dihedral:bytype269  269
+$/dihedral:bytype270  270
+$/dihedral:bytype271  271
+$/dihedral:bytype272  272
+$/dihedral:bytype273  273
+$/dihedral:bytype274  274
+$/dihedral:bytype275  275
+$/dihedral:bytype276  276
+$/dihedral:bytype277  277
+$/dihedral:bytype278  278
+$/dihedral:bytype279  279
+$/dihedral:bytype280  280
+$/dihedral:bytype281  281
+$/dihedral:bytype282  282
+$/dihedral:bytype283  283
+$/dihedral:bytype284  284
+$/dihedral:bytype285  285
+$/dihedral:bytype286  286
+$/dihedral:bytype287  287
+$/dihedral:bytype288  288
+$/dihedral:bytype289  289
+$/dihedral:bytype290  290
+$/dihedral:bytype291  291
+$/dihedral:bytype292  292
+$/dihedral:bytype293  293
+$/dihedral:bytype294  294
+$/dihedral:bytype295  295
+$/dihedral:bytype296  296
+$/dihedral:bytype297  297
+$/dihedral:bytype298  298
+$/dihedral:bytype299  299
+$/dihedral:bytype300  300
+$/dihedral:bytype301  301
+$/dihedral:bytype302  302
+$/dihedral:bytype303  303
+$/dihedral:bytype304  304
+$/dihedral:bytype305  305
+$/dihedral:bytype306  306
+$/dihedral:bytype307  307
+$/dihedral:bytype308  308
+$/dihedral:bytype309  309
+$/dihedral:bytype310  310
+$/dihedral:bytype311  311
+$/dihedral:bytype312  312
+$/dihedral:bytype313  313
+$/dihedral:bytype314  314
+$/dihedral:bytype315  315
+$/dihedral:bytype316  316
+$/dihedral:bytype317  317
+$/dihedral:bytype318  318
+$/dihedral:bytype319  319
+$/dihedral:bytype320  320
+$/dihedral:bytype321  321
+$/dihedral:bytype322  322
+$/dihedral:bytype323  323
+$/dihedral:bytype324  324
+$/dihedral:bytype325  325
+$/dihedral:bytype326  326
+$/dihedral:bytype327  327
+$/dihedral:bytype328  328
+$/dihedral:bytype329  329
+$/dihedral:bytype330  330
+$/dihedral:bytype331  331
+$/dihedral:bytype332  332
+$/dihedral:bytype333  333
+$/dihedral:bytype334  334
+$/dihedral:bytype335  335
+$/dihedral:bytype336  336
+$/dihedral:bytype337  337
+$/dihedral:bytype338  338
+$/dihedral:bytype339  339
+$/dihedral:bytype340  340
+$/dihedral:bytype341  341
+$/dihedral:bytype342  342
+$/dihedral:bytype343  343
+$/dihedral:bytype344  344
+$/dihedral:bytype345  345
+$/dihedral:bytype346  346
+$/dihedral:bytype347  347
+$/dihedral:bytype348  348
+$/dihedral:bytype349  349
+$/dihedral:bytype350  350
+$/dihedral:bytype351  351
+$/dihedral:bytype352  352
+$/dihedral:bytype353  353
+$/dihedral:bytype354  354
+$/dihedral:bytype355  355
+$/dihedral:bytype356  356
+$/dihedral:bytype357  357
+$/dihedral:bytype358  358
+$/dihedral:bytype359  359
+$/dihedral:bytype360  360
+$/dihedral:bytype361  361
+$/dihedral:bytype362  362
+$/dihedral:bytype363  363
+$/dihedral:bytype364  364
+$/dihedral:bytype365  365
+$/dihedral:bytype366  366
+$/dihedral:bytype367  367
+$/dihedral:bytype368  368
+$/dihedral:bytype369  369
+$/dihedral:bytype370  370
+$/dihedral:bytype371  371
+$/dihedral:bytype372  372
+$/dihedral:bytype373  373
+$/dihedral:bytype374  374
+$/dihedral:bytype375  375
+$/dihedral:bytype376  376
+$/dihedral:bytype377  377
+$/dihedral:bytype378  378
+$/dihedral:bytype379  379
+$/dihedral:bytype380  380
+$/dihedral:bytype381  381
+$/dihedral:bytype382  382
+$/dihedral:bytype383  383
+$/dihedral:bytype384  384
+$/dihedral:bytype385  385
+$/dihedral:bytype386  386
+$/dihedral:bytype387  387
+$/dihedral:bytype388  388
+$/dihedral:bytype389  389
+$/dihedral:bytype390  390
+$/dihedral:bytype391  391
+$/dihedral:bytype392  392
+$/dihedral:bytype393  393
+$/dihedral:bytype394  394
+$/dihedral:bytype395  395
+$/dihedral:bytype396  396
+$/dihedral:bytype397  397
+$/dihedral:bytype398  398
+$/dihedral:bytype399  399
+$/dihedral:bytype400  400
+$/dihedral:bytype401  401
+$/dihedral:bytype402  402
+$/dihedral:bytype403  403
+$/dihedral:bytype404  404
+$/dihedral:bytype405  405
+$/dihedral:bytype406  406
+$/dihedral:bytype407  407
+$/dihedral:bytype408  408
+$/dihedral:bytype409  409
+$/dihedral:bytype410  410
+$/dihedral:bytype411  411
+$/dihedral:bytype412  412
+$/dihedral:bytype413  413
+$/dihedral:bytype414  414
+$/dihedral:bytype415  415
+$/dihedral:bytype416  416
+$/dihedral:bytype417  417
+$/dihedral:bytype418  418
+$/dihedral:bytype419  419
+$/dihedral:bytype420  420
+$/dihedral:bytype421  421
+$/dihedral:bytype422  422
+$/dihedral:bytype423  423
+$/dihedral:bytype424  424
+$/dihedral:bytype425  425
+$/dihedral:bytype426  426
+$/dihedral:bytype427  427
+$/dihedral:bytype428  428
+$/dihedral:bytype429  429
+$/dihedral:bytype430  430
+$/dihedral:bytype431  431
+$/dihedral:bytype432  432
+$/dihedral:bytype433  433
+$/dihedral:bytype434  434
+$/dihedral:bytype435  435
+$/dihedral:bytype436  436
+$/dihedral:bytype437  437
+$/dihedral:bytype438  438
+$/dihedral:bytype439  439
+$/dihedral:bytype440  440
+$/dihedral:bytype441  441
+$/dihedral:bytype442  442
+$/dihedral:bytype443  443
+$/dihedral:bytype444  444
+$/dihedral:bytype445  445
+$/dihedral:bytype446  446
+$/dihedral:bytype447  447
+$/dihedral:bytype448  448
+$/dihedral:bytype449  449
+$/dihedral:bytype450  450
+$/dihedral:bytype451  451
+$/dihedral:bytype452  452
+$/dihedral:bytype453  453
+$/dihedral:bytype454  454
+$/dihedral:bytype455  455
+$/dihedral:bytype456  456
+$/dihedral:bytype457  457
+$/dihedral:bytype458  458
+$/dihedral:bytype459  459
+$/dihedral:bytype460  460
+$/dihedral:bytype461  461
+$/dihedral:bytype462  462
+$/dihedral:bytype463  463
+$/dihedral:bytype464  464
+$/dihedral:bytype465  465
+$/dihedral:bytype466  466
+$/dihedral:bytype467  467
+$/dihedral:bytype468  468
+$/dihedral:bytype469  469
+$/dihedral:bytype470  470
+$/dihedral:bytype471  471
+$/dihedral:bytype472  472
+$/dihedral:bytype473  473
+$/dihedral:bytype474  474
+$/dihedral:bytype475  475
+$/dihedral:bytype476  476
+$/dihedral:bytype477  477
+$/dihedral:bytype478  478
+$/dihedral:bytype479  479
+$/dihedral:bytype480  480
+$/dihedral:bytype481  481
+$/dihedral:bytype482  482
+$/dihedral:bytype483  483
+$/dihedral:bytype484  484
+$/dihedral:bytype485  485
+$/dihedral:bytype486  486
+$/dihedral:bytype487  487
+$/dihedral:bytype488  488
+$/dihedral:bytype489  489
+$/dihedral:bytype490  490
+$/dihedral:bytype491  491
+$/dihedral:bytype492  492
+$/dihedral:bytype493  493
+$/dihedral:bytype494  494
+$/dihedral:bytype495  495
+$/dihedral:bytype496  496
+$/dihedral:bytype497  497
+$/dihedral:bytype498  498
+$/dihedral:bytype499  499
+$/dihedral:bytype500  500
+$/dihedral:bytype501  501
+$/dihedral:bytype502  502
+$/dihedral:bytype503  503
+$/dihedral:bytype504  504
+$/dihedral:bytype505  505
+$/dihedral:bytype506  506
+$/dihedral:bytype507  507
+$/dihedral:bytype508  508
+$/dihedral:bytype509  509
+$/dihedral:bytype510  510
+$/dihedral:bytype511  511
+$/dihedral:bytype512  512
+$/dihedral:bytype513  513
+$/dihedral:bytype514  514
+$/dihedral:bytype515  515
+$/dihedral:bytype516  516
+$/dihedral:bytype517  517
+$/dihedral:bytype518  518
+$/dihedral:bytype519  519
+$/dihedral:bytype520  520
+$/dihedral:bytype521  521
+$/dihedral:bytype522  522
+$/dihedral:bytype523  523
+$/dihedral:bytype524  524
+$/dihedral:bytype525  525
+$/dihedral:bytype526  526
+$/dihedral:bytype527  527
+$/dihedral:bytype528  528
+$/dihedral:bytype529  529
+$/dihedral:bytype530  530
+$/dihedral:bytype531  531
+$/dihedral:bytype532  532
+$/dihedral:bytype533  533
+$/dihedral:bytype534  534
+$/dihedral:bytype535  535
+$/dihedral:bytype536  536
+$/dihedral:bytype537  537
+$/dihedral:bytype538  538
+$/dihedral:bytype539  539
+$/dihedral:bytype540  540
+$/dihedral:bytype541  541
+$/dihedral:bytype542  542
+$/dihedral:bytype543  543
+$/dihedral:bytype544  544
+$/dihedral:bytype545  545
+$/dihedral:bytype546  546
+$/dihedral:bytype547  547
+$/dihedral:bytype548  548
+$/dihedral:bytype549  549
+$/dihedral:bytype550  550
+$/dihedral:bytype551  551
+$/dihedral:bytype552  552
+$/dihedral:bytype553  553
+$/dihedral:bytype554  554
+$/dihedral:bytype555  555
+$/dihedral:bytype556  556
+$/dihedral:bytype557  557
+$/dihedral:bytype558  558
+$/dihedral:bytype559  559
+$/dihedral:bytype560  560
+$/dihedral:bytype561  561
+$/dihedral:bytype562  562
+$/dihedral:bytype563  563
+$/dihedral:bytype564  564
+$/dihedral:bytype565  565
+$/dihedral:bytype566  566
+$/dihedral:bytype567  567
+$/dihedral:bytype568  568
+$/dihedral:bytype569  569
+$/dihedral:bytype570  570
+$/dihedral:bytype571  571
+$/dihedral:bytype572  572
+$/dihedral:bytype573  573
+$/dihedral:bytype574  574
+$/dihedral:bytype575  575
+$/dihedral:bytype576  576
+$/dihedral:bytype577  577
+$/dihedral:bytype578  578
+$/dihedral:bytype579  579
+$/dihedral:bytype580  580
+$/dihedral:bytype581  581
+$/dihedral:bytype582  582
+$/dihedral:bytype583  583
+$/dihedral:bytype584  584
+$/dihedral:bytype585  585
+$/dihedral:bytype586  586
+$/dihedral:bytype587  587
+$/dihedral:bytype588  588
+$/dihedral:bytype589  589
+$/dihedral:bytype590  590
+$/dihedral:bytype591  591
+$/dihedral:bytype592  592
+$/dihedral:bytype593  593
+$/dihedral:bytype594  594
+$/dihedral:bytype595  595
+$/dihedral:bytype596  596
+$/dihedral:bytype597  597
+$/dihedral:bytype598  598
+$/dihedral:bytype599  599
+$/dihedral:bytype600  600
+$/dihedral:bytype601  601
+$/dihedral:bytype602  602
+$/dihedral:bytype603  603
+$/dihedral:bytype604  604
+$/dihedral:bytype605  605
+$/dihedral:bytype606  606
+$/dihedral:bytype607  607
+$/dihedral:bytype608  608
+$/dihedral:bytype609  609
+$/dihedral:bytype610  610
+$/dihedral:bytype611  611
+$/dihedral:bytype612  612
+$/dihedral:bytype613  613
+$/dihedral:bytype614  614
+$/dihedral:bytype615  615
+$/dihedral:bytype616  616
+$/dihedral:bytype617  617
+$/dihedral:bytype618  618
+$/dihedral:bytype619  619
+$/dihedral:bytype620  620
+$/dihedral:bytype621  621
+$/dihedral:bytype622  622
+$/dihedral:bytype623  623
+$/dihedral:bytype624  624
+$/dihedral:bytype625  625
+$/dihedral:bytype626  626
+$/dihedral:bytype627  627
+$/dihedral:bytype628  628
+$/dihedral:bytype629  629
+$/dihedral:bytype630  630
+$/dihedral:bytype631  631
+$/dihedral:bytype632  632
+$/dihedral:bytype633  633
+$/dihedral:bytype634  634
+$/dihedral:bytype635  635
+$/dihedral:bytype636  636
+$/dihedral:bytype637  637
+$/dihedral:bytype638  638
+$/dihedral:bytype639  639
+$/dihedral:bytype640  640
+$/dihedral:bytype641  641
+$/dihedral:bytype642  642
+$/dihedral:bytype643  643
+$/dihedral:bytype644  644
+$/dihedral:bytype645  645
+$/dihedral:bytype646  646
+$/dihedral:bytype647  647
+$/dihedral:bytype648  648
+$/dihedral:bytype649  649
+$/dihedral:bytype650  650
+$/dihedral:bytype651  651
+$/dihedral:bytype652  652
+$/dihedral:bytype653  653
+$/dihedral:bytype654  654
+$/dihedral:bytype655  655
+$/dihedral:bytype656  656
+$/dihedral:bytype657  657
+$/dihedral:bytype658  658
+$/dihedral:bytype659  659
+$/dihedral:bytype660  660
+$/dihedral:bytype661  661
+$/dihedral:bytype662  662
+$/dihedral:bytype663  663
+$/dihedral:bytype664  664
+$/dihedral:bytype665  665
+$/dihedral:bytype666  666
+$/dihedral:bytype667  667
+$/dihedral:bytype668  668
+$/dihedral:bytype669  669
+$/dihedral:bytype670  670
+$/dihedral:bytype671  671
+$/dihedral:bytype672  672
+$/dihedral:bytype673  673
+$/dihedral:bytype674  674
+$/dihedral:bytype675  675
+$/dihedral:bytype676  676
+$/dihedral:bytype677  677
+$/dihedral:bytype678  678
+$/dihedral:bytype679  679
+$/dihedral:bytype680  680
+$/dihedral:bytype681  681
+$/dihedral:bytype682  682
+$/dihedral:bytype683  683
+$/dihedral:bytype684  684
+$/dihedral:bytype685  685
+$/dihedral:bytype686  686
+$/dihedral:bytype687  687
+$/dihedral:bytype688  688
+$/dihedral:bytype689  689
+$/dihedral:bytype690  690
+$/dihedral:bytype691  691
+$/dihedral:bytype692  692
+$/dihedral:bytype693  693
+$/dihedral:bytype694  694
+$/dihedral:bytype695  695
+$/dihedral:bytype696  696
+$/dihedral:bytype697  697
+$/dihedral:bytype698  698
+$/dihedral:bytype699  699
+$/dihedral:bytype700  700
+$/dihedral:bytype701  701
+$/dihedral:bytype702  702
+$/dihedral:bytype703  703
+$/dihedral:bytype704  704
+$/dihedral:bytype705  705
+$/dihedral:bytype706  706
+$/dihedral:bytype707  707
+$/dihedral:bytype708  708
+$/dihedral:bytype709  709
+$/dihedral:bytype710  710
+$/dihedral:bytype711  711
+$/dihedral:bytype712  712
+$/dihedral:bytype713  713
+$/dihedral:bytype714  714
+$/dihedral:bytype715  715
+$/dihedral:bytype716  716
+$/dihedral:bytype717  717
+$/dihedral:bytype718  718
+$/dihedral:bytype719  719
+$/dihedral:bytype720  720
+$/dihedral:bytype721  721
+$/dihedral:bytype722  722
+$/dihedral:bytype723  723
+$/dihedral:bytype724  724
+$/dihedral:bytype725  725
+$/dihedral:bytype726  726
+$/dihedral:bytype727  727
+$/dihedral:bytype728  728
+$/dihedral:bytype729  729
+$/dihedral:bytype730  730
+$/dihedral:bytype731  731
+$/dihedral:bytype732  732
+$/dihedral:bytype733  733
+$/dihedral:bytype734  734
+$/dihedral:bytype735  735
+$/dihedral:bytype736  736
+$/dihedral:bytype737  737
+$/dihedral:bytype738  738
+$/dihedral:bytype739  739
+$/dihedral:bytype740  740
+$/dihedral:bytype741  741
+$/dihedral:bytype742  742
+$/dihedral:bytype743  743
+$/dihedral:bytype744  744
+$/dihedral:bytype745  745
+$/dihedral:bytype746  746
+$/dihedral:bytype747  747
+$/dihedral:bytype748  748
+$/dihedral:bytype749  749
+$/dihedral:bytype750  750
+$/dihedral:bytype751  751
+$/dihedral:bytype752  752
+$/dihedral:bytype753  753
+$/dihedral:bytype754  754
+$/dihedral:bytype755  755
+$/dihedral:bytype756  756
+$/dihedral:bytype757  757
+$/dihedral:bytype758  758
+$/dihedral:bytype759  759
+$/dihedral:bytype760  760
+$/dihedral:bytype761  761
+$/dihedral:bytype762  762
+$/dihedral:bytype763  763
+$/dihedral:bytype764  764
+$/dihedral:bytype765  765
+$/dihedral:bytype766  766
+$/dihedral:bytype767  767
+$/dihedral:bytype768  768
+$/dihedral:bytype769  769
+$/dihedral:bytype770  770
+$/dihedral:bytype771  771
+$/dihedral:bytype772  772
+$/dihedral:bytype773  773
+$/dihedral:bytype774  774
+$/dihedral:bytype775  775
+$/dihedral:bytype776  776
+$/dihedral:bytype777  777
+$/dihedral:bytype778  778
+$/dihedral:bytype779  779
+$/dihedral:bytype780  780
+$/dihedral:bytype781  781
+$/dihedral:bytype782  782
+$/dihedral:bytype783  783
+$/dihedral:bytype784  784
+$/dihedral:bytype785  785
+$/dihedral:bytype786  786
+$/dihedral:bytype787  787
+$/dihedral:bytype788  788
+$/dihedral:bytype789  789
+$/dihedral:bytype790  790
+$/dihedral:bytype791  791
+$/dihedral:bytype792  792
+$/dihedral:bytype793  793
+$/dihedral:bytype794  794
+$/dihedral:bytype795  795
+$/dihedral:bytype796  796
+$/dihedral:bytype797  797
+$/dihedral:bytype798  798
+$/dihedral:bytype799  799
+$/dihedral:bytype800  800
+$/dihedral:bytype801  801
+$/dihedral:bytype802  802
+$/dihedral:bytype803  803
+$/dihedral:bytype804  804
+$/dihedral:bytype805  805
+$/dihedral:bytype806  806
+$/dihedral:bytype807  807
+$/dihedral:bytype808  808
+$/dihedral:bytype809  809
+$/dihedral:bytype810  810
+$/dihedral:bytype811  811
+$/dihedral:bytype812  812
+$/dihedral:bytype813  813
+$/dihedral:bytype814  814
+$/dihedral:bytype815  815
+$/dihedral:bytype816  816
+$/dihedral:bytype817  817
+$/dihedral:bytype818  818
+$/dihedral:bytype819  819
+$/dihedral:bytype820  820
+$/dihedral:bytype821  821
+$/dihedral:bytype822  822
+$/dihedral:bytype823  823
+$/dihedral:bytype824  824
+$/dihedral:bytype825  825
+$/dihedral:bytype826  826
+$/dihedral:bytype827  827
+$/dihedral:bytype828  828
+$/dihedral:bytype829  829
+$/dihedral:bytype830  830
+$/dihedral:bytype831  831
+$/dihedral:bytype832  832
+$/dihedral:bytype833  833
+$/dihedral:bytype834  834
+$/dihedral:bytype835  835
+$/dihedral:bytype836  836
+$/dihedral:bytype837  837
+$/dihedral:bytype838  838
+$/dihedral:bytype839  839
+$/dihedral:bytype840  840
+$/dihedral:bytype841  841
+$/dihedral:bytype842  842
+$/dihedral:bytype843  843
+$/dihedral:bytype844  844
+$/dihedral:bytype845  845
+$/dihedral:bytype846  846
+$/dihedral:bytype847  847
+$/dihedral:bytype848  848
+$/dihedral:bytype849  849
+$/dihedral:bytype850  850
+$/dihedral:bytype851  851
+$/dihedral:bytype852  852
+$/dihedral:bytype853  853
+$/dihedral:bytype854  854
+$/dihedral:bytype855  855
+$/dihedral:bytype856  856
+$/dihedral:bytype857  857
+$/dihedral:bytype858  858
+$/dihedral:bytype859  859
+$/dihedral:bytype860  860
+$/dihedral:bytype861  861
+$/dihedral:bytype862  862
+$/dihedral:bytype863  863
+$/dihedral:bytype864  864
+$/dihedral:bytype865  865
+$/dihedral:bytype866  866
+$/dihedral:bytype867  867
+$/dihedral:bytype868  868
+$/dihedral:bytype869  869
+$/dihedral:bytype870  870
+$/dihedral:bytype871  871
+$/dihedral:bytype872  872
+$/dihedral:bytype873  873
+$/dihedral:bytype874  874
+$/dihedral:bytype875  875
+$/dihedral:bytype876  876
+$/dihedral:bytype877  877
+$/dihedral:bytype878  878
+$/dihedral:bytype879  879
+$/dihedral:bytype880  880
+$/dihedral:bytype881  881
+$/dihedral:bytype882  882
+$/dihedral:bytype883  883
+$/dihedral:bytype884  884
+$/dihedral:bytype885  885
+$/dihedral:bytype886  886
+$/dihedral:bytype887  887
+$/dihedral:bytype888  888
+$/dihedral:bytype889  889
+$/dihedral:bytype890  890
+$/dihedral:bytype891  891
+$/dihedral:bytype892  892
+$/dihedral:bytype893  893
+$/dihedral:bytype894  894
+$/dihedral:bytype895  895
+$/dihedral:bytype896  896
+$/dihedral:bytype897  897
+$/dihedral:bytype898  898
+$/dihedral:bytype899  899
+$/dihedral:bytype900  900
+$/dihedral:bytype901  901
+$/dihedral:bytype902  902
+$/dihedral:bytype903  903
+$/dihedral:bytype904  904
+$/dihedral:bytype905  905
+$/dihedral:bytype906  906
+$/dihedral:bytype907  907
+$/dihedral:bytype908  908
+$/dihedral:bytype909  909
+$/dihedral:bytype910  910
+$/dihedral:bytype911  911
+$/dihedral:bytype912  912
+$/dihedral:bytype913  913
+$/dihedral:bytype914  914
+$/dihedral:bytype915  915
+$/dihedral:bytype916  916
+$/dihedral:bytype917  917
+$/dihedral:bytype918  918
+$/dihedral:bytype919  919
+$/dihedral:bytype920  920
+$/dihedral:bytype921  921
+$/dihedral:bytype922  922
+$/dihedral:bytype923  923
+$/dihedral:bytype924  924
+$/dihedral:bytype925  925
+$/dihedral:bytype926  926
+$/dihedral:bytype927  927
+$/dihedral:bytype928  928
+$/dihedral:bytype929  929
+$/dihedral:bytype930  930
+$/dihedral:bytype931  931
+$/dihedral:bytype932  932
+$/dihedral:bytype933  933
+$/dihedral:bytype934  934
+$/dihedral:bytype935  935
+$/dihedral:bytype936  936
+$/dihedral:bytype937  937
+$/dihedral:bytype938  938
+$/dihedral:bytype939  939
+$/dihedral:bytype940  940
+$/dihedral:bytype941  941
+$/dihedral:bytype942  942
+$/dihedral:bytype943  943
+$/dihedral:bytype944  944
+$/dihedral:bytype945  945
+$/dihedral:bytype946  946
+$/dihedral:bytype947  947
+$/dihedral:bytype948  948
+$/dihedral:bytype949  949
+$/dihedral:bytype950  950
+$/dihedral:bytype951  951
+$/dihedral:bytype952  952
+$/dihedral:bytype953  953
+$/dihedral:bytype954  954
+$/dihedral:bytype955  955
+$/dihedral:bytype956  956
+$/dihedral:bytype957  957
+$/dihedral:bytype958  958
+$/dihedral:bytype959  959
+$/dihedral:bytype960  960
+$/dihedral:bytype961  961
+$/dihedral:bytype962  962
+$/dihedral:bytype963  963
+$/dihedral:bytype964  964
+$/dihedral:bytype965  965
+$/dihedral:bytype966  966
+$/dihedral:bytype967  967
+$/dihedral:bytype968  968
+$/dihedral:bytype969  969
+$/dihedral:bytype970  970
+$/dihedral:bytype971  971
+$/dihedral:bytype972  972
+$/dihedral:bytype973  973
+$/dihedral:bytype974  974
+$/dihedral:bytype975  975
+$/dihedral:bytype976  976
+$/dihedral:bytype977  977
+$/dihedral:bytype978  978
+$/dihedral:bytype979  979
+$/dihedral:bytype980  980
+$/dihedral:bytype981  981
+$/dihedral:bytype982  982
+$/dihedral:bytype983  983
+$/dihedral:bytype984  984
+$/dihedral:bytype985  985
+$/dihedral:bytype986  986
+$/dihedral:bytype987  987
+$/dihedral:bytype988  988
+$/dihedral:bytype989  989
+$/dihedral:bytype990  990
+$/dihedral:bytype991  991
+$/dihedral:bytype992  992
+$/dihedral:bytype993  993
+$/dihedral:bytype994  994
+$/dihedral:bytype995  995
+$/dihedral:bytype996  996
+$/dihedral:bytype997  997
+$/dihedral:bytype998  998
+$/dihedral:bytype999  999
+$/dihedral:bytype1000  1000
+$/dihedral:bytype1001  1001
+$/dihedral:bytype1002  1002
+$/dihedral:bytype1003  1003
+$/dihedral:bytype1004  1004
+$/dihedral:bytype1005  1005
+$/dihedral:bytype1006  1006
+$/dihedral:bytype1007  1007
+$/dihedral:bytype1008  1008
+$/dihedral:bytype1009  1009
+$/dihedral:bytype1010  1010
+$/dihedral:bytype1011  1011
+$/dihedral:bytype1012  1012
+$/dihedral:bytype1013  1013
+$/dihedral:bytype1014  1014
+$/dihedral:bytype1015  1015
+$/dihedral:bytype1016  1016
+$/dihedral:bytype1017  1017
+$/dihedral:bytype1018  1018
+$/dihedral:bytype1019  1019
+$/dihedral:bytype1020  1020
+$/dihedral:bytype1021  1021
+$/dihedral:bytype1022  1022
+$/dihedral:bytype1023  1023
+$/dihedral:bytype1024  1024
+$/dihedral:bytype1025  1025
+$/dihedral:bytype1026  1026
+$/dihedral:bytype1027  1027
+$/dihedral:bytype1028  1028
+$/dihedral:bytype1029  1029
+$/dihedral:bytype1030  1030
+$/dihedral:bytype1031  1031
+$/dihedral:bytype1032  1032
+$/dihedral:bytype1033  1033
+$/dihedral:bytype1034  1034
+$/dihedral:bytype1035  1035
+$/dihedral:bytype1036  1036
+$/dihedral:bytype1037  1037
+$/dihedral:bytype1038  1038
+$/dihedral:bytype1039  1039
+$/dihedral:bytype1040  1040
+$/dihedral:bytype1041  1041
+$/dihedral:bytype1042  1042
+$/dihedral:bytype1043  1043
+$/dihedral:bytype1044  1044
+$/dihedral:bytype1045  1045
+$/dihedral:bytype1046  1046
+$/dihedral:bytype1047  1047
+$/dihedral:bytype1048  1048
+$/dihedral:bytype1049  1049
+$/dihedral:bytype1050  1050
+$/dihedral:bytype1051  1051
+$/dihedral:bytype1052  1052
+$/dihedral:bytype1053  1053
+$/dihedral:bytype1054  1054
+$/dihedral:bytype1055  1055
+$/dihedral:bytype1056  1056
+$/dihedral:bytype1057  1057
+$/dihedral:bytype1058  1058
+$/dihedral:bytype1059  1059
+$/dihedral:bytype1060  1060
+$/dihedral:bytype1061  1061
+$/dihedral:bytype1062  1062
+$/dihedral:bytype1063  1063
+$/dihedral:bytype1064  1064
+$/dihedral:bytype1065  1065
+$/dihedral:bytype1066  1066
+$/dihedral:bytype1067  1067
+$/dihedral:bytype1068  1068
+$/dihedral:bytype1069  1069
+$/dihedral:bytype1070  1070
+$/dihedral:bytype1071  1071
+$/dihedral:bytype1072  1072
+$/dihedral:bytype1073  1073
+$/dihedral:bytype1074  1074
+$/dihedral:bytype1075  1075
+$/dihedral:bytype1076  1076
+$/dihedral:bytype1077  1077
+$/dihedral:bytype1078  1078
+$/dihedral:bytype1079  1079
+$/dihedral:bytype1080  1080
+$/dihedral:bytype1081  1081
+$/dihedral:bytype1082  1082
+$/dihedral:bytype1083  1083
+$/dihedral:bytype1084  1084
+$/dihedral:bytype1085  1085
+$/dihedral:bytype1086  1086
+$/dihedral:bytype1087  1087
+$/dihedral:bytype1088  1088
+$/dihedral:bytype1089  1089
+$/dihedral:bytype1090  1090
+$/dihedral:bytype1091  1091
+$/dihedral:bytype1092  1092
+$/dihedral:bytype1093  1093
+$/dihedral:bytype1094  1094
+$/dihedral:bytype1095  1095
+$/dihedral:bytype1096  1096
+$/dihedral:bytype1097  1097
+$/dihedral:bytype1098  1098
+$/dihedral:bytype1099  1099
+$/dihedral:bytype1100  1100
+$/dihedral:bytype1101  1101
+$/dihedral:bytype1102  1102
+$/dihedral:bytype1103  1103
+$/dihedral:bytype1104  1104
+$/dihedral:bytype1105  1105
+$/dihedral:bytype1106  1106
+$/dihedral:bytype1107  1107
+$/dihedral:bytype1108  1108
+$/dihedral:bytype1109  1109
+$/dihedral:bytype1110  1110
+$/dihedral:bytype1111  1111
+$/dihedral:bytype1112  1112
+$/dihedral:bytype1113  1113
+$/dihedral:bytype1114  1114
+$/dihedral:bytype1115  1115
+$/dihedral:bytype1116  1116
+$/dihedral:bytype1117  1117
+$/dihedral:bytype1118  1118
+$/dihedral:bytype1119  1119
+$/dihedral:bytype1120  1120
+$/dihedral:bytype1121  1121
+$/dihedral:bytype1122  1122
+$/dihedral:bytype1123  1123
+$/dihedral:bytype1124  1124
+$/dihedral:bytype1125  1125
+$/dihedral:bytype1126  1126
+$/dihedral:bytype1127  1127
+$/dihedral:bytype1128  1128
+$/dihedral:bytype1129  1129
+$/dihedral:bytype1130  1130
+$/dihedral:bytype1131  1131
+$/dihedral:bytype1132  1132
+$/dihedral:bytype1133  1133
+$/dihedral:bytype1134  1134
+$/dihedral:bytype1135  1135
+$/dihedral:bytype1136  1136
+$/dihedral:bytype1137  1137
+$/dihedral:bytype1138  1138
+$/dihedral:bytype1139  1139
+$/dihedral:bytype1140  1140
+$/dihedral:bytype1141  1141
+$/dihedral:bytype1142  1142
+$/dihedral:bytype1143  1143
+$/dihedral:bytype1144  1144
+$/dihedral:bytype1145  1145
+$/dihedral:bytype1146  1146
+$/dihedral:bytype1147  1147
+$/dihedral:bytype1148  1148
+$/dihedral:bytype1149  1149
+$/dihedral:bytype1150  1150
+$/dihedral:bytype1151  1151
+$/dihedral:bytype1152  1152
+$/dihedral:bytype1153  1153
+$/dihedral:bytype1154  1154
+$/dihedral:bytype1155  1155
+$/dihedral:bytype1156  1156
+$/dihedral:bytype1157  1157
+$/dihedral:bytype1158  1158
+$/dihedral:bytype1159  1159
+$/dihedral:bytype1160  1160
+$/dihedral:bytype1161  1161
+$/dihedral:bytype1162  1162
+$/dihedral:bytype1163  1163
+$/dihedral:bytype1164  1164
+$/dihedral:bytype1165  1165
+$/dihedral:bytype1166  1166
+$/dihedral:bytype1167  1167
+$/dihedral:bytype1168  1168
+$/dihedral:bytype1169  1169
+$/dihedral:bytype1170  1170
+$/dihedral:bytype1171  1171
+$/dihedral:bytype1172  1172
+$/dihedral:bytype1173  1173
+$/dihedral:bytype1174  1174
+$/dihedral:bytype1175  1175
+$/dihedral:bytype1176  1176
+$/dihedral:bytype1177  1177
+$/dihedral:bytype1178  1178
+$/dihedral:bytype1179  1179
+$/dihedral:bytype1180  1180
+$/dihedral:bytype1181  1181
+$/dihedral:bytype1182  1182
+$/dihedral:bytype1183  1183
+$/dihedral:bytype1184  1184
+$/dihedral:bytype1185  1185
+$/dihedral:bytype1186  1186
+$/dihedral:bytype1187  1187
+$/dihedral:bytype1188  1188
+$/dihedral:bytype1189  1189
+$/dihedral:bytype1190  1190
+$/dihedral:bytype1191  1191
+$/dihedral:bytype1192  1192
+$/dihedral:bytype1193  1193
+$/dihedral:bytype1194  1194
+$/dihedral:bytype1195  1195
+$/dihedral:bytype1196  1196
+$/dihedral:bytype1197  1197
+$/dihedral:bytype1198  1198
+$/dihedral:bytype1199  1199
+$/dihedral:bytype1200  1200
+$/dihedral:bytype1201  1201
+$/dihedral:bytype1202  1202
+$/dihedral:bytype1203  1203
+$/dihedral:bytype1204  1204
+$/dihedral:bytype1205  1205
+$/dihedral:bytype1206  1206
+$/dihedral:bytype1207  1207
+$/dihedral:bytype1208  1208
+$/dihedral:bytype1209  1209
+$/dihedral:bytype1210  1210
+$/dihedral:bytype1211  1211
+$/dihedral:bytype1212  1212
+$/dihedral:bytype1213  1213
+$/dihedral:bytype1214  1214
+$/dihedral:bytype1215  1215
+$/dihedral:bytype1216  1216
+$/dihedral:bytype1217  1217
+$/dihedral:bytype1218  1218
+$/dihedral:bytype1219  1219
+$/dihedral:bytype1220  1220
+$/dihedral:bytype1221  1221
+$/dihedral:bytype1222  1222
+$/dihedral:bytype1223  1223
+$/dihedral:bytype1224  1224
+$/dihedral:bytype1225  1225
+$/dihedral:bytype1226  1226
+$/dihedral:bytype1227  1227
+$/dihedral:bytype1228  1228
+$/dihedral:bytype1229  1229
+$/dihedral:bytype1230  1230
+$/dihedral:bytype1231  1231
+$/dihedral:bytype1232  1232
+$/dihedral:bytype1233  1233
+$/dihedral:bytype1234  1234
+$/dihedral:bytype1235  1235
+$/dihedral:bytype1236  1236
+$/dihedral:bytype1237  1237
+$/dihedral:bytype1238  1238
+$/dihedral:bytype1239  1239
+$/dihedral:bytype1240  1240
+$/dihedral:bytype1241  1241
+$/dihedral:bytype1242  1242
+$/dihedral:bytype1243  1243
+$/dihedral:bytype1244  1244
+$/dihedral:bytype1245  1245
+$/dihedral:bytype1246  1246
+$/dihedral:bytype1247  1247
+$/dihedral:bytype1248  1248
+$/dihedral:bytype1249  1249
+$/dihedral:bytype1250  1250
+$/dihedral:bytype1251  1251
+$/dihedral:bytype1252  1252
+$/dihedral:bytype1253  1253
+$/dihedral:bytype1254  1254
+$/dihedral:bytype1255  1255
+$/dihedral:bytype1256  1256
+$/dihedral:bytype1257  1257
+$/dihedral:bytype1258  1258
+$/dihedral:bytype1259  1259
+$/dihedral:bytype1260  1260
+$/dihedral:bytype1261  1261
+$/dihedral:bytype1262  1262
+$/dihedral:bytype1263  1263
+$/dihedral:bytype1264  1264
+$/dihedral:bytype1265  1265
+$/dihedral:bytype1266  1266
+$/dihedral:bytype1267  1267
+$/dihedral:bytype1268  1268
+$/dihedral:bytype1269  1269
+$/dihedral:bytype1270  1270
+$/dihedral:bytype1271  1271
+$/dihedral:bytype1272  1272
+$/dihedral:bytype1273  1273
+$/dihedral:bytype1274  1274
+$/dihedral:bytype1275  1275
+$/dihedral:bytype1276  1276
+$/dihedral:bytype1277  1277
+$/dihedral:bytype1278  1278
+$/dihedral:bytype1279  1279
+$/dihedral:bytype1280  1280
+$/dihedral:bytype1281  1281
+$/dihedral:bytype1282  1282
+$/dihedral:bytype1283  1283
+$/dihedral:bytype1284  1284
+$/dihedral:bytype1285  1285
+$/dihedral:bytype1286  1286
+$/dihedral:bytype1287  1287
+$/dihedral:bytype1288  1288
+$/dihedral:bytype1289  1289
+$/dihedral:bytype1290  1290
+$/dihedral:bytype1291  1291
+$/dihedral:bytype1292  1292
+$/dihedral:bytype1293  1293
+$/dihedral:bytype1294  1294
+$/dihedral:bytype1295  1295
+$/dihedral:bytype1296  1296
+$/dihedral:bytype1297  1297
+$/dihedral:bytype1298  1298
+$/dihedral:bytype1299  1299
+$/dihedral:bytype1300  1300
+$/dihedral:bytype1301  1301
+$/dihedral:bytype1302  1302
+$/dihedral:bytype1303  1303
+$/dihedral:bytype1304  1304
+$/dihedral:bytype1305  1305
+$/dihedral:bytype1306  1306
+$/dihedral:bytype1307  1307
+$/dihedral:bytype1308  1308
+$/dihedral:bytype1309  1309
+$/dihedral:bytype1310  1310
+$/dihedral:bytype1311  1311
+$/dihedral:bytype1312  1312
+$/dihedral:bytype1313  1313
+$/dihedral:bytype1314  1314
+$/dihedral:bytype1315  1315
+$/dihedral:bytype1316  1316
+$/dihedral:bytype1317  1317
+$/dihedral:bytype1318  1318
+$/dihedral:bytype1319  1319
+$/dihedral:bytype1320  1320
+$/dihedral:bytype1321  1321
+$/dihedral:bytype1322  1322
+$/dihedral:bytype1323  1323
+$/dihedral:bytype1324  1324
+$/dihedral:bytype1325  1325
+$/dihedral:bytype1326  1326
+$/dihedral:bytype1327  1327
+$/dihedral:bytype1328  1328
+$/dihedral:bytype1329  1329
+$/dihedral:bytype1330  1330
+$/dihedral:bytype1331  1331
+$/dihedral:bytype1332  1332
+$/dihedral:bytype1333  1333
+$/dihedral:bytype1334  1334
+$/dihedral:bytype1335  1335
+$/dihedral:bytype1336  1336
+$/dihedral:bytype1337  1337
+$/dihedral:bytype1338  1338
+$/dihedral:bytype1339  1339
+$/dihedral:bytype1340  1340
+$/dihedral:bytype1341  1341
+$/dihedral:bytype1342  1342
+$/dihedral:bytype1343  1343
+$/dihedral:bytype1344  1344
+$/dihedral:bytype1345  1345
+$/dihedral:bytype1346  1346
+$/dihedral:bytype1347  1347
+$/dihedral:bytype1348  1348
+$/dihedral:bytype1349  1349
+$/dihedral:bytype1350  1350
+$/dihedral:bytype1351  1351
+$/dihedral:bytype1352  1352
+$/dihedral:bytype1353  1353
+$/dihedral:bytype1354  1354
+$/dihedral:bytype1355  1355
+$/dihedral:bytype1356  1356
+$/dihedral:bytype1357  1357
+$/dihedral:bytype1358  1358
+$/dihedral:bytype1359  1359
+$/dihedral:bytype1360  1360
+$/dihedral:bytype1361  1361
+$/dihedral:bytype1362  1362
+$/dihedral:bytype1363  1363
+$/dihedral:bytype1364  1364
+$/dihedral:bytype1365  1365
+$/dihedral:bytype1366  1366
+$/dihedral:bytype1367  1367
+$/dihedral:bytype1368  1368
+$/dihedral:bytype1369  1369
+$/dihedral:bytype1370  1370
+$/dihedral:bytype1371  1371
+$/dihedral:bytype1372  1372
+$/dihedral:bytype1373  1373
+$/dihedral:bytype1374  1374
+$/dihedral:bytype1375  1375
+$/dihedral:bytype1376  1376
+$/dihedral:bytype1377  1377
+$/dihedral:bytype1378  1378
+$/dihedral:bytype1379  1379
+$/dihedral:bytype1380  1380
+$/dihedral:bytype1381  1381
+$/dihedral:bytype1382  1382
+$/dihedral:bytype1383  1383
+$/dihedral:bytype1384  1384
+$/dihedral:bytype1385  1385
+$/dihedral:bytype1386  1386
+$/dihedral:bytype1387  1387
+$/dihedral:bytype1388  1388
+$/dihedral:bytype1389  1389
+$/dihedral:bytype1390  1390
+$/dihedral:bytype1391  1391
+$/dihedral:bytype1392  1392
+$/dihedral:bytype1393  1393
+$/dihedral:bytype1394  1394
+$/dihedral:bytype1395  1395
+$/dihedral:bytype1396  1396
+$/dihedral:bytype1397  1397
+$/dihedral:bytype1398  1398
+$/dihedral:bytype1399  1399
+$/dihedral:bytype1400  1400
+$/dihedral:bytype1401  1401
+$/dihedral:bytype1402  1402
+$/dihedral:bytype1403  1403
+$/dihedral:bytype1404  1404
+$/dihedral:bytype1405  1405
+$/dihedral:bytype1406  1406
