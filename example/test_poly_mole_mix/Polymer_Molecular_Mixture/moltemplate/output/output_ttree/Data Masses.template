@@ -1,0 +1,5 @@
+    @/atom:OPLSAA/80 12.011 #CT "Alkane CH3-" 6 partial charge=-0.18
+    @/atom:OPLSAA/81 12.011 #CT "Alkane -CH2-" 6 partial charge=-0.12
+    @/atom:OPLSAA/85 1.008 #HC "Alkane H-C" 1 partial charge=0.06
+    @/atom:OPLSAA/90 12.011 #CA "Aromatic C" 6 partial charge=-0.115
+    @/atom:OPLSAA/91 1.008 #HA "Aromatic H-C" 1 partial charge=0.115

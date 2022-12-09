@@ -1,0 +1,5 @@
+    1 12.011 #CT "Alkane CH3-" 6 partial charge=-0.18
+    2 12.011 #CT "Alkane -CH2-" 6 partial charge=-0.12
+    3 1.008 #HC "Alkane H-C" 1 partial charge=0.06
+    4 12.011 #CA "Aromatic C" 6 partial charge=-0.115
+    5 1.008 #HA "Aromatic H-C" 1 partial charge=0.115

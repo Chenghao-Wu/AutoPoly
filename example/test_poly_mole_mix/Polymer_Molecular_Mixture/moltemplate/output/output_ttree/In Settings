@@ -1,0 +1,106 @@
+    pair_coeff 1 1 lj/cut/coul/long 0.066 3.5
+    pair_coeff 2 2 lj/cut/coul/long 0.066 3.5
+    pair_coeff 3 3 lj/cut/coul/long 0.03 2.5
+    pair_coeff 4 4 lj/cut/coul/long 0.07 3.55
+    pair_coeff 5 5 lj/cut/coul/long 0.03 2.42
+    bond_coeff 1 harmonic 268.0 1.529
+    bond_coeff 2 harmonic 268.0 1.529
+    bond_coeff 3 harmonic 268.0 1.529
+    bond_coeff 4 harmonic 268.0 1.529
+    bond_coeff 5 harmonic 340.0 1.09
+    bond_coeff 6 harmonic 340.0 1.09
+    bond_coeff 7 harmonic 317.0 1.51
+    bond_coeff 8 harmonic 317.0 1.51
+    bond_coeff 9 harmonic 469.0 1.4
+    bond_coeff 10 harmonic 367.0 1.08
+    angle_coeff 1 harmonic 58.35 112.7
+    angle_coeff 2 harmonic 58.35 112.7
+    angle_coeff 3 harmonic 58.35 112.7
+    angle_coeff 4 harmonic 58.35 112.7
+    angle_coeff 5 harmonic 58.35 112.7
+    angle_coeff 6 harmonic 58.35 112.7
+    angle_coeff 7 harmonic 58.35 112.7
+    angle_coeff 8 harmonic 58.35 112.7
+    angle_coeff 9 harmonic 33.0 107.8
+    angle_coeff 10 harmonic 33.0 107.8
+    angle_coeff 11 harmonic 37.5 110.7
+    angle_coeff 12 harmonic 37.5 110.7
+    angle_coeff 13 harmonic 37.5 110.7
+    angle_coeff 14 harmonic 37.5 110.7
+    angle_coeff 15 harmonic 35.0 109.5
+    angle_coeff 16 harmonic 35.0 109.5
+    angle_coeff 17 harmonic 40.0 109.5
+    angle_coeff 18 harmonic 40.0 109.5
+    angle_coeff 19 harmonic 63.0 114.0
+    angle_coeff 20 harmonic 63.0 114.0
+    angle_coeff 21 harmonic 63.0 114.0
+    angle_coeff 22 harmonic 63.0 114.0
+    angle_coeff 23 harmonic 63.0 120.0
+    angle_coeff 24 harmonic 70.0 120.0
+    angle_coeff 25 harmonic 70.0 120.0
+    angle_coeff 26 harmonic 35.0 120.0
+    dihedral_coeff 1 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 2 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 3 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 4 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 5 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 6 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 7 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 8 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 9 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 10 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 11 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 12 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 13 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 14 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 15 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 16 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 17 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 18 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 19 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 20 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 21 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 22 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 23 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 24 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 25 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 26 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 27 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 28 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 29 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 30 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 31 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 32 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 33 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 34 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 35 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 36 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 37 opls 0.0 0.0 0.462 0.0
+    dihedral_coeff 38 opls 0.0 0.0 0.462 0.0
+    dihedral_coeff 39 opls 0.0 0.0 0.462 0.0
+    dihedral_coeff 40 opls 0.0 0.0 0.462 0.0
+    dihedral_coeff 41 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 42 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 43 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 44 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 45 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 46 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 47 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 48 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 49 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 50 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 51 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 52 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 53 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 54 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 55 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 56 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 57 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 58 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 59 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 60 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 61 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 62 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 63 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff 64 opls 0.0 7.25 0.0 0.0
+    improper_coeff 1 harmonic 2.5 180 
