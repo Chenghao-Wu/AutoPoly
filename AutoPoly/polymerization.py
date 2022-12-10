@@ -13,14 +13,17 @@ import numpy as np
 from .system import logger
 
 class Polymerization(object):
-    def __init__(self,Name=None,System=None,Model=None,run=True):
+    def __init__(self,Name=None,System=None,Model=None,run=True,path_MonomerBank=None):
         self.Name=Name
         self.System=System
         self.path_cwd=self.System.get_FolderPath+"/"+self.Name+"/moltemplate/"
         self.path_master=str(Path(__file__).parent.resolve())+"/extern/"
         self.path_moltemplatesrc=self.path_master+"moltemplate/src/"
         self.path_oplsaaprm=self.path_master+"moltemplate/oplsaa.prm"
-        self.path_MonomerBank=self.path_master+"Monomer_bank/"
+        if path_MonomerBank==None:
+            self.path_MonomerBank=self.path_master+"Monomer_bank/"
+        else:
+            self.path_MonomerBank=path_MonomerBank
 
         self.Model=Model
 
@@ -421,6 +424,7 @@ class Polymerization(object):
                         with open(mono) as f:
                             while True: 
                                 line = f.readline() 
+                                
                                 if line.strip()=="write(\"Data Atoms\") {":
                                     read_switch=True
                                     continue
@@ -430,11 +434,11 @@ class Polymerization(object):
                                 
                                 # Determine atom types, element names and the raw_charges as
                                 # given in the opls table
-
+                                
                                 if read_switch:
                                     load_line=""
                                     stringvector=line.split()
-
+                                    
                                     load_switch=False
                                     for readii in range(len(stringvector[2])):
                                         if stringvector[2][readii]==":":

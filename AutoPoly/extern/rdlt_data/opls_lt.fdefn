@@ -1,0 +1,1984 @@
+
+DefineFeature @atom:80 [$([CH3D4][C])]
+Family 0CT
+EndFeature
+DefineFeature @atom:81 [$([CH2D4]([C])[C])]
+Family 1CT
+EndFeature
+DefineFeature @atom:82 [$([CH1D4]([C])([C])[C])]
+Family 2CT
+EndFeature
+DefineFeature @atom:83 [CH4D4]
+Family 3CT
+EndFeature
+DefineFeature @atom:84 [$([CH0D4]([C])([C])([C])[C])]
+Family 4CT
+EndFeature
+DefineFeature @atom:85 [$([#1][CH4])]
+Family 5HC
+EndFeature
+DefineFeature @atom:85 [$([#1][CD4;!$([C][CD2,O,N][#6]);!$([C][F,Cl,Br,I])])]
+Family 6HC
+EndFeature
+DefineFeature @atom:86 [$([CH0D3]([#6])([#6])=[#6])]
+Family 7CM
+EndFeature
+DefineFeature @atom:87 [$([CH1D3]([#6])=[#6])]
+Family 8CM
+EndFeature
+DefineFeature @atom:88 [$([CH2D3]=[#6])]
+Family 9CM
+EndFeature
+DefineFeature @atom:89 [$([#1][CD3])]
+Family 10HC
+EndFeature
+DefineFeature @atom:90 [$([c]([c])[c])]
+Family 11CA
+EndFeature
+DefineFeature @atom:460 [$([c](c)(c)-[c](c)c)]
+Family 12C!
+EndFeature
+DefineFeature @atom:91 [$([#1][c]([c])[c])]
+Family 13HA
+EndFeature
+DefineFeature @atom:92 [$([c](c)(c)(c))]
+Family 14CA
+EndFeature
+DefineFeature @atom:93 [$([CH3][c])]
+Family 15CT
+EndFeature
+DefineFeature @atom:94 [$([CH2D4][c])]
+Family 16CT
+EndFeature
+DefineFeature @atom:95 [$([CH1](=C)-[CH1]=C)]
+Family 17C=
+EndFeature
+DefineFeature @atom:800 [$([Cl][CD4])]
+Family 18Cl
+EndFeature
+DefineFeature @atom:801 [$([CH2D4]([!Cl])[Cl])]
+Family 19CT
+EndFeature
+DefineFeature @atom:802 [$([#1][#6D4][Cl])]
+Family 20HC
+EndFeature
+DefineFeature @atom:803 [$([CH1D4]([!Cl])([!Cl])[Cl])]
+Family 21CT
+EndFeature
+DefineFeature @atom:804 [$([CH0D4]([!Cl])([!Cl])([!Cl])[Cl])]
+Family 22CT
+EndFeature
+DefineFeature @atom:805 [$([Br][CD4])]
+Family 23Br
+EndFeature
+DefineFeature @atom:806 [$([CH2D4]([!Br])[Br])]
+Family 24CT
+EndFeature
+DefineFeature @atom:807 [$([#1][#6D4][Br])]
+Family 25HC
+EndFeature
+DefineFeature @atom:808 [$([CH1D4]([!Br])([!Br])[Br])]
+Family 26CT
+EndFeature
+DefineFeature @atom:809 [$([CH0D4]([!Br])([!Br])([!Br])[Br])]
+Family 27CT
+EndFeature
+DefineFeature @atom:838 [$([I][CD4])]
+Family 28I
+EndFeature
+DefineFeature @atom:835 [$([CH2D4]([!I])[I])]
+Family 29CT
+EndFeature
+DefineFeature @atom:839 [$([#1][#6D4][I])]
+Family 30HC
+EndFeature
+DefineFeature @atom:836 [$([CH1D4]([!I])([!I])[I])]
+Family 31CT
+EndFeature
+DefineFeature @atom:837 [$([CH0D4]([!I])([!I])([!I])[I])]
+Family 32CT
+EndFeature
+DefineFeature @atom:96 [$([OH][#6])]
+Family 33OH
+EndFeature
+DefineFeature @atom:97 [$([#1][O][#6])]
+Family 34HO
+EndFeature
+DefineFeature @atom:98 [$([#1][CH3][OH])]
+Family 35HC
+EndFeature
+DefineFeature @atom:99 [$([C;H2,H3][OH])]
+Family 36CT
+EndFeature
+DefineFeature @atom:100 [$([CH1][OH])]
+Family 37CT
+EndFeature
+DefineFeature @atom:101 [$([CH0][OH])]
+Family 38CT
+EndFeature
+DefineFeature @atom:102 [$([CH2]([OH])[C](F)(F)(F))]
+Family 39CT
+EndFeature
+DefineFeature @atom:103 [$([C](F)(F)(F)[CH2]([OH]))]
+Family 40CT
+EndFeature
+DefineFeature @atom:104 [$([OH][CH2][C](F)(F)(F))]
+Family 41OH
+EndFeature
+DefineFeature @atom:105 [$([#1][O][CH2][C](F)(F)(F))]
+Family 42HO
+EndFeature
+DefineFeature @atom:106 [$([F][C](F)(F)[CH2][OH])]
+Family 43F
+EndFeature
+DefineFeature @atom:107 [$([#1][CH2]([OH])[C](F)(F)(F))]
+Family 44HC
+EndFeature
+DefineFeature @atom:108 [$([c]([OH]))]
+Family 45CA
+EndFeature
+DefineFeature @atom:109 [$([OH][c])]
+Family 46OH
+EndFeature
+DefineFeature @atom:110 [$([#1][O][c])]
+Family 47HO
+EndFeature
+DefineFeature @atom:111 [$([OH][C][C][OH])]
+Family 48OH
+EndFeature
+DefineFeature @atom:112 [$([#1][O][C][C][OH])]
+Family 49HO
+EndFeature
+DefineFeature @atom:113 [$([OH][#6][#6]([OH])[#6][OH])]
+Family 50OH
+EndFeature
+DefineFeature @atom:113 [$([OH][#6]([#6][OH])[#6][OH])]
+Family 51OH
+EndFeature
+DefineFeature @atom:114 [$([#1][O][#6][#6]([OH])[#6][OH])]
+Family 52HO
+EndFeature
+DefineFeature @atom:114 [$([#1][O][#6]([#6][OH])[#6][OH])]
+Family 53HO
+EndFeature
+DefineFeature @atom:115 [$([CH2D4]([OH])[#6]([OH])[#6][OH])]
+Family 54CT
+EndFeature
+DefineFeature @atom:115 [$([CH2D4]([OH])[#6][OH])]
+Family 55CT
+EndFeature
+DefineFeature @atom:116 [$([CH1D4]([OH])[#6]([OH])[#6][OH])]
+Family 56CT
+EndFeature
+DefineFeature @atom:116 [$([CH1D4]([OH])([#6][OH])[#6][OH])]
+Family 57CT
+EndFeature
+DefineFeature @atom:116 [$([CH1D4]([OH])[#6][OH])]
+Family 58CT
+EndFeature
+DefineFeature @atom:117 [$([CH0D4]([OH])[#6]([OH])[#6][OH])]
+Family 59CT
+EndFeature
+DefineFeature @atom:117 [$([CH0D4]([OH])([#6][OH])[#6][OH])]
+Family 60CT
+EndFeature
+DefineFeature @atom:117 [$([CH0D4]([OH])[#6][OH])]
+Family 61CT
+EndFeature
+DefineFeature @atom:118 [$([#1][CD4]([OH])[#6]([OH])[#6][OH])]
+Family 62CT
+EndFeature
+DefineFeature @atom:118 [$([#1][CD4]([OH])([#6][OH])[#6][OH])]
+Family 63CT
+EndFeature
+DefineFeature @atom:118 [$([#1][CD4]([OH])[#6][OH])]
+Family 64CT
+EndFeature
+DefineFeature @atom:119 [$([O]([c;r6])[c;r6])]
+Family 65O
+EndFeature
+DefineFeature @atom:120 [$([CH0](=C)-[CH0]=C)]
+Family 66C=
+EndFeature
+DefineFeature @atom:121 [$([#8](c)[CD4])]
+Family 67OS
+EndFeature
+DefineFeature @atom:122 [$([O]([C][*;!$([#7,#8])])[C][*;!$([#7,#8])])]
+Family 68OS
+EndFeature
+DefineFeature @atom:123 [$([CH3D4][O][#6][*;!$([#7,#8])])]
+Family 69CT
+EndFeature
+DefineFeature @atom:124 [$([CH2D4]([*;!$([#7,#8])])[O][#6][*;!$([#7,#8])])]
+Family 70CT
+EndFeature
+DefineFeature @atom:125 [$([CH1D4]([*;!$([#7,#8])])[O][#6][*;!$([#7,#8])])]
+Family 71CT
+EndFeature
+DefineFeature @atom:126 [$([CH0D4]([*;!$([#7,#8])])[O][#6][*;!$([#7,#8])])]
+Family 72CT
+EndFeature
+DefineFeature @atom:127 [$([#1][#6]([*;!$([#7,#8])])[O][#6][*;!$([#7,#8])])]
+Family 73HC
+EndFeature
+DefineFeature @atom:128 [$([O](C)[#6][O][#6])]
+Family 74OS
+EndFeature
+DefineFeature @atom:129 [$([OH][C][O][#6])]
+Family 75OH
+EndFeature
+DefineFeature @atom:130 [$([#1][O][C][O][#6])]
+Family 76HO
+EndFeature
+DefineFeature @atom:131 [$([CH2D4]([O][#6])[O][#6])]
+Family 77CO
+EndFeature
+DefineFeature @atom:132 [$([#1][CH2D4]([O][#6])[O][#6])]
+Family 78HC
+EndFeature
+DefineFeature @atom:133 [$([CH2D4]([OH])[O][#6])]
+Family 79CO
+EndFeature
+DefineFeature @atom:134 [$([#1][CH2D4]([OH])[O][#6])]
+Family 80HC
+EndFeature
+DefineFeature @atom:135 [$([CH1D4]([O][#6])[O][#6])]
+Family 81CO
+EndFeature
+DefineFeature @atom:136 [$([#1][CH1D4]([O][#6])[O][#6])]
+Family 82HC
+EndFeature
+DefineFeature @atom:137 [$([CH1D4]([OH])[O][#6])]
+Family 83CO
+EndFeature
+DefineFeature @atom:138 [$([#1][CH1D4]([OH])[O][#6])]
+Family 84HC
+EndFeature
+DefineFeature @atom:139 [$([CH0D4]([O][#6])[O][#6])]
+Family 85CO
+EndFeature
+DefineFeature @atom:140 [$([CH0D4]([OH])[O][#6])]
+Family 86CO
+EndFeature
+DefineFeature @atom:141 [$([c][O][#6])]
+Family 87CA
+EndFeature
+DefineFeature @atom:142 [#16D2H1]
+Family 88SH
+EndFeature
+DefineFeature @atom:143 [#16D2H2]
+Family 89SH
+EndFeature
+DefineFeature @atom:144 [$([#16H0]~[#6])]
+Family 90S
+EndFeature
+DefineFeature @atom:145 [$([#16D2H0][#16D2H0])]
+Family 91S
+EndFeature
+DefineFeature @atom:146 [$([#1][SD2H1])]
+Family 92HS
+EndFeature
+DefineFeature @atom:147 [$([#1][SD2H2])]
+Family 93HS
+EndFeature
+DefineFeature @atom:148 [$([CH2][#16H1])]
+Family 94CT
+EndFeature
+DefineFeature @atom:149 [$([CH1][#16H1])]
+Family 95CT
+EndFeature
+DefineFeature @atom:150 [$([CH0][#16H1])]
+Family 96CT
+EndFeature
+DefineFeature @atom:151 [$([CH3][#16D2H0])]
+Family 97CT
+EndFeature
+DefineFeature @atom:152 [$([CH2][#16D2H0])]
+Family 98CT
+EndFeature
+DefineFeature @atom:153 [$([CH1][#16D2H0])]
+Family 99CT
+EndFeature
+DefineFeature @atom:154 [$([CH0][#16D2H0])]
+Family 100CT
+EndFeature
+DefineFeature @atom:155 [$([CH3][#16D2H0][#16D2H0])]
+Family 101CT
+EndFeature
+DefineFeature @atom:156 [$([CH2][#16D2H0][#16D2H0])]
+Family 102CT
+EndFeature
+DefineFeature @atom:157 [$([CH1][#16D2H0][#16D2H0])]
+Family 103CT
+EndFeature
+DefineFeature @atom:158 [$([CH0][#16D2H0][#16D2H0])]
+Family 104CT
+EndFeature
+DefineFeature @atom:159 [$([CH3][SH1])]
+Family 105CT
+EndFeature
+DefineFeature @atom:160 [$([CH2](c)[OH])]
+Family 106CT
+EndFeature
+DefineFeature @atom:161 [$([CH1](c)[OH])]
+Family 107CT
+EndFeature
+DefineFeature @atom:162 [$([CH0](c)[OH])]
+Family 108CT
+EndFeature
+DefineFeature @atom:163 [$([c][CH2][OH])]
+Family 109CA
+EndFeature
+DefineFeature @atom:164 [$([SD2]([c])[CH3])]
+Family 110S
+EndFeature
+DefineFeature @atom:165 [$([CH2D4][NH2])]
+Family 111CT
+EndFeature
+DefineFeature @atom:166 [$([CH1D4][NH2])]
+Family 112CT
+EndFeature
+DefineFeature @atom:167 [$([CH0D4][NH2])]
+Family 113CT
+EndFeature
+DefineFeature @atom:168 [$([Cl][CD3])]
+Family 114Cl
+EndFeature
+DefineFeature @atom:169 [$([CD3][F,Cl,Br,I])]
+Family 115CM
+EndFeature
+DefineFeature @atom:170 [$([c][SD2][CH3])]
+Family 116CA
+EndFeature
+DefineFeature @atom:171 [$([CH1D4]([N][C]=[O]))]
+Family 117CT
+EndFeature
+DefineFeature @atom:172 [$([CH0D4]([N][C]=[O]))]
+Family 118CT
+EndFeature
+DefineFeature @atom:173 [$([C]([c])([c])=[O])]
+Family 119C
+EndFeature
+DefineFeature @atom:174 [$([CH1]([c])=[O])]
+Family 120C_2
+EndFeature
+DefineFeature @atom:175 [$([C]([c])([CH3])=[O])]
+Family 121C_2
+EndFeature
+DefineFeature @atom:176 [$([C]([c])([NH2D3])=[O])]
+Family 122C
+EndFeature
+DefineFeature @atom:177 [$([CD3](=O)[ND3])]
+Family 123C
+EndFeature
+DefineFeature @atom:178 [$([O]=[CD3][ND3])]
+Family 124O
+EndFeature
+DefineFeature @atom:179 [$([ND3H2][CD3]=[O])]
+Family 125N
+EndFeature
+DefineFeature @atom:180 [$([ND3H1][CD3]=[O])]
+Family 126N
+EndFeature
+DefineFeature @atom:181 [$([ND3H0][CD3]=[O])]
+Family 127N
+EndFeature
+DefineFeature @atom:182 [$([#1][ND3H2][CD3]=[O])]
+Family 128H
+EndFeature
+DefineFeature @atom:183 [$([#1][ND3H1][CD3]=[O])]
+Family 129H
+EndFeature
+DefineFeature @atom:184 [$([CH3D4][NH1D3][CD3]=[O])]
+Family 130CT
+EndFeature
+DefineFeature @atom:185 [$([CH3D4][NH0D3][CD3]=[O])]
+Family 131CT
+EndFeature
+DefineFeature @atom:186 [$([CH2D4][NH1D3][CD3]=[O])]
+Family 132CT
+EndFeature
+DefineFeature @atom:187 [$([CH2D4][NH0D3][CD3]=[O])]
+Family 133CT_3
+EndFeature
+DefineFeature @atom:188 [$([CH1D4][NH0D3][CD3]=[O])]
+Family 134CT_2
+EndFeature
+DefineFeature @atom:189 [$([CD3](=O)([NH2D3])[NH2D3])]
+Family 135C
+EndFeature
+DefineFeature @atom:190 [$([O]=[CD3]([NH2D3])[NH2D3])]
+Family 136O
+EndFeature
+DefineFeature @atom:191 [$([NH2D3][CD3]([NH2D3])=[O])]
+Family 137N
+EndFeature
+DefineFeature @atom:192 [$([#1][NH2D3][CD3]([NH2D3])=[O])]
+Family 138H
+EndFeature
+DefineFeature @atom:193 [$([ND3]([CD3]=[O])[CD3]=[O])]
+Family 139N
+EndFeature
+DefineFeature @atom:194 [$([CD3](=[O])[ND3][CD3]=[O])]
+Family 140C
+EndFeature
+DefineFeature @atom:195 [$([O]=[CD3][ND3][CD3]=[O])]
+Family 141O
+EndFeature
+DefineFeature @atom:196 [$([#1][ND3]([CD3]=[O])[CD3]=[O])]
+Family 142H
+EndFeature
+DefineFeature @atom:197 [$([#1][CD3](=[O])[ND3][CD3]=[O])]
+Family 143HC
+EndFeature
+DefineFeature @atom:198 [$([CH3D4][CD3](=[O])[ND3][CD3]=[O])]
+Family 144CT
+EndFeature
+DefineFeature @atom:199 [$([CH2D4][CD3](=[O])[ND3][CD3]=[O])]
+Family 145CT
+EndFeature
+DefineFeature @atom:200 [$([CH1D4][CD3](=[O])[ND3][CD3]=[O])]
+Family 146CT
+EndFeature
+DefineFeature @atom:201 [$([CH0D4][CD3](=[O])[ND3][CD3]=[O])]
+Family 147CT
+EndFeature
+DefineFeature @atom:202 [$([c][CD2]#[ND1])]
+Family 148CA
+EndFeature
+DefineFeature @atom:203 [$([CD2](c)#[ND1])]
+Family 149CZ
+EndFeature
+DefineFeature @atom:204 [$([ND1]#[CD2][c])]
+Family 150NZ
+EndFeature
+DefineFeature @atom:205 [$([c][Cl])]
+Family 151CA
+EndFeature
+DefineFeature @atom:206 [$([Cl][c])]
+Family 152Cl
+EndFeature
+DefineFeature @atom:207 [$([NH1D3](c)[CD3]=[O])]
+Family 153N
+EndFeature
+DefineFeature @atom:208 [$([c][NH1D3][CD3]=[O])]
+Family 154CA
+EndFeature
+DefineFeature @atom:209 [$([CD3](=O)[OH])]
+Family 155C
+EndFeature
+DefineFeature @atom:211 [$([OH][CD3]=[O])]
+Family 156OH
+EndFeature
+DefineFeature @atom:210 [$([O]=[CD3][OH])]
+Family 157O_3
+EndFeature
+DefineFeature @atom:212 [$([#1][O][CD3]=[O])]
+Family 158HO
+EndFeature
+DefineFeature @atom:213 [$([#6](~[#8D1])~[#8D1])]
+Family 159C_3
+EndFeature
+DefineFeature @atom:214 [$([#8D1]~[#6]~[#8D1])]
+Family 160O2
+EndFeature
+DefineFeature @atom:215 [$([CH3D4][#6D3](~[#8D1])~[#8D1])]
+Family 161CT
+EndFeature
+DefineFeature @atom:216 [$([CH2D4][#6D3](~[#8D1])~[#8D1])]
+Family 162CT
+EndFeature
+DefineFeature @atom:217 [$([CH1D4][#6D3](~[#8D1])~[#8D1])]
+Family 163CT
+EndFeature
+DefineFeature @atom:218 [$([CH0D4][#6D3](~[#8D1])~[#8D1])]
+Family 164CT
+EndFeature
+DefineFeature @atom:219 [$([CH1]([#6])=[O])]
+Family 165C_2
+EndFeature
+DefineFeature @atom:220 [$([O]=[CH1][#6])]
+Family 166O_2
+EndFeature
+DefineFeature @atom:221 [$([#1][CH1]([#6])=[O])]
+Family 167HC
+EndFeature
+DefineFeature @atom:221 [$([#1][CH1]([#7])=[O])]
+Family 168HC
+EndFeature
+DefineFeature @atom:222 [$([CH0D3]([#6])([#6])=[O])]
+Family 169C_2
+EndFeature
+DefineFeature @atom:223 [$([O]=[CH0D3]([#6])[#6])]
+Family 170O_2
+EndFeature
+DefineFeature @atom:224 [$([#1][CD4][CH0D3](=[O])[#6])]
+Family 171HC
+EndFeature
+DefineFeature @atom:224 [$([#1][CD4][CH1D3](=[O]))]
+Family 172HC
+EndFeature
+DefineFeature @atom:229 [$([#7H4D4])]
+Family 173N3
+EndFeature
+DefineFeature @atom:230 [$([#7H3D4])]
+Family 174N3
+EndFeature
+DefineFeature @atom:231 [$([#7H0D4])]
+Family 175N3
+EndFeature
+DefineFeature @atom:232 [$([#1][#7H4D4])]
+Family 176H3
+EndFeature
+DefineFeature @atom:233 [$([#1][#7H3D4])]
+Family 177H3
+EndFeature
+DefineFeature @atom:234 [$([CH3D4][#7H3D4])]
+Family 178CT
+EndFeature
+DefineFeature @atom:235 [$([CH2D4][#7H3D4])]
+Family 179CT
+EndFeature
+DefineFeature @atom:235 [$([CH2D4]([CD3]=[O])[#7H3D4])]
+Family 180CT_2
+EndFeature
+DefineFeature @atom:240 [$([CH3D4][#7H2D4])]
+Family 181CT
+EndFeature
+DefineFeature @atom:241 [$([CH2D4]([#7D4])[#6D3]([#8D1])[#8D1])]
+Family 182CT_2
+EndFeature
+DefineFeature @atom:242 [$([CH1D4]([CH3D4])([#7D4])[#6D3]([#8D1])[#8D1])]
+Family 183CT_2
+EndFeature
+DefineFeature @atom:243 [$([#7H2D3]~[#6H0D3](~[#7D3])~[#7D3])]
+Family 184N2
+EndFeature
+DefineFeature @atom:244 [$([#1][#7H2D3]~[#6H0D3](~[#7D3])~[#7D3])]
+Family 185H3
+EndFeature
+DefineFeature @atom:245 [$([#6H0D3](~[#7D3])(~[#7D3])~[#7D3])]
+Family 186CA
+EndFeature
+DefineFeature @atom:246 [$([#7H1D3]~[#6H0D3](~[#7D3])~[#7D3])]
+Family 187N2
+EndFeature
+DefineFeature @atom:247 [$([#1][#7H1D3]~[#6H0D3](~[#7D3])~[#7D3])]
+Family 188H3
+EndFeature
+DefineFeature @atom:248 [$([CH3D4][#7H1D3]~[#6H0D3](~[#7D3])~[#7D3])]
+Family 189CT
+EndFeature
+DefineFeature @atom:249 [$([CH3D4][CH2D4][#7H1D3]~[#6H0D3](~[#7D3])~[#7D3])]
+Family 190CT
+EndFeature
+DefineFeature @atom:250 [$([CH2D4][#7H1D3]~[#6H0D3](~[#7D3])~[#7D3])]
+Family 191CT
+EndFeature
+DefineFeature @atom:251 [$([CH2D4]([CH2D4][CH1D4])[CH2D4][#7H1D3]~[#6H0D3](~[#7D3])~[#7D3])]
+Family 192CT
+EndFeature
+DefineFeature @atom:252 [$([#7H2D4])]
+Family 193N3
+EndFeature
+DefineFeature @atom:253 [$([#1][#7H2D4])]
+Family 194H3
+EndFeature
+DefineFeature @atom:254 [$([n]([c]([NH2D3])[c])[c]([NH2D3])[c])]
+Family 195NC
+EndFeature
+DefineFeature @atom:254 [$([#7]=[#6])]
+Family 196NC
+EndFeature
+DefineFeature @atom:254 [$([n][n])]
+Family 197NC
+EndFeature
+DefineFeature @atom:255 [$([c]([n][c]([NH2D3])[c])([NH2D3])[c])]
+Family 198CA
+EndFeature
+DefineFeature @atom:256 [$([NH2D3][c][n][c][NH2D3])]
+Family 199N2
+EndFeature
+DefineFeature @atom:257 [$([#1][NH2D3][c][n][c][NH2D3])]
+Family 200H
+EndFeature
+DefineFeature @atom:258 [$([c](c)[c]([NH2D3])[n][c][NH2D3])]
+Family 201CA
+EndFeature
+DefineFeature @atom:259 [$([#1][c](c)[c]([NH2D3])[n][c][NH2D3])]
+Family 202HA
+EndFeature
+DefineFeature @atom:260 [$([c]([c][c]([NH2D3]))[c][c]([NH2D3])[n])]
+Family 203CA
+EndFeature
+DefineFeature @atom:261 [$([#1][c]([c][c]([NH2D3]))[c][c]([NH2D3])[n])]
+Family 204HA
+EndFeature
+DefineFeature @atom:262 [$([#7H1D3]([#6D3])[#6D3](=O)[#7D3][#6D3]=[O])]
+Family 205NA
+EndFeature
+DefineFeature @atom:262 [$([#7H0D3]([#6D3])[#6D3](=O)[#7D3][#6D3]=[O])]
+Family 206N*
+EndFeature
+DefineFeature @atom:263 [$([#6D3](=O)([#7D3][#6D3]=[O])[#7D3])]
+Family 207C
+EndFeature
+DefineFeature @atom:264 [$([#7H1D3]([#6D3]=[O])[#6D3](=O)[#7D3][#6D3])]
+Family 208NA
+EndFeature
+DefineFeature @atom:265 [$([#6D3](=O)([#6D3][#6D3])[#7D3][#6D3](=O)[#7D3])]
+Family 209C
+EndFeature
+DefineFeature @atom:266 [$([#6D3]([#6H1D3])[#6D3](=O)[#7D3][#6D3](=O)[#7D3])]
+Family 210CM
+EndFeature
+DefineFeature @atom:267 [$([#6H1D3]([#6D3][#6D3]=[O])[#7D3][#6D3](=O)[#7D3])]
+Family 211CM
+EndFeature
+DefineFeature @atom:268 [$([#1][#7H1D3]([#6D3])[#6D3](=O)[#7D3][#6D3]=[O])]
+Family 212H
+EndFeature
+DefineFeature @atom:269 [$([O]=[#6D3]([#7D3][#6D3])[#7D3][#6D3]=[O])]
+Family 213O
+EndFeature
+DefineFeature @atom:270 [$([#1][#7H1D3]([#6D3]=[O])[#6D3](=O)[#7D3][#6D3])]
+Family 214H
+EndFeature
+DefineFeature @atom:271 [$([O]=[#6D3]([#6D3])[#7D3][#6D3](=O)[#7D3])]
+Family 215O
+EndFeature
+DefineFeature @atom:272 [$([#1][#6H1D3]([#6D3])[#6D3](=O)[#7D3][#6D3](=O)[#7D3])]
+Family 216HC
+EndFeature
+DefineFeature @atom:273 [$([#1][#6H1D3]([#6D3][#6D3]=[O])[#7D3][#6D3](=O)[#7D3])]
+Family 217HC
+EndFeature
+DefineFeature @atom:274 [$([#6D4][#6D3]([#6D3])[#6D3](=O)[#7D3][#6D3](=O)[#7D3])]
+Family 218CT
+EndFeature
+DefineFeature @atom:275 [$([#1][#6D4][#6D3]([#6D3])[#6D3](=O)[#7D3][#6D3](=O)[#7D3])]
+Family 219HC
+EndFeature
+DefineFeature @atom:276 [$([#7H1D3]1[#6D3](=O)[#7D2][#6D3]([NH2D3])[#6D3][#6D3]1)]
+Family 220NA
+EndFeature
+DefineFeature @atom:276 [$([#7H0D3]1[#6D3](=O)[#7D2][#6D3]([NH2D3])[#6D3][#6D3]1)]
+Family 221N*
+EndFeature
+DefineFeature @atom:277 [$([#6D3]1(=O)[#7D2][#6D3]([NH2D3])[#6D3][#6D3][#7D3]1)]
+Family 222C
+EndFeature
+DefineFeature @atom:278 [$([#7D2]1[#6D3](=O)[#7D3][#6D3][#6D3][#6D3]1[NH2D3])]
+Family 223NC
+EndFeature
+DefineFeature @atom:279 [$([#6D3]1([NH2D3])[#6D3][#6D3][#7D3][#6D3](=O)[#7D2]1)]
+Family 224CA
+EndFeature
+DefineFeature @atom:280 [$([#6D3]1[#6D3]([NH2D3])[#7D2][#6D3](=O)[#7D3][#6D3]1)]
+Family 225CM
+EndFeature
+DefineFeature @atom:281 [$([#6D3]1[#6D3][#6D3]([NH2D3])[#7D2][#6D3](=O)[#7D3]1)]
+Family 226CM
+EndFeature
+DefineFeature @atom:282 [$([#1][#7H1D3]1[#6D3](=O)[#7D2][#6D3]([NH2D3])[#6D3][#6D3]1)]
+Family 227H
+EndFeature
+DefineFeature @atom:283 [$([O]=[#6D3]1[#7D2][#6D3]([NH2D3])[#6D3][#6D3][#7D3]1)]
+Family 228O
+EndFeature
+DefineFeature @atom:284 [$([NH2D3][#6D3]1[#6D3][#6D3][#7D3][#6D3](=O)[#7D2]1)]
+Family 229N2
+EndFeature
+DefineFeature @atom:285 [$([#1][NH2D3][#6D3]1[#6D3][#6D3][#7D3][#6D3](=O)[#7D2]1)]
+Family 230H
+EndFeature
+DefineFeature @atom:286 [$([#1][NH2D3][#6D3]1[#6D3][#6D3][#7D3][#6D3](=O)[#7D2]1)]
+Family 231H
+EndFeature
+DefineFeature @atom:287 [$([#1][#6D3]1[#6D3]([NH2D3])[#7D2][#6D3](=O)[#7D3][#6D3]1)]
+Family 232HC
+EndFeature
+DefineFeature @atom:288 [$([#1][#6D3]1[#6D3][#6D3]([NH2D3])[#7D2][#6D3](=O)[#7D3]1)]
+Family 233H4
+EndFeature
+DefineFeature @atom:289 [$([#7]1[#6][#7][#6]2[#6]([#7][#6][#7]2)[#6]1([NH2D3]))]
+Family 234NC
+EndFeature
+DefineFeature @atom:290 [$([#6]1[#7][#6]2[#6]([#7][#6][#7]2)[#6]([NH2D3])[#7]1)]
+Family 235CQ
+EndFeature
+DefineFeature @atom:291 [$([#7]1[#6]2[#6]([#7][#6][#7]2)[#6]([NH2D3])[#7][#6]1)]
+Family 236NC
+EndFeature
+DefineFeature @atom:292 [$([#6]1([#7][#6][#7]2)[#6]2[#6]([NH2D3])[#7][#6][#7]1)]
+Family 237CB
+EndFeature
+DefineFeature @atom:293 [$([#6]1([#7][#6][#7]2)[#6]2[#7][#6][#7][#6]1([NH2D3]))]
+Family 238CB
+EndFeature
+DefineFeature @atom:294 [$([#6]1([NH2D3])[#7][#6][#7][#6]2[#6]1([#7][#6][#7]2))]
+Family 239CA
+EndFeature
+DefineFeature @atom:295 [$([#7]1[#6][#7][#6]2[#6]1[#6][#7][#6][#7]2)]
+Family 240NB
+EndFeature
+DefineFeature @atom:296 [$([#6]1[#7][#6]2[#7][#6][#7][#6][#6]2[#7]1)]
+Family 241CK
+EndFeature
+DefineFeature @atom:297 [$([#7D3]1[#6]2[#7][#6][#7][#6][#6]2[#7][#6]1)]
+Family 242NA
+EndFeature
+DefineFeature @atom:297 [$([#7D2D3]1[#6]2[#7][#6][#7][#6][#6]2[#7][#6]1)]
+Family 243N*
+EndFeature
+DefineFeature @atom:298 [$([#1][#6]1[#7][#6]2[#6]([#7][#6][#7]2)[#6]([NH2D3])[#7]1)]
+Family 244H5
+EndFeature
+DefineFeature @atom:299 [$([NH2D3][#6]1[#7][#6][#7][#6]2[#6]1([#7][#6][#7]2))]
+Family 245N2
+EndFeature
+DefineFeature @atom:300 [$([#1][NH2D3][#6]1[#7][#6][#7][#6]2[#6]1([#7][#6][#7]2))]
+Family 246H
+EndFeature
+DefineFeature @atom:301 [$([#1][NH2D3][#6]1[#7][#6][#7][#6]2[#6]1([#7][#6][#7]2))]
+Family 247H
+EndFeature
+DefineFeature @atom:302 [$([#1][#6]1[#7][#6]2[#7][#6][#7][#6][#6]2[#7]1)]
+Family 248H5
+EndFeature
+DefineFeature @atom:303 [$([#1][#7D3]1[#6]2[#7][#6][#7][#6][#6]2[#7][#6]1)]
+Family 249H
+EndFeature
+DefineFeature @atom:304 [$([#7H1]1[#6](=[#8])[#6]([#7H0][#6][#7H1]2)[#6]2[#7H0][#6]1[NH2D3])]
+Family 250NA
+EndFeature
+DefineFeature @atom:305 [$([#6]1([NH2D3])[#7H1][#6](=[#8])[#6]([#7H0][#6][#7H1]2)[#6]2[#7H0]1)]
+Family 251CA
+EndFeature
+DefineFeature @atom:306 [$([#7H0]1[#6]([#7H1][#6][#7H0]2)[#6]2[#6](=[#8])[#7H1][#6]1[NH2D3])]
+Family 252NC
+EndFeature
+DefineFeature @atom:307 [$([#6]1([#7H1][#6][#7H0]2)[#6]2[#6](=[#8])[#7H1][#6]([NH2D3])[#7H0]1)]
+Family 253CB
+EndFeature
+DefineFeature @atom:308 [$([#6]1([#7H0][#6][#7H1]2)[#6]2[#7H0][#6]([NH2D3])[#7H1][#6]1(=[#8]))]
+Family 254CB
+EndFeature
+DefineFeature @atom:309 [$([#6]1(=[#8])[#6]([#7H0][#6][#7H1]2)[#6]2[#7H0][#6]([NH2D3])[#7H1]1)]
+Family 255C
+EndFeature
+DefineFeature @atom:310 [$([#1][#7H1]1[#6](=[#8])[#6]([#7H0][#6][#7H1]2)[#6]2[#7H0][#6]1[NH2D3])]
+Family 256H
+EndFeature
+DefineFeature @atom:311 [$([NH2D3][#6]1[#7H1][#6](=[#8])[#6]([#7H0][#6][#7H1]2)[#6]2[#7H0]1)]
+Family 257N2
+EndFeature
+DefineFeature @atom:312 [$([#1][NH2D3][#6]1[#7H1][#6](=[#8])[#6]([#7H0][#6][#7H1]2)[#6]2[#7H0]1)]
+Family 258H
+EndFeature
+DefineFeature @atom:313 [$([#8]=[#6]1[#6]([#7H0][#6][#7H1]2)[#6]2[#7H0][#6]([NH2D3])[#7H1]1)]
+Family 259O
+EndFeature
+DefineFeature @atom:314 [$([CD4][nD3]1c2ncncc2nc1)]
+Family 260CT
+EndFeature
+DefineFeature @atom:315 [$([#1][CD4][nD3]1c2ncncc2nc1)]
+Family 261HC
+EndFeature
+DefineFeature @atom:316 [$([CD4][#7D3]([#6D3])[#6D3](=O)[#7D3][#6D3]=[O])]
+Family 262CT
+EndFeature
+DefineFeature @atom:317 [$([#1][CD4][#7D3]([#6D3])[#6D3](=O)[#7D3][#6D3]=[O])]
+Family 263HC
+EndFeature
+DefineFeature @atom:318 [$([CD4][#7D3]([#6D3])[#6D3](=O)[#7D2][#6D3][NH2D3])]
+Family 264CT
+EndFeature
+DefineFeature @atom:319 [$([#1][CD4][#7D3]([#6D3])[#6D3](=O)[#7D2][#6D3][NH2D3])]
+Family 265HC
+EndFeature
+DefineFeature @atom:320 [$([#7H1D3]1[#6D3](=O)[#7H1D3][#6D3]([NH2D3])[#6D3][#6D3]1)]
+Family 266NA
+EndFeature
+DefineFeature @atom:320 [$([#7H0D3]1[#6D3](=O)[#7H1D3][#6D3]([NH2D3])[#6D3][#6D3]1)]
+Family 267N*
+EndFeature
+DefineFeature @atom:321 [$([#6D3]1(=O)[#7D3][#6D3]([NH2D3])[#6D3][#6D3][#7D3]1)]
+Family 268C
+EndFeature
+DefineFeature @atom:322 [$([#7D3]1[#6D3](=O)[#7D3][#6D3][#6D3][#6D3]1[NH2D3])]
+Family 269NA
+EndFeature
+DefineFeature @atom:323 [$([#6D3]1([NH2D3])[#6D3][#6D3][#7D3][#6D3](=O)[#7D3]1)]
+Family 270CA
+EndFeature
+DefineFeature @atom:324 [$([#6D3]1[#6D3]([NH2D3])[#7D3][#6D3](=O)[#7D3][#6D3]1)]
+Family 271CM
+EndFeature
+DefineFeature @atom:325 [$([#6D3]1[#6D3][#6D3]([NH2D3])[#7D3][#6D3](=O)[#7D3]1)]
+Family 272CM
+EndFeature
+DefineFeature @atom:326 [$([#1][#7H1D3]1[#6D3](=O)[#7H1D3][#6D3]([NH2D3])[#6D3][#6D3]1)]
+Family 273H
+EndFeature
+DefineFeature @atom:327 [$([O]=[#6D3]1[#7D3][#6D3]([NH2D3])[#6D3][#6D3][#7D3]1)]
+Family 274O
+EndFeature
+DefineFeature @atom:328 [$([#1][#7D3]1[#6D3](=O)[#7D3][#6D3][#6D3][#6D3]1[NH2D3])]
+Family 275H
+EndFeature
+DefineFeature @atom:329 [$([NH2D3][#6D3]1[#6D3][#6D3][#7D3][#6D3](=O)[#7D3]1)]
+Family 276N2
+EndFeature
+DefineFeature @atom:330 [$([#1][NH2D3][#6D3]1[#6D3][#6D3][#7D3][#6D3](=O)[#7D3]1)]
+Family 277H
+EndFeature
+DefineFeature @atom:331 [$([#1][NH2D3][#6D3]1[#6D3][#6D3][#7D3][#6D3](=O)[#7D3]1)]
+Family 278H
+EndFeature
+DefineFeature @atom:332 [$([#1][#6D3]1[#6D3]([NH2D3])[#7D3][#6D3](=O)[#7D3][#6D3]1)]
+Family 279HA
+EndFeature
+DefineFeature @atom:333 [$([#1][#6D3]1[#6D3][#6D3]([NH2D3])[#7D3][#6D3](=O)[#7D3]1)]
+Family 280H4
+EndFeature
+DefineFeature @atom:334 [$([CD4][#7H0D3]1[#6D3](=O)[#7H1D3][#6D3]([NH2D3])[#6D3][#6D3]1)]
+Family 281CT
+EndFeature
+DefineFeature @atom:335 [$([#1][CD4][#7H0D3]1[#6D3](=O)[#7H1D3][#6D3]([NH2D3])[#6D3][#6D3]1)]
+Family 282HC
+EndFeature
+DefineFeature @atom:343 [F-]
+Family 283F-
+EndFeature
+DefineFeature @atom:344 [Cl-]
+Family 284Cl-
+EndFeature
+DefineFeature @atom:345 [Br-]
+Family 285Br-
+EndFeature
+DefineFeature @atom:346 [I-]
+Family 286I-
+EndFeature
+DefineFeature @atom:348 [Li+]
+Family 287Li+
+EndFeature
+DefineFeature @atom:349 [Na+]
+Family 288Na+
+EndFeature
+DefineFeature @atom:350 [K+]
+Family 289K+
+EndFeature
+DefineFeature @atom:351 [Rb+]
+Family 290Rb+
+EndFeature
+DefineFeature @atom:352 [Cs+]
+Family 291Cs+
+EndFeature
+DefineFeature @atom:353 [Mg+2]
+Family 292Mg2+
+EndFeature
+DefineFeature @atom:354 [Ca+2]
+Family 293Ca2+
+EndFeature
+DefineFeature @atom:355 [Sr+2]
+Family 294Sr2+
+EndFeature
+DefineFeature @atom:356 [Ba+2]
+Family 295Ba2+
+EndFeature
+DefineFeature @atom:357 [$([CH3D4][S-])]
+Family 296C3
+EndFeature
+DefineFeature @atom:358 [$([#1][CH3D4][S-])]
+Family 297HC
+EndFeature
+DefineFeature @atom:359 [$([S-][CH3D4])]
+Family 298SH
+EndFeature
+DefineFeature @atom:360 [$([CH3D4][O-])]
+Family 299C3
+EndFeature
+DefineFeature @atom:361 [$([#1][CH3D4][O-])]
+Family 300HC
+EndFeature
+DefineFeature @atom:362 [$([O-][CH3D4])]
+Family 301OH
+EndFeature
+DefineFeature @atom:363 [$([CH2D3][CH0D2][ND1])]
+Family 302CT
+EndFeature
+DefineFeature @atom:364 [$([#1][CH2D3][CH0D2][ND1])]
+Family 303HC
+EndFeature
+DefineFeature @atom:365 [$([CH0D2]([CH2D3])[ND1])]
+Family 304CZ
+EndFeature
+DefineFeature @atom:366 [$([ND1][CH0D2][CH2D3])]
+Family 305NZ
+EndFeature
+DefineFeature @atom:367 [$([CH3D3][NH1D2])]
+Family 306C3
+EndFeature
+DefineFeature @atom:368 [$([#1][CH3D3][NH1D2])]
+Family 307HC
+EndFeature
+DefineFeature @atom:369 [$([NH1D2][CH3D3])]
+Family 308N3
+EndFeature
+DefineFeature @atom:370 [$([#1][NH1D2][CH3D3])]
+Family 309H
+EndFeature
+DefineFeature @atom:371 [$([CH2D3-])]
+Family 310C3
+EndFeature
+DefineFeature @atom:372 [$([#1][CH2D3-])]
+Family 311HC
+EndFeature
+DefineFeature @atom:373 [$([CH3D4][CH2D3-])]
+Family 312CT
+EndFeature
+DefineFeature @atom:374 [$([#1][CH3D4][CH2D3-])]
+Family 313HC
+EndFeature
+DefineFeature @atom:376 [$([OH1D1-])]
+Family 314OH
+EndFeature
+DefineFeature @atom:377 [$([#1][OH1D1-])]
+Family 315HO
+EndFeature
+DefineFeature @atom:381 [$([PD4]([OD2])([OD2])(=[O,S])-[O,S])]
+Family 316P
+EndFeature
+DefineFeature @atom:382 [$([O]=[PD4]([OD2])([OD2])-[O,S])]
+Family 317O2
+EndFeature
+DefineFeature @atom:383 [$([O]([#6])[PD4]([OD2])(=[O,S])-[O,S])]
+Family 318OS
+EndFeature
+DefineFeature @atom:384 [$([#6][O][PD4]([OD2])(=[O,S])-[O,S])]
+Family 319CT
+EndFeature
+DefineFeature @atom:385 [$([#1][#6][O][PD4]([OD2])(=[O,S])-[O,S])]
+Family 320HC
+EndFeature
+DefineFeature @atom:386 [$([PD4]([OD2])(=[O,S])(-[O,S])-[O,S])]
+Family 321P
+EndFeature
+DefineFeature @atom:387 [$([O]=[PD4]([OD2])(-[O,S])-[O,S])]
+Family 322O2
+EndFeature
+DefineFeature @atom:388 [$([O]([#6])[PD4](=[O,S])(-[O,S])-[O,S])]
+Family 323OS
+EndFeature
+DefineFeature @atom:389 [$([#6][O][PD4](=[O,S])(-[O,S])-[O,S])]
+Family 324CT
+EndFeature
+DefineFeature @atom:390 [$([#1][#6][O][PD4](=[O,S])(-[O,S])-[O,S])]
+Family 325HC
+EndFeature
+DefineFeature @atom:391 [$([PD4]([#6])(=[O,S])(-[O,S])[OD2])]
+Family 326P
+EndFeature
+DefineFeature @atom:392 [$([O]=[PD4]([#6])(-[O,S])[OD2])]
+Family 327O2
+EndFeature
+DefineFeature @atom:393 [$([O]([#6])[PD4]([#6])(=[O,S])-[O,S])]
+Family 328OS
+EndFeature
+DefineFeature @atom:394 [$([#6][O][PD4]([#6])(=[O,S])-[O,S])]
+Family 329CT
+EndFeature
+DefineFeature @atom:395 [$([#1][#6][O][PD4]([#6])(=[O,S])-[O,S])]
+Family 330HC
+EndFeature
+DefineFeature @atom:396 [$([#6][PD4](=[O,S])(-[O,S])[OD2])]
+Family 331CT
+EndFeature
+DefineFeature @atom:397 [$([#1][#6][PD4](=[O,S])(-[O,S])[OD2])]
+Family 332HC
+EndFeature
+DefineFeature @atom:398 [$([c][#6][O][PD4](=[O,S])[OD2])]
+Family 333CA
+EndFeature
+DefineFeature @atom:399 [$([#6](c)[O][PD4](=[O,S])[OD2])]
+Family 334CT
+EndFeature
+DefineFeature @atom:400 [$([#1][#6](c)[O][PD4](=[O,S])[OD2])]
+Family 335HC
+EndFeature
+DefineFeature @atom:401 [$([c][#6][PD4](=[O,S])(O)[OD2])]
+Family 336CA
+EndFeature
+DefineFeature @atom:402 [$([#6](c)[PD4](=[O,S])(O)[OD2])]
+Family 337CT
+EndFeature
+DefineFeature @atom:403 [$([#1][#6](c)[PD4](=[O,S])(O)[OD2])]
+Family 338HC
+EndFeature
+DefineFeature @atom:404 [$([c][#8][PD4](=[O,S])([OD1])[OD1])]
+Family 339CA
+EndFeature
+DefineFeature @atom:406 [$([#6D3](=[O,S])[O][#6])]
+Family 340C_2
+EndFeature
+DefineFeature @atom:407 [$([O]=[#6D3][O][#6])]
+Family 341O_2
+EndFeature
+DefineFeature @atom:408 [$([O]([#6])[#6D3]=[O,S])]
+Family 342OS
+EndFeature
+DefineFeature @atom:409 [$([CH3][O][CD3]=[O,S])]
+Family 343CT
+EndFeature
+DefineFeature @atom:410 [$([#1][CD4][O][CD3]=[O,S])]
+Family 344HC
+EndFeature
+DefineFeature @atom:411 [$([CD3]([c])(=[O,S])[O])]
+Family 345C
+EndFeature
+DefineFeature @atom:412 [$([CD3]([c])(=[O,S])[O][CD4])]
+Family 346C
+EndFeature
+DefineFeature @atom:413 [$([c][O][CD3]=[O,S])]
+Family 347CA
+EndFeature
+DefineFeature @atom:414 [$([O]([c])[CD3]=[O,S])]
+Family 348OS
+EndFeature
+DefineFeature @atom:415 [$([SH0D3](=O))]
+Family 349SY
+EndFeature
+DefineFeature @atom:415 [$([SH0D4](=O)(=O)[N,O])]
+Family 350SY
+EndFeature
+DefineFeature @atom:416 [$([O]=[SH0D4](=O)[N,O])]
+Family 351OY
+EndFeature
+DefineFeature @atom:417 [$([CH3D4][SH0D4](=O)(=O)[N,O])]
+Family 352CT
+EndFeature
+DefineFeature @atom:418 [$([#1][CH3D4][SH0D4](=O)(=O)[N,O])]
+Family 353HC
+EndFeature
+DefineFeature @atom:419 [$([NH2D3][SH0D4](=O)=[O])]
+Family 354N
+EndFeature
+DefineFeature @atom:420 [$([#1][NH2D3][SH0D4](=O)=[O])]
+Family 355H
+EndFeature
+DefineFeature @atom:421 [$([NH1D3][SH0D4](=O)=[O])]
+Family 356N
+EndFeature
+DefineFeature @atom:422 [$([#1][NH1D3][SH0D4](=O)=[O])]
+Family 357H
+EndFeature
+DefineFeature @atom:423 [$([CH3D4][ND3][SH0D4](=O)=[O])]
+Family 358CT
+EndFeature
+DefineFeature @atom:424 [$([#1][CH3D4][ND3][SH0D4](=O)=[O])]
+Family 359HC
+EndFeature
+DefineFeature @atom:425 [$([CH2D4][ND3][SH0D4](=O)=[O])]
+Family 360CT
+EndFeature
+DefineFeature @atom:426 [$([#1][CH2D4][ND3][SH0D4](=O)=[O])]
+Family 361HC
+EndFeature
+DefineFeature @atom:427 [$([CH3D4][CD4][ND3][SH0D4](=O)=[O])]
+Family 362CT
+EndFeature
+DefineFeature @atom:428 [$([#1][CH3D4][CD4][ND3][SH0D4](=O)=[O])]
+Family 363HC
+EndFeature
+DefineFeature @atom:429 [$([c][SH0D4](=O)(=O)[N,O])]
+Family 364CA
+EndFeature
+DefineFeature @atom:431 [$([CH2D4]([#6])[O][CD3]=[O])]
+Family 365CT
+EndFeature
+DefineFeature @atom:432 [$([CH1D4]([#6])([#6])[O][CD3]=[O])]
+Family 366CT
+EndFeature
+DefineFeature @atom:433 [$([CH0D4]([#6])([#6])([#6])[O][CD3]=[O])]
+Family 367CT
+EndFeature
+DefineFeature @atom:434 [$([SD4](=O)=[O])]
+Family 368SY2
+EndFeature
+DefineFeature @atom:435 [$([O]=[SD4]=[O])]
+Family 369OY
+EndFeature
+DefineFeature @atom:438 [$([O]=[SD3])]
+Family 370OY
+EndFeature
+DefineFeature @atom:439 [$([CH3D4][SD3]=[O])]
+Family 371CT
+EndFeature
+DefineFeature @atom:440 [$([CH2D4][SD3]=[O])]
+Family 372CT
+EndFeature
+DefineFeature @atom:441 [$([c]1([CH2D4])cnc2c1cccc2)]
+Family 373C*
+EndFeature
+DefineFeature @atom:442 [$([c]1nc2c(c1[CH2D4])cccc2)]
+Family 374CB
+EndFeature
+DefineFeature @atom:443 [$([c]1(ncc2([CH2D4]))c2cccc1)]
+Family 375CN
+EndFeature
+DefineFeature @atom:444 [$([nD3]1c2c(c([CH2D4])c1)cccc2)]
+Family 376NA
+EndFeature
+DefineFeature @atom:445 [$([#1][nD3]1c2c(c([CH2D4])c1)cccc2)]
+Family 377H
+EndFeature
+DefineFeature @atom:446 [$([CH2D4]([CH1D4][NH2D3])c1ncnc1)]
+Family 378CT
+EndFeature
+DefineFeature @atom:447 [$([c]1[nD3]cc[nD2]1)]
+Family 379CR
+EndFeature
+DefineFeature @atom:448 [$([c]1[nD2]c[nD3]c1)]
+Family 380CV
+EndFeature
+DefineFeature @atom:449 [$([c]1[nD3]c[nD2]c1)]
+Family 381CW
+EndFeature
+DefineFeature @atom:450 [$([c]1[nD3]cc[nD3]1)]
+Family 382CR
+EndFeature
+DefineFeature @atom:451 [$([c]1[nD3]c[nD3]c1)]
+Family 383CX
+EndFeature
+DefineFeature @atom:452 [$([nD2]1c[nD3]cc1)]
+Family 384NB
+EndFeature
+DefineFeature @atom:453 [$([nD3]1c[nD3]cc1)]
+Family 385NA
+EndFeature
+DefineFeature @atom:454 [$([#1][nD3]1c[nD3]cc1)]
+Family 386H
+EndFeature
+DefineFeature @atom:455 [$([c]1(cccc2)c2ncc1[CH2D4])]
+Family 387CW
+EndFeature
+DefineFeature @atom:456 [$([CH1D4][c])]
+Family 388CT
+EndFeature
+DefineFeature @atom:457 [$([CH0D4][c])]
+Family 389CT
+EndFeature
+DefineFeature @atom:458 [$([CH1D3](=[CD3])[O][CD4])]
+Family 390CM
+EndFeature
+DefineFeature @atom:459 [$([CH0D3](=[CD3])[O][CD4])]
+Family 391CM
+EndFeature
+DefineFeature @atom:461 [$([nD2]1ccccc1)]
+Family 392NC
+EndFeature
+DefineFeature @atom:462 [$([c]1cccc[nD2]1)]
+Family 393CA
+EndFeature
+DefineFeature @atom:463 [$([c]1ccc[nD2]c1)]
+Family 394CA
+EndFeature
+DefineFeature @atom:464 [$([c]1cc[nD2]cc1)]
+Family 395CA
+EndFeature
+DefineFeature @atom:465 [$([#1]c1cccc[nD2]1)]
+Family 396HA
+EndFeature
+DefineFeature @atom:466 [$([#1]c1ccc[nD2]c1)]
+Family 397HA
+EndFeature
+DefineFeature @atom:467 [$([#1]c1cc[nD2]cc1)]
+Family 398HA
+EndFeature
+DefineFeature @atom:468 [$([nD2]1cc[nD2]cc1)]
+Family 399NC
+EndFeature
+DefineFeature @atom:469 [$([c]1[nD2]cc[nD2]c1)]
+Family 400CA
+EndFeature
+DefineFeature @atom:470 [$([#1]c1[nD2]cc[nD2]c1)]
+Family 401HA
+EndFeature
+DefineFeature @atom:471 [$([nD2]1c[nD2]ccc1)]
+Family 402NC
+EndFeature
+DefineFeature @atom:472 [$([c]1[nD2]ccc[nD2]1)]
+Family 403CQ
+EndFeature
+DefineFeature @atom:473 [$([c]1cc[nD2]c[nD2]1)]
+Family 404CA
+EndFeature
+DefineFeature @atom:474 [$([c]1c[nD2]c[nD2]c1)]
+Family 405CA
+EndFeature
+DefineFeature @atom:475 [$([#1]c1[nD2]ccc[nD2]1)]
+Family 406HA
+EndFeature
+DefineFeature @atom:476 [$([#1]c1cc[nD2]c[nD2]1)]
+Family 407HA
+EndFeature
+DefineFeature @atom:477 [$([#1]c1c[nD2]c[nD2]c1)]
+Family 408HA
+EndFeature
+DefineFeature @atom:478 [$([nD2]1[nD2]cccc1)]
+Family 409NC
+EndFeature
+DefineFeature @atom:479 [$([c]1[nD2][nD2]ccc1)]
+Family 410CA
+EndFeature
+DefineFeature @atom:480 [$([c]1c[nD2][nD2]cc1)]
+Family 411CA
+EndFeature
+DefineFeature @atom:481 [$([#1][c]1[nD2][nD2]ccc1)]
+Family 412HA
+EndFeature
+DefineFeature @atom:482 [$([#1][c]1c[nD2][nD2]cc1)]
+Family 413HA
+EndFeature
+DefineFeature @atom:483 [$([nD3]1cccc1)]
+Family 414NA
+EndFeature
+DefineFeature @atom:484 [$([c]1ccc[nD3]1)]
+Family 415CW
+EndFeature
+DefineFeature @atom:485 [$([c]1cc[nD3]c1)]
+Family 416CS
+EndFeature
+DefineFeature @atom:486 [$([#1][nD3]1cccc1)]
+Family 417H
+EndFeature
+DefineFeature @atom:487 [$([#1][c]1ccc[nD3]1)]
+Family 418HA
+EndFeature
+DefineFeature @atom:488 [$([#1][c]1cc[nD3]c1)]
+Family 419HA
+EndFeature
+DefineFeature @atom:489 [$([nD3]1[nD2]ccc1)]
+Family 420NA
+EndFeature
+DefineFeature @atom:490 [$([nD2]1ccc[nD3]1)]
+Family 421NB
+EndFeature
+DefineFeature @atom:491 [$([c]1cc[nD3][nD2]1)]
+Family 422CU
+EndFeature
+DefineFeature @atom:492 [$([c]1c[nD3][nD2]c1)]
+Family 423CA
+EndFeature
+DefineFeature @atom:493 [$([c]1[nD3][nD2]cc1)]
+Family 424CW
+EndFeature
+DefineFeature @atom:494 [$([#1][nD3]1[nD2]ccc1)]
+Family 425H
+EndFeature
+DefineFeature @atom:495 [$([#1][c]1cc[nD3][nD2]1)]
+Family 426HA
+EndFeature
+DefineFeature @atom:496 [$([#1][c]1c[nD3][nD2]c1)]
+Family 427HA
+EndFeature
+DefineFeature @atom:497 [$([#1][c]1[nD3][nD2]cc1)]
+Family 428HA
+EndFeature
+DefineFeature @atom:498 [$([nD3]1c[nD2]cc1)]
+Family 429NA
+EndFeature
+DefineFeature @atom:499 [$([c]1[nD2]cc[nD3]1)]
+Family 430CR
+EndFeature
+DefineFeature @atom:500 [$([nD2]1cc[nD3]c1)]
+Family 431NB
+EndFeature
+DefineFeature @atom:501 [$([c]1c[nD3]c[nD2]1)]
+Family 432CV
+EndFeature
+DefineFeature @atom:502 [$([c]1[nD3]c[nD2]c1)]
+Family 433CW
+EndFeature
+DefineFeature @atom:503 [$([#1][nD3]1c[nD2]cc1)]
+Family 434H
+EndFeature
+DefineFeature @atom:504 [$([#1][c]1[nD2]cc[nD3]1)]
+Family 435HA
+EndFeature
+DefineFeature @atom:505 [$([#1][c]1c[nD3]c[nD2]1)]
+Family 436HA
+EndFeature
+DefineFeature @atom:506 [$([#1][c]1[nD3]c[nD2]c1)]
+Family 437HA
+EndFeature
+DefineFeature @atom:507 [$([o]1cccc1)]
+Family 438OS
+EndFeature
+DefineFeature @atom:508 [$([c]1ccc[o,s]1)]
+Family 439CW
+EndFeature
+DefineFeature @atom:509 [$([c]1cc[o,s]c1)]
+Family 440CS
+EndFeature
+DefineFeature @atom:510 [$([#1][c]1ccc[o,s]1)]
+Family 441HA
+EndFeature
+DefineFeature @atom:511 [$([#1][c]1cc[o,s]c1)]
+Family 442HA
+EndFeature
+DefineFeature @atom:512 [$([o,s]1cncc1)]
+Family 443OS
+EndFeature
+DefineFeature @atom:513 [$([c]1ncc[o,s]1)]
+Family 444CR
+EndFeature
+DefineFeature @atom:514 [$([n]1cc[o,s]c1)]
+Family 445NB
+EndFeature
+DefineFeature @atom:515 [$([c]1c[o,s]cn1)]
+Family 446CV
+EndFeature
+DefineFeature @atom:516 [$([c]1[o,s]cnc1)]
+Family 447CW
+EndFeature
+DefineFeature @atom:517 [$([#1]c1ncc[o,s]1)]
+Family 448HA
+EndFeature
+DefineFeature @atom:518 [$([#1]c1c[o,s]cn1)]
+Family 449HA
+EndFeature
+DefineFeature @atom:519 [$([#1]c1[o,s]cnc1)]
+Family 450HA
+EndFeature
+DefineFeature @atom:520 [$([o,s]1nccc1)]
+Family 451OS
+EndFeature
+DefineFeature @atom:521 [$([n]1ccc[o,s]1)]
+Family 452NB
+EndFeature
+DefineFeature @atom:522 [$([c]1cc[o,s]n1)]
+Family 453CU
+EndFeature
+DefineFeature @atom:523 [$([c]1c[o,s]nc1)]
+Family 454CA
+EndFeature
+DefineFeature @atom:524 [$([c]1[o,s]ncc1)]
+Family 455CW
+EndFeature
+DefineFeature @atom:525 [$([#1]c1cc[o,s]n1)]
+Family 456HA
+EndFeature
+DefineFeature @atom:526 [$([#1]c1c[o,s]nc1)]
+Family 457HA
+EndFeature
+DefineFeature @atom:527 [$([#1]c1[o,s]ncc1)]
+Family 458HA
+EndFeature
+DefineFeature @atom:528 [$([#7]1[#6][#6][#6]2[#6]1[#6][#6][#6][#6]2)]
+Family 459NA
+EndFeature
+DefineFeature @atom:529 [$([#6]1[#6][#6]2[#6][#6][#6][#6][#6]2[#7]1)]
+Family 460CW
+EndFeature
+DefineFeature @atom:530 [$([#6]1[#6]2[#6][#6][#6][#6][#6]2[#7][#6]1)]
+Family 461CS
+EndFeature
+DefineFeature @atom:531 [$([#6]1[#6][#6][#6][#6]2[#6]1[#6][#6][#7]2)]
+Family 462CA
+EndFeature
+DefineFeature @atom:532 [$([#6]1[#6][#6][#6]2[#7][#6][#6][#6]2[#6]1)]
+Family 463CA
+EndFeature
+DefineFeature @atom:533 [$([#6]1[#6][#6]2[#7][#6][#6][#6]2[#6][#6]1)]
+Family 464CA
+EndFeature
+DefineFeature @atom:534 [$([#6]1[#6]2[#7][#6][#6][#6]2[#6][#6][#6]1)]
+Family 465CA
+EndFeature
+DefineFeature @atom:535 [$([#6]1([#6]2[#6][#6][#6][#6]1)[#7][#6][#6]2)]
+Family 466CN
+EndFeature
+DefineFeature @atom:536 [$([#6]1([#6]2[#6][#6][#6][#6]1)[#6][#6][#7]2)]
+Family 467CB
+EndFeature
+DefineFeature @atom:537 [$([#1][#7]1[#6][#6][#6]2[#6]1[#6][#6][#6][#6]2)]
+Family 468H
+EndFeature
+DefineFeature @atom:538 [$([#1][#6]1[#6][#6]2[#6][#6][#6][#6][#6]2[#7]1)]
+Family 469HA
+EndFeature
+DefineFeature @atom:539 [$([#1][#6]1[#6]2[#6][#6][#6][#6][#6]2[#7][#6]1)]
+Family 470HA
+EndFeature
+DefineFeature @atom:540 [$([#1][#6]1[#6][#6][#6][#6]2[#6]1[#6][#6][#7]2)]
+Family 471HA
+EndFeature
+DefineFeature @atom:541 [$([#1][#6]1[#6][#6][#6]2[#7][#6][#6][#6]2[#6]1)]
+Family 472HA
+EndFeature
+DefineFeature @atom:542 [$([#1][#6]1[#6][#6]2[#7][#6][#6][#6]2[#6][#6]1)]
+Family 473HA
+EndFeature
+DefineFeature @atom:543 [$([#1][#6]1[#6]2[#7][#6][#6][#6]2[#6][#6][#6]1)]
+Family 474HA
+EndFeature
+DefineFeature @atom:544 [$([n]1cccc2c1cccc2)]
+Family 475NC
+EndFeature
+DefineFeature @atom:545 [$([c]1ccc2ccccc2n1)]
+Family 476CA
+EndFeature
+DefineFeature @atom:546 [$([c]1cc2ccccc2nc1)]
+Family 477CA
+EndFeature
+DefineFeature @atom:547 [$([c]1c2ccccc2ncc1)]
+Family 478CA
+EndFeature
+DefineFeature @atom:548 [$([c]1cccc2c1cccn2)]
+Family 479CA
+EndFeature
+DefineFeature @atom:549 [$([c]1ccc2ncccc2c1)]
+Family 480CA
+EndFeature
+DefineFeature @atom:550 [$([c]1cc2ncccc2cc1)]
+Family 481CA
+EndFeature
+DefineFeature @atom:551 [$([c]1c2ncccc2ccc1)]
+Family 482CA
+EndFeature
+DefineFeature @atom:552 [$([c]1(c2cccc1)nccc2)]
+Family 483CA
+EndFeature
+DefineFeature @atom:553 [$([c]1(c2cccc1)cccn2)]
+Family 484CA
+EndFeature
+DefineFeature @atom:554 [$([#1]c1ccc2ccccc2n1)]
+Family 485HA
+EndFeature
+DefineFeature @atom:555 [$([#1]c1cc2ccccc2nc1)]
+Family 486HA
+EndFeature
+DefineFeature @atom:556 [$([#1]c1c2ccccc2ncc1)]
+Family 487HA
+EndFeature
+DefineFeature @atom:557 [$([#1]c1cccc2c1cccn2)]
+Family 488HA
+EndFeature
+DefineFeature @atom:558 [$([#1]c1ccc2ncccc2c1)]
+Family 489HA
+EndFeature
+DefineFeature @atom:559 [$([#1]c1cc2ncccc2cc1)]
+Family 490HA
+EndFeature
+DefineFeature @atom:560 [$([#1]c1c2ncccc2ccc1)]
+Family 491HA
+EndFeature
+DefineFeature @atom:561 [$([n]1cnc2c(c1)ncn2)]
+Family 492NC
+EndFeature
+DefineFeature @atom:562 [$([c]1nc2c(cn1)ncn2)]
+Family 493CQ
+EndFeature
+DefineFeature @atom:563 [$([n]1c2c(cnc1)ncn2)]
+Family 494NC
+EndFeature
+DefineFeature @atom:564 [$([c]1(c2ncn1)ncnc2)]
+Family 495CB
+EndFeature
+DefineFeature @atom:565 [$([c]1(c2ncn1)cncn2)]
+Family 496CB
+EndFeature
+DefineFeature @atom:566 [$([c]1ncnc2c1ncn2)]
+Family 497CA
+EndFeature
+DefineFeature @atom:567 [$([n]1cnc2c1cncn2)]
+Family 498NB
+EndFeature
+DefineFeature @atom:568 [$([c]1nc2c(n1)cncn2)]
+Family 499CK
+EndFeature
+DefineFeature @atom:569 [$([n]1c2c(nc1)cncn2)]
+Family 500NA
+EndFeature
+DefineFeature @atom:570 [$([#1][c]1nc2c(cn1)ncn2)]
+Family 501HA
+EndFeature
+DefineFeature @atom:571 [$([#1][c]1ncnc2c1ncn2)]
+Family 502HA
+EndFeature
+DefineFeature @atom:572 [$([#1][c]1nc2c(n1)cncn2)]
+Family 503HA
+EndFeature
+DefineFeature @atom:573 [$([#1][n]1c2c(nc1)cncn2)]
+Family 504H
+EndFeature
+DefineFeature @atom:574 [$([s]1cncc1)]
+Family 505S
+EndFeature
+DefineFeature @atom:574 [$([s]1cccc1)]
+Family 506S
+EndFeature
+DefineFeature @atom:575 [$([c]1nccs1)]
+Family 507CR
+EndFeature
+DefineFeature @atom:576 [$([n]1ccsc1)]
+Family 508NB
+EndFeature
+DefineFeature @atom:577 [$([c]1cscn1)]
+Family 509CV
+EndFeature
+DefineFeature @atom:578 [$([c]1scnc1)]
+Family 510CW
+EndFeature
+DefineFeature @atom:579 [$([#1][c]1nccs1)]
+Family 511HA
+EndFeature
+DefineFeature @atom:580 [$([#1][c]1cscn1)]
+Family 512HA
+EndFeature
+DefineFeature @atom:581 [$([#1][c]1scnc1)]
+Family 513HA
+EndFeature
+DefineFeature @atom:582 [$([n]1cncnc1)]
+Family 514NC
+EndFeature
+DefineFeature @atom:583 [$([c]1ncncn1)]
+Family 515CQ
+EndFeature
+DefineFeature @atom:584 [$([#1][c]1ncncn1)]
+Family 516HA
+EndFeature
+DefineFeature @atom:585 [$([c]1([OH])ccc2c(c1)ccn2)]
+Family 517CA
+EndFeature
+DefineFeature @atom:586 [$([CH2D4]c1cnc2c1cc([OH])cc2)]
+Family 518CT
+EndFeature
+DefineFeature @atom:587 [$([nR1]1[cR2]2[cR2]([cR1][cR1][cR2][cR2]2)[cR1][cR1][cR1]1)]
+Family 519NC
+EndFeature
+DefineFeature @atom:588 [$([cR1]1[nR1][cR2]2[cR2]([cR1][cR1][cR2][cR2]2)[cR1][cR1]1)]
+Family 520CA
+EndFeature
+DefineFeature @atom:589 [$([cR1]1[cR1][nR1][cR2]2[cR2]([cR1][cR1][cR2][cR2]2)[cR1]1)]
+Family 521CA
+EndFeature
+DefineFeature @atom:590 [$([cR1]1[cR1][cR1][nR1][cR2]2[cR2]1[cR1][cR1][cR2][cR2]2)]
+Family 522CA
+EndFeature
+DefineFeature @atom:591 [$([cR2]1([cR1][cR1][cR1][nR1]2)[cR2]2[cR2][cR2][cR1][cR1]1)]
+Family 523CA
+EndFeature
+DefineFeature @atom:592 [$([cR2]1([nR1][cR1][cR1][cR1]2)[cR2]2[cR1][cR1][cR2][cR2]1)]
+Family 524CA
+EndFeature
+DefineFeature @atom:593 [$([cR1]([cR1][cR2]1)[cR2]2[cR1][cR1][cR1][nR1][cR2]2[cR2]1)]
+Family 525CA
+EndFeature
+DefineFeature @atom:594 [$([#1][cR1]1[nR1][cR2]2[cR2]([cR1][cR1][cR2][cR2]2)[cR1][cR1]1)]
+Family 526HA
+EndFeature
+DefineFeature @atom:595 [$([#1][cR1]1[cR1][nR1][cR2]2[cR2]([cR1][cR1][cR2][cR2]2)[cR1]1)]
+Family 527HA
+EndFeature
+DefineFeature @atom:596 [$([#1][cR1]1[cR1][cR1][nR1][cR2]2[cR2]1[cR1][cR1][cR2][cR2]2)]
+Family 528HA
+EndFeature
+DefineFeature @atom:597 [$([#1][cR1]([cR1][cR2]1)[cR2]2[cR1][cR1][cR1][nR1][cR2]2[cR2]1)]
+Family 529HA
+EndFeature
+DefineFeature @atom:611 [$([CH3D4][cr6]([cr6])[nr6])]
+Family 530CT
+EndFeature
+DefineFeature @atom:612 [$([CH2D4][cr6]([cr6])[nr6])]
+Family 531CT
+EndFeature
+DefineFeature @atom:613 [$([CH3D4][cr6]([cr6])[cr6][nr6])]
+Family 532CT
+EndFeature
+DefineFeature @atom:614 [$([CH2D4][cr6]([cr6])[cr6][nr6])]
+Family 533CT
+EndFeature
+DefineFeature @atom:615 [$([CH3D4][cr6]([cr6])[cr6][cr6][nr6])]
+Family 534CT
+EndFeature
+DefineFeature @atom:616 [$([CH2D4][cr6]([cr6])[cr6][cr6][nr6])]
+Family 535CT
+EndFeature
+DefineFeature @atom:617 [$([CH3D4][cr6]([cr6][nr6])[nr6])]
+Family 536CT
+EndFeature
+DefineFeature @atom:618 [$([CH2D4][cr6]([cr6][nr6])[nr6])]
+Family 537CT
+EndFeature
+DefineFeature @atom:619 [$([CH3D4][cr5]([cr5])[nr5])]
+Family 538CT
+EndFeature
+DefineFeature @atom:620 [$([CH2D4][cr5]([cr5])[nr5])]
+Family 539CT
+EndFeature
+DefineFeature @atom:621 [$([CH3D4][cr5]([cr5])[or5])]
+Family 540CT
+EndFeature
+DefineFeature @atom:622 [$([CH2D4][cr5]([cr5])[or5])]
+Family 541CT
+EndFeature
+DefineFeature @atom:641 [$([CH0+]([CH3D4])([CH3D4])[CH3D4])]
+Family 542C+
+EndFeature
+DefineFeature @atom:642 [$([CH3D4][CH0+]([CH3D4])[CH3D4])]
+Family 543CT
+EndFeature
+DefineFeature @atom:643 [$([#1][CH3D4][CH0+]([CH3D4])[CH3D4])]
+Family 544HC
+EndFeature
+DefineFeature @atom:652 [$([CH2D4]1[CD4][CD4]1)]
+Family 545CY
+EndFeature
+DefineFeature @atom:653 [$([CH1D4]1[CD4][CD4]1)]
+Family 546CY
+EndFeature
+DefineFeature @atom:654 [$([CH0D4]1[CD4][CD4]1)]
+Family 547CY
+EndFeature
+DefineFeature @atom:655 [$([c]1cccc1)]
+Family 548CA
+EndFeature
+DefineFeature @atom:656 [$([#1][c]1cccc1)]
+Family 549HA
+EndFeature
+DefineFeature @atom:659 [$([c][F])]
+Family 550CA
+EndFeature
+DefineFeature @atom:660 [$([F][c])]
+Family 551F
+EndFeature
+DefineFeature @atom:661 [$([c](F)[c](F)[c](F)[c](F)[c](F)[c](F))]
+Family 552CA
+EndFeature
+DefineFeature @atom:662 [$([F][c][c](F)[c](F)[c](F)[c](F)[c](F))]
+Family 553F
+EndFeature
+DefineFeature @atom:665 [$([c][CD4](F)(F)[F])]
+Family 554CA
+EndFeature
+DefineFeature @atom:666 [$([CD4](c)(F)(F)[F])]
+Family 555CT
+EndFeature
+DefineFeature @atom:667 [$([F][CD4](c)(F)[F])]
+Family 556F
+EndFeature
+DefineFeature @atom:668 [$([c](F)[c](F))]
+Family 557CA
+EndFeature
+DefineFeature @atom:668 [$([c](F)[c][c](F))]
+Family 558CA
+EndFeature
+DefineFeature @atom:668 [$([c](F)[c][c][c](F))]
+Family 559CA
+EndFeature
+DefineFeature @atom:669 [$([F][c][c][F])]
+Family 560F
+EndFeature
+DefineFeature @atom:669 [$([F][c][c][c][F])]
+Family 561F
+EndFeature
+DefineFeature @atom:669 [$([F][c][c][c][c][F])]
+Family 562F
+EndFeature
+DefineFeature @atom:670 [$([c][Br])]
+Family 563CA
+EndFeature
+DefineFeature @atom:671 [$([Br][#6])]
+Family 564Br
+EndFeature
+DefineFeature @atom:672 [$([c][I])]
+Family 565CA
+EndFeature
+DefineFeature @atom:673 [$([I][#6])]
+Family 566I
+EndFeature
+DefineFeature @atom:674 [$([CH1D4r3](c)[CD4r3][CD4r3])]
+Family 567CY
+EndFeature
+DefineFeature @atom:675 [$([SH1D2][c])]
+Family 568SH
+EndFeature
+DefineFeature @atom:676 [$([c][SH1D2])]
+Family 569CA
+EndFeature
+DefineFeature @atom:677 [$([c][c][c][c][#6D3](~[#7H2D3])~[#7H2D3])]
+Family 570CA
+EndFeature
+DefineFeature @atom:678 [$([c][c][c][#6D3](~[#7H2D3])~[#7H2D3])]
+Family 571CA
+EndFeature
+DefineFeature @atom:679 [$([c][c][#6D3](~[#7H2D3])~[#7H2D3])]
+Family 572CA
+EndFeature
+DefineFeature @atom:680 [$([c][#6D3](~[#7H2D3])~[#7H2D3])]
+Family 573CA
+EndFeature
+DefineFeature @atom:681 [$([#1][c][c][c][#6D3](~[#7H2D3])~[#7H2D3])]
+Family 574HA
+EndFeature
+DefineFeature @atom:682 [$([#1][c][c][#6D3](~[#7H2D3])~[#7H2D3])]
+Family 575HA
+EndFeature
+DefineFeature @atom:683 [$([#6D3](~[#7H2D3])~[#7H2D3])]
+Family 576CA
+EndFeature
+DefineFeature @atom:684 [$([#7H2D3]~[#6D3](c)~[#7H2D3])]
+Family 577N2
+EndFeature
+DefineFeature @atom:685 [$([#1][#7H2D3]~[#6D3](~[#7H2D3])[c])]
+Family 578H
+EndFeature
+DefineFeature @atom:686 [$([#1][#7H2D3]~[#6D3](~[#7H2D3])[c])]
+Family 579H
+EndFeature
+DefineFeature @atom:687 [$([#1][c][c][c][c][#6D3](~[#7H2D3])~[#7H2D3])]
+Family 580HA
+EndFeature
+DefineFeature @atom:688 [$([CH3D4][#7D2][#6D4]([#7D3])[#7D3])]
+Family 581CT
+EndFeature
+DefineFeature @atom:689 [$([CH2D4][#7H1D3][#6D3]([#7H2D3])[#7H1D2])]
+Family 582CT
+EndFeature
+DefineFeature @atom:690 [$([#7H1D3][#6D3]([#7H2D3])[#7H1D2])]
+Family 583NY
+EndFeature
+DefineFeature @atom:691 [$([#7H1D2][#6D3]([#7H2D3])[#7H1D3])]
+Family 584NZ
+EndFeature
+DefineFeature @atom:692 [$([#7H2D3][#6D3]([#7H1D2])[#7H1D3])]
+Family 585NY
+EndFeature
+DefineFeature @atom:693 [$([#6D3]([#7H1D2])([#7H2D3])[#7H1D3])]
+Family 586CA
+EndFeature
+DefineFeature @atom:694 [$([ND1]#[CD2])]
+Family 587NZ
+EndFeature
+DefineFeature @atom:695 [$([CD2]#[ND1])]
+Family 588CZ
+EndFeature
+DefineFeature @atom:696 [$([CH3D4][CD2]#[ND1])]
+Family 589CT
+EndFeature
+DefineFeature @atom:697 [$([CH2D4][CD2]#[ND1])]
+Family 590CT
+EndFeature
+DefineFeature @atom:698 [$([CH1D4][CD2]#[ND1])]
+Family 591CT
+EndFeature
+DefineFeature @atom:699 [$([CH0D4][CD2]#[ND1])]
+Family 592CT
+EndFeature
+DefineFeature @atom:700 [$([#1][CD4][CD2]#[ND1])]
+Family 593HC
+EndFeature
+DefineFeature @atom:701 [$([#7D3]([!c])(~[#8])~[#8])]
+Family 594NO
+EndFeature
+DefineFeature @atom:702 [$([#8D1]~[#7D3]~[#8D1])]
+Family 595ON
+EndFeature
+DefineFeature @atom:703 [$([CH3D4][#7D3](~[#8])~[#8])]
+Family 596CT
+EndFeature
+DefineFeature @atom:704 [$([#1][CD4][#7D3](~[#8])~[#8])]
+Family 597HC
+EndFeature
+DefineFeature @atom:705 [$([CH2D4][#7D3](~[#8])~[#8])]
+Family 598CT
+EndFeature
+DefineFeature @atom:706 [$([CH1D4][#7D3](~[#8])~[#8])]
+Family 599CT
+EndFeature
+DefineFeature @atom:707 [$([CH0D4][#7D3](~[#8])~[#8])]
+Family 600CT
+EndFeature
+DefineFeature @atom:708 [$([#7D3](c)(~[#8D1])~[#8D1])]
+Family 601NO
+EndFeature
+DefineFeature @atom:709 [$([c][#7D3](~[#8])~[#8])]
+Family 602CA
+EndFeature
+DefineFeature @atom:712 [$([O]=[CD3]1[O][CD4][CD4][O]1)]
+Family 603O
+EndFeature
+DefineFeature @atom:713 [$([CD3]1(=[O])[O][CD4][CD4][O]1)]
+Family 604C
+EndFeature
+DefineFeature @atom:714 [$([O]1[CD3](=[O])[O][CD4][CD4]1)]
+Family 605OS
+EndFeature
+DefineFeature @atom:715 [$([CH2D4]1[O][CD3](=[O])[O][CD4]1)]
+Family 606CT
+EndFeature
+DefineFeature @atom:716 [$([CH1D4]1[O][CD3](=[O])[O][CD4]1)]
+Family 607CT
+EndFeature
+DefineFeature @atom:717 [$([CH3D4][CH1D4]1[O][CD3](=[O])[O][CD4]1)]
+Family 608CT
+EndFeature
+DefineFeature @atom:718 [$([#1][CH2D4]1[O][CD3](=[O])[O][CD4]1)]
+Family 609HC
+EndFeature
+DefineFeature @atom:719 [$([#1][CH1D4]1[O][CD3](=[O])[O][CD4]1)]
+Family 610HC
+EndFeature
+DefineFeature @atom:720 [$([#1][CH3D4][CH1D4]1[O][CD3](=[O])[O][CD4]1)]
+Family 611HC
+EndFeature
+DefineFeature @atom:722 [PD4+]
+Family 612P+
+EndFeature
+DefineFeature @atom:723 [$([CH3D4][PD4+])]
+Family 613CT
+EndFeature
+DefineFeature @atom:724 [$([CH2D4][PD4+])]
+Family 614CT
+EndFeature
+DefineFeature @atom:725 [$([#1][CH3D4][PD4+])]
+Family 615HC
+EndFeature
+DefineFeature @atom:726 [$([P-](F)(F)(F)(F)(F)F)]
+Family 616P
+EndFeature
+DefineFeature @atom:727 [$([F][P-](F)(F)(F)(F)F)]
+Family 617F
+EndFeature
+DefineFeature @atom:728 [$([ND3](~[#8D1])(~[#8D1])~[#8D1])]
+Family 618N
+EndFeature
+DefineFeature @atom:729 [$([#8D1]~[ND3](~[#8D1])~[#8D1])]
+Family 619O
+EndFeature
+DefineFeature @atom:730 [$([NH2D3][!#8,!$([#6]=[#8])])]
+Family 620NT
+EndFeature
+DefineFeature @atom:731 [$([NH1D3]([!#8,!$([#6]=[#8])])[!#8,!$([#6]=[#8])])]
+Family 621NT
+EndFeature
+DefineFeature @atom:732 [$([NH0D3]([!#8,!$([#6]=[#8])])([!#8,!$([#6]=[#8])])[!#8,!$([#6]=[#8])])]
+Family 622NT
+EndFeature
+DefineFeature @atom:733 [$([CH3D4][NH2D3])]
+Family 623CT
+EndFeature
+DefineFeature @atom:734 [$([CH3D4][NH1D3][!#8,!$([#6]=[#8])])]
+Family 624CT
+EndFeature
+DefineFeature @atom:735 [$([CH3D4][NH0D3]([!#8,!$([#6]=[#8])])[!#8,!$([#6]=[#8])])]
+Family 625CT
+EndFeature
+DefineFeature @atom:736 [$([CH2D4]([!#8])[NH2D3])]
+Family 626CT
+EndFeature
+DefineFeature @atom:736 [$([CH2D4]([NH2D3])[CD3](~[#8D1])~[#8D1])]
+Family 627CT_2
+EndFeature
+DefineFeature @atom:737 [$([CH2D4]([!#8])[NH1D3])]
+Family 628CT
+EndFeature
+DefineFeature @atom:738 [$([CH2D4]([!#8])[NH0D3])]
+Family 629CT
+EndFeature
+DefineFeature @atom:739 [$([#1][NH2D3])]
+Family 630H
+EndFeature
+DefineFeature @atom:740 [$([#1][NH1D3])]
+Family 631H
+EndFeature
+DefineFeature @atom:741 [$([#1][CD4][ND3])]
+Family 632HC
+EndFeature
+DefineFeature @atom:742 [$([CH1D4]([CD4])([CD4])[NH2D3])]
+Family 633CT
+EndFeature
+DefineFeature @atom:742 [$([CH1D4]([CD4])([NH2D3])[CD3](~[#8D1])~[#8D1])]
+Family 634CT_2
+EndFeature
+DefineFeature @atom:743 [$([CH0D4]([CD4])([CD4])([CD4])[NH2D3])]
+Family 635CT
+EndFeature
+DefineFeature @atom:744 [$([CH1D4]([CD4])([CD4])[NH1D3])]
+Family 636CT
+EndFeature
+DefineFeature @atom:745 [$([CH1D4]([CD4])([CD4])[NH0D3])]
+Family 637CT
+EndFeature
+DefineFeature @atom:746 [$([c][NH2D3])]
+Family 638CA
+EndFeature
+DefineFeature @atom:747 [$([c][NH1D3][CD4])]
+Family 639CA
+EndFeature
+DefineFeature @atom:748 [$([c][NH0D3]([CD4])[CD4])]
+Family 640CA
+EndFeature
+DefineFeature @atom:755 [$([CH1D2]#[CD2])]
+Family 641CZ
+EndFeature
+DefineFeature @atom:756 [$([#1][CH1D2]#[CD2])]
+Family 642HC
+EndFeature
+DefineFeature @atom:757 [$([CD2](#[CH1D2])[CD4;H2,H3])]
+Family 643CZ
+EndFeature
+DefineFeature @atom:758 [$([CD2](#[CH1D2])[CH1D4])]
+Family 644CZ
+EndFeature
+DefineFeature @atom:759 [$([CD2](#[CH1D2])[CH0D4,c])]
+Family 645CZ
+EndFeature
+DefineFeature @atom:760 [$([#1][CD4][CD2]#[CH1D2])]
+Family 646HC
+EndFeature
+DefineFeature @atom:769 [$([CD2H0]#[CD2H0])]
+Family 647CZ
+EndFeature
+DefineFeature @atom:770 [$([#7H1D4])]
+Family 648N3
+EndFeature
+DefineFeature @atom:771 [$([#1][#7H1D4])]
+Family 649H3
+EndFeature
+DefineFeature @atom:772 [$([CH3D4][#7H1D4])]
+Family 650CT
+EndFeature
+DefineFeature @atom:773 [$([CH2D4][#7H1D4])]
+Family 651CT
+EndFeature
+DefineFeature @atom:774 [$([CH1D4][#7H1D4])]
+Family 652CT
+EndFeature
+DefineFeature @atom:775 [$([CH0D4][#7H1D4])]
+Family 653CT
+EndFeature
+DefineFeature @atom:786 [$([F][CD4]([!F])([!F])[!F])]
+Family 654F
+EndFeature
+DefineFeature @atom:787 [$([CH2D4]([F])[!F])]
+Family 655CT
+EndFeature
+DefineFeature @atom:788 [$([#1][CD4]([F])([!F])[!F])]
+Family 656HC
+EndFeature
+DefineFeature @atom:789 [$([CH1D4]([F])([!F])[!F])]
+Family 657CT
+EndFeature
+DefineFeature @atom:790 [$([CH0D4]([F])([!F])([!F])([!F]))]
+Family 658CT
+EndFeature
+DefineFeature @atom:794 [$([CH0D4](F)(F)(F)F)]
+Family 659CT
+EndFeature
+DefineFeature @atom:795 [$([F][CH0]([F])([F])[F])]
+Family 660F
+EndFeature

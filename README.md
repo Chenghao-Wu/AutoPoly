@@ -53,10 +53,32 @@ you will get something looks like this using Visual Molecular Dynamics:
 
 Monomer data is created by Avogadra [https://avogadro.cc/]
 
+## RDkit
+AutoPoly supports create molecules from RDkit directly and store them in monomer_bank for future use 
+```python
+rdlt=AutoPoly.RDlt(smiles='c1c2ccccc2ccc1')
+rdlt.run(to_file='Naphthalene.lt')
+rdlt.store_bank()# flag=True/False to store or not in the monomer bank, default: True
+
+# Define the system
+# out is the folder name for the output
+system=AutoPoly.System(out="test_molecule_from_RDkit")
+
+# create polymers
+# Just an example of polypropylene and polyethylene with all-atom and united-atom resolutions
+
+naphthalene=AutoPoly.Polymer(ChainNum=50,Sequence=["Naphthalene"])
+
+# polymerization
+# Name is the output folder for this polymer
+poly=AutoPoly.Polymerization(Name="Naphthalene",System=system,Model=[naphthalene],run=True)
+```
+
 ## Acknowledge
 
 "Moltemplate: A Tool for Coarse-Grained Modeling of Complex Biological Matter and Soft Condensed Matter Physics", J. Mol. Biol., 2021, 433(11):166841, Jewett AI, Stelter D, Lambert J, Saladi SM, Roscioni OM; Ricci M, Autin L, Maritan M, Bashusqeh SM, Keyes T, Dame RT; Shea J-E, Jensen GJ, Goodsell DS https://doi.org/10.1016/j.jmb.2021.166841
 
+"rdlt": Script to automate assignment of atom types and build .lt files for use with moltemplate and the OPLS and L-OPLS forcefields that come packaged with it. https://github.com/asteeves/rdlt
 
 ## To-do list
 * Support tacticity of polymers
