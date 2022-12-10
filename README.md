@@ -1,5 +1,7 @@
 # AutoPoly.py: Automatic Generation of Data File for Polymers
 
+* Support OPLS (Optimized Potentials for Liquid Simulations) force field that was developed by Prof. William L. Jorgensen at Purdue University and later at Yale University.
+
 ## How to use AutoPoly.py?
 First, we need to include the package in the python PATH
 ```python
@@ -38,8 +40,7 @@ you will get something looks like this using Visual Molecular Dynamics:
 system=AutoPoly.System(out="test_molecule")
 
 # create polymers
-# Just an example of polypropylene and polyethylene with all-atom and united-atom resolutions
-
+# Just an example of benzene with all-atom resolutions
 benzene=AutoPoly.Polymer(ChainNum=50,Sequence=["Benzene"])
 
 # polymerization
@@ -65,8 +66,7 @@ rdlt.store_bank()# flag=True/False to store or not in the monomer bank, default:
 system=AutoPoly.System(out="test_molecule_from_RDkit")
 
 # create polymers
-# Just an example of polypropylene and polyethylene with all-atom and united-atom resolutions
-
+# Just an example of naphthalene with all-atom resolutions
 naphthalene=AutoPoly.Polymer(ChainNum=50,Sequence=["Naphthalene"])
 
 # polymerization

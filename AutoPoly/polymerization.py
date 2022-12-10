@@ -267,8 +267,10 @@ class Polymerization(object):
                             timez=1 
                             valz+=packingL*signz*timez
                         if modelii.DOP>1:
+                            offset_x=-50.0
                             write_f.write("polymer_"+str(polyindex+1)+" = new "+"poly_"+str(polyindex+1)+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
                         else:
+                            offset_x=-60.0
                             write_f.write("molecule_"+str(polyindex+1)+" = new "+modelii.merSet[0]+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
                         n_pre=n_now
                         counter+=1
@@ -298,8 +300,10 @@ class Polymerization(object):
                             timez=1 
                             valz+=packingL*signz*timez
                         if modelii.DOP>1:
+                            offset_x=-50.0
                             write_f.write("polymer_"+str(polyindex+1)+" = new "+"poly_"+str(polyindex+1)+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
                         else:
+                            offset_x=-60.0
                             write_f.write("molecule_"+str(polyindex+1)+" = new "+modelii.merSet[0]+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
                         n_pre=n_now
                         counter+=1
