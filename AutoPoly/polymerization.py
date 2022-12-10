@@ -230,17 +230,19 @@ class Polymerization(object):
             valz=0
             offset_x=0
 
+            offset_x_increment=10.0
+
             first=True
             for modelii in self.Model:
                 n_poly=len(modelii.sequenceSet)
                 if first:
                     # Pack molecules in square spiral shape
                     if modelii.DOP>1:
-                        offset_x=-50
+                        offset_x=-50.0
                         write_f.write("polymer_"+str(polyindex+1)+" = new poly_"+str(polyindex+1)+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
                     else:
                         #packingL=10
-                        offset_x=-5
+                        offset_x=-60.0
                         write_f.write("molecule_"+str(polyindex+1)+" = new "+modelii.merSet[0]+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
 
                     polyindex=polyindex+1
@@ -303,12 +305,12 @@ class Polymerization(object):
                             offset_x=-50.0
                             write_f.write("polymer_"+str(polyindex+1)+" = new "+"poly_"+str(polyindex+1)+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
                         else:
-                            offset_x=-60.0
                             write_f.write("molecule_"+str(polyindex+1)+" = new "+modelii.merSet[0]+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
                         n_pre=n_now
                         counter+=1
                         polyindex=polyindex+1
-
+                if modelii.DOP==1:
+                    offset_x-=offset_x_increment
                 write_f.write("\n")
 
             hbox=self.moltemplateBoxSize*0.5
