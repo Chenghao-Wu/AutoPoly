@@ -215,103 +215,84 @@ class Polymerization(object):
                     write_f.write("\n")
 
             polyindex=0
+
+            index=0
+
             packingL=self.offset+self.packingL_spacing
-            counter=0
-            n=0
-            bndl=0
-            bndh=0
-            n_now=0
-            n_pre=0
-            signy=1
-            signz=-1
-            timey=0
-            timez=0
-            valy=0
-            valz=0
-            offset_x=0
+            
+            offset_x=-50
 
             offset_x_increment=10.0
-
+            
             first=True
+            coordinates=[]
+            
+            #max_DOP=max([i.DOP for i in self.Model])
+
             for modelii in self.Model:
+                counter=0
+                n=0
+                bndl=0
+                bndh=0
+                n_now=0
+                n_pre=0
+                signy=1
+                signz=-1
+                timey=0
+                timez=0
+                valy=0
+                valz=0
                 n_poly=len(modelii.sequenceSet)
-                if first:
-                    # Pack molecules in square spiral shape
-                    if modelii.DOP>1:
-                        offset_x=-50.0
-                        write_f.write("polymer_"+str(polyindex+1)+" = new poly_"+str(polyindex+1)+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
-                    else:
-                        #packingL=10
-                        offset_x=-60.0
-                        write_f.write("molecule_"+str(polyindex+1)+" = new "+modelii.merSet[0]+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
 
-                    polyindex=polyindex+1
-
-                    for indexi in range(1,n_poly):
-                        n=0
-                        while True:
-                            n=n+1
-                            bndl=(n-1)*n
-                            bndh=n*(n+1)
-                            if bndl<polyindex and indexi<=bndh:
-                                break
-                        n_now=n
-                        if n_now!=n_pre:
-                            counter=0
-                            signy*=-1
-                            signz*=-1
-                        if counter<n_now:
-                            timey=1
-                            valy+=packingL*signy*timey
-                            timez=0
-                        else:
-                            timey=0
-                            timez=1 
-                            valz+=packingL*signz*timez
-                        if modelii.DOP>1:
-                            offset_x=-50.0
-                            write_f.write("polymer_"+str(polyindex+1)+" = new "+"poly_"+str(polyindex+1)+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
-                        else:
-                            offset_x=-60.0
-                            write_f.write("molecule_"+str(polyindex+1)+" = new "+modelii.merSet[0]+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
-                        n_pre=n_now
-                        counter+=1
-                        polyindex=polyindex+1
-                    first=False
-
+                # Pack molecules in square spiral shape
+                if modelii.DOP>1:
+                    offset_x+=offset_x_increment
+                    write_f.write("polymer_"+str(index+1)+" = new poly_"+str(polyindex+1)+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
+                    offset_x_increment=self.offset*(modelii.DOP+2)
+                    polyindex+=1
                 else:
-                    for indexi in range(0,n_poly):
-                        n=0
-                        while True:
-                            n=n+1
-                            bndl=(n-1)*n
-                            bndh=n*(n+1)
-                            if bndl<polyindex and indexi<=bndh:
-                                break
-                        n_now=n
-                        if n_now!=n_pre:
-                            counter=0
-                            signy*=-1
-                            signz*=-1
-                        if counter<n_now:
-                            timey=1
-                            valy+=packingL*signy*timey
-                            timez=0
-                        else:
-                            timey=0
-                            timez=1 
-                            valz+=packingL*signz*timez
-                        if modelii.DOP>1:
-                            offset_x=-50.0
-                            write_f.write("polymer_"+str(polyindex+1)+" = new "+"poly_"+str(polyindex+1)+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
-                        else:
-                            write_f.write("molecule_"+str(polyindex+1)+" = new "+modelii.merSet[0]+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
-                        n_pre=n_now
-                        counter+=1
-                        polyindex=polyindex+1
-                if modelii.DOP==1:
-                    offset_x-=offset_x_increment
+                    #packingL=10
+                    offset_x+=offset_x_increment
+                    write_f.write("molecule_"+str(index+1)+" = new "+modelii.merSet[0]+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
+                    offset_x_increment=self.offset*(modelii.DOP+2)
+
+                index=index+1
+
+                for indexi in range(1,n_poly):
+                    n=0
+                    while True:
+                        n=n+1
+                        bndl=(n-1)*n
+                        bndh=n*(n+1)
+                        if bndl<index and indexi<=bndh:
+                            break
+                    n_now=n
+                    if n_now!=n_pre:
+                        counter=0
+                        signy*=-1
+                        signz*=-1
+                    if counter<n_now:
+                        timey=1
+                        valy+=packingL*signy*timey
+                        timez=0
+                    else:
+                        timey=0
+                        timez=1 
+                        valz+=packingL*signz*timez
+                    if modelii.DOP>1:
+                        #offset_x=-50.0
+                        write_f.write("polymer_"+str(index+1)+" = new "+"poly_"+str(polyindex+1)+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
+                        polyindex+=1
+                    else:
+                        #offset_x=-60.0
+                        write_f.write("molecule_"+str(index+1)+" = new "+modelii.merSet[0]+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
+                    n_pre=n_now
+                    counter+=1
+                    index=index+1
+                    
+
                 write_f.write("\n")
+                #first=True
 
             hbox=self.moltemplateBoxSize*0.5
             fbox=self.moltemplateBoxSize

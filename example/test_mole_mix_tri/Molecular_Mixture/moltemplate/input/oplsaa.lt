@@ -1,0 +1,190 @@
+# NOTE: This file was created automatically using:
+#       oplsaa_moltemplate.py "/home/zwq2834/development/AutoPoly/example/test_mole_mix_tri/Molecular_Mixture/moltemplate/oplsaa_subset.prm"
+
+
+OPLSAA {
+
+  write_once("Data Masses"){
+    @atom:90 12.011 #CA "Aromatic C" 6 partial charge=-0.115
+    @atom:91 1.008 #HA "Aromatic H-C" 1 partial charge=0.115
+    @atom:92 12.011 #CA "Naphthalene Fusion C" 6 partial charge=0.0
+  } #(end of atom masses)
+
+  write_once("In Settings"){
+    pair_coeff @atom:90 @atom:90 lj/cut/coul/long 0.07 3.55
+    pair_coeff @atom:91 @atom:91 lj/cut/coul/long 0.03 2.42
+    pair_coeff @atom:92 @atom:92 lj/cut/coul/long 0.07 3.55
+  } #(end of pair coeffs)
+
+  write_once("In Charges"){
+    set type @atom:90 charge -0.115
+    set type @atom:91 charge 0.115
+    set type @atom:92 charge 0.0
+  } #(end of atom charges)
+
+  write_once("In Settings") {
+    bond_coeff @bond:90-90 harmonic 469.0 1.4
+    bond_coeff @bond:90-92 harmonic 469.0 1.4
+    bond_coeff @bond:92-90 harmonic 469.0 1.4
+    bond_coeff @bond:92-92 harmonic 469.0 1.4
+    bond_coeff @bond:90-91 harmonic 367.0 1.08
+    bond_coeff @bond:92-91 harmonic 367.0 1.08
+  } #(end of bond_coeffs)
+
+  write_once("Data Bonds By Type") {
+    @bond:90-90 @atom:90 @atom:90
+    @bond:90-92 @atom:90 @atom:92
+    @bond:92-90 @atom:92 @atom:90
+    @bond:92-92 @atom:92 @atom:92
+    @bond:90-91 @atom:90 @atom:91
+    @bond:92-91 @atom:92 @atom:91
+  } #(end of bonds by type)
+
+  write_once("Data Angles By Type"){
+    @angle:90-90-90 @atom:90 @atom:90 @atom:90
+    @angle:90-90-92 @atom:90 @atom:90 @atom:92
+    @angle:90-92-90 @atom:90 @atom:92 @atom:90
+    @angle:90-92-92 @atom:90 @atom:92 @atom:92
+    @angle:92-90-90 @atom:92 @atom:90 @atom:90
+    @angle:92-90-92 @atom:92 @atom:90 @atom:92
+    @angle:92-92-90 @atom:92 @atom:92 @atom:90
+    @angle:92-92-92 @atom:92 @atom:92 @atom:92
+    @angle:90-90-91 @atom:90 @atom:90 @atom:91
+    @angle:90-92-91 @atom:90 @atom:92 @atom:91
+    @angle:92-90-91 @atom:92 @atom:90 @atom:91
+    @angle:92-92-91 @atom:92 @atom:92 @atom:91
+  } #(end of angles by type)
+
+  write_once("In Settings" ){
+    angle_coeff @angle:90-90-90 harmonic 63.0 120.0
+    angle_coeff @angle:90-90-92 harmonic 63.0 120.0
+    angle_coeff @angle:90-92-90 harmonic 63.0 120.0
+    angle_coeff @angle:90-92-92 harmonic 63.0 120.0
+    angle_coeff @angle:92-90-90 harmonic 63.0 120.0
+    angle_coeff @angle:92-90-92 harmonic 63.0 120.0
+    angle_coeff @angle:92-92-90 harmonic 63.0 120.0
+    angle_coeff @angle:92-92-92 harmonic 63.0 120.0
+    angle_coeff @angle:90-90-91 harmonic 35.0 120.0
+    angle_coeff @angle:90-92-91 harmonic 35.0 120.0
+    angle_coeff @angle:92-90-91 harmonic 35.0 120.0
+    angle_coeff @angle:92-92-91 harmonic 35.0 120.0
+  } #(end of angle_coeffs)
+
+  write_once("Data Dihedrals By Type") {
+    @dihedral:0-90-90-0 @atom:* @atom:90 @atom:90 @atom:*
+    @dihedral:0-90-92-0 @atom:* @atom:90 @atom:92 @atom:*
+    @dihedral:0-92-90-0 @atom:* @atom:92 @atom:90 @atom:*
+    @dihedral:0-92-92-0 @atom:* @atom:92 @atom:92 @atom:*
+    @dihedral:0-90-90-90 @atom:* @atom:90 @atom:90 @atom:90
+    @dihedral:0-90-90-92 @atom:* @atom:90 @atom:90 @atom:92
+    @dihedral:0-90-92-90 @atom:* @atom:90 @atom:92 @atom:90
+    @dihedral:0-90-92-92 @atom:* @atom:90 @atom:92 @atom:92
+    @dihedral:0-92-90-90 @atom:* @atom:92 @atom:90 @atom:90
+    @dihedral:0-92-90-92 @atom:* @atom:92 @atom:90 @atom:92
+    @dihedral:0-92-92-90 @atom:* @atom:92 @atom:92 @atom:90
+    @dihedral:0-92-92-92 @atom:* @atom:92 @atom:92 @atom:92
+    @dihedral:0-90-90-91 @atom:* @atom:90 @atom:90 @atom:91
+    @dihedral:0-90-92-91 @atom:* @atom:90 @atom:92 @atom:91
+    @dihedral:0-92-90-91 @atom:* @atom:92 @atom:90 @atom:91
+    @dihedral:0-92-92-91 @atom:* @atom:92 @atom:92 @atom:91
+    @dihedral:90-90-90-90 @atom:90 @atom:90 @atom:90 @atom:90
+    @dihedral:90-90-90-92 @atom:90 @atom:90 @atom:90 @atom:92
+    @dihedral:90-90-92-90 @atom:90 @atom:90 @atom:92 @atom:90
+    @dihedral:90-90-92-92 @atom:90 @atom:90 @atom:92 @atom:92
+    @dihedral:90-92-90-90 @atom:90 @atom:92 @atom:90 @atom:90
+    @dihedral:90-92-90-92 @atom:90 @atom:92 @atom:90 @atom:92
+    @dihedral:90-92-92-90 @atom:90 @atom:92 @atom:92 @atom:90
+    @dihedral:90-92-92-92 @atom:90 @atom:92 @atom:92 @atom:92
+    @dihedral:92-90-90-90 @atom:92 @atom:90 @atom:90 @atom:90
+    @dihedral:92-90-90-92 @atom:92 @atom:90 @atom:90 @atom:92
+    @dihedral:92-90-92-90 @atom:92 @atom:90 @atom:92 @atom:90
+    @dihedral:92-90-92-92 @atom:92 @atom:90 @atom:92 @atom:92
+    @dihedral:92-92-90-90 @atom:92 @atom:92 @atom:90 @atom:90
+    @dihedral:92-92-90-92 @atom:92 @atom:92 @atom:90 @atom:92
+    @dihedral:92-92-92-90 @atom:92 @atom:92 @atom:92 @atom:90
+    @dihedral:92-92-92-92 @atom:92 @atom:92 @atom:92 @atom:92
+    @dihedral:90-90-90-91 @atom:90 @atom:90 @atom:90 @atom:91
+    @dihedral:90-90-92-91 @atom:90 @atom:90 @atom:92 @atom:91
+    @dihedral:90-92-90-91 @atom:90 @atom:92 @atom:90 @atom:91
+    @dihedral:90-92-92-91 @atom:90 @atom:92 @atom:92 @atom:91
+    @dihedral:92-90-90-91 @atom:92 @atom:90 @atom:90 @atom:91
+    @dihedral:92-90-92-91 @atom:92 @atom:90 @atom:92 @atom:91
+    @dihedral:92-92-90-91 @atom:92 @atom:92 @atom:90 @atom:91
+    @dihedral:92-92-92-91 @atom:92 @atom:92 @atom:92 @atom:91
+    @dihedral:91-90-90-91 @atom:91 @atom:90 @atom:90 @atom:91
+    @dihedral:91-90-92-91 @atom:91 @atom:90 @atom:92 @atom:91
+    @dihedral:91-92-90-91 @atom:91 @atom:92 @atom:90 @atom:91
+    @dihedral:91-92-92-91 @atom:91 @atom:92 @atom:92 @atom:91
+  } #(end of Dihedrals by type)
+
+  write_once("In Settings") {
+    dihedral_coeff @dihedral:0-90-90-0 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:0-90-92-0 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:0-92-90-0 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:0-92-92-0 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:0-90-90-90 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:0-90-90-92 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:0-90-92-90 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:0-90-92-92 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:0-92-90-90 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:0-92-90-92 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:0-92-92-90 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:0-92-92-92 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:0-90-90-91 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:0-90-92-91 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:0-92-90-91 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:0-92-92-91 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:90-90-90-90 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:90-90-90-92 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:90-90-92-90 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:90-90-92-92 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:90-92-90-90 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:90-92-90-92 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:90-92-92-90 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:90-92-92-92 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:92-90-90-90 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:92-90-90-92 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:92-90-92-90 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:92-90-92-92 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:92-92-90-90 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:92-92-90-92 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:92-92-92-90 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:92-92-92-92 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:90-90-90-91 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:90-90-92-91 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:90-92-90-91 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:90-92-92-91 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:92-90-90-91 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:92-90-92-91 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:92-92-90-91 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:92-92-92-91 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:91-90-90-91 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:91-90-92-91 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:91-92-90-91 opls 0.0 7.25 0.0 0.0
+    dihedral_coeff @dihedral:91-92-92-91 opls 0.0 7.25 0.0 0.0
+  } #(end of dihedral_coeffs)
+
+  write_once("Data Impropers By Type (opls_imp.py)") {
+    @improper:0-0-90-0 @atom:* @atom:* @atom:90 @atom:*
+    @improper:0-0-92-0 @atom:* @atom:* @atom:92 @atom:*
+  } #(end of impropers by type)
+
+  write_once("In Settings") {
+    improper_coeff @improper:0-0-90-0 harmonic 2.5 180 
+    improper_coeff @improper:0-0-92-0 harmonic 2.5 180 
+  } #(end of improp_coeffs)
+
+  write_once("In Init") {
+    units real
+    atom_style full
+    bond_style hybrid harmonic
+    angle_style hybrid harmonic
+    dihedral_style hybrid opls
+    improper_style hybrid harmonic
+    pair_style hybrid lj/cut/coul/long 10.0 10.0
+    pair_modify mix geometric
+    special_bonds lj/coul 0.0 0.0 0.5
+    kspace_style pppm 0.0001
+  } #end of init parameters
+
+} # OPLSAA
