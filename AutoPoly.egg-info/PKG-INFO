@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: AutoPoly
+Version: 0.0.1
+Summary: AutoPoly
+Home-page: UNKNOWN
+Author: Zhenghao Wu
+Author-email: zhenghao.wu95@gmail.com
+License: UNKNOWN
+Description: Build your LAMMPS data file
+Keywords: python,molecular dynamics
+Platform: UNKNOWN

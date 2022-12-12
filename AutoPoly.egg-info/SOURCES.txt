@@ -1,0 +1,15 @@
+README.md
+setup.py
+AutoPoly/__init__.py
+AutoPoly/conf.py
+AutoPoly/logger.py
+AutoPoly/polymer.py
+AutoPoly/polymerization.py
+AutoPoly/system.py
+AutoPoly.egg-info/PKG-INFO
+AutoPoly.egg-info/SOURCES.txt
+AutoPoly.egg-info/dependency_links.txt
+AutoPoly.egg-info/requires.txt
+AutoPoly.egg-info/top_level.txt
+AutoPoly/extern/__init__.py
+AutoPoly/extern/rdlt.py

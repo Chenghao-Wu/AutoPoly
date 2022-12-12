@@ -3,18 +3,18 @@
 * Support OPLS (Optimized Potentials for Liquid Simulations) force field that was developed by Prof. William L. Jorgensen at Purdue University and later at Yale University.
 
 ## How to use AutoPoly.py?
-First, we need to include the package in the python PATH
+Install AutoPoly via pip:
+```bash
+pip install AutoPoly
+```
+
+Load package AutoPoly in python script
 ```python
-import sys
-sys.path.append('package_path')
 import AutoPoly
 ```
 
-Then, you can try AutoPoly.py
-
 ### Create polymer system with PP PE chains at AA, UA levels
 ```python
-
 # Define the system
 # out is the folder name for the output
 system=AutoPoly.System(out="test")
@@ -82,4 +82,4 @@ poly=AutoPoly.Polymerization(Name="Naphthalene",System=system,Model=[naphthalene
 
 ## To-do list
 * Support tacticity of polymers
-* Support creation of coarse-grained polymers
+* Support coarse-grained polymers
