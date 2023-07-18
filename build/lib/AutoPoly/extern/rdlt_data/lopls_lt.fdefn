@@ -1,0 +1,22 @@
+
+DefineFeature @atom:80L [$([CH3D4][C;R0]~[C;R0]~[C;R0])]
+Family 0CT
+EndFeature
+DefineFeature @atom:81L [$([CH2D4;R0]([C;R0])[C;R0]~[C;R0])]
+Family 1CT
+EndFeature
+DefineFeature @atom:85LCH3 [$([#1][CH3D4][C;R0]~[C;R0]~[C;R0])]
+Family 2HC
+EndFeature
+DefineFeature @atom:85LCH2 [$([#1][CH2D4;R0]([C;R0])[C;R0]~[C;R0])]
+Family 3HC
+EndFeature
+DefineFeature @atom:87L [$([CH1D3]([CH2D4;R0][C])=[CD3;R0][CD4])]
+Family 4CM
+EndFeature
+DefineFeature @atom:89L [$([#1][CH1D3]([CH2D4;R0][C])=[CD3;R0])]
+Family 5HC
+EndFeature
+DefineFeature @atom:86L [$([CH0D3]([CD4;R0])=[CD3;R0])]
+Family 6CM
+EndFeature

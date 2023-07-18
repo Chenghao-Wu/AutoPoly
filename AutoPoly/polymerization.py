@@ -18,6 +18,7 @@ class Polymerization(object):
         self.System=System
         self.path_cwd=self.System.get_FolderPath+"/"+self.Name+"/moltemplate/"
         self.path_master=str(Path(__file__).parent.resolve())+"/extern/"
+        logger.info(' '.join(["\n'you are now using extern path of "+self.path_master+"\n"]))
         self.path_moltemplatesrc=self.path_master+"moltemplate/src/"
         self.path_oplsaaprm=self.path_master+"moltemplate/oplsaa.prm"
         if path_MonomerBank==None:

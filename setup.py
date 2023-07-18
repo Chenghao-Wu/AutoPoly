@@ -13,6 +13,8 @@ setup(
         author_email="zhenghao.wu95@gmail.com",
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
+        package_data={'AutoPoly': ['extern/*']},
+        include_package_data=True,
         packages=find_packages(),
         install_requires=['numpy >= 1.8.0',
                         'rdkit >= 2022.09.1',

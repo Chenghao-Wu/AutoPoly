@@ -1,0 +1,29 @@
+import gaff.lt
+
+PAXre inherits GAFF {
+
+    # atom-id mol-id atom-type charge X Y Z # comments
+   write("Data Atoms") {
+        $atom:C1  $mol:...  @atom:c2  -0.2      -2.22427      -0.77658      -0.36586  #
+        $atom:C2  $mol:...  @atom:c1  -0.2      -0.70731      -0.78567      -0.11301  #
+        $atom:H3  $mol:...  @atom:hc  0.1      -2.56363       0.23788      -0.58617  #
+        $atom:H4  $mol:...  @atom:hc  0.1      -2.46827      -1.41564      -1.21644  #
+        $atom:C5  $mol:...  @atom:c  0.14      -0.34475       0.17122       1.00049  #
+        $atom:H6  $mol:...  @atom:hc   0.1      -0.18003      -0.50320      -1.02743  #
+        $atom:H7  $mol:...  @atom:hc  0.1      -0.38393      -1.79408       0.15457  #
+        $atom:O8  $mol:...  @atom:o   -0.57      -0.56252      -0.18723       2.13999  #
+        $atom:O9  $mol:...  @atom:o  -0.57       0.07608       1.26548       0.68301  #
+    }
+
+    # bond-id atom-id1 atom-id2
+    write("Data Bond List") {
+        $bond:1  $atom:C1  $atom:C2
+        $bond:2  $atom:C1  $atom:H3
+        $bond:3  $atom:C1  $atom:H4
+        $bond:4  $atom:C2  $atom:C5
+        $bond:5  $atom:C2  $atom:H6
+        $bond:6  $atom:C2  $atom:H7
+        $bond:7  $atom:C5  $atom:O8
+        $bond:8  $atom:C5  $atom:O9
+    }
+}

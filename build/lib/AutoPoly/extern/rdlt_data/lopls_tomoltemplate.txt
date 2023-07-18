@@ -1,0 +1,34 @@
+* This file attempts to match lopls atom types defined 
+* in the loplsaa.lt file based on SMARTS pattern matching
+* Not sure how well these are defined. Should we overwrite all "@atom:80" types with "@atom:80L"?
+* I have chosen to restrict these to specific domains and leave the standard OPLS in place 
+
+C  |  CT    |  opls_135   | [$([CH3D4][C;R0]~[C;R0]~[C;R0])]   | @atom:80L | -0.222  | "Alkane CH3- (LOPLS CT_CH3)"
+C  |  CT    |  opls_136   | [$([CH2D4;R0]([C;R0])[C;R0]~[C;R0])]   | @atom:81L | -0.148  | "Alkane -CH2- (LOPLS CT_CH2)"
+H  |  HC    |  opls_140   | [$([#1][CH3D4][C;R0]~[C;R0]~[C;R0])]   | @atom:85LCH3 | 0.074  | "Alkane H-C CH3 (LOPLS HC_CH3)"
+H  |  HC    |  opls_140   | [$([#1][CH2D4;R0]([C;R0])[C;R0]~[C;R0])]   | @atom:85LCH2 | 0.074  | "Alkane H-C CH2 (LOPLS HC_CH2)"
+
+*only use for non-terminal alkenes?
+C  |  CM    |  opls_142   | [$([CH1D3]([CH2D4;R0][C])=[CD3;R0][CD4])] | @atom:87L | -0.16  | "Alkene RH-C= (LOPLS CM_CH)"
+H  |  HC    |  opls_144   | [$([#1][CH1D3]([CH2D4;R0][C])=[CD3;R0])] | @atom:89L | 0.16  | "Alkene H-C= (LOPLS HC_CH)"
+C  |  CM    |  opls_141   | [$([CH0D3]([CD4;R0])=[CD3;R0])] | @atom:86L | 0.0  | "Alkene R2-C= (LOPLS)"
+
+* this type is for terminal alkenes, which don't seem represented in the LOPLS paper
+* H |  HC    |  opls_144   | [$([#1][CH2D3]=[CD3;R0])] | @atom:88L | -0.23  | "Alkene H2-C= (LOPLS)" 
+
+* Only source given for these is the LOPLS JCTC 2012, but they aren't defined there. Overwrite OPLS?
+*    set type @atom:169L charge 0.005  # "Chloroalkene Cl-CH= (LOPLS)"
+*    set type @atom:266L charge -0.07  # "Uracil & Thymine C5 (LOPLS)"
+*    set type @atom:267L charge 0.08  # "Uracil & Thymine C6 (LOPLS)"
+*    set type @atom:280L charge -0.06  # "Cytosine C5 (LOPLS)"
+*    set type @atom:281L charge 0.1  # "Cytosine C6 (LOPLS)"
+*    set type @atom:324L charge -0.06  # "CytosineH+ C5 (LOPLS)"
+*    set type @atom:325L charge 0.1  # "CytosineH+ C6 (LOPLS)"
+*    set type @atom:340L charge 0.18  # "Trifluorothymine CF3- (LOPLS)"
+*    set type @atom:342L charge 0.12  # "Chloroalkene Cl2-C= (LOPLS)"
+*    set type @atom:458L charge -0.03  # "Vinyl Ether =CH-OR (LOPLS)"
+*    set type @atom:459L charge 0.085  # "Vinyl Ether =CR-OR (LOPLS)"
+*    set type @atom:649L charge -0.344  # "Cl..CH3..Cl- Sn2 TS (LOPLS)"
+*    set type @atom:900L charge -0.25  # "Allene/Ketene H2C=C=X (LOPLS)"
+*    set type @atom:901L charge -0.1  # "Allene/Ketene HRC=C=X (LOPLS)"
+*    set type @atom:902L charge 0.05  # "Allene/Ketene R2C=C=X (LOPLS)"

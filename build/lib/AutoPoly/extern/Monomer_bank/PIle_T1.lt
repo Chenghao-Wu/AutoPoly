@@ -1,0 +1,41 @@
+import "oplsaa.lt"		# <-- defines the "OPLSAA" force field
+
+## isoprene lemer
+
+S005le_T1 inherits OPLSAA {
+
+	# atom-id	mol-id	atom-type	charge	x	y	z
+
+	write("Data Atoms") {
+		$atom:C1 $mol:... @atom:80  0.00  -3.412   1.908  -0.006
+		$atom:C2 $mol:... @atom:81  0.00   0.569   1.725  -0.000
+		$atom:C3 $mol:... @atom:86  0.00  -1.999   1.355  -0.000
+		$atom:C4 $mol:... @atom:80  0.00  -2.010  -0.150   0.010
+		$atom:C5 $mol:... @atom:87  0.00  -0.891   2.122  -0.005
+        $atom:H1 $mol:... @atom:85  0.00  -3.471   3.000  -0.008
+		$atom:H2 $mol:... @atom:85  0.00  -3.955   1.544   0.875
+		$atom:H3 $mol:... @atom:85  0.00  -3.949   1.541  -0.889
+		$atom:H4 $mol:... @atom:85  0.00   1.187   2.635   0.004
+		$atom:H5 $mol:... @atom:85  0.00   0.862   1.168  -0.896
+		$atom:H6 $mol:... @atom:85  0.00  -3.045  -0.521   0.016
+		$atom:H7 $mol:... @atom:85  0.00  -1.535  -0.543   0.911
+		$atom:H8 $mol:... @atom:85  0.00  -1.543  -0.553  -0.891
+        $atom:H9 $mol:... @atom:89  0.00  -1.020   3.206  -0.015
+	}
+
+	write('Data Bond List') {
+		$bond:1 $atom:C1 $atom:C3
+		$bond:2 $atom:C1 $atom:H1
+		$bond:3 $atom:C1 $atom:H2
+        $bond:4 $atom:C1 $atom:H3
+		$bond:5 $atom:C2 $atom:C5
+		$bond:6 $atom:C2 $atom:H4
+		$bond:7 $atom:C2 $atom:H5
+		$bond:8 $atom:C3 $atom:C4
+		$bond:9 $atom:C3 $atom:C5
+		$bond:10 $atom:C4 $atom:H6
+		$bond:11 $atom:C4 $atom:H7
+		$bond:12 $atom:C4 $atom:H8
+        $bond:13 $atom:C5 $atom:H9
+	}
+}

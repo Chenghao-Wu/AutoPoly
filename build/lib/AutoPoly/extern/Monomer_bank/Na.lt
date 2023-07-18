@@ -1,0 +1,10 @@
+import "oplsaa.lt"
+
+Na inherits OPLSAA {
+
+  # AtomID  MolID  AtomType  charge   X       Y         Z
+  write("Data Atoms") {
+    $atom:Na  $mol:...  @atom:57  0.000      0.00000  0.00000   0.000000
+  }
+
+} # NaIon
