@@ -2,6 +2,19 @@
 
 * Support OPLS (Optimized Potentials for Liquid Simulations) force field that was developed by Prof. William L. Jorgensen at Purdue University and later at Yale University.
 
+## Version update
+
+* Tacticity supported
+
+## Support Polymers
+
+1. PMMA
+2. PS
+3. PE
+4. PI
+5. PP
+6. PVA
+
 ## Why AutoPoly?
 
 It can create polymers with any chain length!
@@ -85,5 +98,4 @@ poly=AutoPoly.Polymerization(Name="Naphthalene",System=system,Model=[naphthalene
 "rdlt": Script to automate assignment of atom types and build .lt files for use with moltemplate and the OPLS and L-OPLS forcefields that come packaged with it. https://github.com/asteeves/rdlt
 
 ## To-do list
-* Support tacticity of polymers
 * Support coarse-grained polymers

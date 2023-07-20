@@ -7,12 +7,13 @@ Created on Fri Dec 21 12:19:08 2018
 """
 import os
 import sys
+import random
 
 from .system import logger
 
 class Polymer:
-    def __init__(self,ChainNum=None,Sequence=None):
-
+    def __init__(self,ChainNum=None,Sequence=None, Tacticity='atactic', seed=00000): #Tacticity: isotactic, syndiotactic, atactic
+        random.seed(seed)
         self.ChainNum=ChainNum
         self.sequence=Sequence
 
@@ -20,7 +21,9 @@ class Polymer:
         self.sequenceSet=[]
         self.sequenceName=[]
         self.merSet=[]
+        self.tacticity=Tacticity
         self.set_Sequence()
+        
         
     
     def set_merSet(self,merSet):
@@ -41,25 +44,104 @@ class Polymer:
             logger.error("Error : Please set number of chains ")
             sys.exit()
 
+        randbool = bool(random.choice([True, False]))
+        chosenTac=".lt" if randbool else "_T1.lt"
+        chosenTac_name = "" if randbool else "_T1"
+
         for chainii in range(self.ChainNum):
             merSet=[]
             merSet_=[]
-            if self.SequnceLen>1:
-                for merii in range(self.SequnceLen):
-                    if merii==0:
-                        merSet.append(sequence[merii]+"le.lt")
-                        merSet_.append(sequence[merii]+"le")
-                    elif merii == self.SequnceLen-1:
-                        merSet.append(sequence[merii]+"re.lt")
-                        merSet_.append(sequence[merii]+"re")
-                    else:
-                        merSet.append(sequence[merii]+"i.lt")
-                        merSet_.append(sequence[merii]+"i")
-                self.sequenceSet.append(merSet)
-                self.sequenceName.append(merSet_)
-            elif self.SequnceLen==1:
-                for merii in range(self.SequnceLen):
-                    merSet.append(sequence[merii]+".lt")
-                    merSet_.append(sequence[merii])
-                self.sequenceSet.append(merSet)
-                self.sequenceName.append(merSet_)
+
+            if self.tacticity == 'atactic':
+                if self.SequnceLen>1:
+                    for merii in range(self.SequnceLen):
+                        if merii==0:
+                            if bool(random.choice([True, False])):
+                                merSet.append(sequence[merii]+"le_T1.lt")
+                                merSet_.append(sequence[merii]+"le_T1")
+                            else:
+                                merSet.append(sequence[merii]+"le.lt")
+                                merSet_.append(sequence[merii]+"le")
+                        elif merii == self.SequnceLen-1:
+                            if bool(random.choice([True, False])):
+                                merSet.append(sequence[merii]+"re_T1.lt")
+                                merSet_.append(sequence[merii]+"re_T1")
+                            else:
+                                merSet.append(sequence[merii]+"re.lt")
+                                merSet_.append(sequence[merii]+"re")
+                        else:
+                            if bool(random.choice([True, False])):
+                                merSet.append(sequence[merii]+"i_T1.lt")
+                                merSet_.append(sequence[merii]+"i_T1")
+                            else:
+                                merSet.append(sequence[merii]+"i.lt")
+                                merSet_.append(sequence[merii]+"i")
+                    self.sequenceSet.append(merSet)
+                    self.sequenceName.append(merSet_)
+                elif self.SequnceLen==1:
+                    for merii in range(self.SequnceLen):
+                        merSet.append(sequence[merii]+".lt")
+                        merSet_.append(sequence[merii])
+                    self.sequenceSet.append(merSet)
+                    self.sequenceName.append(merSet_)
+            elif self.tacticity == 'isotactic':
+                if self.SequnceLen>1:
+                    for merii in range(self.SequnceLen):
+                        if merii==0:
+                            merSet.append(sequence[merii]+"le"+chosenTac)
+                            merSet_.append(sequence[merii]+"le"+chosenTac_name)
+                        elif merii == self.SequnceLen-1:
+                            merSet.append(sequence[merii]+"re"+chosenTac)
+                            merSet_.append(sequence[merii]+"re"+chosenTac_name)
+                        else:
+                            merSet.append(sequence[merii]+"i"+chosenTac)
+                            merSet_.append(sequence[merii]+"i"+chosenTac_name)
+                    self.sequenceSet.append(merSet)
+                    self.sequenceName.append(merSet_)
+                elif self.SequnceLen==1:
+                    for merii in range(self.SequnceLen):
+                        merSet.append(sequence[merii]+".lt")
+                        merSet_.append(sequence[merii])
+                    self.sequenceSet.append(merSet)
+                    self.sequenceName.append(merSet_)
+
+            elif self.tacticity == 'syndiotactic':
+
+                randbool = bool(random.choice([True, False]))
+                if randbool:
+                    startTac="_T1.lt"
+                    nextTac =".lt"
+                    startTac_name="_T1"
+                    nextTac_name =""
+                else:
+                    startTac=".lt"
+                    nextTac ="_T1.lt"
+                    startTac_name=""
+                    nextTac_name ="_T1"
+
+                if self.SequnceLen>1:
+                    for merii in range(self.SequnceLen):
+                        if merii%2==0:
+                            currentTac=startTac
+                            currentTac_name = startTac_name
+                        else:
+                            currentTac=nextTac
+                            currentTac_name=nextTac_name
+                            
+                        if merii==0:
+                            merSet.append(sequence[merii]+"le"+currentTac)
+                            merSet_.append(sequence[merii]+"le"+currentTac_name)
+                        elif merii == self.SequnceLen-1:
+                            merSet.append(sequence[merii]+"re"+currentTac)
+                            merSet_.append(sequence[merii]+"re"+currentTac_name)
+                        else:
+                            merSet.append(sequence[merii]+"i"+currentTac)
+                            merSet_.append(sequence[merii]+"i"+currentTac_name)
+                    self.sequenceSet.append(merSet)
+                    self.sequenceName.append(merSet_)
+                elif self.SequnceLen==1:
+                    for merii in range(self.SequnceLen):
+                        merSet.append(sequence[merii]+".lt")
+                        merSet_.append(sequence[merii])
+                    self.sequenceSet.append(merSet)
+                    self.sequenceName.append(merSet_)
