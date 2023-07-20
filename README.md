@@ -2,6 +2,11 @@
 
 * Support OPLS (Optimized Potentials for Liquid Simulations) force field that was developed by Prof. William L. Jorgensen at Purdue University and later at Yale University.
 
+## Why AutoPoly?
+
+It can create polymers with any chain length!
+
+
 ## Version update
 
 * Tacticity supported
@@ -14,10 +19,6 @@
 4. PI
 5. PP
 6. PVA
-
-## Why AutoPoly?
-
-It can create polymers with any chain length!
 
 ## How to use AutoPoly.py?
 Install AutoPoly via pip:
