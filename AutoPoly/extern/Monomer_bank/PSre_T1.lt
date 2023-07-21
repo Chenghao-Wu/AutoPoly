@@ -5,10 +5,10 @@ PSre_T1 inherits OPLSAA {
     # atom-id mol-id atom-type charge X Y Z # comments
    write("Data Atoms") {
         $atom:C1  $mol:...   @atom:81   0.00       0.00000       0.00000       0.00000  #
-        $atom:C2  $mol:...   @atom:456  0.00       1.52673       0.00000      -0.00000  #
+        $atom:C2  $mol:...   @atom:81  0.00       1.52673       0.00000      -0.00000  #
         $atom:H3  $mol:...   @atom:85   0.00      -0.39867       0.89017      -0.53146  #
         $atom:H4  $mol:...   @atom:85   0.00      -0.39804      -0.04540       1.03606  #
-        $atom:C5  $mol:...   @atom:90   0.00       2.18007       1.17471       0.70142  #
+        $atom:C5  $mol:...   @atom:92   0.00       2.18007       1.17471       0.70142  #
         $atom:H6  $mol:...   @atom:85   0.00       1.86635      -0.01618      -1.05771  #
         $atom:C7  $mol:...   @atom:90   0.00       1.45259       2.21528       1.31937  #
         $atom:C8  $mol:...   @atom:90   0.00       2.12230       3.26938       1.94918  #

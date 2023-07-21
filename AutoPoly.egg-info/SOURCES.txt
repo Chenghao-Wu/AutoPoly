@@ -54,6 +54,8 @@ AutoPoly/extern/Monomer_bank/PSi.lt
 AutoPoly/extern/Monomer_bank/PSi_T1.lt
 AutoPoly/extern/Monomer_bank/PSle.lt
 AutoPoly/extern/Monomer_bank/PSle_T1.lt
+AutoPoly/extern/Monomer_bank/PSre.lt
+AutoPoly/extern/Monomer_bank/PSre_T1.lt
 AutoPoly/extern/Monomer_bank/PVAi.lt
 AutoPoly/extern/Monomer_bank/PVAi_T1.lt
 AutoPoly/extern/Monomer_bank/PVAle.lt
