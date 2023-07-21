@@ -4,14 +4,14 @@ PVAre inherits OPLSAA {
 
     # atom-id mol-id atom-type charge X Y Z # comments
    write("Data Atoms") {
-        $atom:C1  $mol:...  @atom:81   0.00      -4.10864       1.07966       0.07497  #
-        $atom:C2  $mol:...  @atom:100  0.00      -2.61011       0.95203      -0.15491  #
-        $atom:H3  $mol:...  @atom:85   0.00      -4.65410       0.29246      -0.48727  #
-        $atom:H4  $mol:...  @atom:85   0.00      -4.34104       0.99077       1.15736  #
-        $atom:H5  $mol:...  @atom:85   0.00      -2.37137       1.07878      -1.23481  #
-        $atom:O6  $mol:...  @atom:96   0.00      -2.14500      -0.28416       0.31343  #
-        $atom:H7  $mol:...  @atom:97   0.00      -2.38269      -0.95731      -0.37661  #
-        $atom:H8  $mol:...  @atom:85  0.00      -2.08782       1.76163       0.39610  #
+        $atom:C1  $mol:...  @atom:81 0.00       0.00000       0.00000       0.00000  #
+        $atom:C2  $mol:...  @atom:99 0.00       1.52140      -0.00000       0.00000  #
+        $atom:H3  $mol:...  @atom:85 0.00      -0.38629      -0.57432       0.86848  #
+        $atom:H4  $mol:...  @atom:85 0.00      -0.38504      -0.44691      -0.94101  #
+        $atom:O5  $mol:...  @atom:96 0.00       2.01239      -1.30703      -0.12049  #
+        $atom:H6  $mol:...  @atom:85 0.00       1.88477       0.59833      -0.86127  #
+        $atom:H7  $mol:...  @atom:97 0.00       1.94223      -1.72118       0.77913  #
+        $atom:H8  $mol:...  @atom:85 0.00       1.90900       0.48229       0.92543  #
     }
 
     # bond-id atom-id1 atom-id2
@@ -19,9 +19,9 @@ PVAre inherits OPLSAA {
         $bond:1  $atom:C1  $atom:C2
         $bond:2  $atom:C1  $atom:H3
         $bond:3  $atom:C1  $atom:H4
-        $bond:4  $atom:C2  $atom:H5
-        $bond:5  $atom:C2  $atom:O6
-        $bond:6  $atom:O6  $atom:H7
+        $bond:4  $atom:C2  $atom:O5
+        $bond:5  $atom:C2  $atom:H6
+        $bond:6  $atom:O5  $atom:H7
         $bond:7  $atom:C2  $atom:H8
     }
 }
