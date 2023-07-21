@@ -5,10 +5,10 @@ PSi inherits OPLSAA {
     # atom-id mol-id atom-type charge X Y Z # comments
    write("Data Atoms") {
         $atom:C1  $mol:...   @atom:81   0.00       0.00216      -0.00586       0.01014  #
-        $atom:C2  $mol:...   @atom:456  0.00       1.52682       0.02663      -0.02399  #
+        $atom:C2  $mol:...   @atom:82  0.00       1.52682       0.02663      -0.02399  #
         $atom:H3  $mol:...   @atom:85   0.00      -0.42705       0.85245      -0.54909  #
         $atom:H4  $mol:...   @atom:85   0.00      -0.36827      -0.01858       1.05671  #
-        $atom:C5  $mol:...   @atom:90   0.00       2.18091       1.21629       0.64336  #
+        $atom:C5  $mol:...   @atom:92   0.00       2.18091       1.21629       0.64336  #
         $atom:H6  $mol:...   @atom:85   0.00       1.86128      -0.03378      -1.08165  #
         $atom:C7  $mol:...   @atom:90   0.00       1.45594       2.28060       1.22092  #
         $atom:C8  $mol:...   @atom:90   0.00       2.12905       3.34904       1.82238  #

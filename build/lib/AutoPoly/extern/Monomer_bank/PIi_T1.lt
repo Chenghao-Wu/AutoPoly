@@ -2,7 +2,7 @@ import "oplsaa.lt"		# <-- defines the "OPLSAA" force field
 
 ## isoprene imer
 
-S005i_T1 inherits OPLSAA {
+PIi_T1 inherits OPLSAA {
 
 	# atom-id	mol-id	atom-type	charge	x	y	z
 

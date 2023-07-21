@@ -5,7 +5,7 @@ PMMAre inherits OPLSAA {
     # atom-id mol-id atom-type charge X Y Z # comments
    write("Data Atoms") {
         $atom:C1  $mol:...   @atom:81   0.00       0.00000       0.00000       0.00000  #
-        $atom:C2  $mol:...   @atom:84   0.00       1.52839       0.00000       0.00000  #
+        $atom:C2  $mol:...   @atom:82   0.00       1.52839       0.00000       0.00000  #
         $atom:H3  $mol:...   @atom:85   0.00      -0.39794       1.02867       0.13341  #
         $atom:H4  $mol:...   @atom:85   0.00      -0.39992      -0.43141      -0.94315  #
         $atom:C5  $mol:...   @atom:80   0.00       2.04043      -1.44451      -0.07180  #
