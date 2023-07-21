@@ -100,3 +100,5 @@ poly=AutoPoly.Polymerization(Name="Naphthalene",System=system,Model=[naphthalene
 
 ## To-do list
 * Support coarse-grained polymers
+* Support branched polymers
+* Support ring polymers
