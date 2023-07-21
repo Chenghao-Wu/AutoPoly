@@ -13,12 +13,12 @@ It can create polymers with any chain length!
 
 ## Support Polymers
 
-1. PMMA
-2. PS
-3. PE
-4. PI
-5. PP
-6. PVA
+1. PMMA (T)
+2. PS (T)
+3. PE (T)
+4. PI (cis)
+5. PP (T)
+6. PVA (T)
 
 ## How to use AutoPoly.py?
 Install AutoPoly via pip:
