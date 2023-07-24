@@ -102,3 +102,5 @@ poly=AutoPoly.Polymerization(Name="Naphthalene",System=system,Model=[naphthalene
 * Support coarse-grained polymers
 * Support branched polymers
 * Support ring polymers
+* Support pre-relaxation using LAMMPS
+* Integrate LigParGen for small molecules
