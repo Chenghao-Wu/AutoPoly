@@ -12,9 +12,8 @@ from pathlib import Path
 import numpy as np
 from .system import logger
 
-class Polymerization(object):
-    def __init__(self,Name=None,System=None,Model=None,run=True,path_MonomerBank=None):
-        self.Name=Name
+class Moltemplatelmpdata(object):
+    def __init__(self, System=None, Model=None, run=True, path_MonomerBank=None):
         self.System=System
         self.path_cwd=self.System.get_FolderPath+"/"+self.Name+"/moltemplate/"
         self.path_master=str(Path(__file__).parent.resolve())+"/extern/"
@@ -34,6 +33,9 @@ class Polymerization(object):
         self.packingL_spacing=5.0
         self.moltemplateBoxSize=400.0 # OPTIMIZED: will change accord. to actual packing 
 
+        self.seuqenceSet = []
+        self.chem_mono = []
+
         self.create_Folder()
 
         if run==True:
@@ -50,6 +52,11 @@ class Polymerization(object):
 
     def set_tacticity(self,tacticity):
         self.tacticity=tacticity
+
+    def make_atacticSequenceSet(self):
+        SequenceSet = []
+        return SequenceSet
+
 
     def n_monomerAtoms(self,merltfile):
         n_monomerAtoms=0
@@ -74,8 +81,192 @@ class Polymerization(object):
         else:
             logger.error(' '.join(["in MoltemplateLmpData::n_monomerAtoms():\n",merltfile_Path," file cannot open.\n"]))
             sys.exit()
-
         return n_monomerAtoms
+    
+    def make_SequenceSet_adhoc(self):
+        sequenceSet = []
+        merSet = []
+        counter=0
+        n_chainAtoms=0
+        n_chains=0
+        chain=0
+        mer=0
+
+        for indexi in range(len(self.chem_mono)):
+            counter += self.mono_beads[indexi]
+            if self.sequenceLen>1:
+                n_chainAtoms += self.n_monomerAtoms(self.chem_mono[indexi]+"le.lt")*self.mono_beads[indexi]
+            else:
+                n_chainAtoms += self.n_monomerAtoms(self.chem_mono[indexi]+".lt")*self.mono_beads[indexi]
+        # /** sanity check **/
+        if counter!=self.sequenceLen:
+            logger.error(' '.join(["in MoltemplateLmpData::make_SequenceSet_adhoc():\nNumber of mers per chain",str(counter),"!= sequenceLen (",str(self.sequenceLen),"). Please check.\n"]))
+            sys.exit()
+        # /** Determine number of chains **/
+        if self.n_total_atoms==0: #{/** controlled by sequenceNum **/
+            n_chains=self.sequenceNum
+        else: #{/** controlled by n_total_atoms **/
+            if n_chainAtoms>self.n_total_atoms:
+                logger.error(' '.join(["in MoltemplateLmpData::make_SequenceSet_adhoc():\nn_chainAtoms",str(n_chainAtoms),") > n_total_atoms(",str(self.n_total_atoms),")\nThe upper threshold of total number of atoms in system is reached.\nPlease either increase n_total_atoms or choose a shorter chain.\n"]))
+                sys.exit()
+            n_chains=np.floor(self.n_total_atoms/n_chainAtoms)
+        # /** sanity check **/
+        if n_chains<=0:
+            logger.error(' '.join(["in MoltemplateLmpData::make_SequenceSet_adhoc():\nn_chain=",str(n_chains),", which is invalid. Please check.\n"]))
+            sys.exit()
+
+        #/** For generating small molecule **/
+        # //--------------------------------------------------------------------------
+        if self.sequenceLen==1:
+        
+            if self.chem_mono.size()>1:
+                logger.error(' '.join(["sequenceLen = ",str(self.sequenceLen),"merSet should only have one mer type! Please check.\n"]))
+                sys.exit()
+            for chain in range(n_chains):
+                merSet = []
+                for mer in range(self.sequenceLen):
+                    merSet.append(self.chem_mono[0]+".lt")
+                self.sequenceSet.append(merSet)
+            return sequenceSet
+        #/** Homopolymer **/
+        import random
+
+        if len(self.chem_mono) == 1:
+            if bool(random.getrandbits(1)):
+                chosenTac="_T1.lt"
+            else:
+                chosenTac=".lt"
+
+            for chain in range(n_chains):
+                merSet = []
+                
+                if self.tacticity=="atactic": #/** random chirality **/
+                    for mer in range(self.sequenceLen):
+                        if mer==0:# {//1st monomer: le ltfile
+                            if bool(random.getrandbits(1)):# {//true: T1
+                                merSet.append(self.chem_mono[0]+"le_T1.lt")
+                            else:# {//false: normal
+                                merSet.append(self.chem_mono[0]+"le.lt")
+                        elif mer==(self.sequenceLen-1): #{//last monomer: re ltfile
+                            if bool(random.getrandbits(1)):# {//true: T1
+                                merSet.append(self.chem_mono[0]+"re_T1.lt")
+                            else:# {//false: normal
+                                merSet.append(self.chem_mono[0]+"re.lt")
+                        else: #{//intermediate monomers: i ltfiles
+                            if bool(random.getrandbits(1)):# {//true: T1
+                                merSet.append(self.chem_mono[0]+"i_T1.lt")
+                            else:# {//false: normal
+                                merSet.append(self.chem_mono[0]+"i.lt")
+
+                elif self.tacticity=="isotactic":# /** monotonic chirality **/
+                    for mer in range(self.sequenceLen):
+                        if mer==0: #{//1st monomer: le ltfile
+                            merSet.append(self.chem_mono[0]+"le"+chosenTac)
+                        elif mer==(self.sequenceLen-1):# {//last monomer: re ltfile
+                            merSet.append(self.chem_mono[0]+"re"+chosenTac)
+                        else:# {//intermediate monomers: i ltfiles
+                            merSet.append(self.chem_mono[0]+"i"+chosenTac)
+
+                elif self.tacticity=="syndiotactic":# /** alternating chirality **/
+                    #string startTac,nextTac,currentTac;
+                    #/** coin flip to decide start tacticity **/
+                    if bool(random.getrandbits(1)):
+                        startTac="_T1.lt"
+                        nextTac =".lt"
+                    else: 
+                        startTac=".lt"
+                        nextTac ="_T1.lt"
+                    for mer in range(self.sequenceLen):
+                        if mer%2==0:
+                            currentTac=startTac
+                        else:
+                            currentTac=nextTac
+                        if mer==0: #{//1st monomer: le ltfile
+                            merSet.append(self.chem_mono[0]+"le"+currentTac)
+                        elif mer==(self.sequenceLen-1):# {//last monomer: re ltfile
+                            merSet.append(self.chem_mono[0]+"re"+currentTac)
+                        else:# {//intermediate monomers: i ltfiles
+                            merSet.append(self.chem_mono[0]+"i"+currentTac)
+                else:
+                    logger.error(' '.join(["in MoltemplateLmpData::make_SequenceSet_adhoc()\nPlease choose tacticity from {atactic,syndiotactic,isotactic}\n"]))
+                    sys.exit()
+                #/** load in tacticity of current chain **/
+                sequenceSet.append(merSet)
+        else:
+            if self.copolymerType=="random":
+                #//TODO
+                return
+            
+            if self.copolymerType=="block":# { /** Block Copolymer **/
+
+                if bool(random.getrandbits(1)):
+                    chosenTac="_T1.lt"
+                else:
+                    chosenTac=".lt"
+
+                for chain in range(n_chains):
+                    merSet = []
+                    counter_mer=0
+                    if self.tacticity=="atactic": #/** random chirality **/
+                        for mertype in range(len(self.chem_mono)):
+                            for mer in range(self.sequenceLen):
+                                if counter_mer==0:# {//1st monomer: le ltfile
+                                    if bool(random.getrandbits(1)):# {//true: T1
+                                        merSet.append(self.chem_mono[mertype]+"le_T1.lt")
+                                    else:# {//false: normal
+                                        merSet.append(self.chem_mono[mertype]+"le.lt")
+                                elif counter_mer==(self.sequenceLen-1): #{//last monomer: re ltfile
+                                    if bool(random.getrandbits(1)):# {//true: T1
+                                        merSet.append(self.chem_mono[mertype]+"re_T1.lt")
+                                    else:# {//false: normal
+                                        merSet.append(self.chem_mono[mertype]+"re.lt")
+                                else: #{//intermediate monomers: i ltfiles
+                                    if bool(random.getrandbits(1)):# {//true: T1
+                                        merSet.append(self.chem_mono[mertype]+"i_T1.lt")
+                                    else:# {//false: normal
+                                        merSet.append(self.chem_mono[mertype]+"i.lt")
+                                counter_mer=counter_mer+1
+
+                    elif self.tacticity=="isotactic":# /** monotonic chirality **/
+                        for mertype in range(len(self.chem_mono)):
+                            for mer in range(self.sequenceLen):
+                                if counter_mer==0: #{//1st monomer: le ltfile
+                                    merSet.append(self.chem_mono[mertype]+"le"+chosenTac)
+                                elif counter_mer==(self.sequenceLen-1):# {//last monomer: re ltfile
+                                    merSet.append(self.chem_mono[mertype]+"re"+chosenTac)
+                                else:# {//intermediate monomers: i ltfiles
+                                    merSet.append(self.chem_mono[mertype]+"i"+chosenTac)
+                                counter_mer=counter_mer+1
+
+                    elif self.tacticity=="syndiotactic":# /** alternating chirality **/
+                        #string startTac,nextTac,currentTac;
+                        #/** coin flip to decide start tacticity **/
+                        if bool(random.getrandbits(1)):
+                            startTac="_T1.lt"
+                            nextTac =".lt"
+                        else: 
+                            startTac=".lt"
+                            nextTac ="_T1.lt"
+                        for mertype in range(len(self.chem_mono)):
+                            for mer in range(self.sequenceLen):
+                                if counter_mer%2==0:
+                                    currentTac=startTac
+                                else:
+                                    currentTac=nextTac
+                                if counter_mer==0: #{//1st monomer: le ltfile
+                                    merSet.append(self.chem_mono[mertype]+"le"+currentTac)
+                                elif counter_mer==(self.sequenceLen-1):# {//last monomer: re ltfile
+                                    merSet.append(self.chem_mono[mertype]+"re"+currentTac)
+                                else:# {//intermediate monomers: i ltfiles
+                                    merSet.append(self.chem_mono[mertype]+"i"+currentTac)
+                                counter_mer=counter_mer+1
+                    else:
+                        logger.error(' '.join(["in MoltemplateLmpData::make_SequenceSet_adhoc()\nPlease choose tacticity from {atactic,syndiotactic,isotactic}\n"]))
+                        sys.exit()
+                    #/** load in tacticity of current chain **/
+                    sequenceSet.append(merSet)
+
+        return sequenceSet
     
     def getridof_ljcutcoullong(self):
         in_=self.path_cwd+"system.in.settings"
@@ -165,6 +356,9 @@ class Polymerization(object):
 
         # move files to working directory
         self.mv_files()
+
+        logger.info("\nmoltemplate-enabled lmpdata made!\n")
+
 
     def mv_files(self):
         datafile="system.data"
