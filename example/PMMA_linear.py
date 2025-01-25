@@ -18,4 +18,4 @@ system.made_folder = True
 linear_polymer = AutoPoly.Polymer(ChainNum=10, Sequence=["PMMA"]*10, topology="linear")
 
 # Polymerization with ring topology
-poly = AutoPoly.Polymerization(name="LinearPolymer", system=system, model=[linear_polymer], run=True)
+poly = AutoPoly.Polymerization(name="LinearPolymer2", system=system, model=[linear_polymer], run=True)

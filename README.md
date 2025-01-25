@@ -14,7 +14,9 @@ AutoPoly is a Python package for automatically generating LAMMPS data files for 
 
 Install AutoPoly via pip:
 ```bash
-pip install AutoPoly
+git clone https://github.com/Chenghao-Wu/AutoPoly.git
+cd pubplot
+pip install .
 ```
 
 ## Supported Polymers

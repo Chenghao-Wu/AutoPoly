@@ -8,6 +8,8 @@ Created on Fri Dec 21 12:19:08 2018
 import sys
 import os
 from pathlib import Path
+import subprocess
+import shutil
 
 import numpy as np
 from .system import logger
@@ -28,34 +30,62 @@ class Polymerization(object):
         self.system = system
         self.path_cwd = f"{self.system.get_FolderPath}/{self.name}/moltemplate/"
         self.path_master = f"{Path(__file__).parent.resolve()}/extern/"
-        logger.info(f"\n'you are now using extern path of {self.path_master}\n")
         self.path_moltemplatesrc = f"{self.path_master}moltemplate/src/"
         self.path_oplsaaprm = f"{self.path_master}moltemplate/oplsaa.prm"
         self.path_monomer_bank = (self.path_master + "Monomer_bank/"
                                   if path_monomer_bank is None else path_monomer_bank)
 
         self.model = model
-
         self.rotate = 90.0
         self.offset_spacing = 2.0
         self.offset = 4.0
         self.packingL_spacing = 5.0
-        self.moltemplate_box_size = 400.0 # OPTIMIZED: will change according to actual packing 
+        self.moltemplate_box_size = 400.0
 
-        self.create_folder()
+        # Create working directory before proceeding
+        self.create_working_directory()
+        
+        logger.info(f"\n'you are now using extern path of {self.path_master}\n")
 
         if run:
             self.make_lmp_data_file_by_moltemplate()
 
+    def create_working_directory(self) -> None:
+        """Creates and manages the working directory structure."""
+        base_path = Path(self.system.get_FolderPath)
+        polymer_path = base_path / self.name
+        moltemplate_path = polymer_path / "moltemplate"
+        
+        # Check if base directory exists
+        if polymer_path.exists():
+            response = input(f"{polymer_path} folder exists, delete and make new?(y/n) ")
+            if response.lower() == 'y':
+                logger.info(f"removing {polymer_path}")
+                shutil.rmtree(polymer_path)
+            else:
+                logger.error("Please remove the existing folder or choose a different name.")
+                sys.exit(1)
+        
+        # Create directory structure
+        moltemplate_path.mkdir(parents=True, exist_ok=True)
+
     def create_folder(self) -> None:
         """Creates the working directory for the polymerization."""
-        if self.system.made_folder:
-            path = Path(self.path_cwd)
-            if path.exists():
-                logger.error(f"{self.path_cwd} already exists! Please check.")
-                sys.exit()
+        path = Path(self.path_cwd)
+        parent_path = path.parent
+        
+        if parent_path.exists():
+            response = input(f"{parent_path} folder exists, delete and make new?(y/n) ")
+            if response.lower() == 'y':
+                logger.info(f"removing {parent_path}")
+                import shutil
+                shutil.rmtree(parent_path)
             else:
-                path.mkdir(parents=True, exist_ok=True)
+                logger.error("Please remove the existing folder or choose a different name.")
+                sys.exit(1)
+        
+        # Create the directory structure
+        path.mkdir(parents=True, exist_ok=True)
 
     def set_tacticity(self, tacticity: str) -> None:
         """Sets the tacticity of the polymer.
@@ -121,41 +151,56 @@ class Polymerization(object):
 
                     # check monomer.lt's in the monomer bank
                     for indexii in range(len(modelii.sequenceSet[moleii])):
-                        if self.check_monomer_bank(modelii.sequenceSet[moleii][indexii]):
-                            source = Path(self.path_monomer_bank)/modelii.sequenceSet[moleii][indexii]
+                        monomer_file = modelii.sequenceSet[moleii][indexii]
+                        if not monomer_file.endswith('.lt'):
+                            monomer_file += '.lt'
+                        if self.check_monomer_bank(monomer_file):
+                            source = Path(self.path_monomer_bank)/monomer_file
                             self.copy_to_cwd(source)
                         else:
-                            logger.error(' '.join(["\nError: ", "At monomer#" + str(indexii+1) + " (" +
-                                                 modelii.sequenceSet[moleii][indexii] + ") ",
-                                                 "of molecule#" + str(moleii+1) + ": ",
-                                                 "\nCan't find corresponding lt file in the monomer bank.\n\n",
-                                                 "Automation terminated.\n\n"]))
-                            sys.exit()
+                            logger.error(f"Error: Cannot find monomer file {monomer_file} in monomer bank at {self.path_monomer_bank}")
+                            sys.exit(1)
 
                     if modelii.DOP > 1:
                         # make poly.lt file
+                        logger.info(f"Creating poly_{poly_index+1}.lt")
                         self.make_poly_lt(poly_index, modelii.sequenceSet[moleii], modelii)
                         poly_index += 1
 
             # make oplsaa.lt
+            logger.info("Generating oplsaa.lt")
             self.make_oplsaalt()
 
             # make system.lt file
+            logger.info("Creating system.lt")
             self.make_system_lt()
 
             # invoke moltemplate to generate LAMMPS datafile
+            logger.info("Running moltemplate")
             self.invoke_moltemplate()
 
             # Check if the required files exist before proceeding
-            settings_file = Path(self.path_cwd) / "system.in.settings"
-            if not settings_file.exists():
-                logger.error(f"Moltemplate failed to generate required files. Check for errors in the .lt files.")
+            required_files = ['system.in.settings', 'system.data', 'system.in.charges']
+            missing_files = []
+            for file in required_files:
+                if not (Path(self.path_cwd) / file).exists():
+                    missing_files.append(file)
+            
+            if missing_files:
+                logger.error(f"Moltemplate failed to generate required files: {', '.join(missing_files)}")
+                logger.error("Check the following:")
+                logger.error("1. All monomer .lt files exist and are valid")
+                logger.error("2. The polymer .lt files were generated correctly")
+                logger.error("3. The system.lt file is properly formatted")
                 sys.exit(1)
 
+            logger.info("Processing output files")
             self.get_rid_of_lj_cut_coul_long()
 
             # move files to working directory
             self.mv_files()
+            logger.info("Successfully completed polymer generation")
+            
         except Exception as e:
             logger.error(f"Error in make_lmp_data_file_by_moltemplate: {str(e)}")
             sys.exit(1)
@@ -200,18 +245,35 @@ class Polymerization(object):
 
     def mv_files(self) -> None:
         """Moves generated files to the appropriate directories."""
-        datafile="system.data"
-        incharge="system.in.charges"
-        insetting="system.in.settings"
-        data="cd "+self.path_cwd+";"+"cp "+datafile+" ../; cd ../;"
-        os.system(data)
-        init="cd "+self.path_cwd+";"+"cp "+incharge+" "+insetting+" system.in system.in.init ../;"+"cd ..;"
-        os.system(init)
-        output="cd "+self.path_cwd+";"
-        output+="mkdir output; mv system.in* system*data output_ttree output/"
-        os.system(output)
-        input_="cd "+self.path_cwd+"; mkdir input; mv *.lt *.prm input/"
-        os.system(input_)
+        try:
+            # Define paths
+            moltemplate_dir = Path(self.path_cwd)
+            parent_dir = moltemplate_dir.parent
+            
+            # Create output and input directories if they don't exist
+            output_dir = parent_dir / "output"
+            input_dir = parent_dir / "input"
+            output_dir.mkdir(exist_ok=True)
+            input_dir.mkdir(exist_ok=True)
+
+            # Copy data files to parent directory
+            for file in ["system.data", "system.in.charges", "system.in.settings", "system.in", "system.in.init"]:
+                if (moltemplate_dir / file).exists():
+                    shutil.copy2(moltemplate_dir / file, parent_dir)
+
+            # Move files to output directory
+            for pattern in ["system.in*", "system*data", "output_ttree"]:
+                for file in moltemplate_dir.glob(pattern):
+                    shutil.move(str(file), str(output_dir))
+
+            # Move files to input directory
+            for pattern in ["*.lt", "*.prm"]:
+                for file in moltemplate_dir.glob(pattern):
+                    shutil.move(str(file), str(input_dir))
+
+        except Exception as e:
+            logger.error(f"Error moving files: {str(e)}")
+            sys.exit(1)
 
     def evaluate_box_len(self):
         in_=path_cwd+"system.data"
@@ -221,9 +283,36 @@ class Polymerization(object):
 
     def invoke_moltemplate(self) -> None:
         """Invokes Moltemplate to generate the LAMMPS data file."""
-        # NOTE: system.lt is in cwd
-        bash="cd "+self.path_cwd+"; "+self.path_moltemplatesrc+"moltemplate.sh ./system.lt"
-        os.system(bash)
+        try:
+            # First check if system.lt exists
+            system_lt = Path(self.path_cwd) / "system.lt"
+            if not system_lt.exists():
+                logger.error(f"system.lt not found in {self.path_cwd}")
+                sys.exit(1)
+
+            # Run moltemplate with output capture for error cases
+            process = subprocess.run(
+                f"cd {self.path_cwd}; {self.path_moltemplatesrc}moltemplate.sh ./system.lt",
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+            
+            if process.returncode != 0:
+                logger.error("Moltemplate execution failed with the following error:")
+                logger.error(process.stderr)
+                # Also log the last few lines of stdout which might contain useful info
+                stdout_lines = process.stdout.splitlines()
+                if stdout_lines:
+                    logger.error("Last output lines:")
+                    for line in stdout_lines[-5:]:
+                        logger.error(line)
+                sys.exit(1)
+            
+        except Exception as e:
+            logger.error(f"Error running Moltemplate: {str(e)}")
+            sys.exit(1)
 
     def make_system_lt(self) -> None:
         """Creates the system.lt file for the polymerization."""
@@ -317,12 +406,12 @@ class Polymerization(object):
         with open(output, "w") as write_f:
             write_f.write("import \"oplsaa.lt\"\n")
 
-            # Import unique monomers - ensure each monomer has .lt extension
-            unique_monomers = list(dict.fromkeys([
-                f"{m}.lt" if not m.endswith('.lt') else m for m in monomer_set
-            ]))
+            # Import unique monomers - ensure proper .lt extension
+            unique_monomers = list(dict.fromkeys(monomer_set))
             for monomer in unique_monomers:
-                write_f.write(f"import \"{monomer}\"\n")
+                # Remove .lt if it exists, then add it back
+                base_name = monomer[:-3] if monomer.endswith('.lt') else monomer
+                write_f.write(f"import \"{base_name}.lt\"\n")
 
             write_f.write("\n")
 
@@ -334,51 +423,54 @@ class Polymerization(object):
             is_ring = hasattr(model, 'topology') and model.topology == "ring"
 
             if is_ring:
-                # Ring polymer arrangement
-                radius = self.offset * len(monomer_set) / (2 * np.pi)
+                # Calculate radius based on number of monomers and offset
+                n_monomers = len(monomer_set)
+                radius = self.offset * n_monomers / (2 * np.pi)
                 
-                for i in range(len(monomer_set)):
-                    angle = 2 * np.pi * i / len(monomer_set)
+                for i in range(n_monomers):
+                    # Calculate position on the ring
+                    angle = 2 * np.pi * i / n_monomers
                     x = radius * np.cos(angle)
                     y = radius * np.sin(angle)
-                    rotation_angle = (angle * 180 / np.pi) + 90
                     
-                    monomer_name = monomer_set[i]
-                    if not monomer_name.endswith('.lt'):
-                        monomer_name += '.lt'
-                    monomer_name = monomer_name[:-3]  # Remove .lt for the instance name
+                    # Calculate rotation to point each monomer towards the center
+                    rotation_angle = (angle * 180 / np.pi) + 90  # Convert to degrees and add offset
                     
-                    write_f.write(f"    monomer{i} = new {monomer_name}")
-                    write_f.write(f".rot({rotation_angle},0,0,1)")
+                    # Get base name without .lt extension for the instance
+                    monomer_name = monomer_set[i][:-3] if monomer_set[i].endswith('.lt') else monomer_set[i]
+                    
+                    # Create monomer with position and rotation
+                    write_f.write(f"    monomer[{i}] = new {monomer_name}")
+                    write_f.write(f".rot({rotation_angle},0,0,1)")  # Rotate around z-axis
                     write_f.write(f".move({x:.4f},{y:.4f},0)\n")
+
+                # Add bonds between monomers including the ring closure
+                write_f.write("\n    write('Data Bond List') {\n")
+                for i in range(n_monomers):
+                    next_i = (i + 1) % n_monomers  # Wrap around to 0 for last monomer
+                    write_f.write(f"      $bond:b{i+1}  $atom:monomer[{i}]/C2  $atom:monomer[{next_i}]/C1\n")
+                write_f.write("    }\n")
+
             else:
-                # Linear polymer arrangement
+                # Original linear polymer code
                 offset_cum = 0
-                for i in range(len(monomer_set)):
-                    monomer_name = monomer_set[i]
-                    if not monomer_name.endswith('.lt'):
-                        monomer_name += '.lt'
-                    monomer_name = monomer_name[:-3]  # Remove .lt for the instance name
+                for indexii in range(len(monomer_set)):
+                    monomer_name = monomer_set[indexii][:-3] if monomer_set[indexii].endswith('.lt') else monomer_set[indexii]
                     
-                    write_f.write(f"    monomer{i} = new {monomer_name}")
-                    if i > 0:
-                        write_f.write(f".rot({self.rotate*(i%2)},1,0,0).move({offset_cum:.4f},0,0)")
+                    write_f.write(f"    monomer[{indexii}] = new {monomer_name}")
+                    if indexii > 0:
+                        write_f.write(f".rot({self.rotate*(indexii%2)},1,0,0).move({offset_cum:.4f},0,0)")
                     write_f.write("\n")
-                    self.evaluate_offset(monomer_name + ".lt")
+
+                    self.evaluate_offset(f"{monomer_name}.lt")
                     offset_cum += self.offset
 
-            # Add bonds between monomers
-            write_f.write("\n    write(\"Data Bond List\") {\n")
-            
-            # Connect sequential monomers
-            for i in range(len(monomer_set)-1):
-                write_f.write(f"      $bond:b{i+1}  $atom:monomer{i}/C2  $atom:monomer{i+1}/C1\n")
-            
-            # For ring polymers, connect last monomer to first
-            if is_ring:
-                write_f.write(f"      $bond:b{len(monomer_set)}  $atom:monomer{len(monomer_set)-1}/C2  $atom:monomer0/C1\n")
-            
-            write_f.write("    }\n")
+                # Add bonds for linear polymer
+                write_f.write("\n    write('Data Bond List') {\n")
+                for indexii in range(len(monomer_set)-1):
+                    write_f.write(f"      $bond:b{indexii+1}  $atom:monomer[{indexii}]/C2  $atom:monomer[{indexii+1}]/C1\n")
+                write_f.write("    }\n")
+
             write_f.write(f"\n}} # poly_{poly_index+1}\n")
 
     def evaluate_offset(self, merltfile: str) -> None:
@@ -412,15 +504,29 @@ class Polymerization(object):
                         return
             
     def make_oplsaalt(self) -> None:
-        
-        self.make_oplsaa_subset()
+        """Creates the oplsaa.lt file."""
+        try:
+            self.make_oplsaa_subset()
 
-        # invoke oplsaa_moltemplate.py to make oplsaa.lt 
-        oplsaa_subset=self.path_cwd+"oplsaa_subset.prm"
-        oplsaa_py=self.path_moltemplatesrc+"oplsaa_moltemplate.py "+oplsaa_subset
-        bash="cd "+self.path_cwd+"; "+oplsaa_py
-        os.system(bash)
-    
+            # Invoke oplsaa_moltemplate.py to make oplsaa.lt with suppressed output
+            oplsaa_subset = self.path_cwd + "oplsaa_subset.prm"
+            oplsaa_py = self.path_moltemplatesrc + "oplsaa_moltemplate.py " + oplsaa_subset
+            
+            # Redirect both stdout and stderr to devnull
+            with open(os.devnull, 'w') as devnull:
+                return_code = subprocess.call(f"cd {self.path_cwd}; {oplsaa_py}", 
+                                            shell=True,
+                                            stdout=devnull,
+                                            stderr=devnull)
+            
+            if return_code != 0:
+                logger.error("Failed to generate oplsaa.lt file. Check oplsaa_subset.prm for errors.")
+                sys.exit(1)
+            
+        except Exception as e:
+            logger.error(f"Error in make_oplsaalt: {str(e)}")
+            sys.exit(1)
+
     def make_oplsaa_subset(self) -> None:
         """Creates a subset of the oplsaa parameters based on the models."""
         # path to oplsaa_subset.prm file
