@@ -1,6 +1,6 @@
 # AutoPoly.py: Automatic Generation of Data File for Polymers
 
-AutoPoly is a Python package for automatically generating LAMMPS data files for polymer systems. It supports the OPLS (Optimized Potentials for Liquid Simulations) force field developed by Prof. William L. Jorgensen.
+AutoPoly is a Python package for automatically generating LAMMPS data files for polymer systems. It supports both atomistic (OPLS force field) and coarse-grained (bead-spring) polymer models.
 
 ## Why AutoPoly?
 
@@ -9,24 +9,33 @@ AutoPoly is a Python package for automatically generating LAMMPS data files for 
 - Easy integration with RDKit for custom monomer creation
 - Automated handling of tacticity
 - Built-in support for common polymer types
+- Coarse-grained bead-spring polymer models
 
 ## Installation
 
 Install AutoPoly via pip:
 ```bash
 git clone https://github.com/Chenghao-Wu/AutoPoly.git
-cd pubplot
+cd AutoPoly
 pip install .
 ```
 
-## Supported Polymers
+## Supported Models
 
+### Atomistic Polymers (OPLS)
 1. PMMA (Tacticity supported)
 2. PS (Tacticity supported)
 3. PE (Tacticity supported)
 4. PI (cis)
 5. PP (Tacticity supported)
 6. PVA (Tacticity supported)
+
+### Coarse-Grained Models
+- Bead-spring polymer chains
+  - Linear topology
+  - Ring topology
+  - Configurable parameters (mass, bond length, LJ parameters)
+  - 3D spatial distribution for non-overlapping configurations
 
 ## Examples
 
@@ -36,7 +45,6 @@ import AutoPoly
 
 # Define the system
 system = AutoPoly.System(out="pmma_linear")
-system.made_folder = True
 
 # Create a linear PMMA polymer with 10 chains, each with 50 monomers
 linear_polymer = AutoPoly.Polymer(ChainNum=10, Sequence=["PMMA"]*50, topology="linear")
@@ -48,7 +56,52 @@ poly = AutoPoly.Polymerization(name="LinearPolymer",
                               run=True)
 ```
 
-### 2. Mixed Polymer System (PP and PE)
+### 2. Bead-Spring Polymer System
+```python
+import AutoPoly
+from AutoPoly.bead_spring import BeadSpringPolymer
+
+# Define the system
+system = AutoPoly.System(out="bead_spring_test")
+
+# Create a linear bead-spring polymer
+linear_polymer = BeadSpringPolymer(
+    name="linear_polymer",
+    system=system,
+    n_chains=10,
+    n_beads=50,
+    topology="linear",
+    bond_length=1.0,
+    mass=1.0,
+    epsilon=1.0,
+    sigma=1.0
+)
+linear_polymer.generate_data_file()
+
+# Create a ring bead-spring polymer
+ring_polymer = BeadSpringPolymer(
+    name="ring_polymer",
+    system=system,
+    n_chains=60,
+    n_beads=50,
+    topology="ring",
+    bond_length=1.0,
+    mass=1.0,
+    epsilon=1.0,
+    sigma=1.0
+)
+ring_polymer.generate_data_file()
+```
+
+The bead-spring model features:
+- Customizable number of chains and beads per chain
+- Linear or ring topology
+- Lennard-Jones non-bonded interactions
+- Harmonic bond potentials
+- Non-overlapping 3D configurations for ring polymers
+- Automatic LAMMPS input script generation
+
+### 3. Mixed Polymer System (PP and PE)
 ```python
 # Define the system
 system = AutoPoly.System(out="mixed_polymers")
@@ -65,7 +118,7 @@ poly = AutoPoly.Polymerization(name="MixedSystem",
                               run=True)
 ```
 
-### 3. Using RDKit to Create Custom Monomers
+### 4. Using RDKit to Create Custom Monomers
 ```python
 # Create a custom monomer using SMILES
 rdlt = AutoPoly.RDlt(smiles='c1c2ccccc2ccc1')  # Naphthalene
@@ -82,7 +135,7 @@ poly = AutoPoly.Polymerization(name="CustomPolymer",
                               run=True)
 ```
 
-### 4. Small Molecule System
+### 5. Small Molecule System
 ```python
 # Create a system of 50 benzene molecules
 system = AutoPoly.System(out="benzene_system")
@@ -98,9 +151,25 @@ poly = AutoPoly.Polymerization(name="BenzeneSystem",
 
 AutoPoly generates:
 - LAMMPS data files (.data)
-- Moltemplate files (.lt)
+- Moltemplate files (.lt) for atomistic models
+- LAMMPS input scripts
 - Force field parameters
 - System configuration files
+
+## Features
+
+### Atomistic Models
+- OPLS force field support
+- Tacticity control
+- Custom monomer creation via RDKit
+- Moltemplate integration
+
+### Coarse-Grained Models
+- Bead-spring representation
+- Configurable force field parameters
+- 3D spatial distribution
+- Multiple chain topologies
+- Ready-to-run LAMMPS configurations
 
 ## Monomer Bank
 
@@ -115,12 +184,12 @@ The package includes a built-in monomer bank with common polymer units. Custom m
 
 ## Future Development
 
-- [ ] Support for coarse-grained polymers
-- [ ] Enhanced support for branched polymers
-- [ ] Pre-relaxation using LAMMPS
-- [ ] Integration with LigParGen for small molecules
+- [ ] Enhanced coarse-grained model support
 - [ ] Additional polymer architectures
+- [ ] Pre-relaxation using LAMMPS
+- [ ] Integration with LigParGen
 - [ ] Extended force field support
+- [ ] More polymer topologies
 
 ## Contributing
 

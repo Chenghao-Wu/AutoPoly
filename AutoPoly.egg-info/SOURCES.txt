@@ -2,6 +2,7 @@ MANIFEST.in
 README.md
 setup.py
 AutoPoly/__init__.py
+AutoPoly/bead_spring.py
 AutoPoly/conf.py
 AutoPoly/logger.py
 AutoPoly/polymer.py
