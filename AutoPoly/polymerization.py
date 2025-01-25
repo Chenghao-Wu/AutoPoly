@@ -13,51 +13,73 @@ import numpy as np
 from .system import logger
 
 class Polymerization(object):
-    def __init__(self,Name=None,System=None,Model=None,run=True,path_MonomerBank=None):
-        self.Name=Name
-        self.System=System
-        self.path_cwd=self.System.get_FolderPath+"/"+self.Name+"/moltemplate/"
-        self.path_master=str(Path(__file__).parent.resolve())+"/extern/"
-        logger.info(' '.join(["\n'you are now using extern path of "+self.path_master+"\n"]))
-        self.path_moltemplatesrc=self.path_master+"moltemplate/src/"
-        self.path_oplsaaprm=self.path_master+"moltemplate/oplsaa.prm"
-        if path_MonomerBank==None:
-            self.path_MonomerBank=self.path_master+"Monomer_bank/"
-        else:
-            self.path_MonomerBank=path_MonomerBank
+    def __init__(self, name: str = None, system: object = None, model: list = None,
+                 run: bool = True, path_monomer_bank: str = None) -> None:
+        """Initializes the Polymerization class.
 
-        self.Model=Model
+        Args:
+            name (str): Name of the polymerization.
+            system (object): System object containing folder path.
+            model (list): List of models for polymerization.
+            run (bool): Flag to run the process immediately.
+            path_monomer_bank (str): Path to the monomer bank.
+        """
+        self.name = name
+        self.system = system
+        self.path_cwd = f"{self.system.get_FolderPath}/{self.name}/moltemplate/"
+        self.path_master = f"{Path(__file__).parent.resolve()}/extern/"
+        logger.info(f"\n'you are now using extern path of {self.path_master}\n")
+        self.path_moltemplatesrc = f"{self.path_master}moltemplate/src/"
+        self.path_oplsaaprm = f"{self.path_master}moltemplate/oplsaa.prm"
+        self.path_monomer_bank = (self.path_master + "Monomer_bank/"
+                                  if path_monomer_bank is None else path_monomer_bank)
 
-        self.rotate=90.0
-        self.offset_spacing=2.0
-        self.offset=4.0
-        self.packingL_spacing=5.0
-        self.moltemplateBoxSize=400.0 # OPTIMIZED: will change accord. to actual packing 
+        self.model = model
 
-        self.create_Folder()
+        self.rotate = 90.0
+        self.offset_spacing = 2.0
+        self.offset = 4.0
+        self.packingL_spacing = 5.0
+        self.moltemplate_box_size = 400.0 # OPTIMIZED: will change according to actual packing 
 
-        if run==True:
-            self.make_LmpDataFilebyMoltemplate()
+        self.create_folder()
 
-    def create_Folder(self):
-        if self.System.MadeFolder==True:
-            path=Path(self.path_cwd)
+        if run:
+            self.make_lmp_data_file_by_moltemplate()
+
+    def create_folder(self) -> None:
+        """Creates the working directory for the polymerization."""
+        if self.system.made_folder:
+            path = Path(self.path_cwd)
             if path.exists():
-                logger.error(' '.join([self.path_cwd," already exist! Please have a check"]))
+                logger.error(f"{self.path_cwd} already exists! Please check.")
                 sys.exit()
             else:
                 path.mkdir(parents=True, exist_ok=True)
 
-    def set_tacticity(self,tacticity):
-        self.tacticity=tacticity
+    def set_tacticity(self, tacticity: str) -> None:
+        """Sets the tacticity of the polymer.
 
-    def n_monomerAtoms(self,merltfile):
-        n_monomerAtoms=0
-        MonomerBank=Path(self.path_MonomerBank)
-        merltfile_Path=MonomerBank/merltfile
-        if merltfile_Path.is_file():
-            is_inside_block=False
-            with open(merltfile_Path) as f:
+        Args:
+            tacticity (str): The tacticity to set.
+        """
+        self.tacticity = tacticity
+
+    def n_monomer_atoms(self, merltfile: str) -> int:
+        """Counts the number of monomer atoms in the specified file.
+
+        Args:
+            merltfile (str): The name of the merlt file.
+
+        Returns:
+            int: The number of monomer atoms.
+        """
+        n_monomer_atoms = 0
+        monomer_bank = Path(self.path_monomer_bank)
+        merltfile_path = monomer_bank / merltfile
+        if merltfile_path.is_file():
+            is_inside_block = False
+            with open(merltfile_path) as f:
                 while True: 
                     line = f.readline() 
                     if line.strip()=="write(\"Data Atoms\") {":
@@ -67,17 +89,79 @@ class Polymerization(object):
                         is_inside_block=False
                     
                     if is_inside_block:
-                        n_monomerAtoms=n_monomerAtoms+1
+                        n_monomer_atoms=n_monomer_atoms+1
 
                     if not line: 
                         break
         else:
-            logger.error(' '.join(["in MoltemplateLmpData::n_monomerAtoms():\n",merltfile_Path," file cannot open.\n"]))
+            logger.error(' '.join(["in MoltemplateLmpData::n_monomerAtoms():\n",merltfile_path," file cannot open.\n"]))
             sys.exit()
 
-        return n_monomerAtoms
-    
-    def getridof_ljcutcoullong(self):
+        return n_monomer_atoms
+                    
+    def make_lmp_data_file_by_moltemplate(self) -> None:
+        """Generates the LAMMPS data file using Moltemplate."""
+        try:
+            logger.info(' '.join(["\nlmpdata prepared by Moltemplate.\n"]))
+            
+            poly_index = 0
+            for modelii in self.model:
+                logger.info(' '.join(["\nNumber of Molecules = ", str(len(modelii.sequenceSet))]))
+                # loop through all polymers and make corresponding polymer lt files
+                for moleii in range(len(modelii.sequenceSet)):
+                    # check degrees of polymerization (DOP) of current polymer
+                    if modelii.DOP > 0:
+                        if len(modelii.sequenceSet[moleii]) != modelii.DOP:
+                            logger.warning(' '.join(["\nWarning: At molecule# ", str(moleii), " DOP=",
+                                                   str(len(modelii.sequenceSet[moleii])),
+                                                   " != ", str(modelii.DOP), "\n"]))
+                    else:
+                        logger.error(' '.join(["\nWarning: At molecule#", str(moleii+1), ",",
+                                             "DOP=", str(len(modelii.sequenceSet[moleii])), str(modelii.DOP)]))
+
+                    # check monomer.lt's in the monomer bank
+                    for indexii in range(len(modelii.sequenceSet[moleii])):
+                        if self.check_monomer_bank(modelii.sequenceSet[moleii][indexii]):
+                            source = Path(self.path_monomer_bank)/modelii.sequenceSet[moleii][indexii]
+                            self.copy_to_cwd(source)
+                        else:
+                            logger.error(' '.join(["\nError: ", "At monomer#" + str(indexii+1) + " (" +
+                                                 modelii.sequenceSet[moleii][indexii] + ") ",
+                                                 "of molecule#" + str(moleii+1) + ": ",
+                                                 "\nCan't find corresponding lt file in the monomer bank.\n\n",
+                                                 "Automation terminated.\n\n"]))
+                            sys.exit()
+
+                    if modelii.DOP > 1:
+                        # make poly.lt file
+                        self.make_poly_lt(poly_index, modelii.sequenceSet[moleii], modelii)
+                        poly_index += 1
+
+            # make oplsaa.lt
+            self.make_oplsaalt()
+
+            # make system.lt file
+            self.make_system_lt()
+
+            # invoke moltemplate to generate LAMMPS datafile
+            self.invoke_moltemplate()
+
+            # Check if the required files exist before proceeding
+            settings_file = Path(self.path_cwd) / "system.in.settings"
+            if not settings_file.exists():
+                logger.error(f"Moltemplate failed to generate required files. Check for errors in the .lt files.")
+                sys.exit(1)
+
+            self.get_rid_of_lj_cut_coul_long()
+
+            # move files to working directory
+            self.mv_files()
+        except Exception as e:
+            logger.error(f"Error in make_lmp_data_file_by_moltemplate: {str(e)}")
+            sys.exit(1)
+
+    def get_rid_of_lj_cut_coul_long(self) -> None:
+        """Removes lj/cut/coul/long from the settings file."""
         in_=self.path_cwd+"system.in.settings"
         out=self.path_cwd+"tmp.data"
         write_f=open(out, "w")
@@ -114,59 +198,8 @@ class Polymerization(object):
         mv="rm "+in_+";mv "+out+" "+in_
         os.system(mv)
 
-    def make_LmpDataFilebyMoltemplate(self):
-        logger.info(' '.join(["\nlmpdata prepared by Moltemplate.\n"]))
-        
-        poly_index=0
-        for modelii in self.Model:
-            logger.info(' '.join(["\nNumber of Molecules = ",str(len(modelii.sequenceSet))]))
-            # loop through all polymers and make corresponding polymer lt files
-            for moleii in range(len(modelii.sequenceSet)):
-                # check degrees of polymerization (DOP) of current polymer
-                if modelii.DOP>0:
-                    if len(modelii.sequenceSet[moleii])!=modelii.DOP:
-                        logger.warning(' '.join(["\nWarning: At molecule# ",str(moleii)," DOP=",str(len(modelii.sequenceSet[moleii])),
-                                                " != ",str(modelii.DOP),"\n"]))
-                else:
-                    logger.error(' '.join(["\nWarning: At molecule#",str(moleii+1),",",
-                                            "DOP=",str(len(modelii.sequenceSet[moleii])),str(modelii.DOP)]))
-
-                # check monomer.lt's in the monomer bank
-                for indexii in range(len(modelii.sequenceSet[moleii])):
-                    if self.check_monomerbank(modelii.sequenceSet[moleii][indexii]):
-                        source=Path(self.path_MonomerBank)/modelii.sequenceSet[moleii][indexii]
-                        self.copy_to_cwd(source)
-                    else:
-                        logger.error(' '.join(["\nError: ","At monomer#" +str(indexii+1)+" ("+modelii.sequenceSet[moleii][indexii]+") ","of molecule#"+str(moleii+1) +": ",
-                                            "\nCan't find corresponding lt file in the monomer bank.\n\n",
-                                            "Automation terminated.\n\n"]))
-                        sys.exit()
-
-                if modelii.DOP>1:
-                    # make poly.lt file
-                    self.make_polylt(poly_index,modelii.sequenceName[moleii])
-                    poly_index=poly_index+1
-
-        #make oplsaa.lt (requiring oplsaa_subset.prm)
-        #NOTE: the oplsaa.lt is shared by the current polymer and all its
-        #constituent monomers; to make it more general, this function should
-        #generate an unique oplsaa.lt file for each polymer and its own
-        #monomers. This feature is NOT supported in the current version
-    
-        self.make_oplsaalt()
-
-        # make system.lt file
-        self.make_systemlt()
-
-        # invoke moltemplate to generate LAMMPS datafile
-        self.invoke_moltemplate()
-
-        self.getridof_ljcutcoullong()
-
-        # move files to working directory
-        self.mv_files()
-
-    def mv_files(self):
+    def mv_files(self) -> None:
+        """Moves generated files to the appropriate directories."""
         datafile="system.data"
         incharge="system.in.charges"
         insetting="system.in.settings"
@@ -180,27 +213,30 @@ class Polymerization(object):
         input_="cd "+self.path_cwd+"; mkdir input; mv *.lt *.prm input/"
         os.system(input_)
 
-    def evaluate_boxLen(self):
+    def evaluate_box_len(self):
         in_=path_cwd+"system.data"
         dubVar=0
         lmin=0
         lmax=0
 
-    def invoke_moltemplate(self):
+    def invoke_moltemplate(self) -> None:
+        """Invokes Moltemplate to generate the LAMMPS data file."""
         # NOTE: system.lt is in cwd
         bash="cd "+self.path_cwd+"; "+self.path_moltemplatesrc+"moltemplate.sh ./system.lt"
         os.system(bash)
 
-    def make_systemlt(self):
-        output=self.path_cwd+"/system.lt"
+    def make_system_lt(self) -> None:
+        """Creates the system.lt file for the polymerization."""
+        output = self.path_cwd + "/system.lt"
+
         with open(output, "w") as write_f:
-            polyindex=0
-            for modelii in self.Model:
-                n_poly=len(modelii.sequenceSet)
-                if modelii.DOP>1:
+            polyindex = 0
+            for modelii in self.model:
+                n_poly = len(modelii.sequenceSet)
+                if modelii.DOP > 1:
                     for indexi in range(n_poly):
-                        write_f.write("import \"poly_"+str(polyindex+1)+".lt\"\n")
-                        polyindex=polyindex+1
+                        write_f.write(f"import \"poly_{polyindex+1}.lt\"\n")
+                        polyindex += 1
                     write_f.write("\n")
                 else:
                     if len(modelii.merSet)>1:
@@ -214,151 +250,137 @@ class Polymerization(object):
                         write_f.write("import \""+unique_Sequence[sequenceii]+"\"\n")
                     write_f.write("\n")
 
-            polyindex=0
+            polyindex = 0
+            index = 0
 
-            index=0
-
-            packingL=self.offset+self.packingL_spacing
-            
-            offset_x=-50
-
-            offset_x_increment=10.0
-            
-            first=True
-            coordinates=[]
-            
-            #max_DOP=max([i.DOP for i in self.Model])
-
-            for modelii in self.Model:
-                counter=0
-                n=0
-                bndl=0
-                bndh=0
-                n_now=0
-                n_pre=0
-                signy=1
-                signz=-1
-                timey=0
-                timez=0
-                valy=0
-                valz=0
-                n_poly=len(modelii.sequenceSet)
-
-                # Pack molecules in square spiral shape
-                if modelii.DOP>1:
-                    offset_x+=offset_x_increment
-                    write_f.write("polymer_"+str(index+1)+" = new poly_"+str(polyindex+1)+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
-                    offset_x_increment=self.offset*(modelii.DOP+2)
-                    polyindex+=1
+            # Calculate spacing based on polymer type and size
+            for modelii in self.model:
+                n_poly = len(modelii.sequenceSet)
+                is_ring = hasattr(modelii, 'topology') and modelii.topology == "ring"
+                
+                if is_ring:
+                    # For ring polymers, calculate radius and use it for spacing
+                    radius = self.offset * len(modelii.sequenceSet[0]) / (2 * np.pi)
+                    spacing = radius * 2.5  # Use 2.5x the ring radius for good separation
                 else:
-                    #packingL=10
-                    offset_x+=offset_x_increment
-                    write_f.write("molecule_"+str(index+1)+" = new "+modelii.merSet[0]+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
-                    offset_x_increment=self.offset*(modelii.DOP+2)
+                    spacing = self.offset * (modelii.DOP + 2)
 
-                index=index+1
-
-                for indexi in range(1,n_poly):
-                    n=0
-                    while True:
-                        n=n+1
-                        bndl=(n-1)*n
-                        bndh=n*(n+1)
-                        if bndl<index and indexi<=bndh:
-                            break
-                    n_now=n
-                    if n_now!=n_pre:
-                        counter=0
-                        signy*=-1
-                        signz*=-1
-                    if counter<n_now:
-                        timey=1
-                        valy+=packingL*signy*timey
-                        timez=0
-                    else:
-                        timey=0
-                        timez=1 
-                        valz+=packingL*signz*timez
-                    if modelii.DOP>1:
-                        #offset_x=-50.0
-                        write_f.write("polymer_"+str(index+1)+" = new "+"poly_"+str(polyindex+1)+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
-                        polyindex+=1
-                    else:
-                        #offset_x=-60.0
-                        write_f.write("molecule_"+str(index+1)+" = new "+modelii.merSet[0]+".move("+"{:.4f}".format(offset_x)+","+"{:.4f}".format(valy)+","+"{:.4f}".format(valz)+")"+ "\n")
-                    n_pre=n_now
-                    counter+=1
-                    index=index+1
+                # Calculate grid arrangement
+                grid_size = int(np.ceil(np.sqrt(n_poly)))  # Arrange in a square grid
+                
+                for moleii in range(n_poly):
+                    # Calculate grid position
+                    grid_x = moleii % grid_size
+                    grid_y = moleii // grid_size
                     
-
+                    # Calculate actual position with spacing
+                    pos_x = grid_x * spacing
+                    pos_y = grid_y * spacing
+                    pos_z = 0.0  # Keep all polymers in the same plane initially
+                    
+                    if modelii.DOP > 1:
+                        write_f.write(f"polymer_{index+1} = new poly_{polyindex+1}")
+                        write_f.write(f".move({pos_x:.4f},{pos_y:.4f},{pos_z:.4f})\n")
+                        polyindex += 1
+                    else:
+                        write_f.write(f"molecule_{index+1} = new {modelii.merSet[0]}")
+                        write_f.write(f".move({pos_x:.4f},{pos_y:.4f},{pos_z:.4f})\n")
+                    
+                    index += 1
+                
                 write_f.write("\n")
-                #first=True
 
-            hbox=self.moltemplateBoxSize*0.5
-            fbox=self.moltemplateBoxSize
+            # Adjust box size based on total system size
+            max_coord = max([
+                grid_size * spacing for modelii in self.model
+                if len(modelii.sequenceSet) > 0
+            ])
+            box_size = max_coord * 1.2  # Add 20% padding
+            
+            # Write box boundaries
+            write_f.write("write_once(\"Data Boundary\") {\n")
+            write_f.write(f"   -{box_size/2:.4f}  {box_size/2:.4f}  xlo xhi\n")
+            write_f.write(f"   -{box_size/2:.4f}  {box_size/2:.4f}  ylo yhi\n")
+            write_f.write(f"   -{box_size/2:.4f}  {box_size/2:.4f}  zlo zhi\n")
+            write_f.write("}\n")
 
-            if True:
-                write_f.write("write_once(\"Data Boundary\") {\n")
-                write_f.write("   -"+str(hbox)+"  "+str(hbox)+"  xlo xhi\n")
-                write_f.write("   -"+str(hbox)+"  "+str(hbox)+"  ylo yhi\n")
-                write_f.write("   -"+str(hbox)+"  "+str(hbox)+"  zlo zhi\n")
-                write_f.write("}\n")
-                write_f.write("\n")
-            else:
-                write_f.write("write_once(\"Data Boundary\") {\n")
-                write_f.write("   0.0  "+fbox+"  xlo xhi\n")
-                write_f.write("   0.0  "+fbox+"  ylo yhi\n")
-                write_f.write("   0.0  "+fbox+"  zlo zhi\n")
-                write_f.write("}\n")
-                write_f.write("\n")
-            write_f.close()
+    def make_poly_lt(self, poly_index: int, monomer_set: list, model: object) -> None:
+        """Creates a poly.lt file for the specified polymer.
 
-
-
-    def make_polylt(self,polyindex,monomerSet):
-        output=self.path_cwd+"/poly_"+str(polyindex+1)+".lt"
+        Args:
+            poly_index (int): The index of the polymer.
+            monomer_set (list): The list of monomers in the polymer.
+            model (object): The polymer model object containing topology information.
+        """
+        output = self.path_cwd + f"/poly_{poly_index+1}.lt"
 
         with open(output, "w") as write_f:
             write_f.write("import \"oplsaa.lt\"\n")
 
-
-            unique_monomers=list(dict.fromkeys(monomerSet))
-            for monomerii in range(len(unique_monomers)):
-                write_f.write("import \""+unique_monomers[monomerii]+".lt"+"\"\n")
+            # Import unique monomers - ensure we don't add .lt if it's already there
+            unique_monomers = list(dict.fromkeys([
+                m[:-3] if m.endswith('.lt') else m for m in monomer_set
+            ]))
+            for monomer in unique_monomers:
+                write_f.write(f"import \"{monomer}.lt\"\n")
 
             write_f.write("\n")
 
-            #Define combined molecule (ex.polymer)
-            write_f.write("poly_"+str(polyindex+1)+" inherits OPLSAA {\n\n")
-            write_f.write("    "+ "create_var {$mol}\n\n")
+            # Define combined molecule (ex.polymer)
+            write_f.write(f"poly_{poly_index+1} inherits OPLSAA {{\n\n")
+            write_f.write("    create_var {$mol}\n\n")
 
-            monomerSet_copy=monomerSet
-            offset_cum=0
-            for indexii in range(len(monomerSet)):
-                # erase .lt from name string
-                #del monomerSet_copy[-3:]
-                # pack monomers along x-axis and rotate accordingly (1,0,0)
-                write_f.write("    "+"monomer["+str(indexii)+"] = new "+monomerSet[indexii])
-                if indexii>0:
-                    write_f.write(".rot(" +str(self.rotate*(indexii%2))+",1,0,0)"+".move("+"{:.4f}".format(offset_cum)+",0,0)")
-                write_f.write("\n")
-                # evaluate offset distance based on C1-C2 of the pre-mer
+            # Check if this is a ring polymer
+            is_ring = hasattr(model, 'topology') and model.topology == "ring"
 
-                self.evaluate_offset(monomerSet[indexii]+".lt")
-                offset_cum+=self.offset
-                #print(offset_cum)
-            # add a list of bonds connecting propagating carbons
+            if is_ring:
+                # Ring polymer arrangement
+                radius = self.offset * len(monomer_set) / (2 * np.pi)
+                
+                for i in range(len(monomer_set)):
+                    angle = 2 * np.pi * i / len(monomer_set)
+                    x = radius * np.cos(angle)
+                    y = radius * np.sin(angle)
+                    rotation_angle = (angle * 180 / np.pi) + 90
+                    
+                    # Remove .lt extension if present for the monomer instance
+                    monomer_name = monomer_set[i][:-3] if monomer_set[i].endswith('.lt') else monomer_set[i]
+                    write_f.write(f"    monomer[{i}] = new {monomer_name}")
+                    write_f.write(f".rot({rotation_angle},0,0,1)")
+                    write_f.write(f".move({x:.4f},{y:.4f},0)")
+                    write_f.write("\n")
+            else:
+                # Linear polymer arrangement
+                offset_cum = 0
+                for i in range(len(monomer_set)):
+                    write_f.write(f"    monomer[{i}] = new {monomer_set[i]}")
+                    if i > 0:
+                        write_f.write(f".rot({self.rotate*(i%2)},1,0,0).move({offset_cum:.4f},0,0)")
+                    write_f.write("\n")
+                    self.evaluate_offset(monomer_set[i] + ".lt")
+                    offset_cum += self.offset
+
+            # Add bonds between monomers
             write_f.write("\n    write('Data Bond List') {\n")
-            for indexii in range(len(monomerSet)-1):
-                write_f.write("      "+"$bond:b"+str(indexii+1)+"  "+"$atom:monomer["+str(indexii)+"]/C2"+"  "+"$atom:monomer["+str(indexii+1)+"]/C1"+"  "+"\n")
+            
+            # Connect sequential monomers
+            for i in range(len(monomer_set)-1):
+                write_f.write(f"      $bond:b{i+1}  $atom:monomer[{i}]/C2  $atom:monomer[{i+1}]/C1\n")
+            
+            # For ring polymers, connect last monomer to first
+            if is_ring:
+                write_f.write(f"      $bond:b{len(monomer_set)}  $atom:monomer[{len(monomer_set)-1}]/C2  $atom:monomer[0]/C1\n")
+            
             write_f.write("    }\n")
-            # end cap of poly.lt scope
-            write_f.write("\n} # poly_"+str(polyindex+1)+ "\n") 
-            write_f.close()
-    
+            write_f.write(f"\n}} # poly_{poly_index+1}\n")
 
-    def evaluate_offset(self,merltfile):
-        MonomerBank=Path(self.path_MonomerBank)
+    def evaluate_offset(self, merltfile: str) -> None:
+        """Evaluates the offset distance based on the specified merlt file.
+
+        Args:
+            merltfile (str): The name of the merlt file.
+        """
+        MonomerBank=Path(self.path_monomer_bank)
         merltfile_Path=MonomerBank/merltfile
         if merltfile_Path.is_file():
             C1=[]
@@ -382,7 +404,7 @@ class Polymerization(object):
                         
                         return
             
-    def make_oplsaalt(self):
+    def make_oplsaalt(self) -> None:
         
         self.make_oplsaa_subset()
 
@@ -392,21 +414,22 @@ class Polymerization(object):
         bash="cd "+self.path_cwd+"; "+oplsaa_py
         os.system(bash)
     
-    def make_oplsaa_subset(self):
+    def make_oplsaa_subset(self) -> None:
+        """Creates a subset of the oplsaa parameters based on the models."""
         # path to oplsaa_subset.prm file
         opls_subset_file = self.path_cwd+"oplsaa_subset.prm"
 
         atom_keys=[]
-        for modelii in self.Model:
+        for modelii in self.model:
             for monomerii in range(len(modelii.sequenceSet)):
                 monomerSet=modelii.sequenceSet[monomerii]
                 # vector to store all atom types including the repeats
                 for vecii in range(len(monomerSet)):
                     # path to monomer.lt in monomer bank
-                    MonomerBank=Path(self.path_MonomerBank)
+                    MonomerBank=Path(self.path_monomer_bank)
                     merltfile_Path=MonomerBank/monomerSet[vecii]
                     if merltfile_Path.is_file():
-                        mono = self.path_MonomerBank+monomerSet[vecii]
+                        mono = self.path_monomer_bank+monomerSet[vecii]
                         read_switch= False 
                         with open(mono) as f:
                             while True: 
@@ -489,12 +512,77 @@ class Polymerization(object):
                         break
         write_f.close()
 
-    def check_monomerbank(self,monomer):
-        monomer_path=Path(self.path_MonomerBank)/monomer
-        return monomer_path.is_file()
+    def check_monomer_bank(self, monomer: str) -> bool:
+        """Checks if the specified monomer exists in the monomer bank."""
+        monomer_path = Path(self.path_monomer_bank) / monomer
+        exists = monomer_path.is_file()
+        if not exists:
+            logger.warning(f"Could not find monomer file: {monomer_path}")
+            logger.info(f"Looking in directory: {self.path_monomer_bank}")
+            logger.info(f"Searching for file: {monomer}")
+            logger.info(f"Available files in monomer bank: {sorted(list(Path(self.path_monomer_bank).glob('*.lt')))}")
+            logger.info(f"Monomer bank path exists: {Path(self.path_monomer_bank).exists()}")
+        return exists
 
-    def copy_to_cwd(self,source):
+    def copy_to_cwd(self, source: Path) -> None:
+        """Copies the specified source file to the current working directory.
+
+        Args:
+            source (Path): The path of the source file to copy.
+        """
         bash="cp "
         bash=bash+str(source)+" "+self.path_cwd
         os.system(bash)
 
+    def create_ring_polymer_topology(self, poly_index: int, monomer_set: list) -> None:
+        """Creates a ring polymer topology and coordinates based on the provided monomer sequence.
+
+        Args:
+            poly_index (int): The index of the polymer.
+            monomer_set (list): The list of monomers in the ring polymer.
+        """
+        output = self.path_cwd + f"/poly_{poly_index+1}.lt"
+
+        with open(output, "w") as write_f:
+            write_f.write("import \"oplsaa.lt\"\n")
+
+            # Import unique monomers
+            unique_monomers = list(dict.fromkeys(monomer_set))
+            for monomer in unique_monomers:
+                write_f.write(f"import \"{monomer}.lt\"\n")
+
+            write_f.write("\n")
+
+            # Define combined ring polymer
+            write_f.write(f"poly_{poly_index+1} inherits OPLSAA {{\n\n")
+            write_f.write("    create_var {$mol}\n\n")
+
+            offset_cum = 0
+            radius = self.offset * len(monomer_set) / (2 * np.pi)  # Calculate radius based on number of monomers
+            
+            # Place monomers in a circular arrangement
+            for i in range(len(monomer_set)):
+                angle = 2 * np.pi * i / len(monomer_set)  # Angle for current monomer
+                x = radius * np.cos(angle)
+                y = radius * np.sin(angle)
+                
+                # Calculate rotation to point each monomer towards the center
+                rotation_angle = (angle * 180 / np.pi) + 90  # Convert to degrees and add 90° offset
+                
+                write_f.write(f"    monomer[{i}] = new {monomer_set[i]}")
+                write_f.write(f".rot({rotation_angle},0,0,1)")  # Rotate around z-axis
+                write_f.write(f".move({x:.4f},{y:.4f},0)")
+                write_f.write("\n")
+
+            # Add bonds between monomers to form the ring
+            write_f.write("\n    write('Data Bond List') {\n")
+            
+            # Connect sequential monomers
+            for i in range(len(monomer_set)-1):
+                write_f.write(f"      $bond:b{i+1}  $atom:monomer[{i}]/C2  $atom:monomer[{i+1}]/C1\n")
+            
+            # Connect last monomer to first to close the ring
+            write_f.write(f"      $bond:b{len(monomer_set)}  $atom:monomer[{len(monomer_set)-1}]/C2  $atom:monomer[0]/C1\n")
+            
+            write_f.write("    }\n")
+            write_f.write(f"\n}} # poly_{poly_index+1}\n")
