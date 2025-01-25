@@ -1,0 +1,2135 @@
+    pair_coeff 1 1 0.066 3.5 
+    pair_coeff 2 2 0.066 3.5 
+    pair_coeff 3 3 0.066 3.5 
+    pair_coeff 4 4 0.066 3.5 
+    pair_coeff 5 5 0.03 2.5 
+    pair_coeff 6 6 0.105 3.75 
+    pair_coeff 7 7 0.21 2.96 
+    pair_coeff 8 8 0.17 3.0 
+    pair_coeff 9 9 0.066 3.5 
+    bond_coeff 1 harmonic 350.0 1.51
+    bond_coeff 2 harmonic 570.0 1.229
+    bond_coeff 3 harmonic 317.0 1.522
+    bond_coeff 4 harmonic 317.0 1.522
+    bond_coeff 5 harmonic 317.0 1.522
+    bond_coeff 6 harmonic 317.0 1.522
+    bond_coeff 7 harmonic 317.0 1.522
+    bond_coeff 8 harmonic 214.0 1.327
+    bond_coeff 9 harmonic 340.0 1.09
+    bond_coeff 10 harmonic 268.0 1.529
+    bond_coeff 11 harmonic 268.0 1.529
+    bond_coeff 12 harmonic 268.0 1.529
+    bond_coeff 13 harmonic 268.0 1.529
+    bond_coeff 14 harmonic 268.0 1.529
+    bond_coeff 15 harmonic 268.0 1.529
+    bond_coeff 16 harmonic 268.0 1.529
+    bond_coeff 17 harmonic 268.0 1.529
+    bond_coeff 18 harmonic 268.0 1.529
+    bond_coeff 19 harmonic 268.0 1.529
+    bond_coeff 20 harmonic 268.0 1.529
+    bond_coeff 21 harmonic 268.0 1.529
+    bond_coeff 22 harmonic 268.0 1.529
+    bond_coeff 23 harmonic 268.0 1.529
+    bond_coeff 24 harmonic 268.0 1.529
+    bond_coeff 25 harmonic 268.0 1.529
+    bond_coeff 26 harmonic 268.0 1.529
+    bond_coeff 27 harmonic 268.0 1.529
+    bond_coeff 28 harmonic 268.0 1.529
+    bond_coeff 29 harmonic 268.0 1.529
+    bond_coeff 30 harmonic 268.0 1.529
+    bond_coeff 31 harmonic 268.0 1.529
+    bond_coeff 32 harmonic 268.0 1.529
+    bond_coeff 33 harmonic 268.0 1.529
+    bond_coeff 34 harmonic 268.0 1.529
+    bond_coeff 35 harmonic 320.0 1.41
+    bond_coeff 36 harmonic 320.0 1.41
+    bond_coeff 37 harmonic 320.0 1.41
+    bond_coeff 38 harmonic 320.0 1.41
+    bond_coeff 39 harmonic 320.0 1.41
+    bond_coeff 40 harmonic 340.0 1.09
+    bond_coeff 41 harmonic 340.0 1.09
+    bond_coeff 42 harmonic 340.0 1.09
+    bond_coeff 43 harmonic 340.0 1.09
+    bond_coeff 44 harmonic 340.0 1.09
+    bond_coeff 45 harmonic 250.0 1.47
+    angle_coeff 1 harmonic 80.0 121.4
+    angle_coeff 2 harmonic 80.0 126.0
+    angle_coeff 3 harmonic 70.0 116.0
+    angle_coeff 4 harmonic 70.0 116.0
+    angle_coeff 5 harmonic 70.0 116.0
+    angle_coeff 6 harmonic 70.0 116.0
+    angle_coeff 7 harmonic 70.0 116.0
+    angle_coeff 8 harmonic 70.0 116.0
+    angle_coeff 9 harmonic 70.0 116.0
+    angle_coeff 10 harmonic 70.0 116.0
+    angle_coeff 11 harmonic 70.0 116.0
+    angle_coeff 12 harmonic 70.0 116.0
+    angle_coeff 13 harmonic 70.0 116.0
+    angle_coeff 14 harmonic 70.0 116.0
+    angle_coeff 15 harmonic 70.0 116.0
+    angle_coeff 16 harmonic 70.0 116.0
+    angle_coeff 17 harmonic 70.0 116.0
+    angle_coeff 18 harmonic 70.0 116.0
+    angle_coeff 19 harmonic 70.0 116.0
+    angle_coeff 20 harmonic 70.0 116.0
+    angle_coeff 21 harmonic 70.0 116.0
+    angle_coeff 22 harmonic 70.0 116.0
+    angle_coeff 23 harmonic 70.0 116.0
+    angle_coeff 24 harmonic 70.0 116.0
+    angle_coeff 25 harmonic 70.0 116.0
+    angle_coeff 26 harmonic 70.0 116.0
+    angle_coeff 27 harmonic 70.0 116.0
+    angle_coeff 28 harmonic 80.0 117.2
+    angle_coeff 29 harmonic 80.0 117.2
+    angle_coeff 30 harmonic 80.0 117.2
+    angle_coeff 31 harmonic 80.0 117.2
+    angle_coeff 32 harmonic 80.0 117.2
+    angle_coeff 33 harmonic 80.0 120.4
+    angle_coeff 34 harmonic 80.0 120.4
+    angle_coeff 35 harmonic 80.0 120.4
+    angle_coeff 36 harmonic 80.0 120.4
+    angle_coeff 37 harmonic 80.0 120.4
+    angle_coeff 38 harmonic 81.0 111.4
+    angle_coeff 39 harmonic 81.0 111.4
+    angle_coeff 40 harmonic 81.0 111.4
+    angle_coeff 41 harmonic 81.0 111.4
+    angle_coeff 42 harmonic 81.0 111.4
+    angle_coeff 43 harmonic 83.0 123.4
+    angle_coeff 44 harmonic 35.0 115.0
+    angle_coeff 45 harmonic 35.0 115.0
+    angle_coeff 46 harmonic 35.0 115.0
+    angle_coeff 47 harmonic 35.0 115.0
+    angle_coeff 48 harmonic 35.0 115.0
+    angle_coeff 49 harmonic 35.0 115.0
+    angle_coeff 50 harmonic 35.0 123.0
+    angle_coeff 51 harmonic 40.0 115.0
+    angle_coeff 52 harmonic 63.0 111.1
+    angle_coeff 53 harmonic 63.0 111.1
+    angle_coeff 54 harmonic 63.0 111.1
+    angle_coeff 55 harmonic 63.0 111.1
+    angle_coeff 56 harmonic 63.0 111.1
+    angle_coeff 57 harmonic 58.35 112.7
+    angle_coeff 58 harmonic 58.35 112.7
+    angle_coeff 59 harmonic 58.35 112.7
+    angle_coeff 60 harmonic 58.35 112.7
+    angle_coeff 61 harmonic 58.35 112.7
+    angle_coeff 62 harmonic 58.35 112.7
+    angle_coeff 63 harmonic 58.35 112.7
+    angle_coeff 64 harmonic 58.35 112.7
+    angle_coeff 65 harmonic 58.35 112.7
+    angle_coeff 66 harmonic 58.35 112.7
+    angle_coeff 67 harmonic 58.35 112.7
+    angle_coeff 68 harmonic 58.35 112.7
+    angle_coeff 69 harmonic 58.35 112.7
+    angle_coeff 70 harmonic 58.35 112.7
+    angle_coeff 71 harmonic 58.35 112.7
+    angle_coeff 72 harmonic 58.35 112.7
+    angle_coeff 73 harmonic 58.35 112.7
+    angle_coeff 74 harmonic 58.35 112.7
+    angle_coeff 75 harmonic 58.35 112.7
+    angle_coeff 76 harmonic 58.35 112.7
+    angle_coeff 77 harmonic 58.35 112.7
+    angle_coeff 78 harmonic 58.35 112.7
+    angle_coeff 79 harmonic 58.35 112.7
+    angle_coeff 80 harmonic 58.35 112.7
+    angle_coeff 81 harmonic 58.35 112.7
+    angle_coeff 82 harmonic 58.35 112.7
+    angle_coeff 83 harmonic 58.35 112.7
+    angle_coeff 84 harmonic 58.35 112.7
+    angle_coeff 85 harmonic 58.35 112.7
+    angle_coeff 86 harmonic 58.35 112.7
+    angle_coeff 87 harmonic 58.35 112.7
+    angle_coeff 88 harmonic 58.35 112.7
+    angle_coeff 89 harmonic 58.35 112.7
+    angle_coeff 90 harmonic 58.35 112.7
+    angle_coeff 91 harmonic 58.35 112.7
+    angle_coeff 92 harmonic 58.35 112.7
+    angle_coeff 93 harmonic 58.35 112.7
+    angle_coeff 94 harmonic 58.35 112.7
+    angle_coeff 95 harmonic 58.35 112.7
+    angle_coeff 96 harmonic 58.35 112.7
+    angle_coeff 97 harmonic 58.35 112.7
+    angle_coeff 98 harmonic 58.35 112.7
+    angle_coeff 99 harmonic 58.35 112.7
+    angle_coeff 100 harmonic 58.35 112.7
+    angle_coeff 101 harmonic 58.35 112.7
+    angle_coeff 102 harmonic 58.35 112.7
+    angle_coeff 103 harmonic 58.35 112.7
+    angle_coeff 104 harmonic 58.35 112.7
+    angle_coeff 105 harmonic 58.35 112.7
+    angle_coeff 106 harmonic 58.35 112.7
+    angle_coeff 107 harmonic 58.35 112.7
+    angle_coeff 108 harmonic 58.35 112.7
+    angle_coeff 109 harmonic 58.35 112.7
+    angle_coeff 110 harmonic 58.35 112.7
+    angle_coeff 111 harmonic 58.35 112.7
+    angle_coeff 112 harmonic 58.35 112.7
+    angle_coeff 113 harmonic 58.35 112.7
+    angle_coeff 114 harmonic 58.35 112.7
+    angle_coeff 115 harmonic 58.35 112.7
+    angle_coeff 116 harmonic 58.35 112.7
+    angle_coeff 117 harmonic 58.35 112.7
+    angle_coeff 118 harmonic 58.35 112.7
+    angle_coeff 119 harmonic 58.35 112.7
+    angle_coeff 120 harmonic 58.35 112.7
+    angle_coeff 121 harmonic 58.35 112.7
+    angle_coeff 122 harmonic 58.35 112.7
+    angle_coeff 123 harmonic 58.35 112.7
+    angle_coeff 124 harmonic 58.35 112.7
+    angle_coeff 125 harmonic 58.35 112.7
+    angle_coeff 126 harmonic 58.35 112.7
+    angle_coeff 127 harmonic 58.35 112.7
+    angle_coeff 128 harmonic 58.35 112.7
+    angle_coeff 129 harmonic 58.35 112.7
+    angle_coeff 130 harmonic 58.35 112.7
+    angle_coeff 131 harmonic 58.35 112.7
+    angle_coeff 132 harmonic 58.35 112.7
+    angle_coeff 133 harmonic 58.35 112.7
+    angle_coeff 134 harmonic 58.35 112.7
+    angle_coeff 135 harmonic 58.35 112.7
+    angle_coeff 136 harmonic 58.35 112.7
+    angle_coeff 137 harmonic 58.35 112.7
+    angle_coeff 138 harmonic 58.35 112.7
+    angle_coeff 139 harmonic 58.35 112.7
+    angle_coeff 140 harmonic 58.35 112.7
+    angle_coeff 141 harmonic 58.35 112.7
+    angle_coeff 142 harmonic 58.35 112.7
+    angle_coeff 143 harmonic 58.35 112.7
+    angle_coeff 144 harmonic 58.35 112.7
+    angle_coeff 145 harmonic 58.35 112.7
+    angle_coeff 146 harmonic 58.35 112.7
+    angle_coeff 147 harmonic 58.35 112.7
+    angle_coeff 148 harmonic 58.35 112.7
+    angle_coeff 149 harmonic 58.35 112.7
+    angle_coeff 150 harmonic 58.35 112.7
+    angle_coeff 151 harmonic 58.35 112.7
+    angle_coeff 152 harmonic 58.35 112.7
+    angle_coeff 153 harmonic 58.35 112.7
+    angle_coeff 154 harmonic 58.35 112.7
+    angle_coeff 155 harmonic 58.35 112.7
+    angle_coeff 156 harmonic 58.35 112.7
+    angle_coeff 157 harmonic 58.35 112.7
+    angle_coeff 158 harmonic 58.35 112.7
+    angle_coeff 159 harmonic 58.35 112.7
+    angle_coeff 160 harmonic 58.35 112.7
+    angle_coeff 161 harmonic 58.35 112.7
+    angle_coeff 162 harmonic 58.35 112.7
+    angle_coeff 163 harmonic 58.35 112.7
+    angle_coeff 164 harmonic 58.35 112.7
+    angle_coeff 165 harmonic 58.35 112.7
+    angle_coeff 166 harmonic 58.35 112.7
+    angle_coeff 167 harmonic 58.35 112.7
+    angle_coeff 168 harmonic 58.35 112.7
+    angle_coeff 169 harmonic 58.35 112.7
+    angle_coeff 170 harmonic 58.35 112.7
+    angle_coeff 171 harmonic 58.35 112.7
+    angle_coeff 172 harmonic 58.35 112.7
+    angle_coeff 173 harmonic 58.35 112.7
+    angle_coeff 174 harmonic 58.35 112.7
+    angle_coeff 175 harmonic 58.35 112.7
+    angle_coeff 176 harmonic 58.35 112.7
+    angle_coeff 177 harmonic 58.35 112.7
+    angle_coeff 178 harmonic 58.35 112.7
+    angle_coeff 179 harmonic 58.35 112.7
+    angle_coeff 180 harmonic 58.35 112.7
+    angle_coeff 181 harmonic 58.35 112.7
+    angle_coeff 182 harmonic 63.0 111.1
+    angle_coeff 183 harmonic 63.0 111.1
+    angle_coeff 184 harmonic 63.0 111.1
+    angle_coeff 185 harmonic 63.0 111.1
+    angle_coeff 186 harmonic 63.0 111.1
+    angle_coeff 187 harmonic 63.0 111.1
+    angle_coeff 188 harmonic 63.0 111.1
+    angle_coeff 189 harmonic 63.0 111.1
+    angle_coeff 190 harmonic 63.0 111.1
+    angle_coeff 191 harmonic 63.0 111.1
+    angle_coeff 192 harmonic 63.0 111.1
+    angle_coeff 193 harmonic 63.0 111.1
+    angle_coeff 194 harmonic 63.0 111.1
+    angle_coeff 195 harmonic 63.0 111.1
+    angle_coeff 196 harmonic 63.0 111.1
+    angle_coeff 197 harmonic 63.0 111.1
+    angle_coeff 198 harmonic 63.0 111.1
+    angle_coeff 199 harmonic 63.0 111.1
+    angle_coeff 200 harmonic 63.0 111.1
+    angle_coeff 201 harmonic 63.0 111.1
+    angle_coeff 202 harmonic 63.0 111.1
+    angle_coeff 203 harmonic 63.0 111.1
+    angle_coeff 204 harmonic 63.0 111.1
+    angle_coeff 205 harmonic 63.0 111.1
+    angle_coeff 206 harmonic 63.0 111.1
+    angle_coeff 207 harmonic 50.0 109.5
+    angle_coeff 208 harmonic 50.0 109.5
+    angle_coeff 209 harmonic 50.0 109.5
+    angle_coeff 210 harmonic 50.0 109.5
+    angle_coeff 211 harmonic 50.0 109.5
+    angle_coeff 212 harmonic 50.0 109.5
+    angle_coeff 213 harmonic 50.0 109.5
+    angle_coeff 214 harmonic 50.0 109.5
+    angle_coeff 215 harmonic 50.0 109.5
+    angle_coeff 216 harmonic 50.0 109.5
+    angle_coeff 217 harmonic 50.0 109.5
+    angle_coeff 218 harmonic 50.0 109.5
+    angle_coeff 219 harmonic 50.0 109.5
+    angle_coeff 220 harmonic 50.0 109.5
+    angle_coeff 221 harmonic 50.0 109.5
+    angle_coeff 222 harmonic 50.0 109.5
+    angle_coeff 223 harmonic 50.0 109.5
+    angle_coeff 224 harmonic 50.0 109.5
+    angle_coeff 225 harmonic 50.0 109.5
+    angle_coeff 226 harmonic 50.0 109.5
+    angle_coeff 227 harmonic 50.0 109.5
+    angle_coeff 228 harmonic 50.0 109.5
+    angle_coeff 229 harmonic 50.0 109.5
+    angle_coeff 230 harmonic 50.0 109.5
+    angle_coeff 231 harmonic 50.0 109.5
+    angle_coeff 232 harmonic 50.0 109.5
+    angle_coeff 233 harmonic 50.0 109.5
+    angle_coeff 234 harmonic 50.0 109.5
+    angle_coeff 235 harmonic 50.0 109.5
+    angle_coeff 236 harmonic 50.0 109.5
+    angle_coeff 237 harmonic 33.0 107.8
+    angle_coeff 238 harmonic 33.0 107.8
+    angle_coeff 239 harmonic 33.0 107.8
+    angle_coeff 240 harmonic 33.0 107.8
+    angle_coeff 241 harmonic 33.0 107.8
+    angle_coeff 242 harmonic 35.0 109.5
+    angle_coeff 243 harmonic 35.0 109.5
+    angle_coeff 244 harmonic 35.0 109.5
+    angle_coeff 245 harmonic 35.0 109.5
+    angle_coeff 246 harmonic 35.0 109.5
+    angle_coeff 247 harmonic 35.0 109.5
+    angle_coeff 248 harmonic 35.0 109.5
+    angle_coeff 249 harmonic 35.0 109.5
+    angle_coeff 250 harmonic 35.0 109.5
+    angle_coeff 251 harmonic 35.0 109.5
+    angle_coeff 252 harmonic 37.5 110.7
+    angle_coeff 253 harmonic 37.5 110.7
+    angle_coeff 254 harmonic 37.5 110.7
+    angle_coeff 255 harmonic 37.5 110.7
+    angle_coeff 256 harmonic 37.5 110.7
+    angle_coeff 257 harmonic 37.5 110.7
+    angle_coeff 258 harmonic 37.5 110.7
+    angle_coeff 259 harmonic 37.5 110.7
+    angle_coeff 260 harmonic 37.5 110.7
+    angle_coeff 261 harmonic 37.5 110.7
+    angle_coeff 262 harmonic 37.5 110.7
+    angle_coeff 263 harmonic 37.5 110.7
+    angle_coeff 264 harmonic 37.5 110.7
+    angle_coeff 265 harmonic 37.5 110.7
+    angle_coeff 266 harmonic 37.5 110.7
+    angle_coeff 267 harmonic 37.5 110.7
+    angle_coeff 268 harmonic 37.5 110.7
+    angle_coeff 269 harmonic 37.5 110.7
+    angle_coeff 270 harmonic 37.5 110.7
+    angle_coeff 271 harmonic 37.5 110.7
+    angle_coeff 272 harmonic 37.5 110.7
+    angle_coeff 273 harmonic 37.5 110.7
+    angle_coeff 274 harmonic 37.5 110.7
+    angle_coeff 275 harmonic 37.5 110.7
+    angle_coeff 276 harmonic 37.5 110.7
+    angle_coeff 277 harmonic 60.0 109.5
+    angle_coeff 278 harmonic 60.0 109.5
+    angle_coeff 279 harmonic 60.0 109.5
+    angle_coeff 280 harmonic 60.0 109.5
+    angle_coeff 281 harmonic 60.0 109.5
+    angle_coeff 282 harmonic 60.0 109.5
+    angle_coeff 283 harmonic 60.0 109.5
+    angle_coeff 284 harmonic 60.0 109.5
+    angle_coeff 285 harmonic 60.0 109.5
+    angle_coeff 286 harmonic 60.0 109.5
+    angle_coeff 287 harmonic 60.0 109.5
+    angle_coeff 288 harmonic 60.0 109.5
+    angle_coeff 289 harmonic 60.0 109.5
+    angle_coeff 290 harmonic 60.0 109.5
+    angle_coeff 291 harmonic 60.0 109.5
+    angle_coeff 292 harmonic 60.0 109.5
+    angle_coeff 293 harmonic 60.0 109.5
+    angle_coeff 294 harmonic 60.0 109.5
+    angle_coeff 295 harmonic 60.0 109.5
+    angle_coeff 296 harmonic 60.0 109.5
+    angle_coeff 297 harmonic 60.0 109.5
+    angle_coeff 298 harmonic 60.0 109.5
+    angle_coeff 299 harmonic 60.0 109.5
+    angle_coeff 300 harmonic 60.0 109.5
+    angle_coeff 301 harmonic 60.0 109.5
+    angle_coeff 302 harmonic 83.0 116.9
+    angle_coeff 303 harmonic 83.0 116.9
+    angle_coeff 304 harmonic 83.0 116.9
+    angle_coeff 305 harmonic 83.0 116.9
+    angle_coeff 306 harmonic 83.0 116.9
+    dihedral_coeff 1 opls 1.6 3.2 0.0 0.0
+    dihedral_coeff 2 opls 0.0 0.5 0.0 0.0
+    dihedral_coeff 3 opls 0.0 0.5 0.0 0.0
+    dihedral_coeff 4 opls 0.0 0.5 0.0 0.0
+    dihedral_coeff 5 opls 0.0 0.5 0.0 0.0
+    dihedral_coeff 6 opls 0.0 0.5 0.0 0.0
+    dihedral_coeff 7 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 8 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 9 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 10 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 11 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 12 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 13 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 14 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 15 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 16 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 17 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 18 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 19 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 20 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 21 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 22 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 23 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 24 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 25 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 26 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 27 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 28 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 29 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 30 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 31 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 32 opls 0.7 -1.5 0.0 0.0
+    dihedral_coeff 33 opls 0.8 -0.76 0.0 0.0
+    dihedral_coeff 34 opls 0.8 -0.76 0.0 0.0
+    dihedral_coeff 35 opls 0.8 -0.76 0.0 0.0
+    dihedral_coeff 36 opls 0.8 -0.76 0.0 0.0
+    dihedral_coeff 37 opls 0.8 -0.76 0.0 0.0
+    dihedral_coeff 38 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 39 opls 0.0 0.0 0.085 0.0
+    dihedral_coeff 40 opls 0.0 0.0 0.085 0.0
+    dihedral_coeff 41 opls 0.0 0.0 0.085 0.0
+    dihedral_coeff 42 opls 0.0 0.0 0.085 0.0
+    dihedral_coeff 43 opls 0.0 0.0 0.085 0.0
+    dihedral_coeff 44 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 45 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 46 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 47 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 48 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 49 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 50 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 51 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 52 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 53 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 54 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 55 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 56 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 57 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 58 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 59 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 60 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 61 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 62 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 63 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 64 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 65 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 66 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 67 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 68 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 69 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 70 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 71 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 72 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 73 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 74 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 75 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 76 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 77 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 78 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 79 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 80 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 81 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 82 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 83 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 84 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 85 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 86 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 87 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 88 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 89 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 90 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 91 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 92 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 93 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 94 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 95 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 96 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 97 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 98 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 99 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 100 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 101 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 102 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 103 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 104 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 105 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 106 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 107 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 108 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 109 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 110 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 111 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 112 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 113 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 114 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 115 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 116 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 117 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 118 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 119 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 120 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 121 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 122 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 123 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 124 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 125 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 126 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 127 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 128 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 129 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 130 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 131 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 132 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 133 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 134 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 135 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 136 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 137 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 138 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 139 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 140 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 141 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 142 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 143 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 144 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 145 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 146 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 147 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 148 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 149 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 150 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 151 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 152 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 153 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 154 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 155 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 156 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 157 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 158 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 159 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 160 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 161 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 162 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 163 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 164 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 165 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 166 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 167 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 168 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 169 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 170 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 171 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 172 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 173 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 174 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 175 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 176 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 177 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 178 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 179 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 180 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 181 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 182 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 183 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 184 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 185 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 186 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 187 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 188 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 189 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 190 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 191 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 192 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 193 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 194 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 195 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 196 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 197 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 198 opls 1.454 -0.144 -0.775 0.0
+    dihedral_coeff 199 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 200 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 201 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 202 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 203 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 204 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 205 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 206 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 207 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 208 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 209 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 210 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 211 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 212 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 213 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 214 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 215 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 216 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 217 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 218 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 219 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 220 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 221 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 222 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 223 opls 0.0 0.0 0.275 0.0
+    dihedral_coeff 224 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 225 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 226 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 227 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 228 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 229 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 230 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 231 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 232 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 233 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 234 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 235 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 236 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 237 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 238 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 239 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 240 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 241 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 242 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 243 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 244 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 245 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 246 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 247 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 248 opls 0.0 0.0 -0.553 0.0
+    dihedral_coeff 249 opls 0.0 0.0 0.132 0.0
+    dihedral_coeff 250 opls 0.0 0.0 0.132 0.0
+    dihedral_coeff 251 opls 0.0 0.0 0.132 0.0
+    dihedral_coeff 252 opls 0.0 0.0 0.132 0.0
+    dihedral_coeff 253 opls 0.0 0.0 0.132 0.0
+    dihedral_coeff 254 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 255 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 256 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 257 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 258 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 259 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 260 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 261 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 262 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 263 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 264 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 265 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 266 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 267 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 268 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 269 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 270 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 271 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 272 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 273 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 274 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 275 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 276 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 277 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 278 opls 0.0 0.0 0.0 0.0
+    dihedral_coeff 279 opls 0.0 0.0 0.36 0.0
+    dihedral_coeff 280 opls 0.0 0.0 0.36 0.0
+    dihedral_coeff 281 opls 0.0 0.0 0.36 0.0
+    dihedral_coeff 282 opls 0.0 0.0 0.36 0.0
+    dihedral_coeff 283 opls 0.0 0.0 0.36 0.0
+    dihedral_coeff 284 opls 0.0 5.124 0.0 0.0
+    dihedral_coeff 285 opls 0.0 5.124 0.0 0.0
+    dihedral_coeff 286 opls 0.0 5.124 0.0 0.0
+    dihedral_coeff 287 opls 0.0 5.124 0.0 0.0
+    dihedral_coeff 288 opls 0.0 5.124 0.0 0.0
+    dihedral_coeff 289 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 290 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 291 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 292 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 293 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 294 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 295 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 296 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 297 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 298 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 299 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 300 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 301 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 302 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 303 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 304 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 305 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 306 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 307 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 308 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 309 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 310 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 311 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 312 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 313 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 314 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 315 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 316 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 317 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 318 opls 4.669 5.124 0.0 0.0
+    dihedral_coeff 319 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 320 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 321 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 322 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 323 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 324 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 325 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 326 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 327 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 328 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 329 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 330 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 331 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 332 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 333 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 334 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 335 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 336 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 337 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 338 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 339 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 340 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 341 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 342 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 343 opls -4.344 -1.714 0.0 0.0
+    dihedral_coeff 344 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 345 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 346 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 347 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 348 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 349 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 350 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 351 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 352 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 353 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 354 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 355 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 356 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 357 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 358 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 359 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 360 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 361 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 362 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 363 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 364 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 365 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 366 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 367 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 368 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 369 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 370 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 371 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 372 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 373 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 374 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 375 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 376 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 377 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 378 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 379 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 380 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 381 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 382 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 383 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 384 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 385 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 386 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 387 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 388 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 389 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 390 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 391 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 392 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 393 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 394 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 395 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 396 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 397 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 398 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 399 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 400 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 401 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 402 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 403 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 404 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 405 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 406 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 407 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 408 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 409 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 410 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 411 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 412 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 413 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 414 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 415 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 416 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 417 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 418 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 419 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 420 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 421 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 422 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 423 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 424 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 425 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 426 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 427 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 428 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 429 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 430 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 431 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 432 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 433 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 434 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 435 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 436 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 437 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 438 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 439 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 440 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 441 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 442 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 443 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 444 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 445 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 446 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 447 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 448 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 449 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 450 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 451 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 452 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 453 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 454 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 455 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 456 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 457 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 458 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 459 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 460 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 461 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 462 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 463 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 464 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 465 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 466 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 467 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 468 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff 469 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 470 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 471 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 472 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 473 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 474 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 475 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 476 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 477 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 478 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 479 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 480 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 481 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 482 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 483 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 484 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 485 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 486 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 487 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 488 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 489 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 490 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 491 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 492 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 493 opls -0.55 0.0 1.0 0.0
+    dihedral_coeff 494 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 495 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 496 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 497 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 498 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 499 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 500 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 501 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 502 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 503 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 504 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 505 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 506 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 507 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 508 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 509 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 510 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 511 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 512 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 513 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 514 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 515 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 516 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 517 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 518 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 519 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 520 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 521 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 522 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 523 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 524 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 525 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 526 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 527 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 528 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 529 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 530 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 531 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 532 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 533 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 534 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 535 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 536 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 537 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 538 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 539 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 540 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 541 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 542 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 543 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 544 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 545 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 546 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 547 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 548 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 549 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 550 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 551 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 552 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 553 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 554 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 555 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 556 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 557 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 558 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 559 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 560 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 561 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 562 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 563 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 564 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 565 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 566 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 567 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 568 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 569 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 570 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 571 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 572 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 573 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 574 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 575 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 576 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 577 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 578 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 579 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 580 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 581 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 582 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 583 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 584 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 585 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 586 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 587 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 588 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 589 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 590 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 591 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 592 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 593 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 594 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 595 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 596 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 597 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 598 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 599 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 600 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 601 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 602 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 603 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 604 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 605 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 606 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 607 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 608 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 609 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 610 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 611 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 612 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 613 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 614 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 615 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 616 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 617 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 618 opls -2.06 -0.313 0.315 0.0
+    dihedral_coeff 619 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 620 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 621 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 622 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 623 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 624 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 625 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 626 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 627 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 628 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 629 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 630 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 631 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 632 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 633 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 634 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 635 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 636 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 637 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 638 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 639 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 640 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 641 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 642 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 643 opls 0.0 0.0 -0.1 0.0
+    dihedral_coeff 644 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 645 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 646 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 647 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 648 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 649 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 650 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 651 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 652 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 653 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 654 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 655 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 656 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 657 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 658 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 659 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 660 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 661 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 662 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 663 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 664 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 665 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 666 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 667 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 668 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 669 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 670 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 671 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 672 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 673 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 674 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 675 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 676 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 677 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 678 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 679 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 680 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 681 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 682 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 683 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 684 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 685 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 686 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 687 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 688 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 689 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 690 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 691 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 692 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 693 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 694 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 695 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 696 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 697 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 698 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 699 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 700 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 701 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 702 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 703 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 704 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 705 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 706 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 707 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 708 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 709 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 710 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 711 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 712 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 713 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 714 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 715 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 716 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 717 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 718 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 719 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 720 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 721 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 722 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 723 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 724 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 725 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 726 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 727 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 728 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 729 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 730 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 731 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 732 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 733 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 734 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 735 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 736 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 737 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 738 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 739 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 740 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 741 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 742 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 743 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 744 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 745 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 746 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 747 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 748 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 749 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 750 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 751 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 752 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 753 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 754 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 755 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 756 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 757 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 758 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 759 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 760 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 761 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 762 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 763 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 764 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 765 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 766 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 767 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 768 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 769 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 770 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 771 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 772 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 773 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 774 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 775 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 776 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 777 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 778 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 779 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 780 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 781 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 782 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 783 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 784 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 785 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 786 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 787 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 788 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 789 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 790 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 791 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 792 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 793 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 794 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 795 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 796 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 797 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 798 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 799 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 800 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 801 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 802 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 803 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 804 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 805 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 806 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 807 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 808 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 809 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 810 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 811 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 812 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 813 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 814 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 815 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 816 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 817 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 818 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 819 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 820 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 821 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 822 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 823 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 824 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 825 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 826 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 827 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 828 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 829 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 830 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 831 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 832 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 833 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 834 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 835 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 836 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 837 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 838 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 839 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 840 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 841 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 842 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 843 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 844 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 845 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 846 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 847 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 848 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 849 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 850 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 851 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 852 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 853 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 854 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 855 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 856 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 857 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 858 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 859 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 860 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 861 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 862 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 863 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 864 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 865 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 866 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 867 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 868 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 869 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 870 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 871 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 872 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 873 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 874 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 875 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 876 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 877 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 878 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 879 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 880 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 881 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 882 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 883 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 884 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 885 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 886 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 887 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 888 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 889 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 890 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 891 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 892 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 893 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 894 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 895 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 896 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 897 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 898 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 899 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 900 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 901 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 902 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 903 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 904 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 905 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 906 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 907 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 908 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 909 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 910 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 911 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 912 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 913 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 914 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 915 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 916 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 917 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 918 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 919 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 920 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 921 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 922 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 923 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 924 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 925 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 926 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 927 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 928 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 929 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 930 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 931 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 932 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 933 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 934 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 935 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 936 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 937 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 938 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 939 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 940 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 941 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 942 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 943 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 944 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 945 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 946 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 947 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 948 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 949 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 950 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 951 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 952 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 953 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 954 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 955 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 956 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 957 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 958 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 959 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 960 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 961 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 962 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 963 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 964 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 965 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 966 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 967 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 968 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 969 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 970 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 971 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 972 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 973 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 974 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 975 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 976 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 977 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 978 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 979 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 980 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 981 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 982 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 983 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 984 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 985 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 986 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 987 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 988 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 989 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 990 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 991 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 992 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 993 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 994 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 995 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 996 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 997 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 998 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 999 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1000 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1001 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1002 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1003 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1004 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1005 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1006 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1007 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1008 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1009 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1010 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1011 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1012 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1013 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1014 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1015 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1016 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1017 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1018 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1019 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1020 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1021 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1022 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1023 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1024 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1025 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1026 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1027 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1028 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1029 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1030 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1031 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1032 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1033 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1034 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1035 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1036 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1037 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1038 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1039 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1040 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1041 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1042 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1043 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1044 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1045 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1046 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1047 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1048 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1049 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1050 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1051 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1052 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1053 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1054 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1055 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1056 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1057 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1058 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1059 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1060 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1061 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1062 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1063 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1064 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1065 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1066 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1067 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1068 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1069 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1070 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1071 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1072 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1073 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1074 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1075 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1076 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1077 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1078 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1079 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1080 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1081 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1082 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1083 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1084 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1085 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1086 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1087 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1088 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1089 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1090 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1091 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1092 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1093 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1094 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1095 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1096 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1097 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1098 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1099 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1100 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1101 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1102 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1103 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1104 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1105 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1106 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1107 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1108 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1109 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1110 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1111 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1112 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1113 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1114 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1115 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1116 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1117 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1118 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1119 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1120 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1121 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1122 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1123 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1124 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1125 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1126 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1127 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1128 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1129 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1130 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1131 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1132 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1133 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1134 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1135 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1136 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1137 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1138 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1139 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1140 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1141 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1142 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1143 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1144 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1145 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1146 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1147 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1148 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1149 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1150 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1151 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1152 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1153 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1154 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1155 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1156 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1157 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1158 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1159 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1160 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1161 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1162 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1163 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1164 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1165 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1166 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1167 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1168 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1169 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1170 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1171 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1172 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1173 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1174 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1175 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1176 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1177 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1178 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1179 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1180 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1181 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1182 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1183 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1184 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1185 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1186 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1187 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1188 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1189 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1190 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1191 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1192 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1193 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1194 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1195 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1196 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1197 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1198 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1199 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1200 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1201 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1202 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1203 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1204 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1205 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1206 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1207 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1208 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1209 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1210 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1211 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1212 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1213 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1214 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1215 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1216 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1217 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1218 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1219 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1220 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1221 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1222 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1223 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1224 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1225 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1226 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1227 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1228 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1229 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1230 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1231 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1232 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1233 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1234 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1235 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1236 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1237 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1238 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1239 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1240 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1241 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1242 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1243 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1244 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1245 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1246 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1247 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1248 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1249 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1250 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1251 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1252 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1253 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1254 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1255 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1256 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1257 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1258 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1259 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1260 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1261 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1262 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1263 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1264 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1265 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1266 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1267 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1268 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1269 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1270 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1271 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1272 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1273 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1274 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1275 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1276 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1277 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1278 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1279 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1280 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1281 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1282 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1283 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1284 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1285 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1286 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1287 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1288 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1289 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1290 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1291 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1292 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1293 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1294 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1295 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1296 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1297 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1298 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1299 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1300 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1301 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1302 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1303 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1304 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1305 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1306 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1307 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1308 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1309 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1310 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1311 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1312 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1313 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1314 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1315 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1316 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1317 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1318 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1319 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1320 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1321 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1322 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1323 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1324 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1325 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1326 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1327 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1328 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1329 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1330 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1331 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1332 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1333 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1334 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1335 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1336 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1337 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1338 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1339 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1340 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1341 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1342 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1343 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1344 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1345 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1346 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1347 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1348 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1349 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1350 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1351 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1352 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1353 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1354 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1355 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1356 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1357 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1358 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1359 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1360 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1361 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1362 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1363 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1364 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1365 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1366 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1367 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1368 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1369 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1370 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1371 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1372 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1373 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1374 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1375 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1376 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1377 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1378 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1379 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1380 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1381 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1382 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1383 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1384 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1385 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1386 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1387 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1388 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1389 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1390 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1391 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1392 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1393 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1394 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1395 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1396 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1397 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1398 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1399 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1400 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1401 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1402 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1403 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1404 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1405 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1406 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1407 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1408 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1409 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1410 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1411 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1412 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1413 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1414 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1415 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1416 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1417 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1418 opls -0.55 0.0 0.0 0.0
+    dihedral_coeff 1419 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1420 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1421 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1422 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1423 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1424 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1425 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1426 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1427 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1428 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1429 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1430 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1431 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1432 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1433 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1434 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1435 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1436 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1437 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1438 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1439 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1440 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1441 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1442 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1443 opls 0.0 0.0 0.468 0.0
+    dihedral_coeff 1444 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1445 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1446 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1447 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1448 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1449 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1450 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1451 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1452 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1453 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1454 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1455 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1456 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1457 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1458 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1459 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1460 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1461 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1462 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1463 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1464 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1465 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1466 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1467 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1468 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff 1469 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1470 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1471 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1472 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1473 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1474 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1475 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1476 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1477 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1478 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1479 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1480 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1481 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1482 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1483 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1484 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1485 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1486 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1487 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1488 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1489 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1490 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1491 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1492 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1493 opls -0.521 -2.018 1.996 0.0
+    dihedral_coeff 1494 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1495 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1496 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1497 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1498 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1499 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1500 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1501 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1502 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1503 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1504 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1505 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1506 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1507 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1508 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1509 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1510 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1511 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1512 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1513 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1514 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1515 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1516 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1517 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1518 opls -1.22 -0.126 0.422 0.0
+    dihedral_coeff 1519 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1520 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1521 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1522 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1523 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1524 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1525 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1526 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1527 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1528 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1529 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1530 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1531 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1532 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1533 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1534 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1535 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1536 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1537 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1538 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1539 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1540 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1541 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1542 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1543 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1544 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1545 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1546 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1547 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1548 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1549 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1550 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1551 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1552 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1553 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1554 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1555 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1556 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1557 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1558 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1559 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1560 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1561 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1562 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1563 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1564 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1565 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1566 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1567 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1568 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1569 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1570 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1571 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1572 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1573 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1574 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1575 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1576 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1577 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1578 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1579 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1580 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1581 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1582 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1583 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1584 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1585 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1586 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1587 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1588 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1589 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1590 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1591 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1592 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1593 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1594 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1595 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1596 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1597 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1598 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1599 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1600 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1601 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1602 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1603 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1604 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1605 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1606 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1607 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1608 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1609 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1610 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1611 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1612 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1613 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1614 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1615 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1616 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1617 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1618 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1619 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1620 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1621 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1622 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1623 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1624 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1625 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1626 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1627 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1628 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1629 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1630 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1631 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1632 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1633 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1634 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1635 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1636 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1637 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1638 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1639 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1640 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1641 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1642 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1643 opls 0.65 -0.25 0.67 0.0
+    dihedral_coeff 1644 opls 0.0 0.0 0.198 0.0
+    dihedral_coeff 1645 opls 0.0 0.0 0.198 0.0
+    dihedral_coeff 1646 opls 0.0 0.0 0.198 0.0
+    dihedral_coeff 1647 opls 0.0 0.0 0.198 0.0
+    dihedral_coeff 1648 opls 0.0 0.0 0.198 0.0
+    dihedral_coeff 1649 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1650 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1651 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1652 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1653 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1654 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1655 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1656 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1657 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1658 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1659 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1660 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1661 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1662 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1663 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1664 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1665 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1666 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1667 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1668 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1669 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1670 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1671 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1672 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1673 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1674 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1675 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1676 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1677 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1678 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1679 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1680 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1681 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1682 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1683 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1684 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1685 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1686 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1687 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1688 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1689 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1690 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1691 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1692 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1693 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1694 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1695 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1696 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1697 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1698 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1699 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1700 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1701 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1702 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1703 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1704 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1705 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1706 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1707 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1708 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1709 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1710 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1711 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1712 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1713 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1714 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1715 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1716 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1717 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1718 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1719 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1720 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1721 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1722 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1723 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1724 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1725 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1726 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1727 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1728 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1729 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1730 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1731 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1732 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1733 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1734 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1735 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1736 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1737 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1738 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1739 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1740 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1741 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1742 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1743 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1744 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1745 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1746 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1747 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1748 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1749 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1750 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1751 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1752 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1753 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1754 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1755 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1756 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1757 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1758 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1759 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1760 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1761 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1762 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1763 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1764 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1765 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1766 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1767 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1768 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1769 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1770 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1771 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1772 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff 1773 opls 1.3 -0.05 0.2 0.0
+    improper_coeff 1 harmonic 10.5 180 
+

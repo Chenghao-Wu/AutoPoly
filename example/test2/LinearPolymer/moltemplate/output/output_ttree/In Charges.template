@@ -1,0 +1,9 @@
+    set type @/atom:OPLSAA/80 charge -0.18
+    set type @/atom:OPLSAA/81 charge -0.12
+    set type @/atom:OPLSAA/82 charge -0.06
+    set type @/atom:OPLSAA/84 charge 0.0
+    set type @/atom:OPLSAA/85 charge 0.06
+    set type @/atom:OPLSAA/406 charge 0.51
+    set type @/atom:OPLSAA/407 charge -0.43
+    set type @/atom:OPLSAA/408 charge -0.33
+    set type @/atom:OPLSAA/409 charge 0.16

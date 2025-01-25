@@ -1,0 +1,114 @@
+import "oplsaa.lt"
+import "PMMAle_T1.lt"
+import "PMMAi_T1.lt"
+import "PMMAi.lt"
+import "PMMAre.lt"
+
+poly_5 inherits OPLSAA {
+
+    create_var {$mol}
+
+    monomer0 = new PMMAle_T1
+    monomer1 = new PMMAi_T1.rot(90.0,1,0,0).move(3.5304,0,0)
+    monomer2 = new PMMAi.rot(0.0,1,0,0).move(7.0573,0,0)
+    monomer3 = new PMMAi.rot(90.0,1,0,0).move(10.5842,0,0)
+    monomer4 = new PMMAi.rot(0.0,1,0,0).move(14.1110,0,0)
+    monomer5 = new PMMAi_T1.rot(90.0,1,0,0).move(17.6379,0,0)
+    monomer6 = new PMMAi_T1.rot(0.0,1,0,0).move(21.1648,0,0)
+    monomer7 = new PMMAi_T1.rot(90.0,1,0,0).move(24.6917,0,0)
+    monomer8 = new PMMAi.rot(0.0,1,0,0).move(28.2185,0,0)
+    monomer9 = new PMMAi.rot(90.0,1,0,0).move(31.7454,0,0)
+    monomer10 = new PMMAi_T1.rot(0.0,1,0,0).move(35.2723,0,0)
+    monomer11 = new PMMAi_T1.rot(90.0,1,0,0).move(38.7991,0,0)
+    monomer12 = new PMMAi_T1.rot(0.0,1,0,0).move(42.3260,0,0)
+    monomer13 = new PMMAi.rot(90.0,1,0,0).move(45.8529,0,0)
+    monomer14 = new PMMAi_T1.rot(0.0,1,0,0).move(49.3798,0,0)
+    monomer15 = new PMMAi_T1.rot(90.0,1,0,0).move(52.9066,0,0)
+    monomer16 = new PMMAi_T1.rot(0.0,1,0,0).move(56.4335,0,0)
+    monomer17 = new PMMAi.rot(90.0,1,0,0).move(59.9604,0,0)
+    monomer18 = new PMMAi.rot(0.0,1,0,0).move(63.4873,0,0)
+    monomer19 = new PMMAi.rot(90.0,1,0,0).move(67.0141,0,0)
+    monomer20 = new PMMAi_T1.rot(0.0,1,0,0).move(70.5410,0,0)
+    monomer21 = new PMMAi_T1.rot(90.0,1,0,0).move(74.0679,0,0)
+    monomer22 = new PMMAi.rot(0.0,1,0,0).move(77.5947,0,0)
+    monomer23 = new PMMAi.rot(90.0,1,0,0).move(81.1216,0,0)
+    monomer24 = new PMMAi.rot(0.0,1,0,0).move(84.6485,0,0)
+    monomer25 = new PMMAi_T1.rot(90.0,1,0,0).move(88.1754,0,0)
+    monomer26 = new PMMAi.rot(0.0,1,0,0).move(91.7022,0,0)
+    monomer27 = new PMMAi_T1.rot(90.0,1,0,0).move(95.2291,0,0)
+    monomer28 = new PMMAi_T1.rot(0.0,1,0,0).move(98.7560,0,0)
+    monomer29 = new PMMAi.rot(90.0,1,0,0).move(102.2828,0,0)
+    monomer30 = new PMMAi.rot(0.0,1,0,0).move(105.8097,0,0)
+    monomer31 = new PMMAi_T1.rot(90.0,1,0,0).move(109.3366,0,0)
+    monomer32 = new PMMAi_T1.rot(0.0,1,0,0).move(112.8635,0,0)
+    monomer33 = new PMMAi.rot(90.0,1,0,0).move(116.3903,0,0)
+    monomer34 = new PMMAi.rot(0.0,1,0,0).move(119.9172,0,0)
+    monomer35 = new PMMAi_T1.rot(90.0,1,0,0).move(123.4441,0,0)
+    monomer36 = new PMMAi_T1.rot(0.0,1,0,0).move(126.9709,0,0)
+    monomer37 = new PMMAi.rot(90.0,1,0,0).move(130.4978,0,0)
+    monomer38 = new PMMAi.rot(0.0,1,0,0).move(134.0247,0,0)
+    monomer39 = new PMMAi_T1.rot(90.0,1,0,0).move(137.5516,0,0)
+    monomer40 = new PMMAi_T1.rot(0.0,1,0,0).move(141.0784,0,0)
+    monomer41 = new PMMAi_T1.rot(90.0,1,0,0).move(144.6053,0,0)
+    monomer42 = new PMMAi_T1.rot(0.0,1,0,0).move(148.1322,0,0)
+    monomer43 = new PMMAi.rot(90.0,1,0,0).move(151.6591,0,0)
+    monomer44 = new PMMAi.rot(0.0,1,0,0).move(155.1859,0,0)
+    monomer45 = new PMMAi_T1.rot(90.0,1,0,0).move(158.7128,0,0)
+    monomer46 = new PMMAi.rot(0.0,1,0,0).move(162.2397,0,0)
+    monomer47 = new PMMAi.rot(90.0,1,0,0).move(165.7665,0,0)
+    monomer48 = new PMMAi.rot(0.0,1,0,0).move(169.2934,0,0)
+    monomer49 = new PMMAre.rot(90.0,1,0,0).move(172.8203,0,0)
+
+    write("Data Bond List") {
+      $bond:b1  $atom:monomer0/C2  $atom:monomer1/C1
+      $bond:b2  $atom:monomer1/C2  $atom:monomer2/C1
+      $bond:b3  $atom:monomer2/C2  $atom:monomer3/C1
+      $bond:b4  $atom:monomer3/C2  $atom:monomer4/C1
+      $bond:b5  $atom:monomer4/C2  $atom:monomer5/C1
+      $bond:b6  $atom:monomer5/C2  $atom:monomer6/C1
+      $bond:b7  $atom:monomer6/C2  $atom:monomer7/C1
+      $bond:b8  $atom:monomer7/C2  $atom:monomer8/C1
+      $bond:b9  $atom:monomer8/C2  $atom:monomer9/C1
+      $bond:b10  $atom:monomer9/C2  $atom:monomer10/C1
+      $bond:b11  $atom:monomer10/C2  $atom:monomer11/C1
+      $bond:b12  $atom:monomer11/C2  $atom:monomer12/C1
+      $bond:b13  $atom:monomer12/C2  $atom:monomer13/C1
+      $bond:b14  $atom:monomer13/C2  $atom:monomer14/C1
+      $bond:b15  $atom:monomer14/C2  $atom:monomer15/C1
+      $bond:b16  $atom:monomer15/C2  $atom:monomer16/C1
+      $bond:b17  $atom:monomer16/C2  $atom:monomer17/C1
+      $bond:b18  $atom:monomer17/C2  $atom:monomer18/C1
+      $bond:b19  $atom:monomer18/C2  $atom:monomer19/C1
+      $bond:b20  $atom:monomer19/C2  $atom:monomer20/C1
+      $bond:b21  $atom:monomer20/C2  $atom:monomer21/C1
+      $bond:b22  $atom:monomer21/C2  $atom:monomer22/C1
+      $bond:b23  $atom:monomer22/C2  $atom:monomer23/C1
+      $bond:b24  $atom:monomer23/C2  $atom:monomer24/C1
+      $bond:b25  $atom:monomer24/C2  $atom:monomer25/C1
+      $bond:b26  $atom:monomer25/C2  $atom:monomer26/C1
+      $bond:b27  $atom:monomer26/C2  $atom:monomer27/C1
+      $bond:b28  $atom:monomer27/C2  $atom:monomer28/C1
+      $bond:b29  $atom:monomer28/C2  $atom:monomer29/C1
+      $bond:b30  $atom:monomer29/C2  $atom:monomer30/C1
+      $bond:b31  $atom:monomer30/C2  $atom:monomer31/C1
+      $bond:b32  $atom:monomer31/C2  $atom:monomer32/C1
+      $bond:b33  $atom:monomer32/C2  $atom:monomer33/C1
+      $bond:b34  $atom:monomer33/C2  $atom:monomer34/C1
+      $bond:b35  $atom:monomer34/C2  $atom:monomer35/C1
+      $bond:b36  $atom:monomer35/C2  $atom:monomer36/C1
+      $bond:b37  $atom:monomer36/C2  $atom:monomer37/C1
+      $bond:b38  $atom:monomer37/C2  $atom:monomer38/C1
+      $bond:b39  $atom:monomer38/C2  $atom:monomer39/C1
+      $bond:b40  $atom:monomer39/C2  $atom:monomer40/C1
+      $bond:b41  $atom:monomer40/C2  $atom:monomer41/C1
+      $bond:b42  $atom:monomer41/C2  $atom:monomer42/C1
+      $bond:b43  $atom:monomer42/C2  $atom:monomer43/C1
+      $bond:b44  $atom:monomer43/C2  $atom:monomer44/C1
+      $bond:b45  $atom:monomer44/C2  $atom:monomer45/C1
+      $bond:b46  $atom:monomer45/C2  $atom:monomer46/C1
+      $bond:b47  $atom:monomer46/C2  $atom:monomer47/C1
+      $bond:b48  $atom:monomer47/C2  $atom:monomer48/C1
+      $bond:b49  $atom:monomer48/C2  $atom:monomer49/C1
+    }
+
+} # poly_5
