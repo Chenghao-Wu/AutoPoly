@@ -15,7 +15,7 @@ system.made_folder = True
 
 # Create a ring polymer with 10 PMMA monomers
 # Note: Using just "PMMA" as the base name - the code will append the necessary suffixes
-ring_polymer = AutoPoly.Polymer(ChainNum=10, Sequence=["PMMA"]*50, topology="ring")
+ring_polymer = AutoPoly.Polymer(ChainNum=10, Sequence=["PMMA"]*10, topology="ring")
 
 # Polymerization with ring topology
 poly = AutoPoly.Polymerization(name="RingPolymer", system=system, model=[ring_polymer], run=True)

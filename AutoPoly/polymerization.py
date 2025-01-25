@@ -317,12 +317,10 @@ class Polymerization(object):
         with open(output, "w") as write_f:
             write_f.write("import \"oplsaa.lt\"\n")
 
-            # Import unique monomers - ensure each monomer has .lt extension
-            unique_monomers = list(dict.fromkeys([
-                f"{m}.lt" if not m.endswith('.lt') else m for m in monomer_set
-            ]))
-            for monomer in unique_monomers:
-                write_f.write(f"import \"{monomer}\"\n")
+
+            unique_monomers=list(dict.fromkeys(monomerSet))
+            for monomerii in range(len(unique_monomers)):
+                write_f.write("import \""+unique_monomers[monomerii]+".lt"+"\"\n")
 
             write_f.write("\n")
 
@@ -330,54 +328,25 @@ class Polymerization(object):
             write_f.write(f"poly_{poly_index+1} inherits OPLSAA {{\n\n")
             write_f.write("    create_var {$mol}\n\n")
 
-            # Check if this is a ring polymer
-            is_ring = hasattr(model, 'topology') and model.topology == "ring"
+            monomerSet_copy=monomerSet
+            offset_cum=0
+            for indexii in range(len(monomerSet)):
+                # erase .lt from name string
+                #del monomerSet_copy[-3:]
+                # pack monomers along x-axis and rotate accordingly (1,0,0)
+                write_f.write("    "+"monomer["+str(indexii)+"] = new "+monomerSet[indexii])
+                if indexii>0:
+                    write_f.write(".rot(" +str(self.rotate*(indexii%2))+",1,0,0)"+".move("+"{:.4f}".format(offset_cum)+",0,0)")
+                write_f.write("\n")
+                # evaluate offset distance based on C1-C2 of the pre-mer
 
-            if is_ring:
-                # Ring polymer arrangement
-                radius = self.offset * len(monomer_set) / (2 * np.pi)
-                
-                for i in range(len(monomer_set)):
-                    angle = 2 * np.pi * i / len(monomer_set)
-                    x = radius * np.cos(angle)
-                    y = radius * np.sin(angle)
-                    rotation_angle = (angle * 180 / np.pi) + 90
-                    
-                    monomer_name = monomer_set[i]
-                    if not monomer_name.endswith('.lt'):
-                        monomer_name += '.lt'
-                    monomer_name = monomer_name[:-3]  # Remove .lt for the instance name
-                    
-                    write_f.write(f"    monomer{i} = new {monomer_name}")
-                    write_f.write(f".rot({rotation_angle},0,0,1)")
-                    write_f.write(f".move({x:.4f},{y:.4f},0)\n")
-            else:
-                # Linear polymer arrangement
-                offset_cum = 0
-                for i in range(len(monomer_set)):
-                    monomer_name = monomer_set[i]
-                    if not monomer_name.endswith('.lt'):
-                        monomer_name += '.lt'
-                    monomer_name = monomer_name[:-3]  # Remove .lt for the instance name
-                    
-                    write_f.write(f"    monomer{i} = new {monomer_name}")
-                    if i > 0:
-                        write_f.write(f".rot({self.rotate*(i%2)},1,0,0).move({offset_cum:.4f},0,0)")
-                    write_f.write("\n")
-                    self.evaluate_offset(monomer_name + ".lt")
-                    offset_cum += self.offset
-
-            # Add bonds between monomers
-            write_f.write("\n    write(\"Data Bond List\") {\n")
-            
-            # Connect sequential monomers
-            for i in range(len(monomer_set)-1):
-                write_f.write(f"      $bond:b{i+1}  $atom:monomer{i}/C2  $atom:monomer{i+1}/C1\n")
-            
-            # For ring polymers, connect last monomer to first
-            if is_ring:
-                write_f.write(f"      $bond:b{len(monomer_set)}  $atom:monomer{len(monomer_set)-1}/C2  $atom:monomer0/C1\n")
-            
+                self.evaluate_offset(monomerSet[indexii]+".lt")
+                offset_cum+=self.offset
+                #print(offset_cum)
+            # add a list of bonds connecting propagating carbons
+            write_f.write("\n    write('Data Bond List') {\n")
+            for indexii in range(len(monomerSet)-1):
+                write_f.write("      "+"$bond:b"+str(indexii+1)+"  "+"$atom:monomer["+str(indexii)+"]/C2"+"  "+"$atom:monomer["+str(indexii+1)+"]/C1"+"  "+"\n")
             write_f.write("    }\n")
             write_f.write(f"\n}} # poly_{poly_index+1}\n")
 
