@@ -7,8 +7,12 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem import ChemicalFeatures
 
-# Path to feature definition file (adjust if needed)
-FDEF = str('/gpfs/work/che/zhenghaowu/AutoPoly/AutoPoly/extern/rdlt_data/opls_lt.fdefn')
+# Get path to opls_lt.fdefn using AutoPoly package
+import AutoPoly
+FDEF = str(pathlib.Path(AutoPoly.__file__).parent / 'extern' / 'rdlt_data' / 'opls_lt.fdefn')
+
+if not os.path.exists(FDEF):
+    raise FileNotFoundError(f"Could not find opls_lt.fdefn at {FDEF}. Please ensure the file exists in the correct location.")
 
 
 def parse_cml(filename):

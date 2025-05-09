@@ -1,0 +1,31 @@
+import "oplsaa.lt"
+
+PLAle inherits OPLSAA {
+
+    # atom-id mol-id atom-type charge X Y Z # comments
+
+   write("Data Atoms") {
+        $atom:C1  $mol:...  @atom:219  0.00  0.000000  0.000000  0.000000  # C
+        $atom:O2  $mol:...  @atom:96  0.00  2.365838  -0.000000  0.000000  # O
+        $atom:C3  $mol:...  @atom:100  0.00  1.247208  -0.521252  0.653197  # C
+        $atom:C4  $mol:...  @atom:80  0.00  1.298141  -2.046494  0.606909  # C
+        $atom:H5  $mol:...  @atom:224  0.00  1.262565  -0.193195  1.714737  # H
+        $atom:H6  $mol:...  @atom:85  0.00  0.422848  -2.476498  1.139512  # H
+        $atom:H7  $mol:...  @atom:85  0.00  2.224253  -2.407303  1.102772  # H
+        $atom:H8  $mol:...  @atom:85  0.00  1.294257  -2.404291  -0.445349  # H
+        $atom:O9  $mol:...  @atom:220  0.00  -0.211924  1.201363  -0.041738  # O
+        $atom:H10  $mol:...  @atom:221  0.00  -0.725603  -0.680064  -0.436695  # H
+    }
+
+    write("Data Bond List") {
+        $bond:1  $atom:C1  $atom:C3  # order:1
+        $bond:2  $atom:C3  $atom:O2  # order:1
+        $bond:3  $atom:C3  $atom:C4  # order:1
+        $bond:4  $atom:C3  $atom:H5  # order:1
+        $bond:5  $atom:C4  $atom:H6  # order:1
+        $bond:6  $atom:C4  $atom:H7  # order:1
+        $bond:7  $atom:C4  $atom:H8  # order:1
+        $bond:8  $atom:C1  $atom:O9  # order:2
+        $bond:9  $atom:C1  $atom:H10  # order:1
+    }
+}
