@@ -16,7 +16,7 @@ from .system import logger
 
 class Polymerization(object):
     def __init__(self, name: str = None, system: object = None, model: list = None,
-                 run: bool = True, path_monomer_bank: str = None) -> None:
+                 run: bool = True, path_monomer_bank: str = None,is_lopls=False) -> None:
         """Initializes the Polymerization class.
 
         Args:
@@ -31,10 +31,16 @@ class Polymerization(object):
         self.path_cwd = f"{self.system.get_FolderPath}/{self.name}/moltemplate/"
         self.path_master = f"{Path(__file__).parent.resolve()}/extern/"
         self.path_moltemplatesrc = f"{self.path_master}moltemplate/src/"
-        self.path_oplsaaprm = f"{self.path_master}moltemplate/oplsaa.prm"
+        
         self.path_monomer_bank = (self.path_master + "Monomer_bank/"
                                   if path_monomer_bank is None else path_monomer_bank)
+        self.is_lopls=is_lopls
+        if is_lopls:
+            self.path_oplsaaprm = f"{self.path_master}moltemplate/loplsaa.prm"
+        else:
+            self.path_oplsaaprm = f"{self.path_master}moltemplate/oplsaa.prm"
 
+        logger.info(f"\n'you are now using parameter set of {self.path_oplsaaprm}\n")
         self.model = model
         self.rotate = 90.0
         self.offset_spacing = 2.0
@@ -42,6 +48,9 @@ class Polymerization(object):
         self.packingL_spacing = 5.0
         self.moltemplate_box_size = 400.0
 
+        self.FFmodify_alkylDihedral = np.array([0.6446926386, -0.2143420172, 0.1782194073, 0.0]) #Kj/mol -> kcal/mol
+
+        
         # Create working directory before proceeding
         self.create_working_directory()
         
@@ -128,7 +137,64 @@ class Polymerization(object):
             sys.exit()
 
         return n_monomer_atoms
+
+    def read_lt_end_atoms(self,lt_file):
+        """Read the first and second atoms from a .lt file.
+        
+        Args:
+            lt_file (str): Path to the .lt file
+            
+        Returns:
+            tuple: (first_atom, second_atom) where each atom is a dict with:
+                - element: atom element symbol
+                - atom_type: OPLS atom type
+                - x, y, z: coordinates
+        """
+        first_atom = None
+        second_atom = None
+        in_atoms_block = False
+        
+        with open(lt_file, 'r') as f:
+            for line in f:
+                line = line.strip()
+                
+                if line == 'write("Data Atoms") {':
+                    in_atoms_block = True
+                    continue
+                elif line == '}':
+                    in_atoms_block = False
+                    continue
                     
+                if in_atoms_block and line:
+                    # Parse atom line: $atom:atom_id $mol:... atom_type charge x y z # element
+                    parts = line.split()
+                    if len(parts) >= 7:  # Ensure we have all required fields
+                        atom_type = parts[2]
+                        x = float(parts[4])
+                        y = float(parts[5])
+                        z = float(parts[6])
+                        element = parts[-1]  # Last field after #
+                        
+                        atom_data = {
+                            'element': element,
+                            'atom_type': atom_type,
+                            'x': x,
+                            'y': y,
+                            'z': z
+                        }
+                        
+                        if first_atom is None:
+                            first_atom = atom_data['element']
+                        elif second_atom is None:
+                            second_atom = atom_data['element']
+                            break  # We have both atoms, no need to continue
+        
+        if first_atom is None or second_atom is None:
+            raise ValueError(f"Could not find both end atoms in {lt_file}")
+            
+        return first_atom+"1", second_atom+"2"
+    
+
     def make_lmp_data_file_by_moltemplate(self) -> None:
         """Generates the LAMMPS data file using Moltemplate."""
         try:
@@ -174,6 +240,10 @@ class Polymerization(object):
             # make system.lt file
             logger.info("Creating system.lt")
             self.make_system_lt()
+
+            # Modify alkyl dihedral coefficients if needed
+            if self.is_lopls:
+                self.FFmodify_alkyl_dihedral_oplsaa()
 
             # invoke moltemplate to generate LAMMPS datafile
             logger.info("Running moltemplate")
@@ -448,7 +518,14 @@ class Polymerization(object):
                 write_f.write("\n    write('Data Bond List') {\n")
                 for i in range(n_monomers):
                     next_i = (i + 1) % n_monomers  # Wrap around to 0 for last monomer
-                    write_f.write(f"      $bond:b{i+1}  $atom:monomer[{i}]/C2  $atom:monomer[{next_i}]/C1\n")
+                    monomer_name_1 = monomer_set[i][:-3] if monomer_set[i].endswith('.lt') else monomer_set[i]
+                    monomer_name_2 = monomer_set[next_i][:-3] if monomer_set[next_i].endswith('.lt') else monomer_set[next_i]
+                    monomer_bank = Path(self.path_monomer_bank)
+                    merltfile_path_1 = monomer_bank / f"{monomer_name_1}.lt"
+                    _, second_atom = self.read_lt_end_atoms(merltfile_path_1)
+                    merltfile_path_2 = monomer_bank / f"{monomer_name_2}.lt"
+                    first_atom, _ = self.read_lt_end_atoms(merltfile_path_2)
+                    write_f.write(f"      $bond:b{i+1}  $atom:monomer[{i}]/{second_atom}  $atom:monomer[{next_i}]/{first_atom}\n")
                 write_f.write("    }\n")
 
             else:
@@ -468,7 +545,15 @@ class Polymerization(object):
                 # Add bonds for linear polymer
                 write_f.write("\n    write('Data Bond List') {\n")
                 for indexii in range(len(monomer_set)-1):
-                    write_f.write(f"      $bond:b{indexii+1}  $atom:monomer[{indexii}]/C2  $atom:monomer[{indexii+1}]/C1\n")
+
+                    monomer_name_1 = monomer_set[indexii][:-3] if monomer_set[indexii].endswith('.lt') else monomer_set[indexii]
+                    monomer_name_2 = monomer_set[indexii+1][:-3] if monomer_set[indexii+1].endswith('.lt') else monomer_set[indexii+1]
+                    monomer_bank = Path(self.path_monomer_bank)
+                    merltfile_path_1 = monomer_bank / f"{monomer_name_1}.lt"
+                    _, second_atom = self.read_lt_end_atoms(merltfile_path_1)
+                    merltfile_path_2 = monomer_bank / f"{monomer_name_2}.lt"
+                    first_atom, _ = self.read_lt_end_atoms(merltfile_path_2)
+                    write_f.write(f"      $bond:b{indexii+1}  $atom:monomer[{indexii}]/{second_atom}  $atom:monomer[{indexii+1}]/{first_atom}\n")
                 write_f.write("    }\n")
 
             write_f.write(f"\n}} # poly_{poly_index+1}\n")
@@ -525,6 +610,105 @@ class Polymerization(object):
             
         except Exception as e:
             logger.error(f"Error in make_oplsaalt: {str(e)}")
+            sys.exit(1)
+
+    def FFmodify_alkyl_dihedral_oplsaa(self) -> None:
+        """Modifies alkyl dihedral coefficients in the OPLSAA force field."""
+        input_file = Path(self.path_cwd) / "oplsaa.lt"
+        output_file = Path(self.path_cwd) / "oplsaa_tmp.lt"
+
+        try:
+            if not input_file.exists():
+                logger.error("oplsaa.lt file cannot open.")
+                sys.exit(1)
+            logger.info(f"Start modifying alkyl dihedral coefficients")
+            with open(input_file, 'r') as read_f, open(output_file, 'w') as write_f:
+                is_inside_block = False
+                
+                for line in read_f:
+                    line = line.strip()
+                    
+                    if not is_inside_block:
+                        write_f.write(f"{line}\n")
+                    
+                    words = line.split()
+                    if not words:
+                        continue
+                    
+                    
+                    if words[0] == 'write_once("In':
+                        next_line = next(read_f).strip()
+                        next_words = next_line.split()
+                        
+                        if next_words and next_words[0] == "dihedral_coeff":
+                            is_inside_block = True
+                            string_strip=next_line.strip()
+                            if not string_strip.startswith('dihedral_coeff @dihedral:'):
+                                write_f.write(f"{next_line}\n")
+                                continue
+                                
+                            # Extract atom types from dihedral specification
+                            dihedral_spec = next_line.split("@dihedral:")[1].split()[0]
+                            atom_types = [int(x) for x in dihedral_spec.split('-')]
+
+                            # Check if all atoms are CH3(80), CH2(81), or CH(82)
+                            alkyl_atoms = {80, 81, 82}  # CH3, CH2, CH atoms
+                            if all(atom in alkyl_atoms for atom in atom_types):
+                                # Write modified dihedral coefficients
+                                write_f.write("dihedral_coeff @dihedral:")
+                                write_f.write('-'.join(str(x) for x in atom_types))
+                                write_f.write(" opls")
+                                
+                                # Write new dihedral coefficients
+                                # Note: FFmodify_alkylDihedral should be defined as a class attribute
+                                if hasattr(self, 'FFmodify_alkylDihedral'):
+                                    write_f.write(" " + " ".join(str(x) for x in self.FFmodify_alkylDihedral))
+                                write_f.write("\n")
+                            else:
+                                write_f.write(f"{next_line}\n")
+                            continue
+                        else:
+                            write_f.write(f"{next_line}\n")
+                    
+                    elif words[0] == "}":
+                        if is_inside_block:
+                            
+                            write_f.write(f"{line}\n")
+                        is_inside_block = False
+                    
+                    if is_inside_block:
+                        # Parse dihedral specification
+                        string_strip=line.strip()
+                        if not string_strip.startswith('dihedral_coeff @dihedral:'):
+                            
+                            write_f.write(f"{line}\n")
+                            continue
+                            
+                        # Extract atom types from dihedral specification
+                        dihedral_spec = line.split("@dihedral:")[1].split()[0]
+                        atom_types = [int(x) for x in dihedral_spec.split('-')]
+
+                        # Check if all atoms are CH3(80), CH2(81), or CH(82)
+                        alkyl_atoms = {80, 81, 82}  # CH3, CH2, CH atoms
+                        if all(atom in alkyl_atoms for atom in atom_types):
+                            # Write modified dihedral coefficients
+                            write_f.write("dihedral_coeff @dihedral:")
+                            write_f.write('-'.join(str(x) for x in atom_types))
+                            write_f.write(" opls")
+                            
+                            # Write new dihedral coefficients
+                            # Note: FFmodify_alkylDihedral should be defined as a class attribute
+                            if hasattr(self, 'FFmodify_alkylDihedral'):
+                                write_f.write(" " + " ".join(str(x) for x in self.FFmodify_alkylDihedral))
+                            write_f.write("\n")
+                        else:
+                            write_f.write(f"{line}\n")
+
+            # Replace original file with modified version
+            shutil.move(str(output_file), str(input_file))
+
+        except Exception as e:
+            logger.error(f"Error modifying alkyl dihedral coefficients: {str(e)}")
             sys.exit(1)
 
     def make_oplsaa_subset(self) -> None:

@@ -113,6 +113,8 @@ class Polymer(object):
                         self.sequenceSet.append(merSet)
                         self.sequenceName.append(merSet_)
                 elif self.tacticity == 'isotactic':
+                    chosenTac =".lt"
+                    chosenTac_name=''
                     if self.SequnceLen>1:
                         for merii in range(self.SequnceLen):
                             if merii==0:

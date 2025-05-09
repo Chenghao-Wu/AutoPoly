@@ -1,24 +1,41 @@
-import "oplsaa.lt"
-
+import "oplsaa.lt"    # <-- defines the standard "OPLSAA" force field
 PEAAi inherits OPLSAA {
 
-    # atom-id mol-id atom-type charge X Y Z # comments
+# atom-id  mol-id  atom-type charge      X         Y        Z
 
-   write("Data Atoms") {
-        $atom:C1  $mol:...  @atom:81  0.00  0.000000  0.000000  0.000000  # C
-        $atom:C2  $mol:...  @atom:81  0.00  1.515775  0.000000  0.000000  # C
-        $atom:H3  $mol:...  @atom:85  0.00  -0.373982  -0.955011  -0.424212  # H
-        $atom:H4  $mol:...  @atom:85  0.00  -0.373982  0.844439  -0.615568  # H
-        $atom:H5  $mol:...  @atom:85  0.00  1.889757  -0.844439  0.615568  # H
-        $atom:H6  $mol:...  @atom:85  0.00  1.889757  0.955011  0.424212  # H
-    }
+  write("Data Atoms") {
+	$atom:C1 $mol:... @atom:80 0.00   -0.760   -0.007   -0.051
+	$atom:C2 $mol:... @atom:80 0.00    0.743   -0.034    0.003
+	$atom:H3 $mol:... @atom:85 0.00   -1.131   -0.183    0.986
+	$atom:H4 $mol:... @atom:85 0.00   -1.073    1.019   -0.324
+	$atom:H5 $mol:... @atom:85 0.00   -1.201   -0.789   -0.683
+	$atom:H6 $mol:... @atom:85 0.00    1.054    0.902    0.547
+	$atom:H7 $mol:... @atom:85 0.00    1.219    0.022   -0.987
+	$atom:H8 $mol:... @atom:85 0.00    1.149   -0.931    0.508
+  }
 
-    
-    write("Data Bond List") {
-        $bond:1  $atom:C1  $atom:C2  # order:1
-        $bond:2  $atom:C1  $atom:H3  # order:1
-        $bond:3  $atom:C1  $atom:H4  # order:1
-        $bond:4  $atom:C2  $atom:H5  # order:1
-        $bond:5  $atom:C2  $atom:H6  # order:1
-    }
-}
+  write('Data Bond List') {
+
+	$bond:C1C2	$atom:C1	$atom:C2
+	$bond:C1H3	$atom:C1	$atom:H3
+	$bond:C1H4	$atom:C1	$atom:H4
+	$bond:C1H5	$atom:C1	$atom:H5
+	$bond:C2H6	$atom:C2	$atom:H6
+	$bond:C2H7	$atom:C2	$atom:H7
+	$bond:C2H8	$atom:C2	$atom:H8
+  }
+} # PEAAi
+
+# Note: You don't need to supply the partial partial charges of the atoms.
+#       If you like, just fill the fourth column with zeros ("0.000").
+#       Moltemplate and LAMMPS will automatically assign the charge later
+# Given the current charge dictionary, the atoms will have the following charges:
+# Atom 0 is type @atom:80 with charge -0.18
+# Atom 1 is type @atom:80 with charge -0.18
+# Atom 2 is type @atom:85 with charge 0.06
+# Atom 3 is type @atom:85 with charge 0.06
+# Atom 4 is type @atom:85 with charge 0.06
+# Atom 5 is type @atom:85 with charge 0.06
+# Atom 6 is type @atom:85 with charge 0.06
+# Atom 7 is type @atom:85 with charge 0.06
+# The sum of the atomic charges is: 0.00

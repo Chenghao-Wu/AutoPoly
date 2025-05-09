@@ -5,6 +5,7 @@ AutoPoly/__init__.py
 AutoPoly/bead_spring.py
 AutoPoly/conf.py
 AutoPoly/logger.py
+AutoPoly/monomer.py
 AutoPoly/polymer.py
 AutoPoly/polymerization.py
 AutoPoly/system.py
@@ -39,6 +40,12 @@ AutoPoly/extern/Monomer_bank/PIle.lt
 AutoPoly/extern/Monomer_bank/PIle_T1.lt
 AutoPoly/extern/Monomer_bank/PIre.lt
 AutoPoly/extern/Monomer_bank/PIre_T1.lt
+AutoPoly/extern/Monomer_bank/PLAi.lt
+AutoPoly/extern/Monomer_bank/PLAi_T1.lt
+AutoPoly/extern/Monomer_bank/PLAle.lt
+AutoPoly/extern/Monomer_bank/PLAle_T1.lt
+AutoPoly/extern/Monomer_bank/PLAre.lt
+AutoPoly/extern/Monomer_bank/PLAre_T1.lt
 AutoPoly/extern/Monomer_bank/PMMAi.lt
 AutoPoly/extern/Monomer_bank/PMMAi_T1.lt
 AutoPoly/extern/Monomer_bank/PMMAle.lt
@@ -87,6 +94,7 @@ AutoPoly/extern/__pycache__/rdlt.cpython-37.pyc
 AutoPoly/extern/__pycache__/rdlt.cpython-38.pyc
 AutoPoly/extern/moltemplate/LICENSE.TXT
 AutoPoly/extern/moltemplate/README.TXT
+AutoPoly/extern/moltemplate/loplsaa.prm
 AutoPoly/extern/moltemplate/moltemplate_manual.pdf
 AutoPoly/extern/moltemplate/oplsaa.prm
 AutoPoly/extern/moltemplate/common/gaff.lt
