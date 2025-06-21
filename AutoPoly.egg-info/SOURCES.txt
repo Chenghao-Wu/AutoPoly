@@ -5,7 +5,6 @@ AutoPoly/__init__.py
 AutoPoly/bead_spring.py
 AutoPoly/conf.py
 AutoPoly/logger.py
-AutoPoly/monomer.py
 AutoPoly/polymer.py
 AutoPoly/polymerization.py
 AutoPoly/system.py

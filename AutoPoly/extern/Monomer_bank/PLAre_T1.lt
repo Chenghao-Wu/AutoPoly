@@ -5,7 +5,7 @@ PLAre_T1 inherits OPLSAA {
     # atom-id mol-id atom-type charge X Y Z # comments
 
    write("Data Atoms") {
-        $atom:C1  $mol:...  @atom:219  0.00  0.000000  0.000000  0.000000  # C
+        $atom:C1  $mol:...  @atom:406  0.00  0.000000  0.000000  0.000000  # C
         $atom:O2  $mol:...  @atom:96  0.00  2.357841  0.000000  -0.000000  # O
         $atom:C3  $mol:...  @atom:100  0.00  1.242156  -0.807399  -0.262603  # C
         $atom:C4  $mol:...  @atom:80  0.00  1.309992  -2.080143  0.589083  # C
@@ -13,7 +13,7 @@ PLAre_T1 inherits OPLSAA {
         $atom:H6  $mol:...  @atom:85  0.00  1.326958  -1.823892  1.670226  # H
         $atom:H7  $mol:...  @atom:85  0.00  0.433246  -2.730115  0.381283  # H
         $atom:H8  $mol:...  @atom:85  0.00  2.232240  -2.648484  0.344154  # H
-        $atom:O9  $mol:...  @atom:220  0.00  -0.838915  -0.341765  0.819662  # O
+        $atom:O9  $mol:...  @atom:407  0.00  -0.838915  -0.341765  0.819662  # O
         $atom:H10  $mol:...  @atom:97  0.00  3.125577  -0.403922  -0.483385  # H
     }
 

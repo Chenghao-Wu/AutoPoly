@@ -10,7 +10,7 @@ import os
 from pathlib import Path
 import subprocess
 import shutil
-
+import re
 import numpy as np
 from .system import logger
 
@@ -138,6 +138,25 @@ class Polymerization(object):
 
         return n_monomer_atoms
 
+    def extract_element_from_atom(self,atom_string):
+        """
+        Extract element name from atom identifier string.
+        
+        Args:
+            atom_string (str): Atom identifier like "$atom:C1", "$atom:H16", etc.
+        
+        Returns:
+            str: Element name (e.g., "C", "H", "Si", "Fe")
+            None: If no match found
+        """
+        pattern = r'\$atom:([A-Z][a-z]?)\d*'
+        match = re.search(pattern, atom_string)
+        
+        if match:
+            return match.group(1)  # Return the captured element name
+        else:
+            return None
+
     def read_lt_end_atoms(self,lt_file):
         """Read the first and second atoms from a .lt file.
         
@@ -173,8 +192,9 @@ class Polymerization(object):
                         x = float(parts[4])
                         y = float(parts[5])
                         z = float(parts[6])
-                        element = parts[-1]  # Last field after #
-                        
+                        #print(atom_type)
+                        element = self.extract_element_from_atom(parts[0])  # Last field after #
+                        #print(element)
                         atom_data = {
                             'element': element,
                             'atom_type': atom_type,
