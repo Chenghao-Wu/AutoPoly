@@ -39,33 +39,100 @@ import numpy as np
 class CMLToLTConverterTacticity:
     """Convert CML files to LT files for polymer monomers with tacticity support."""
     
-    def __init__(self, opls_fdef_path: Optional[str] = None, lopls_fdef_path: Optional[str] = None):
+    def __init__(self, opls_fdef_path: Optional[str] = None, lopls_fdef_path: Optional[str] = None,
+                 atom_type_mapping: Optional[Dict] = None):
         """
         Initialize the converter.
         
         Args:
             opls_fdef_path: Path to OPLS feature definition file
             lopls_fdef_path: Path to LOPLS feature definition file
+            atom_type_mapping: Custom atom type mapping dictionary
         """
         self.opls_fdef_path = opls_fdef_path
         self.lopls_fdef_path = lopls_fdef_path
         
-        # Atom type mapping for polymer monomers
-        self.atom_type_mapping = {
-            'internal': {'C1': '@atom:81', 'C2': '@atom:82'},  # CH2, CH2
-            'left': {'C1': '@atom:80', 'C2': '@atom:82'},      # CH3, CH2
-            'right': {'C1': '@atom:81', 'C2': '@atom:81'}      # CH2, CH2
+        # Default atom type mapping for polymer monomers
+        default_atom_type_mapping = {
+            'internal': {'atom1': '@atom:81', 'atom2': '@atom:82'},  # CH2, CH2
+            'left': {'atom1': '@atom:80', 'atom2': '@atom:82'},      # CH3, CH2
+            'right': {'atom1': '@atom:81', 'atom2': '@atom:81'}      # CH2, CH2
         }
+        
+        # Use custom mapping if provided, otherwise use default
+        if atom_type_mapping is not None:
+            # Validate custom mapping
+            self.validate_atom_type_mapping(atom_type_mapping)
+            self.atom_type_mapping = atom_type_mapping
+        else:
+            self.atom_type_mapping = default_atom_type_mapping
         
         # Tacticity options
         self.tacticity_options = ['atactic', 'isotactic', 'syndiotactic']
         
         # Stereochemical transformation matrix for T1 variant (180° rotation around backbone)
         self.t1_transformation = np.array([
-            [1, 0, 0],  # Flip x coordinates
+            [-1, 0, 0],  # Flip x coordinates
             [0, -1, 0],  # Flip y coordinates  
             [0, 0, 1]    # Keep z coordinates
         ])
+    
+    def validate_atom_type_mapping(self, atom_type_mapping: Dict) -> None:
+        """
+        Validate the provided atom type mapping.
+        
+        Args:
+            atom_type_mapping: Dictionary containing atom type mappings
+            
+        Raises:
+            ValueError: If the mapping is invalid
+        """
+        required_keys = ['internal', 'left', 'right']
+        
+        # Check if all required monomer types are present
+        for key in required_keys:
+            if key not in atom_type_mapping:
+                raise ValueError(f"Missing required monomer type '{key}' in atom_type_mapping")
+            
+            # Check that each monomer type has at least 2 atoms defined
+            atoms = atom_type_mapping[key]
+            if not isinstance(atoms, dict) or len(atoms) < 2:
+                raise ValueError(f"Monomer type '{key}' must have at least 2 atoms defined")
+            
+            # Validate atom type format for all atoms
+            for atom_name, atom_type in atoms.items():
+                if not isinstance(atom_type, str) or not atom_type.startswith('@atom:'):
+                    raise ValueError(f"Invalid atom type format '{atom_type}' for {key}.{atom_name}. Must start with '@atom:'")
+    
+    def set_atom_type_mapping(self, atom_type_mapping: Dict) -> None:
+        """
+        Set custom atom type mapping after initialization.
+        
+        Args:
+            atom_type_mapping: Dictionary containing atom type mappings
+        """
+        self.validate_atom_type_mapping(atom_type_mapping)
+        self.atom_type_mapping = atom_type_mapping
+    
+    def get_atom_type_mapping(self) -> Dict:
+        """
+        Get the current atom type mapping.
+        
+        Returns:
+            Dictionary containing current atom type mappings
+        """
+        return self.atom_type_mapping.copy()
+    
+    def print_atom_type_mapping(self) -> None:
+        """Print the current atom type mapping in a readable format."""
+        print("Current Atom Type Mapping:")
+        print("=" * 50)
+        for monomer_type, atoms in self.atom_type_mapping.items():
+            print(f"{monomer_type.upper()} monomer:")
+            # Sort atoms by name for consistent output
+            for atom_name in sorted(atoms.keys()):
+                print(f"  {atom_name}: {atoms[atom_name]}")
+            print()
     
     def parse_cml_file(self, cml_file_path: str) -> Tuple[List[Dict], List[Dict], Dict]:
         """
@@ -218,15 +285,15 @@ class CMLToLTConverterTacticity:
         
         return m
     
-    def identify_connection_carbons(self, mol: Chem.Mol) -> Tuple[int, int]:
+    def identify_connection_carbons(self, mol: Chem.Mol) -> List[int]:
         """
-        Identify the two carbons that will serve as connection points.
+        Identify all carbon atoms that will serve as connection points.
         
         Args:
             mol: RDKit molecule
             
         Returns:
-            Tuple of (c1_idx, c2_idx) - indices of connection carbons
+            List of indices of connection carbon atoms
         """
         carbon_atoms = []
         for atom in mol.GetAtoms():
@@ -238,17 +305,16 @@ class CMLToLTConverterTacticity:
         
         # Sort by atom index for consistent ordering
         carbon_atoms.sort()
-        return carbon_atoms[0], carbon_atoms[1]
+        return carbon_atoms
     
-    def assign_atom_types(self, mol: Chem.Mol, monomer_type: str, c1_idx: int, c2_idx: int) -> Chem.Mol:
+    def assign_atom_types(self, mol: Chem.Mol, monomer_type: str, connection_indices: List[int]) -> Chem.Mol:
         """
         Assign atom types based on monomer variant.
         
         Args:
             mol: RDKit molecule
             monomer_type: 'internal', 'left', or 'right'
-            c1_idx: Index of first connection carbon
-            c2_idx: Index of second connection carbon
+            connection_indices: List of indices of connection atoms (backbone atoms)
             
         Returns:
             Molecule with updated atom types
@@ -263,13 +329,24 @@ class CMLToLTConverterTacticity:
                 for atom_id in feature.GetAtomIds():
                     mol.GetAtomWithIdx(atom_id).SetProp('AtomType', feature.GetType())
         
-        # Override connection carbons based on monomer type
+        # Override connection atoms based on monomer type
         if monomer_type not in self.atom_type_mapping:
             raise ValueError(f"Unknown monomer_type: {monomer_type}")
         
         type_map = self.atom_type_mapping[monomer_type]
-        mol.GetAtomWithIdx(c1_idx).SetProp('AtomType', type_map['C1'])
-        mol.GetAtomWithIdx(c2_idx).SetProp('AtomType', type_map['C2'])
+        
+        # Get the atom names from the type map (sorted for consistent ordering)
+        atom_names = sorted(type_map.keys())
+        
+        # Assign types to connection atoms
+        for i, atom_idx in enumerate(connection_indices):
+            if i < len(atom_names):
+                atom_name = atom_names[i]
+                mol.GetAtomWithIdx(atom_idx).SetProp('AtomType', type_map[atom_name])
+            else:
+                # If we have more connection atoms than defined types, use the last defined type
+                last_atom_name = atom_names[-1]
+                mol.GetAtomWithIdx(atom_idx).SetProp('AtomType', type_map[last_atom_name])
         
         # Assign default types to other atoms if not already assigned
         for atom in mol.GetAtoms():
@@ -398,10 +475,10 @@ class CMLToLTConverterTacticity:
         mol = self.build_rdkit_molecule(atoms, bonds, atom_id_map)
         
         # Identify connection carbons
-        c1_idx, c2_idx = self.identify_connection_carbons(mol)
+        connection_carbons = self.identify_connection_carbons(mol)
         
         # Assign atom types
-        mol = self.assign_atom_types(mol, monomer_type, c1_idx, c2_idx)
+        mol = self.assign_atom_types(mol, monomer_type, connection_carbons)
         
         # Generate LT file
         return self.generate_lt_file(mol, monomer_name, output_file, loplsflag)
@@ -500,24 +577,117 @@ class CMLToLTConverterTacticity:
         return generated_files
 
 
+def parse_atom_type_mapping(mapping_string: str) -> Dict:
+    """
+    Parse atom type mapping from command line string.
+    
+    Expected format: "internal:atom1@atom:81,atom2@atom:82;left:atom1@atom:80,atom2@atom:82;right:atom1@atom:81,atom2@atom:81"
+    Atom names can be any identifier (e.g., C1, C2, Si1, Si2, etc.)
+    
+    Args:
+        mapping_string: String containing atom type mapping
+        
+    Returns:
+        Dictionary containing parsed atom type mapping
+        
+    Raises:
+        ValueError: If the mapping string format is invalid
+    """
+    atom_type_mapping = {}
+    
+    try:
+        # Split by monomer types
+        monomer_types = mapping_string.split(';')
+        
+        for monomer_type_str in monomer_types:
+            if not monomer_type_str.strip():
+                continue
+            # DEBUG: print the string being parsed
+            # print(f"Parsing monomer_type_str: '{monomer_type_str}'")
+            # Split monomer type and atoms (only at the first colon)
+            parts = monomer_type_str.split(':', 1)
+            if len(parts) != 2:
+                raise ValueError(f"Invalid format in '{monomer_type_str}'. Expected 'type:atom1@atom:XX,atom2@atom:XX'")
+            monomer_type = parts[0].strip()
+            atoms_str = parts[1].strip()
+            # Parse atoms
+            atoms = {}
+            atom_pairs = atoms_str.split(',')
+            for atom_pair in atom_pairs:
+                if not atom_pair.strip():
+                    continue
+                if '@' not in atom_pair:
+                    raise ValueError(f"Invalid atom format in '{atom_pair}'. Expected 'atomname@atom:XX'")
+                atom_name, atom_type = atom_pair.split('@', 1)
+                atom_name = atom_name.strip()
+                atom_type = f"@{atom_type.strip()}"
+                atoms[atom_name] = atom_type
+            atom_type_mapping[monomer_type] = atoms
+    
+    except Exception as e:
+        raise ValueError(f"Error parsing atom type mapping: {str(e)}")
+    
+    return atom_type_mapping
+
+
 def main():
     """Main function for command-line usage."""
     parser = argparse.ArgumentParser(description='Convert CML files to LT files for polymer monomers with tacticity support')
-    parser.add_argument('--internal', '-i', required=True, help='Internal monomer CML file (e.g., *i.cml)')
-    parser.add_argument('--left', '-l', required=True, help='Left-end monomer CML file (e.g., *l.cml)')
-    parser.add_argument('--right', '-r', required=True, help='Right-end monomer CML file (e.g., *r.cml)')
-    parser.add_argument('--base-name', '-b', required=True, help='Base name for the monomer (e.g., PE, PS)')
+    parser.add_argument('--internal', '-i', help='Internal monomer CML file (e.g., *i.cml)')
+    parser.add_argument('--left', '-l', help='Left-end monomer CML file (e.g., *l.cml)')
+    parser.add_argument('--right', '-r', help='Right-end monomer CML file (e.g., *r.cml)')
+    parser.add_argument('--base-name', '-b', help='Base name for the monomer (e.g., PE, PS)')
     parser.add_argument('--output-dir', '-o', default='.', help='Output directory for LT files')
     parser.add_argument('--tacticity', '-t', choices=['atactic', 'isotactic', 'syndiotactic'], 
-                       default='syndiotactic', help='Polymer tacticity')
+                       default='atactic', help='Polymer tacticity')
     parser.add_argument('--opls-fdef', help='Path to OPLS feature definition file')
     parser.add_argument('--lopls-fdef', help='Path to LOPLS feature definition file')
     parser.add_argument('--lopls', action='store_true', help='Use LOPLS atom typing')
+    parser.add_argument('--atom-type-mapping', '-m', help='Custom atom type mapping. Format: "internal:atom1@atom:81,atom2@atom:82;left:atom1@atom:80,atom2@atom:82;right:atom1@atom:81,atom2@atom:81" (atom names can be any identifier)')
+    parser.add_argument('--show-mapping', action='store_true', help='Show current atom type mapping and exit')
     
     args = parser.parse_args()
     
+    # Show mapping if requested (no other arguments needed)
+    if args.show_mapping:
+        # Parse custom atom type mapping if provided
+        atom_type_mapping = None
+        if args.atom_type_mapping:
+            try:
+                atom_type_mapping = parse_atom_type_mapping(args.atom_type_mapping)
+                print("Using custom atom type mapping:")
+                for monomer_type, atoms in atom_type_mapping.items():
+                    atom_list = [f"{name}={atom_type}" for name, atom_type in sorted(atoms.items())]
+                    print(f"  {monomer_type}: {', '.join(atom_list)}")
+                print()
+            except ValueError as e:
+                print(f"Error: {e}")
+                sys.exit(1)
+        
+        converter = CMLToLTConverterTacticity(atom_type_mapping=atom_type_mapping)
+        converter.print_atom_type_mapping()
+        sys.exit(0)
+    
+    # Check required arguments for normal operation
+    if not all([args.internal, args.left, args.right, args.base_name]):
+        parser.error("--internal, --left, --right, and --base-name are required for conversion (unless using --show-mapping)")
+    
+    # Parse custom atom type mapping if provided
+    atom_type_mapping = None
+    if args.atom_type_mapping:
+        try:
+            atom_type_mapping = parse_atom_type_mapping(args.atom_type_mapping)
+            print("Using custom atom type mapping:")
+            for monomer_type, atoms in atom_type_mapping.items():
+                atom_list = [f"{name}={atom_type}" for name, atom_type in sorted(atoms.items())]
+                print(f"  {monomer_type}: {', '.join(atom_list)}")
+            print()
+        except ValueError as e:
+            print(f"Error: {e}")
+            sys.exit(1)
+    
     # Set up converter
-    converter = CMLToLTConverterTacticity(args.opls_fdef, args.lopls_fdef)
+    converter = CMLToLTConverterTacticity(args.opls_fdef, args.lopls_fdef, atom_type_mapping)
     
     # Define CML files
     cml_files = {
