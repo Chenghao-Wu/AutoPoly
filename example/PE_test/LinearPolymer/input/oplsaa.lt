@@ -1,0 +1,449 @@
+# NOTE: This file was created automatically using:
+#       oplsaa_moltemplate.py "/gpfs/work/che/zhenghaowu/AutoPoly/example/PE_test/LinearPolymer/moltemplate/oplsaa_subset.prm"
+
+
+OPLSAA {
+
+  write_once("Data Masses"){
+    @atom:80 12.011 #CT "Alkane CH3-" 6 partial charge=-0.18
+    @atom:81 12.011 #CT "Alkane -CH2-" 6 partial charge=-0.12
+    @atom:82 12.011 #CT "Alkane >CH-" 6 partial charge=-0.06
+    @atom:85 1.008 #HC "Alkane H-C" 1 partial charge=0.06
+  } #(end of atom masses)
+
+  write_once("In Settings"){
+    pair_coeff @atom:80 @atom:80 lj/cut/coul/long 0.066 3.5
+    pair_coeff @atom:81 @atom:81 lj/cut/coul/long 0.066 3.5
+    pair_coeff @atom:82 @atom:82 lj/cut/coul/long 0.066 3.5
+    pair_coeff @atom:85 @atom:85 lj/cut/coul/long 0.03 2.5
+  } #(end of pair coeffs)
+
+  write_once("In Charges"){
+    set type @atom:80 charge -0.18
+    set type @atom:81 charge -0.12
+    set type @atom:82 charge -0.06
+    set type @atom:85 charge 0.06
+  } #(end of atom charges)
+
+  write_once("In Settings") {
+    bond_coeff @bond:80-80 harmonic 268.0 1.529
+    bond_coeff @bond:80-81 harmonic 268.0 1.529
+    bond_coeff @bond:80-82 harmonic 268.0 1.529
+    bond_coeff @bond:81-80 harmonic 268.0 1.529
+    bond_coeff @bond:81-81 harmonic 268.0 1.529
+    bond_coeff @bond:81-82 harmonic 268.0 1.529
+    bond_coeff @bond:82-80 harmonic 268.0 1.529
+    bond_coeff @bond:82-81 harmonic 268.0 1.529
+    bond_coeff @bond:82-82 harmonic 268.0 1.529
+    bond_coeff @bond:80-85 harmonic 340.0 1.09
+    bond_coeff @bond:81-85 harmonic 340.0 1.09
+    bond_coeff @bond:82-85 harmonic 340.0 1.09
+  } #(end of bond_coeffs)
+
+  write_once("Data Bonds By Type") {
+    @bond:80-80 @atom:80 @atom:80
+    @bond:80-81 @atom:80 @atom:81
+    @bond:80-82 @atom:80 @atom:82
+    @bond:81-80 @atom:81 @atom:80
+    @bond:81-81 @atom:81 @atom:81
+    @bond:81-82 @atom:81 @atom:82
+    @bond:82-80 @atom:82 @atom:80
+    @bond:82-81 @atom:82 @atom:81
+    @bond:82-82 @atom:82 @atom:82
+    @bond:80-85 @atom:80 @atom:85
+    @bond:81-85 @atom:81 @atom:85
+    @bond:82-85 @atom:82 @atom:85
+  } #(end of bonds by type)
+
+  write_once("Data Angles By Type"){
+    @angle:80-80-80 @atom:80 @atom:80 @atom:80
+    @angle:80-80-81 @atom:80 @atom:80 @atom:81
+    @angle:80-80-82 @atom:80 @atom:80 @atom:82
+    @angle:80-81-80 @atom:80 @atom:81 @atom:80
+    @angle:80-81-81 @atom:80 @atom:81 @atom:81
+    @angle:80-81-82 @atom:80 @atom:81 @atom:82
+    @angle:80-82-80 @atom:80 @atom:82 @atom:80
+    @angle:80-82-81 @atom:80 @atom:82 @atom:81
+    @angle:80-82-82 @atom:80 @atom:82 @atom:82
+    @angle:81-80-80 @atom:81 @atom:80 @atom:80
+    @angle:81-80-81 @atom:81 @atom:80 @atom:81
+    @angle:81-80-82 @atom:81 @atom:80 @atom:82
+    @angle:81-81-80 @atom:81 @atom:81 @atom:80
+    @angle:81-81-81 @atom:81 @atom:81 @atom:81
+    @angle:81-81-82 @atom:81 @atom:81 @atom:82
+    @angle:81-82-80 @atom:81 @atom:82 @atom:80
+    @angle:81-82-81 @atom:81 @atom:82 @atom:81
+    @angle:81-82-82 @atom:81 @atom:82 @atom:82
+    @angle:82-80-80 @atom:82 @atom:80 @atom:80
+    @angle:82-80-81 @atom:82 @atom:80 @atom:81
+    @angle:82-80-82 @atom:82 @atom:80 @atom:82
+    @angle:82-81-80 @atom:82 @atom:81 @atom:80
+    @angle:82-81-81 @atom:82 @atom:81 @atom:81
+    @angle:82-81-82 @atom:82 @atom:81 @atom:82
+    @angle:82-82-80 @atom:82 @atom:82 @atom:80
+    @angle:82-82-81 @atom:82 @atom:82 @atom:81
+    @angle:82-82-82 @atom:82 @atom:82 @atom:82
+    @angle:85-80-85 @atom:85 @atom:80 @atom:85
+    @angle:85-81-85 @atom:85 @atom:81 @atom:85
+    @angle:85-82-85 @atom:85 @atom:82 @atom:85
+    @angle:80-80-85 @atom:80 @atom:80 @atom:85
+    @angle:80-81-85 @atom:80 @atom:81 @atom:85
+    @angle:80-82-85 @atom:80 @atom:82 @atom:85
+    @angle:81-80-85 @atom:81 @atom:80 @atom:85
+    @angle:81-81-85 @atom:81 @atom:81 @atom:85
+    @angle:81-82-85 @atom:81 @atom:82 @atom:85
+    @angle:82-80-85 @atom:82 @atom:80 @atom:85
+    @angle:82-81-85 @atom:82 @atom:81 @atom:85
+    @angle:82-82-85 @atom:82 @atom:82 @atom:85
+  } #(end of angles by type)
+
+  write_once("In Settings" ){
+    angle_coeff @angle:80-80-80 harmonic 58.35 112.7
+    angle_coeff @angle:80-80-81 harmonic 58.35 112.7
+    angle_coeff @angle:80-80-82 harmonic 58.35 112.7
+    angle_coeff @angle:80-81-80 harmonic 58.35 112.7
+    angle_coeff @angle:80-81-81 harmonic 58.35 112.7
+    angle_coeff @angle:80-81-82 harmonic 58.35 112.7
+    angle_coeff @angle:80-82-80 harmonic 58.35 112.7
+    angle_coeff @angle:80-82-81 harmonic 58.35 112.7
+    angle_coeff @angle:80-82-82 harmonic 58.35 112.7
+    angle_coeff @angle:81-80-80 harmonic 58.35 112.7
+    angle_coeff @angle:81-80-81 harmonic 58.35 112.7
+    angle_coeff @angle:81-80-82 harmonic 58.35 112.7
+    angle_coeff @angle:81-81-80 harmonic 58.35 112.7
+    angle_coeff @angle:81-81-81 harmonic 58.35 112.7
+    angle_coeff @angle:81-81-82 harmonic 58.35 112.7
+    angle_coeff @angle:81-82-80 harmonic 58.35 112.7
+    angle_coeff @angle:81-82-81 harmonic 58.35 112.7
+    angle_coeff @angle:81-82-82 harmonic 58.35 112.7
+    angle_coeff @angle:82-80-80 harmonic 58.35 112.7
+    angle_coeff @angle:82-80-81 harmonic 58.35 112.7
+    angle_coeff @angle:82-80-82 harmonic 58.35 112.7
+    angle_coeff @angle:82-81-80 harmonic 58.35 112.7
+    angle_coeff @angle:82-81-81 harmonic 58.35 112.7
+    angle_coeff @angle:82-81-82 harmonic 58.35 112.7
+    angle_coeff @angle:82-82-80 harmonic 58.35 112.7
+    angle_coeff @angle:82-82-81 harmonic 58.35 112.7
+    angle_coeff @angle:82-82-82 harmonic 58.35 112.7
+    angle_coeff @angle:85-80-85 harmonic 33.0 107.8
+    angle_coeff @angle:85-81-85 harmonic 33.0 107.8
+    angle_coeff @angle:85-82-85 harmonic 33.0 107.8
+    angle_coeff @angle:80-80-85 harmonic 37.5 110.7
+    angle_coeff @angle:80-81-85 harmonic 37.5 110.7
+    angle_coeff @angle:80-82-85 harmonic 37.5 110.7
+    angle_coeff @angle:81-80-85 harmonic 37.5 110.7
+    angle_coeff @angle:81-81-85 harmonic 37.5 110.7
+    angle_coeff @angle:81-82-85 harmonic 37.5 110.7
+    angle_coeff @angle:82-80-85 harmonic 37.5 110.7
+    angle_coeff @angle:82-81-85 harmonic 37.5 110.7
+    angle_coeff @angle:82-82-85 harmonic 37.5 110.7
+  } #(end of angle_coeffs)
+
+  write_once("Data Dihedrals By Type") {
+    @dihedral:0-80-80-80 @atom:* @atom:80 @atom:80 @atom:80
+    @dihedral:0-80-80-81 @atom:* @atom:80 @atom:80 @atom:81
+    @dihedral:0-80-80-82 @atom:* @atom:80 @atom:80 @atom:82
+    @dihedral:0-80-81-80 @atom:* @atom:80 @atom:81 @atom:80
+    @dihedral:0-80-81-81 @atom:* @atom:80 @atom:81 @atom:81
+    @dihedral:0-80-81-82 @atom:* @atom:80 @atom:81 @atom:82
+    @dihedral:0-80-82-80 @atom:* @atom:80 @atom:82 @atom:80
+    @dihedral:0-80-82-81 @atom:* @atom:80 @atom:82 @atom:81
+    @dihedral:0-80-82-82 @atom:* @atom:80 @atom:82 @atom:82
+    @dihedral:0-81-80-80 @atom:* @atom:81 @atom:80 @atom:80
+    @dihedral:0-81-80-81 @atom:* @atom:81 @atom:80 @atom:81
+    @dihedral:0-81-80-82 @atom:* @atom:81 @atom:80 @atom:82
+    @dihedral:0-81-81-80 @atom:* @atom:81 @atom:81 @atom:80
+    @dihedral:0-81-81-81 @atom:* @atom:81 @atom:81 @atom:81
+    @dihedral:0-81-81-82 @atom:* @atom:81 @atom:81 @atom:82
+    @dihedral:0-81-82-80 @atom:* @atom:81 @atom:82 @atom:80
+    @dihedral:0-81-82-81 @atom:* @atom:81 @atom:82 @atom:81
+    @dihedral:0-81-82-82 @atom:* @atom:81 @atom:82 @atom:82
+    @dihedral:0-82-80-80 @atom:* @atom:82 @atom:80 @atom:80
+    @dihedral:0-82-80-81 @atom:* @atom:82 @atom:80 @atom:81
+    @dihedral:0-82-80-82 @atom:* @atom:82 @atom:80 @atom:82
+    @dihedral:0-82-81-80 @atom:* @atom:82 @atom:81 @atom:80
+    @dihedral:0-82-81-81 @atom:* @atom:82 @atom:81 @atom:81
+    @dihedral:0-82-81-82 @atom:* @atom:82 @atom:81 @atom:82
+    @dihedral:0-82-82-80 @atom:* @atom:82 @atom:82 @atom:80
+    @dihedral:0-82-82-81 @atom:* @atom:82 @atom:82 @atom:81
+    @dihedral:0-82-82-82 @atom:* @atom:82 @atom:82 @atom:82
+    @dihedral:80-80-80-80 @atom:80 @atom:80 @atom:80 @atom:80
+    @dihedral:80-80-80-81 @atom:80 @atom:80 @atom:80 @atom:81
+    @dihedral:80-80-80-82 @atom:80 @atom:80 @atom:80 @atom:82
+    @dihedral:80-80-81-80 @atom:80 @atom:80 @atom:81 @atom:80
+    @dihedral:80-80-81-81 @atom:80 @atom:80 @atom:81 @atom:81
+    @dihedral:80-80-81-82 @atom:80 @atom:80 @atom:81 @atom:82
+    @dihedral:80-80-82-80 @atom:80 @atom:80 @atom:82 @atom:80
+    @dihedral:80-80-82-81 @atom:80 @atom:80 @atom:82 @atom:81
+    @dihedral:80-80-82-82 @atom:80 @atom:80 @atom:82 @atom:82
+    @dihedral:80-81-80-80 @atom:80 @atom:81 @atom:80 @atom:80
+    @dihedral:80-81-80-81 @atom:80 @atom:81 @atom:80 @atom:81
+    @dihedral:80-81-80-82 @atom:80 @atom:81 @atom:80 @atom:82
+    @dihedral:80-81-81-80 @atom:80 @atom:81 @atom:81 @atom:80
+    @dihedral:80-81-81-81 @atom:80 @atom:81 @atom:81 @atom:81
+    @dihedral:80-81-81-82 @atom:80 @atom:81 @atom:81 @atom:82
+    @dihedral:80-81-82-80 @atom:80 @atom:81 @atom:82 @atom:80
+    @dihedral:80-81-82-81 @atom:80 @atom:81 @atom:82 @atom:81
+    @dihedral:80-81-82-82 @atom:80 @atom:81 @atom:82 @atom:82
+    @dihedral:80-82-80-80 @atom:80 @atom:82 @atom:80 @atom:80
+    @dihedral:80-82-80-81 @atom:80 @atom:82 @atom:80 @atom:81
+    @dihedral:80-82-80-82 @atom:80 @atom:82 @atom:80 @atom:82
+    @dihedral:80-82-81-80 @atom:80 @atom:82 @atom:81 @atom:80
+    @dihedral:80-82-81-81 @atom:80 @atom:82 @atom:81 @atom:81
+    @dihedral:80-82-81-82 @atom:80 @atom:82 @atom:81 @atom:82
+    @dihedral:80-82-82-80 @atom:80 @atom:82 @atom:82 @atom:80
+    @dihedral:80-82-82-81 @atom:80 @atom:82 @atom:82 @atom:81
+    @dihedral:80-82-82-82 @atom:80 @atom:82 @atom:82 @atom:82
+    @dihedral:81-80-80-80 @atom:81 @atom:80 @atom:80 @atom:80
+    @dihedral:81-80-80-81 @atom:81 @atom:80 @atom:80 @atom:81
+    @dihedral:81-80-80-82 @atom:81 @atom:80 @atom:80 @atom:82
+    @dihedral:81-80-81-80 @atom:81 @atom:80 @atom:81 @atom:80
+    @dihedral:81-80-81-81 @atom:81 @atom:80 @atom:81 @atom:81
+    @dihedral:81-80-81-82 @atom:81 @atom:80 @atom:81 @atom:82
+    @dihedral:81-80-82-80 @atom:81 @atom:80 @atom:82 @atom:80
+    @dihedral:81-80-82-81 @atom:81 @atom:80 @atom:82 @atom:81
+    @dihedral:81-80-82-82 @atom:81 @atom:80 @atom:82 @atom:82
+    @dihedral:81-81-80-80 @atom:81 @atom:81 @atom:80 @atom:80
+    @dihedral:81-81-80-81 @atom:81 @atom:81 @atom:80 @atom:81
+    @dihedral:81-81-80-82 @atom:81 @atom:81 @atom:80 @atom:82
+    @dihedral:81-81-81-80 @atom:81 @atom:81 @atom:81 @atom:80
+    @dihedral:81-81-81-81 @atom:81 @atom:81 @atom:81 @atom:81
+    @dihedral:81-81-81-82 @atom:81 @atom:81 @atom:81 @atom:82
+    @dihedral:81-81-82-80 @atom:81 @atom:81 @atom:82 @atom:80
+    @dihedral:81-81-82-81 @atom:81 @atom:81 @atom:82 @atom:81
+    @dihedral:81-81-82-82 @atom:81 @atom:81 @atom:82 @atom:82
+    @dihedral:81-82-80-80 @atom:81 @atom:82 @atom:80 @atom:80
+    @dihedral:81-82-80-81 @atom:81 @atom:82 @atom:80 @atom:81
+    @dihedral:81-82-80-82 @atom:81 @atom:82 @atom:80 @atom:82
+    @dihedral:81-82-81-80 @atom:81 @atom:82 @atom:81 @atom:80
+    @dihedral:81-82-81-81 @atom:81 @atom:82 @atom:81 @atom:81
+    @dihedral:81-82-81-82 @atom:81 @atom:82 @atom:81 @atom:82
+    @dihedral:81-82-82-80 @atom:81 @atom:82 @atom:82 @atom:80
+    @dihedral:81-82-82-81 @atom:81 @atom:82 @atom:82 @atom:81
+    @dihedral:81-82-82-82 @atom:81 @atom:82 @atom:82 @atom:82
+    @dihedral:82-80-80-80 @atom:82 @atom:80 @atom:80 @atom:80
+    @dihedral:82-80-80-81 @atom:82 @atom:80 @atom:80 @atom:81
+    @dihedral:82-80-80-82 @atom:82 @atom:80 @atom:80 @atom:82
+    @dihedral:82-80-81-80 @atom:82 @atom:80 @atom:81 @atom:80
+    @dihedral:82-80-81-81 @atom:82 @atom:80 @atom:81 @atom:81
+    @dihedral:82-80-81-82 @atom:82 @atom:80 @atom:81 @atom:82
+    @dihedral:82-80-82-80 @atom:82 @atom:80 @atom:82 @atom:80
+    @dihedral:82-80-82-81 @atom:82 @atom:80 @atom:82 @atom:81
+    @dihedral:82-80-82-82 @atom:82 @atom:80 @atom:82 @atom:82
+    @dihedral:82-81-80-80 @atom:82 @atom:81 @atom:80 @atom:80
+    @dihedral:82-81-80-81 @atom:82 @atom:81 @atom:80 @atom:81
+    @dihedral:82-81-80-82 @atom:82 @atom:81 @atom:80 @atom:82
+    @dihedral:82-81-81-80 @atom:82 @atom:81 @atom:81 @atom:80
+    @dihedral:82-81-81-81 @atom:82 @atom:81 @atom:81 @atom:81
+    @dihedral:82-81-81-82 @atom:82 @atom:81 @atom:81 @atom:82
+    @dihedral:82-81-82-80 @atom:82 @atom:81 @atom:82 @atom:80
+    @dihedral:82-81-82-81 @atom:82 @atom:81 @atom:82 @atom:81
+    @dihedral:82-81-82-82 @atom:82 @atom:81 @atom:82 @atom:82
+    @dihedral:82-82-80-80 @atom:82 @atom:82 @atom:80 @atom:80
+    @dihedral:82-82-80-81 @atom:82 @atom:82 @atom:80 @atom:81
+    @dihedral:82-82-80-82 @atom:82 @atom:82 @atom:80 @atom:82
+    @dihedral:82-82-81-80 @atom:82 @atom:82 @atom:81 @atom:80
+    @dihedral:82-82-81-81 @atom:82 @atom:82 @atom:81 @atom:81
+    @dihedral:82-82-81-82 @atom:82 @atom:82 @atom:81 @atom:82
+    @dihedral:82-82-82-80 @atom:82 @atom:82 @atom:82 @atom:80
+    @dihedral:82-82-82-81 @atom:82 @atom:82 @atom:82 @atom:81
+    @dihedral:82-82-82-82 @atom:82 @atom:82 @atom:82 @atom:82
+    @dihedral:80-80-80-85 @atom:80 @atom:80 @atom:80 @atom:85
+    @dihedral:80-80-81-85 @atom:80 @atom:80 @atom:81 @atom:85
+    @dihedral:80-80-82-85 @atom:80 @atom:80 @atom:82 @atom:85
+    @dihedral:80-81-80-85 @atom:80 @atom:81 @atom:80 @atom:85
+    @dihedral:80-81-81-85 @atom:80 @atom:81 @atom:81 @atom:85
+    @dihedral:80-81-82-85 @atom:80 @atom:81 @atom:82 @atom:85
+    @dihedral:80-82-80-85 @atom:80 @atom:82 @atom:80 @atom:85
+    @dihedral:80-82-81-85 @atom:80 @atom:82 @atom:81 @atom:85
+    @dihedral:80-82-82-85 @atom:80 @atom:82 @atom:82 @atom:85
+    @dihedral:81-80-80-85 @atom:81 @atom:80 @atom:80 @atom:85
+    @dihedral:81-80-81-85 @atom:81 @atom:80 @atom:81 @atom:85
+    @dihedral:81-80-82-85 @atom:81 @atom:80 @atom:82 @atom:85
+    @dihedral:81-81-80-85 @atom:81 @atom:81 @atom:80 @atom:85
+    @dihedral:81-81-81-85 @atom:81 @atom:81 @atom:81 @atom:85
+    @dihedral:81-81-82-85 @atom:81 @atom:81 @atom:82 @atom:85
+    @dihedral:81-82-80-85 @atom:81 @atom:82 @atom:80 @atom:85
+    @dihedral:81-82-81-85 @atom:81 @atom:82 @atom:81 @atom:85
+    @dihedral:81-82-82-85 @atom:81 @atom:82 @atom:82 @atom:85
+    @dihedral:82-80-80-85 @atom:82 @atom:80 @atom:80 @atom:85
+    @dihedral:82-80-81-85 @atom:82 @atom:80 @atom:81 @atom:85
+    @dihedral:82-80-82-85 @atom:82 @atom:80 @atom:82 @atom:85
+    @dihedral:82-81-80-85 @atom:82 @atom:81 @atom:80 @atom:85
+    @dihedral:82-81-81-85 @atom:82 @atom:81 @atom:81 @atom:85
+    @dihedral:82-81-82-85 @atom:82 @atom:81 @atom:82 @atom:85
+    @dihedral:82-82-80-85 @atom:82 @atom:82 @atom:80 @atom:85
+    @dihedral:82-82-81-85 @atom:82 @atom:82 @atom:81 @atom:85
+    @dihedral:82-82-82-85 @atom:82 @atom:82 @atom:82 @atom:85
+    @dihedral:85-80-80-85 @atom:85 @atom:80 @atom:80 @atom:85
+    @dihedral:85-80-81-85 @atom:85 @atom:80 @atom:81 @atom:85
+    @dihedral:85-80-82-85 @atom:85 @atom:80 @atom:82 @atom:85
+    @dihedral:85-81-80-85 @atom:85 @atom:81 @atom:80 @atom:85
+    @dihedral:85-81-81-85 @atom:85 @atom:81 @atom:81 @atom:85
+    @dihedral:85-81-82-85 @atom:85 @atom:81 @atom:82 @atom:85
+    @dihedral:85-82-80-85 @atom:85 @atom:82 @atom:80 @atom:85
+    @dihedral:85-82-81-85 @atom:85 @atom:82 @atom:81 @atom:85
+    @dihedral:85-82-82-85 @atom:85 @atom:82 @atom:82 @atom:85
+  } #(end of Dihedrals by type)
+
+  write_once("In Settings") {
+    dihedral_coeff @dihedral:0-80-80-80 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-80-80-81 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-80-80-82 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-80-81-80 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-80-81-81 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-80-81-82 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-80-82-80 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-80-82-81 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-80-82-82 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-81-80-80 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-81-80-81 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-81-80-82 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-81-81-80 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-81-81-81 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-81-81-82 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-81-82-80 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-81-82-81 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-81-82-82 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-82-80-80 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-82-80-81 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-82-80-82 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-82-81-80 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-82-81-81 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-82-81-82 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-82-82-80 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-82-82-81 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:0-82-82-82 opls 1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:80-80-80-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-80-80-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-80-80-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-80-81-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-80-81-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-80-81-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-80-82-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-80-82-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-80-82-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-81-80-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-81-80-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-81-80-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-81-81-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-81-81-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-81-81-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-81-82-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-81-82-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-81-82-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-82-80-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-82-80-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-82-80-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-82-81-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-82-81-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-82-81-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-82-82-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-82-82-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-82-82-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-80-80-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-80-80-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-80-80-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-80-81-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-80-81-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-80-81-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-80-82-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-80-82-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-80-82-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-81-80-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-81-80-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-81-80-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-81-81-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-81-81-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-81-81-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-81-82-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-81-82-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-81-82-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-82-80-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-82-80-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-82-80-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-82-81-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-82-81-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-82-81-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-82-82-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-82-82-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:81-82-82-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-80-80-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-80-80-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-80-80-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-80-81-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-80-81-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-80-81-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-80-82-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-80-82-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-80-82-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-81-80-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-81-80-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-81-80-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-81-81-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-81-81-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-81-81-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-81-82-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-81-82-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-81-82-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-82-80-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-82-80-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-82-80-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-82-81-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-82-81-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-82-81-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-82-82-80 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-82-82-81 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:82-82-82-82 opls 1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:80-80-80-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:80-80-81-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:80-80-82-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:80-81-80-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:80-81-81-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:80-81-82-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:80-82-80-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:80-82-81-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:80-82-82-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:81-80-80-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:81-80-81-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:81-80-82-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:81-81-80-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:81-81-81-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:81-81-82-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:81-82-80-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:81-82-81-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:81-82-82-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:82-80-80-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:82-80-81-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:82-80-82-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:82-81-80-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:82-81-81-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:82-81-82-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:82-82-80-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:82-82-81-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:82-82-82-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:85-80-80-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:85-80-81-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:85-80-82-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:85-81-80-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:85-81-81-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:85-81-82-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:85-82-80-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:85-82-81-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:85-82-82-85 opls 0.0 0.0 0.3 0.0
+  } #(end of dihedral_coeffs)
+
+  write_once("In Init") {
+    units real
+    atom_style full
+    bond_style hybrid harmonic
+    angle_style hybrid harmonic
+    dihedral_style hybrid opls
+    improper_style hybrid harmonic
+    pair_style hybrid lj/cut/coul/long 10.0 10.0
+    pair_modify mix geometric
+    special_bonds lj/coul 0.0 0.0 0.5
+    kspace_style pppm 0.0001
+  } #end of init parameters
+
+} # OPLSAA

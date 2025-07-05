@@ -1,0 +1,33 @@
+import "oplsaa.lt"
+import "PIle.lt"
+import "PIi.lt"
+import "PIre.lt"
+
+poly_5 inherits OPLSAA {
+
+    create_var {$mol}
+
+    monomer[0] = new PIle
+    monomer[1] = new PIi.rot(90.0,1,0,0).move(3.3510,0,0)
+    monomer[2] = new PIi.rot(0.0,1,0,0).move(6.7010,0,0)
+    monomer[3] = new PIi.rot(90.0,1,0,0).move(10.0510,0,0)
+    monomer[4] = new PIi.rot(0.0,1,0,0).move(13.4010,0,0)
+    monomer[5] = new PIi.rot(90.0,1,0,0).move(16.7510,0,0)
+    monomer[6] = new PIi.rot(0.0,1,0,0).move(20.1010,0,0)
+    monomer[7] = new PIi.rot(90.0,1,0,0).move(23.4510,0,0)
+    monomer[8] = new PIi.rot(0.0,1,0,0).move(26.8010,0,0)
+    monomer[9] = new PIre.rot(90.0,1,0,0).move(30.1511,0,0)
+
+    write('Data Bond List') {
+      $bond:b1  $atom:monomer[0]/C2  $atom:monomer[1]/C1
+      $bond:b2  $atom:monomer[1]/C2  $atom:monomer[2]/C1
+      $bond:b3  $atom:monomer[2]/C2  $atom:monomer[3]/C1
+      $bond:b4  $atom:monomer[3]/C2  $atom:monomer[4]/C1
+      $bond:b5  $atom:monomer[4]/C2  $atom:monomer[5]/C1
+      $bond:b6  $atom:monomer[5]/C2  $atom:monomer[6]/C1
+      $bond:b7  $atom:monomer[6]/C2  $atom:monomer[7]/C1
+      $bond:b8  $atom:monomer[7]/C2  $atom:monomer[8]/C1
+      $bond:b9  $atom:monomer[8]/C2  $atom:monomer[9]/C1
+    }
+
+} # poly_5

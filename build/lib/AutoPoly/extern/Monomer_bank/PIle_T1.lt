@@ -1,39 +1,41 @@
-import oplsaa.lt
-
+import "oplsaa.lt"    # <-- defines the standard "OPLSAA" force field
 PIle_T1 inherits OPLSAA {
 
-    # atom-id mol-id atom-type charge X Y Z # comments
-   write("Data Atoms") {
-        $atom:C1  $mol:...   @atom:80  0.00       0.00000       0.00000       0.00000  #
-        $atom:C2  $mol:...   @atom:81  0.00       2.19399      -1.24223       0.00362  #
-        $atom:C3  $mol:...   @atom:80  0.00      -0.72120       1.32082      -0.00384  #
-        $atom:H4  $mol:...   @atom:85  0.00      -0.44455       1.90441       0.89975  #
-        $atom:H5  $mol:...   @atom:85  0.00      -1.82246       1.17540      -0.00342  #
-        $atom:H6  $mol:...   @atom:85  0.00      -0.44454       1.89915      -0.91081  #
-        $atom:C7  $mol:...   @atom:86  0.00      -0.82980      -1.26263       0.00367  #
-        $atom:H8  $mol:...   @atom:85  0.00      -0.22488      -2.19078       0.00637  #
-        $atom:H9  $mol:...   @atom:85  0.00      -1.47533      -1.27960      -0.89930  #
-        $atom:H10  $mol:...  @atom:85  0.00      -1.47532      -1.27435       0.90673  #
-        $atom:C11  $mol:...  @atom:87  0.00       1.35091      -0.00000       0.00000  #
-        $atom:H12  $mol:...  @atom:85  0.00       1.98588      -1.84268       0.91412  #
-        $atom:H13  $mol:...  @atom:85  0.00       1.98587      -1.84799      -0.90336  #
-        $atom:H14  $mol:...  @atom:89  0.00       1.87685       0.95174      -0.00277  #
-    }
+# atom-id  mol-id  atom-type charge      X         Y        Z
+  write("Data Atoms") {
+	$atom:C1 $mol:... @atom:80 0.00    0.000    0.000    0.000
+	$atom:C2 $mol:... @atom:82 0.00    1.351    0.000    0.000
+	$atom:C3 $mol:... @atom:80 0.00   -0.721   -1.321   -0.004
+	$atom:H4 $mol:... @atom:85 0.00   -0.445   -1.904    0.900
+	$atom:H5 $mol:... @atom:85 0.00   -1.822   -1.175   -0.003
+	$atom:H6 $mol:... @atom:85 0.00   -0.445   -1.899   -0.911
+	$atom:C7 $mol:... @atom:80 0.00   -0.830    1.263    0.004
+	$atom:H8 $mol:... @atom:85 0.00   -0.225    2.191    0.006
+	$atom:H9 $mol:... @atom:85 0.00   -1.475    1.280   -0.899
+	$atom:H10 $mol:... @atom:85 0.00   -1.475    1.274    0.907
+	$atom:C11 $mol:... @atom:81 0.00    2.194    1.242    0.004
+	$atom:H12 $mol:... @atom:85 0.00    1.986    1.843    0.914
+	$atom:H13 $mol:... @atom:85 0.00    1.986    1.848   -0.903
+	$atom:H14 $mol:... @atom:85 0.00    1.877   -0.952   -0.003
+  }
 
-    # bond-id atom-id1 atom-id2
-    write("Data Bond List") {
-        $bond:1  $atom:C1  $atom:C11
-        $bond:2  $atom:C1  $atom:C3
-        $bond:3  $atom:C3  $atom:H4
-        $bond:4  $atom:C3  $atom:H5
-        $bond:5  $atom:C3  $atom:H6
-        $bond:6  $atom:C1  $atom:C7
-        $bond:7  $atom:C7  $atom:H8
-        $bond:8  $atom:C7  $atom:H9
-        $bond:9  $atom:C7  $atom:H10
-        $bond:10  $atom:C11  $atom:C2
-        $bond:11  $atom:C2  $atom:H12
-        $bond:12  $atom:C2  $atom:H13
-        $bond:13  $atom:C11  $atom:H14
-    }
-}
+  write('Data Bond List') {
+	$bond:C1C2	$atom:C1	$atom:C2
+	$bond:C1C3	$atom:C1	$atom:C3
+	$bond:C3H4	$atom:C3	$atom:H4
+	$bond:C3H5	$atom:C3	$atom:H5
+	$bond:C3H6	$atom:C3	$atom:H6
+	$bond:C1C7	$atom:C1	$atom:C7
+	$bond:C7H8	$atom:C7	$atom:H8
+	$bond:C7H9	$atom:C7	$atom:H9
+	$bond:C7H10	$atom:C7	$atom:H10
+	$bond:C2C11	$atom:C2	$atom:C11
+	$bond:C11H12	$atom:C11	$atom:H12
+	$bond:C11H13	$atom:C11	$atom:H13
+	$bond:C2H14	$atom:C2	$atom:H14
+  }
+} # PIle_T1
+
+# Note: You don't need to supply the partial partial charges of the atoms.
+#       If you like, just fill the fourth column with zeros ("0.000").
+#       Moltemplate and LAMMPS will automatically assign the charge later

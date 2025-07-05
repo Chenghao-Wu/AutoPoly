@@ -232,6 +232,8 @@ class Polymer(object):
                             merSet_.append(sequence[merii])
                         self.sequenceSet.append(merSet)
                         self.sequenceName.append(merSet_)
+        print(self.sequenceSet)
+        print(self.sequenceName)
     
     def get_sequence_set(self) -> List[List[str]]:
         """

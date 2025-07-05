@@ -1,32 +1,80 @@
+"""
+Bead-Spring Polymer Model Module
+
+This module provides the BeadSpringPolymer class for generating simplified
+bead-spring polymer models for coarse-grained molecular dynamics simulations.
+
+The BeadSpringPolymer class handles:
+- Generation of bead-spring polymer structures
+- Support for linear and ring topologies
+- LAMMPS data file generation
+- Input script creation for molecular dynamics simulations
+
+This module is useful for:
+- Quick polymer structure generation
+- Coarse-grained simulations
+- Educational purposes
+- Testing polymer simulation workflows
+"""
 import os
 import sys
 from pathlib import Path
 import numpy as np
+from typing import Optional
 from .logger import setup_logger
 
 logger = setup_logger()
 
 class BeadSpringPolymer:
+    """
+    Bead-spring polymer model generator for LAMMPS simulations.
+    
+    This class generates simplified bead-spring polymer models where each
+    monomer is represented as a single bead connected by harmonic springs.
+    It supports both linear and ring polymer topologies and generates
+    complete LAMMPS input files for molecular dynamics simulations.
+    
+    Attributes:
+        name (str): Name for the output files
+        system (object): System object containing path information
+        path (str): Full path to output directory
+        n_chains (int): Number of polymer chains
+        n_beads (int): Number of beads per chain
+        topology (str): Polymer topology ('linear' or 'ring')
+        bond_length (float): Equilibrium bond length
+        mass (float): Mass of each bead
+        epsilon (float): LJ energy parameter
+        sigma (float): LJ distance parameter
+    """
+    
     def __init__(self, name: str = None, system: object = None, 
                  n_chains: int = 1, n_beads: int = 10, 
                  topology: str = "linear", bond_length: float = 1.0,
                  mass: float = 1.0, epsilon: float = 1.0, sigma: float = 1.0) -> None:
-        """Initialize bead-spring polymer generator.
+        """
+        Initialize bead-spring polymer generator.
         
         Args:
-            name (str): Name for the output files
-            system (object): System object containing path information
-            n_chains (int): Number of polymer chains
-            n_beads (int): Number of beads per chain
-            topology (str): "linear" or "ring"
-            bond_length (float): Equilibrium bond length
-            mass (float): Mass of each bead
-            epsilon (float): LJ energy parameter
-            sigma (float): LJ distance parameter
+            name (str, optional): Name for the output files. Defaults to None.
+            system (object, optional): System object containing path information.
+                                     Defaults to None.
+            n_chains (int, optional): Number of polymer chains. Defaults to 1.
+            n_beads (int, optional): Number of beads per chain. Defaults to 10.
+            topology (str, optional): "linear" or "ring". Defaults to "linear".
+            bond_length (float, optional): Equilibrium bond length. Defaults to 1.0.
+            mass (float, optional): Mass of each bead. Defaults to 1.0.
+            epsilon (float, optional): LJ energy parameter. Defaults to 1.0.
+            sigma (float, optional): LJ distance parameter. Defaults to 1.0.
+        
+        Raises:
+            ValueError: If topology is not 'linear' or 'ring'
         """
+        if topology not in ["linear", "ring"]:
+            raise ValueError("Topology must be either 'linear' or 'ring'")
+            
         self.name = name
         self.system = system
-        self.path = f"{self.system.get_FolderPath}/{self.name}"
+        self.path = f"{self.system.get_FolderPath}/{self.name}" if system else f"./{name}"
         self.n_chains = n_chains
         self.n_beads = n_beads
         self.topology = topology
@@ -37,9 +85,23 @@ class BeadSpringPolymer:
         
         # Create output directory
         Path(self.path).mkdir(parents=True, exist_ok=True)
+        logger.info(f"Initialized bead-spring polymer: {n_chains} chains, {n_beads} beads each, {topology} topology")
         
     def generate_data_file(self) -> None:
-        """Generate LAMMPS data file for bead-spring polymer."""
+        """
+        Generate LAMMPS data file for bead-spring polymer.
+        
+        This method creates a complete LAMMPS data file containing:
+        - System information (number of atoms, bonds, atom types, bond types)
+        - Box dimensions
+        - Atom masses
+        - Atom coordinates
+        - Bond connectivity
+        
+        The method handles different topologies:
+        - Linear: Chains arranged along x-axis with spacing
+        - Ring: Chains arranged in 3D grid with random orientations
+        """
         n_bonds = self.n_beads - 1 if self.topology == "linear" else self.n_beads
         total_beads = self.n_chains * self.n_beads
         total_bonds = self.n_chains * n_bonds
@@ -142,7 +204,16 @@ class BeadSpringPolymer:
         logger.info(f"Generated bead-spring polymer files in {self.path}")
     
     def _generate_input_script(self) -> None:
-        """Generate LAMMPS input script for the bead-spring polymer."""
+        """
+        Generate LAMMPS input script for the bead-spring polymer.
+        
+        This method creates a complete LAMMPS input script with:
+        - Units and atom style settings
+        - Force field parameters (LJ + harmonic bonds)
+        - Energy minimization
+        - Molecular dynamics simulation settings
+        - Output and analysis commands
+        """
         with open(f"{self.path}/in.polymer", 'w') as f:
             f.write("# LAMMPS input script for bead-spring polymer\n\n")
             f.write("units           lj\n")
@@ -170,4 +241,51 @@ class BeadSpringPolymer:
             f.write("fix           1 all nvt temp 1.0 1.0 0.5\n")
             f.write("dump          1 all custom 1000 dump.lammpstrj id type x y z\n")
             f.write("thermo        1000\n")
-            f.write("run           100000\n") 
+            f.write("run           100000\n")
+    
+    def get_system_info(self) -> dict:
+        """
+        Get comprehensive information about the bead-spring polymer system.
+        
+        Returns:
+            dict: Dictionary containing system properties
+        """
+        n_bonds = self.n_beads - 1 if self.topology == "linear" else self.n_beads
+        total_beads = self.n_chains * self.n_beads
+        total_bonds = self.n_chains * n_bonds
+        
+        return {
+            'name': self.name,
+            'n_chains': self.n_chains,
+            'n_beads_per_chain': self.n_beads,
+            'topology': self.topology,
+            'total_beads': total_beads,
+            'total_bonds': total_bonds,
+            'bond_length': self.bond_length,
+            'mass': self.mass,
+            'epsilon': self.epsilon,
+            'sigma': self.sigma,
+            'output_path': self.path
+        }
+    
+    def modify_parameters(self, **kwargs) -> None:
+        """
+        Modify polymer parameters after initialization.
+        
+        Args:
+            **kwargs: Keyword arguments for parameters to modify
+                     (n_chains, n_beads, topology, bond_length, mass, epsilon, sigma)
+        """
+        valid_params = ['n_chains', 'n_beads', 'topology', 'bond_length', 
+                       'mass', 'epsilon', 'sigma']
+        
+        for param, value in kwargs.items():
+            if param in valid_params:
+                setattr(self, param, value)
+                logger.info(f"Modified {param} to {value}")
+            else:
+                logger.warning(f"Unknown parameter: {param}")
+        
+        if 'topology' in kwargs:
+            if kwargs['topology'] not in ["linear", "ring"]:
+                raise ValueError("Topology must be either 'linear' or 'ring'") 

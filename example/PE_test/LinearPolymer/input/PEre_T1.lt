@@ -1,0 +1,27 @@
+import "oplsaa.lt"    # <-- defines the standard "OPLSAA" force field
+PEre_T1 inherits OPLSAA {
+
+# atom-id  mol-id  atom-type charge      X         Y        Z
+  write("Data Atoms") {
+	$atom:C1 $mol:... @atom:81 0.00    0.000    0.000    0.000
+	$atom:C2 $mol:... @atom:81 0.00   -1.517    0.000    0.000
+	$atom:H3 $mol:... @atom:85 0.00    0.380    0.359   -0.980
+	$atom:H4 $mol:... @atom:85 0.00    0.380    0.662    0.806
+	$atom:H5 $mol:... @atom:85 0.00   -1.890   -0.669   -0.803
+	$atom:H6 $mol:... @atom:85 0.00   -1.896    1.029   -0.175
+	$atom:H7 $mol:... @atom:85 0.00   -1.890   -0.366    0.979
+  }
+
+  write('Data Bond List') {
+	$bond:C1C2	$atom:C1	$atom:C2
+	$bond:C1H3	$atom:C1	$atom:H3
+	$bond:C1H4	$atom:C1	$atom:H4
+	$bond:C2H5	$atom:C2	$atom:H5
+	$bond:C2H6	$atom:C2	$atom:H6
+	$bond:C2H7	$atom:C2	$atom:H7
+  }
+} # PEre_T1
+
+# Note: You don't need to supply the partial partial charges of the atoms.
+#       If you like, just fill the fourth column with zeros ("0.000").
+#       Moltemplate and LAMMPS will automatically assign the charge later

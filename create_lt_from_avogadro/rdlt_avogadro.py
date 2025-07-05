@@ -1,16 +1,29 @@
 #!/usr/bin/env python3
 """
-CML to LT file converter for polymer monomers.
+CML to LT file converter for polymer monomers with tacticity support.
 
 This module converts CML (Chemical Markup Language) files to LT (LAMMPS Template) files
-for use with the AutoPoly polymerization system. It generates three monomer variants:
+for use with the AutoPoly polymerization system. It generates monomer variants with
+tacticity support for different stereochemical configurations.
+
+Tacticity Types:
+- Atactic: Random stereochemistry
+- Isotactic: All monomers have the same stereochemistry  
+- Syndiotactic: Alternating stereochemistry
+
+Monomer Variants:
 - Internal monomer (suffix 'i'): Two connection points
 - Left-end monomer (suffix 'le'): One terminal end, one connection point
 - Right-end monomer (suffix 're'): One connection point, one terminal end
+
+Stereochemical Variants:
+- Normal: Standard configuration
+- T1: Stereochemical variant (180° rotation around backbone)
 """
 
 import sys
 import os
+import random
 import xml.etree.ElementTree as ET
 from pathlib import Path
 import argparse
@@ -20,10 +33,11 @@ from typing import Dict, List, Tuple, Optional
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem import ChemicalFeatures
+import numpy as np
 
 
-class CMLToLTConverter:
-    """Convert CML files to LT files for polymer monomers."""
+class CMLToLTConverterTacticity:
+    """Convert CML files to LT files for polymer monomers with tacticity support."""
     
     def __init__(self, opls_fdef_path: Optional[str] = None, lopls_fdef_path: Optional[str] = None):
         """
@@ -42,6 +56,16 @@ class CMLToLTConverter:
             'left': {'C1': '@atom:80', 'C2': '@atom:82'},      # CH3, CH2
             'right': {'C1': '@atom:81', 'C2': '@atom:81'}      # CH2, CH2
         }
+        
+        # Tacticity options
+        self.tacticity_options = ['atactic', 'isotactic', 'syndiotactic']
+        
+        # Stereochemical transformation matrix for T1 variant (180° rotation around backbone)
+        self.t1_transformation = np.array([
+            [1, 0, 0],  # Flip x coordinates
+            [0, -1, 0],  # Flip y coordinates  
+            [0, 0, 1]    # Keep z coordinates
+        ])
     
     def parse_cml_file(self, cml_file_path: str) -> Tuple[List[Dict], List[Dict], Dict]:
         """
@@ -105,6 +129,44 @@ class CMLToLTConverter:
             
         except Exception as e:
             raise ValueError(f"Error parsing CML file {cml_file_path}: {str(e)}")
+    
+    def apply_stereochemical_transformation(self, atoms: List[Dict], variant: str = 'normal') -> List[Dict]:
+        """
+        Apply stereochemical transformation to atom coordinates.
+        
+        Args:
+            atoms: List of atom dictionaries
+            variant: 'normal' or 'T1' for stereochemical variant
+            
+        Returns:
+            List of transformed atom dictionaries
+        """
+        if variant == 'normal':
+            return atoms
+        
+        elif variant == 'T1':
+            # Apply T1 transformation (180° rotation around backbone)
+            transformed_atoms = []
+            
+            for atom in atoms:
+                # Get original coordinates
+                coords = np.array([atom['x'], atom['y'], atom['z']])
+                
+                # Apply transformation
+                transformed_coords = np.dot(self.t1_transformation, coords)
+                
+                # Create new atom data with transformed coordinates
+                transformed_atom = atom.copy()
+                transformed_atom['x'] = transformed_coords[0]
+                transformed_atom['y'] = transformed_coords[1]
+                transformed_atom['z'] = transformed_coords[2]
+                
+                transformed_atoms.append(transformed_atom)
+            
+            return transformed_atoms
+        
+        else:
+            raise ValueError(f"Unknown stereochemical variant: {variant}")
     
     def build_rdkit_molecule(self, atoms: List[Dict], bonds: List[Dict], atom_id_map: Dict) -> Chem.Mol:
         """
@@ -308,16 +370,19 @@ class CMLToLTConverter:
         
         return output_file
     
-    def process_cml_to_lt(self, cml_file_path: str, monomer_name: str, monomer_type: str, 
-                         output_file: str, loplsflag: bool = False) -> str:
+    def process_cml_to_lt_with_tacticity(self, cml_file_path: str, monomer_name: str, monomer_type: str, 
+                                       output_file: str, tacticity: str = 'atactic', 
+                                       stereochemical_variant: str = 'normal', loplsflag: bool = False) -> str:
         """
-        Process a single CML file to LT format.
+        Process a single CML file to LT format with tacticity support.
         
         Args:
             cml_file_path: Path to input CML file
             monomer_name: Name for the monomer
             monomer_type: 'internal', 'left', or 'right'
             output_file: Path to output LT file
+            tacticity: 'atactic', 'isotactic', or 'syndiotactic'
+            stereochemical_variant: 'normal' or 'T1'
             loplsflag: Whether to use LOPLS atom typing
             
         Returns:
@@ -325,6 +390,9 @@ class CMLToLTConverter:
         """
         # Parse CML file
         atoms, bonds, atom_id_map = self.parse_cml_file(cml_file_path)
+        
+        # Apply stereochemical transformation
+        atoms = self.apply_stereochemical_transformation(atoms, stereochemical_variant)
         
         # Build RDKit molecule
         mol = self.build_rdkit_molecule(atoms, bonds, atom_id_map)
@@ -338,20 +406,25 @@ class CMLToLTConverter:
         # Generate LT file
         return self.generate_lt_file(mol, monomer_name, output_file, loplsflag)
     
-    def process_polymer_monomers(self, cml_files: Dict[str, str], base_name: str, 
-                                output_dir: str = ".", loplsflag: bool = False) -> Dict[str, str]:
+    def generate_tacticity_variants(self, cml_files: Dict[str, str], base_name: str, 
+                                  output_dir: str = ".", tacticity: str = 'atactic', 
+                                  loplsflag: bool = False) -> Dict[str, List[str]]:
         """
-        Process all three CML files for polymer monomers.
+        Generate monomer variants with tacticity support.
         
         Args:
             cml_files: Dictionary mapping monomer types to CML file paths
             base_name: Base name for the monomer (e.g., 'PE', 'PS')
             output_dir: Output directory
+            tacticity: 'atactic', 'isotactic', or 'syndiotactic'
             loplsflag: Whether to use LOPLS atom typing
             
         Returns:
-            Dictionary mapping monomer types to generated LT file paths
+            Dictionary mapping monomer types to lists of generated file paths
         """
+        if tacticity not in self.tacticity_options:
+            raise ValueError(f"Unknown tacticity: {tacticity}. Must be one of {self.tacticity_options}")
+        
         # Ensure output directory exists
         os.makedirs(output_dir, exist_ok=True)
         
@@ -371,34 +444,72 @@ class CMLToLTConverter:
             
             if not os.path.exists(cml_file):
                 print(f"Warning: CML file '{cml_file}' not found, skipping...")
-                generated_files[monomer_type] = None
+                generated_files[monomer_type] = []
                 continue
             
             monomer_name = variants[monomer_type]
-            output_file = os.path.join(output_dir, f"{monomer_name}.lt")
+            generated_files[monomer_type] = []
             
-            try:
-                generated_file = self.process_cml_to_lt(
-                    cml_file, monomer_name, monomer_type, output_file, loplsflag
-                )
-                generated_files[monomer_type] = generated_file
-                print(f"Generated {monomer_type} monomer: {generated_file}")
+            # Generate variants based on tacticity
+            if tacticity == 'atactic':
+                # For atactic, generate both normal and T1 variants
+                for variant in ['normal', 'T1']:
+                    suffix = '_T1' if variant == 'T1' else ''
+                    output_file = os.path.join(output_dir, f"{monomer_name}{suffix}.lt")
+                    
+                    try:
+                        generated_file = self.process_cml_to_lt_with_tacticity(
+                            cml_file, f"{monomer_name}{suffix}", monomer_type, 
+                            output_file, tacticity, variant, loplsflag
+                        )
+                        generated_files[monomer_type].append(generated_file)
+                        print(f"Generated {monomer_type} monomer ({variant}): {generated_file}")
+                    except Exception as e:
+                        print(f"Error generating {monomer_type} monomer ({variant}): {e}")
+            
+            elif tacticity == 'isotactic':
+                # For isotactic, generate only normal variant
+                output_file = os.path.join(output_dir, f"{monomer_name}.lt")
                 
-            except Exception as e:
-                print(f"Error generating {monomer_type} monomer: {e}")
-                generated_files[monomer_type] = None
+                try:
+                    generated_file = self.process_cml_to_lt_with_tacticity(
+                        cml_file, monomer_name, monomer_type, 
+                        output_file, tacticity, 'normal', loplsflag
+                    )
+                    generated_files[monomer_type].append(generated_file)
+                    print(f"Generated {monomer_type} monomer (isotactic): {generated_file}")
+                except Exception as e:
+                    print(f"Error generating {monomer_type} monomer (isotactic): {e}")
+            
+            elif tacticity == 'syndiotactic':
+                # For syndiotactic, generate both variants (will be used alternately)
+                for variant in ['normal', 'T1']:
+                    suffix = '_T1' if variant == 'T1' else ''
+                    output_file = os.path.join(output_dir, f"{monomer_name}{suffix}.lt")
+                    
+                    try:
+                        generated_file = self.process_cml_to_lt_with_tacticity(
+                            cml_file, f"{monomer_name}{suffix}", monomer_type, 
+                            output_file, tacticity, variant, loplsflag
+                        )
+                        generated_files[monomer_type].append(generated_file)
+                        print(f"Generated {monomer_type} monomer ({variant}): {generated_file}")
+                    except Exception as e:
+                        print(f"Error generating {monomer_type} monomer ({variant}): {e}")
         
         return generated_files
 
 
 def main():
     """Main function for command-line usage."""
-    parser = argparse.ArgumentParser(description='Convert CML files to LT files for polymer monomers')
+    parser = argparse.ArgumentParser(description='Convert CML files to LT files for polymer monomers with tacticity support')
     parser.add_argument('--internal', '-i', required=True, help='Internal monomer CML file (e.g., *i.cml)')
     parser.add_argument('--left', '-l', required=True, help='Left-end monomer CML file (e.g., *l.cml)')
     parser.add_argument('--right', '-r', required=True, help='Right-end monomer CML file (e.g., *r.cml)')
     parser.add_argument('--base-name', '-b', required=True, help='Base name for the monomer (e.g., PE, PS)')
     parser.add_argument('--output-dir', '-o', default='.', help='Output directory for LT files')
+    parser.add_argument('--tacticity', '-t', choices=['atactic', 'isotactic', 'syndiotactic'], 
+                       default='syndiotactic', help='Polymer tacticity')
     parser.add_argument('--opls-fdef', help='Path to OPLS feature definition file')
     parser.add_argument('--lopls-fdef', help='Path to LOPLS feature definition file')
     parser.add_argument('--lopls', action='store_true', help='Use LOPLS atom typing')
@@ -406,7 +517,7 @@ def main():
     args = parser.parse_args()
     
     # Set up converter
-    converter = CMLToLTConverter(args.opls_fdef, args.lopls_fdef)
+    converter = CMLToLTConverterTacticity(args.opls_fdef, args.lopls_fdef)
     
     # Define CML files
     cml_files = {
@@ -415,17 +526,19 @@ def main():
         'right': args.right
     }
     
-    # Process files
+    # Process files with tacticity
     try:
-        generated_files = converter.process_polymer_monomers(
-            cml_files, args.base_name, args.output_dir, args.lopls
+        generated_files = converter.generate_tacticity_variants(
+            cml_files, args.base_name, args.output_dir, args.tacticity, args.lopls
         )
         
-        print("\nProcessing completed!")
+        print(f"\nProcessing completed for {args.tacticity} tacticity!")
         print("Generated files:")
-        for monomer_type, file_path in generated_files.items():
-            if file_path:
-                print(f"  {monomer_type}: {file_path}")
+        for monomer_type, file_list in generated_files.items():
+            if file_list:
+                print(f"  {monomer_type}:")
+                for file_path in file_list:
+                    print(f"    {file_path}")
             else:
                 print(f"  {monomer_type}: FAILED")
                 

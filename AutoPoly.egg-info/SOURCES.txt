@@ -33,6 +33,12 @@ AutoPoly/extern/Monomer_bank/PEUAle.lt
 AutoPoly/extern/Monomer_bank/PEUAle_T1.lt
 AutoPoly/extern/Monomer_bank/PEUAre.lt
 AutoPoly/extern/Monomer_bank/PEUAre_T1.lt
+AutoPoly/extern/Monomer_bank/PEi.lt
+AutoPoly/extern/Monomer_bank/PEi_T1.lt
+AutoPoly/extern/Monomer_bank/PEle.lt
+AutoPoly/extern/Monomer_bank/PEle_T1.lt
+AutoPoly/extern/Monomer_bank/PEre.lt
+AutoPoly/extern/Monomer_bank/PEre_T1.lt
 AutoPoly/extern/Monomer_bank/PIi.lt
 AutoPoly/extern/Monomer_bank/PIi_T1.lt
 AutoPoly/extern/Monomer_bank/PIle.lt
@@ -87,10 +93,14 @@ AutoPoly/extern/Monomer_bank/PVAle_T1.lt
 AutoPoly/extern/Monomer_bank/PVAre.lt
 AutoPoly/extern/Monomer_bank/PVAre_T1.lt
 AutoPoly/extern/Monomer_bank/README.md
+AutoPoly/extern/__pycache__/__init__.cpython-311.pyc
 AutoPoly/extern/__pycache__/__init__.cpython-37.pyc
 AutoPoly/extern/__pycache__/__init__.cpython-38.pyc
+AutoPoly/extern/__pycache__/__init__.cpython-39.pyc
+AutoPoly/extern/__pycache__/rdlt.cpython-311.pyc
 AutoPoly/extern/__pycache__/rdlt.cpython-37.pyc
 AutoPoly/extern/__pycache__/rdlt.cpython-38.pyc
+AutoPoly/extern/__pycache__/rdlt.cpython-39.pyc
 AutoPoly/extern/moltemplate/LICENSE.TXT
 AutoPoly/extern/moltemplate/README.TXT
 AutoPoly/extern/moltemplate/loplsaa.prm

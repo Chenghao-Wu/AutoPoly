@@ -1,168 +1,134 @@
-# CML to LT File Converter for AutoPoly
-
-This module converts CML (Chemical Markup Language) files to LT (LAMMPS Template) files for use with the AutoPoly polymerization system.
+# CML to LT File Converter with Tacticity Support
 
 ## Overview
 
-The converter generates three types of monomer .lt files required for polymer building:
-- **Internal monomer** (suffix 'i'): Two connection points for linking to other monomers
-- **Left-end monomer** (suffix 'le'): One terminal end and one connection point  
-- **Right-end monomer** (suffix 're'): One connection point and one terminal end
+`rdlt_avogadro.py` is a Python script that converts CML (Chemical Markup Language) files into LAMMPS Template (`.lt`) files for use in polymer simulations. It supports tacticity (atactic, isotactic, syndiotactic) and generates all required monomer variants for the AutoPoly polymerization system.
+
+---
 
 ## Features
+- **CML to LT conversion** for polymer monomers
+- **Tacticity support**: atactic, isotactic, syndiotactic
+- **Stereochemical variants**: normal and T1 (180° rotation)
+- **OPLSAA and LOPLS** atom typing
+- **AutoPoly compatibility**
+- **Command-line interface**
 
-- ✅ **CML File Parsing**: Parses CML files with atom coordinates and bond information
-- ✅ **Atom Type Assignment**: Assigns correct OPLS atom types for polymer connectivity
-- ✅ **3D Coordinate Preservation**: Maintains exact 3D coordinates from CML files
-- ✅ **Bond Connectivity**: Preserves all bond information for proper molecular structure
-- ✅ **AutoPoly Compatibility**: Generates .lt files compatible with the AutoPoly system
-- ✅ **LOPLS Support**: Optional LOPLS force field support
-- ✅ **Error Handling**: Robust error handling for missing files and parsing errors
+---
 
-## Atom Type Mapping
+## Quickstart
 
-| Monomer Type | C1 Atom Type | C2 Atom Type | Description |
-|--------------|--------------|--------------|-------------|
-| Internal (i) | @atom:81 | @atom:82 | Both connection points (CH2) |
-| Left-end (le) | @atom:80 | @atom:82 | Terminal (CH3) + connection (CH2) |
-| Right-end (re) | @atom:81 | @atom:81 | Connection (CH2) + terminal (CH2) |
-
-## Installation
-
-No additional installation required beyond the existing AutoPoly dependencies:
-- Python 3.x
+### 1. Install Requirements
+- Python 3.7+
 - RDKit
-- XML parsing (built-in)
+- NumPy
 
-## Usage
+Install with pip (RDKit may require conda):
+```bash
+conda install -c conda-forge rdkit
+pip install numpy
+```
 
-### Command Line Interface
+### 2. Prepare Your CML Files
+Place your monomer CML files in the same directory:
+- `PEi.cml` (internal)
+- `PEl.cml` (left-end)
+- `PEr.cml` (right-end)
+
+### 3. Run the Converter
+```bash
+python rdlt_avogadro.py --internal PEi.cml --left PEl.cml --right PEr.cml \
+    --base-name PE --output-dir output --tacticity atactic
+```
+
+---
+
+## Command-Line Usage
 
 ```bash
-# Basic usage
-python rdlt_avogadro.py --internal PEi.cml --left PEl.cml --right PEr.cml --base-name PE --output-dir output
-
-# With LOPLS force field
-python rdlt_avogadro.py --internal PEi.cml --left PEl.cml --right PEr.cml --base-name PE --output-dir output --lopls
-
-# With custom feature definitions
-python rdlt_avogadro.py --internal PEi.cml --left PEl.cml --right PEr.cml --base-name PE --output-dir output --opls-fdef path/to/opls_lt.fdefn
+python rdlt_avogadro.py \
+    --internal PEi.cml \
+    --left PEl.cml \
+    --right PEr.cml \
+    --base-name PE \
+    --output-dir output \
+    --tacticity {atactic,isotactic,syndiotactic} \
+    [--lopls] [--opls-fdef opls.fdef] [--lopls-fdef lopls.fdef]
 ```
 
-### Python API
+**Arguments:**
+- `--internal`   Internal monomer CML file
+- `--left`       Left-end monomer CML file
+- `--right`      Right-end monomer CML file
+- `--base-name`  Base name for output files (e.g. PE)
+- `--output-dir` Output directory (default: current)
+- `--tacticity`  Tacticity type: atactic, isotactic, syndiotactic
+- `--lopls`      Use LOPLS atom typing (optional)
+- `--opls-fdef`  Path to OPLS feature definition file (optional)
+- `--lopls-fdef` Path to LOPLS feature definition file (optional)
 
-```python
-from rdlt_avogadro import CMLToLTConverter
+---
 
-# Create converter
-converter = CMLToLTConverter()
+## Output
+Depending on tacticity, the script generates:
+- Atactic: `PEi.lt`, `PEi_T1.lt`, `PEle.lt`, `PEle_T1.lt`, `PEre.lt`, `PEre_T1.lt`
+- Isotactic: `PEi.lt`, `PEle.lt`, `PEre.lt`
+- Syndiotactic: `PEi.lt`, `PEi_T1.lt`, `PEle.lt`, `PEle_T1.lt`, `PEre.lt`, `PEre_T1.lt`
 
-# Process all three monomer variants
-cml_files = {
-    'internal': 'PEi.cml',
-    'left': 'PEl.cml', 
-    'right': 'PEr.cml'
-}
+All files are ready for use with AutoPoly and LAMMPS.
 
-generated_files = converter.process_polymer_monomers(cml_files, 'PE', 'output')
+---
 
-# Process single monomer
-converter.process_cml_to_lt('PEi.cml', 'PEi', 'internal', 'PEi.lt')
+## Tutorial: Generating Tacticity-Controlled Monomers
+
+### Step 1: Prepare Monomer CML Files
+- Use Avogadro or another tool to create and export your monomer structures as `.cml` files.
+- Name them according to their role: `*i.cml` (internal), `*l.cml` (left), `*r.cml` (right).
+
+### Step 2: Run the Script for Atactic Polymer
+```bash
+python rdlt_avogadro.py --internal PEi.cml --left PEl.cml --right PEr.cml \
+    --base-name PE --output-dir output --tacticity atactic
+```
+- This will generate both normal and T1 variants for each monomer type.
+
+### Step 3: Run for Isotactic or Syndiotactic
+```bash
+# Isotactic (all same stereochemistry)
+python rdlt_avogadro.py --internal PEi.cml --left PEl.cml --right PEr.cml \
+    --base-name PE --output-dir output --tacticity isotactic
+
+# Syndiotactic (alternating stereochemistry)
+python rdlt_avogadro.py --internal PEi.cml --left PEl.cml --right PEr.cml \
+    --base-name PE --output-dir output --tacticity syndiotactic
 ```
 
-## Testing
+### Step 4: Use in AutoPoly
+- The generated `.lt` files can be directly used in the AutoPoly system for polymerization.
+- Select the appropriate tacticity for your simulation.
 
-The implementation has been thoroughly tested with the provided PE (Polyethylene) CML files:
+---
 
-### Test Results
-
-✅ **Command Line Interface**: Works correctly with all options
-✅ **File Generation**: All three monomer variants generated successfully
-✅ **Atom Type Assignment**: Correct OPLS atom types assigned for each variant
-✅ **Coordinate Preservation**: 3D coordinates preserved from CML files
-✅ **Bond Connectivity**: All bonds maintained correctly
-✅ **File Structure**: Generated files have correct AutoPoly-compatible structure
-✅ **Error Handling**: Gracefully handles missing files and parsing errors
-✅ **LOPLS Support**: LOPLS flag adds appropriate import statements
-
-### Generated Files
-
-For PE monomers, the following files are generated:
-- `PEi.lt`: Internal monomer with 6 atoms (2 C, 4 H) and 5 bonds
-- `PEle.lt`: Left-end monomer with 7 atoms (2 C, 5 H) and 6 bonds  
-- `PEre.lt`: Right-end monomer with 7 atoms (2 C, 5 H) and 6 bonds
-
-### File Structure
-
-Each generated .lt file contains:
-```lt
-import "oplsaa.lt"    # <-- defines the standard "OPLSAA" force field
-{monomer_name} inherits OPLSAA {
-
-# atom-id  mol-id  atom-type charge      X         Y        Z
-  write("Data Atoms") {
-    $atom:C1 $mol:... @atom:81 0.00    0.136    0.013   -0.007
-    $atom:C2 $mol:... @atom:82 0.00    1.652   -0.002    0.014
-    ...
-  }
-
-  write('Data Bond List') {
-    $bond:C1C2	$atom:C1	$atom:C2
-    ...
-  }
-} # {monomer_name}
+## Advanced: LOPLS Support
+To use LOPLS atom typing, add the `--lopls` flag:
+```bash
+python rdlt_avogadro.py --internal PEi.cml --left PEl.cml --right PEr.cml \
+    --base-name PE --output-dir output --tacticity atactic --lopls
 ```
 
-## Integration with AutoPoly
+---
 
-The generated .lt files are fully compatible with the AutoPoly polymerization system:
+## Troubleshooting
+- **Missing dependencies?** Install RDKit and NumPy as shown above.
+- **CML parsing errors?** Ensure your CML files are valid and contain 3D coordinates.
+- **File not generated?** Check the script output for warnings about missing or invalid files.
 
-```python
-import AutoPoly
-
-# Use the generated monomers
-system = AutoPoly.System(out="test_polymer")
-polymer = AutoPoly.Polymer(ChainNum=10, Sequence=["PEi"]*50, topology="linear")
-poly = AutoPoly.Polymerization(name="TestPE", system=system, model=[polymer], run=True)
-```
-
-## Example Files
-
-The repository includes example CML files for testing:
-- `PEi.cml`: Internal polyethylene monomer
-- `PEl.cml`: Left-end polyethylene monomer  
-- `PEr.cml`: Right-end polyethylene monomer
-
-## Test Scripts
-
-- `test_cml_to_lt.py`: Basic functionality tests
-- `example_usage.py`: Usage examples
-- `integration_test.py`: AutoPoly integration tests
-
-## Error Handling
-
-The converter handles various error conditions:
-- Missing CML files: Skips with warning
-- Invalid CML format: Raises descriptive error
-- Missing atom types: Validates before file generation
-- File write errors: Handles gracefully
-
-## Performance
-
-- Fast parsing of CML files
-- Efficient RDKit molecule building
-- Minimal memory usage
-- Quick .lt file generation
-
-## Future Enhancements
-
-Potential improvements:
-- Support for more complex molecular structures
-- Automatic connection point detection
-- Integration with molecular visualization tools
-- Batch processing of multiple monomer sets
-- Support for additional force fields
+---
 
 ## License
+MIT License
 
-This module is part of the AutoPoly project and follows the same licensing terms. 
+---
+
+## Citation
+If you use this script in your research, please cite the AutoPoly project and this repository. 

@@ -1,8 +1,32 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Dec 21 12:19:08 2018
+Polymerization Module for AutoPoly Package
 
+This module provides the core Polymerization class for generating polymer structures
+using Moltemplate and preparing them for LAMMPS molecular dynamics simulations.
+
+The Polymerization class handles:
+- Polymer structure generation from monomer templates
+- Moltemplate integration for LAMMPS data file creation
+- Force field parameter management (OPLS-AA)
+- Support for various polymer topologies and tacticity
+- File organization and output management
+
+Key Features:
+- Atomistic polymer modeling with OPLS-AA force field
+- Support for linear and ring polymer topologies
+- Tacticity control (atactic, isotactic, syndiotactic)
+- Automatic monomer bank management
+- LAMMPS input file generation
+- Comprehensive error handling and logging
+
+Dependencies:
+- Moltemplate: For generating LAMMPS data files
+- OPLS-AA force field parameters
+- Monomer bank with .lt template files
+
+Created on Fri Dec 21 12:19:08 2018
 @author: zwu
 """
 import sys
@@ -12,19 +36,51 @@ import subprocess
 import shutil
 import re
 import numpy as np
+from typing import List, Optional, Dict, Any
 from .system import logger
 
 class Polymerization(object):
+    """
+    Core polymerization class for generating polymer structures using Moltemplate.
+    
+    This class manages the complete workflow for creating polymer structures
+    from monomer templates and generating LAMMPS input files for molecular
+    dynamics simulations. It handles file management, force field parameters,
+    and integration with external tools like Moltemplate.
+    
+    Attributes:
+        name (str): Name of the polymerization project
+        system (object): System object containing path information
+        path_cwd (str): Current working directory for the project
+        path_master (str): Path to external dependencies
+        path_moltemplatesrc (str): Path to Moltemplate source
+        path_monomer_bank (str): Path to monomer template bank
+        path_oplsaaprm (str): Path to OPLS-AA force field parameters
+        is_lopls (bool): Whether to use LOPLS force field
+        model (list): List of polymer models to generate
+        rotate (float): Rotation angle for monomer placement
+        offset_spacing (float): Spacing between polymer chains
+        offset (float): Offset distance for monomer placement
+        packingL_spacing (float): Packing length spacing
+        moltemplate_box_size (float): Box size for Moltemplate
+        FFmodify_alkylDihedral (np.array): Modified dihedral parameters
+    """
+    
     def __init__(self, name: str = None, system: object = None, model: list = None,
-                 run: bool = True, path_monomer_bank: str = None,is_lopls=False) -> None:
-        """Initializes the Polymerization class.
+                 run: bool = True, path_monomer_bank: str = None, is_lopls: bool = False) -> None:
+        """
+        Initialize the Polymerization class.
 
         Args:
-            name (str): Name of the polymerization.
-            system (object): System object containing folder path.
-            model (list): List of models for polymerization.
-            run (bool): Flag to run the process immediately.
-            path_monomer_bank (str): Path to the monomer bank.
+            name (str, optional): Name of the polymerization project. Defaults to None.
+            system (object, optional): System object containing folder path. Defaults to None.
+            model (list, optional): List of models for polymerization. Defaults to None.
+            run (bool, optional): Flag to run the process immediately. Defaults to True.
+            path_monomer_bank (str, optional): Path to the monomer bank. Defaults to None.
+            is_lopls (bool, optional): Whether to use LOPLS force field. Defaults to False.
+        
+        Raises:
+            SystemExit: If required directories or files are not found
         """
         self.name = name
         self.system = system
@@ -34,7 +90,7 @@ class Polymerization(object):
         
         self.path_monomer_bank = (self.path_master + "Monomer_bank/"
                                   if path_monomer_bank is None else path_monomer_bank)
-        self.is_lopls=is_lopls
+        self.is_lopls = is_lopls
         if is_lopls:
             self.path_oplsaaprm = f"{self.path_master}moltemplate/loplsaa.prm"
         else:
@@ -48,8 +104,8 @@ class Polymerization(object):
         self.packingL_spacing = 5.0
         self.moltemplate_box_size = 400.0
 
-        self.FFmodify_alkylDihedral = np.array([0.6446926386, -0.2143420172, 0.1782194073, 0.0]) #Kj/mol -> kcal/mol
-
+        # Modified alkyl dihedral parameters (Kj/mol -> kcal/mol conversion)
+        self.FFmodify_alkylDihedral = np.array([0.6446926386, -0.2143420172, 0.1782194073, 0.0])
         
         # Create working directory before proceeding
         self.create_working_directory()
@@ -60,7 +116,19 @@ class Polymerization(object):
             self.make_lmp_data_file_by_moltemplate()
 
     def create_working_directory(self) -> None:
-        """Creates and manages the working directory structure."""
+        """
+        Create and manage the working directory structure for the polymerization.
+        
+        This method sets up the directory structure needed for the polymerization
+        process. It creates the main project directory and the moltemplate
+        subdirectory where all intermediate files will be stored.
+        
+        The method handles existing directories by prompting the user to either
+        delete and recreate them or choose a different project name.
+        
+        Raises:
+            SystemExit: If user chooses not to overwrite existing directory
+        """
         base_path = Path(self.system.get_FolderPath)
         polymer_path = base_path / self.name
         moltemplate_path = polymer_path / "moltemplate"
@@ -105,36 +173,45 @@ class Polymerization(object):
         self.tacticity = tacticity
 
     def n_monomer_atoms(self, merltfile: str) -> int:
-        """Counts the number of monomer atoms in the specified file.
+        """
+        Count the number of monomer atoms in the specified .lt file.
+
+        This method parses a Moltemplate monomer file (.lt) and counts the
+        number of atoms defined in the "Data Atoms" block. This information
+        is used for polymer structure generation and validation.
 
         Args:
-            merltfile (str): The name of the merlt file.
+            merltfile (str): The name of the monomer .lt file.
 
         Returns:
             int: The number of monomer atoms.
+
+        Raises:
+            SystemExit: If the monomer file cannot be opened or found.
         """
         n_monomer_atoms = 0
         monomer_bank = Path(self.path_monomer_bank)
         merltfile_path = monomer_bank / merltfile
+        
         if merltfile_path.is_file():
             is_inside_block = False
             with open(merltfile_path) as f:
                 while True: 
                     line = f.readline() 
-                    if line.strip()=="write(\"Data Atoms\") {":
-                        is_inside_block=True
+                    if line.strip() == "write(\"Data Atoms\") {":
+                        is_inside_block = True
                         line = f.readline() 
-                    elif line.strip()=="}":
-                        is_inside_block=False
+                    elif line.strip() == "}":
+                        is_inside_block = False
                     
                     if is_inside_block:
-                        n_monomer_atoms=n_monomer_atoms+1
+                        n_monomer_atoms = n_monomer_atoms + 1
 
                     if not line: 
                         break
         else:
-            logger.error(' '.join(["in MoltemplateLmpData::n_monomerAtoms():\n",merltfile_path," file cannot open.\n"]))
-            sys.exit()
+            logger.error(f"in MoltemplateLmpData::n_monomerAtoms(): {merltfile_path} file cannot open.")
+            sys.exit(1)
 
         return n_monomer_atoms
 
@@ -216,48 +293,65 @@ class Polymerization(object):
     
 
     def make_lmp_data_file_by_moltemplate(self) -> None:
-        """Generates the LAMMPS data file using Moltemplate."""
+        """
+        Generate the LAMMPS data file using Moltemplate.
+        
+        This is the main method that orchestrates the complete polymer generation
+        process. It performs the following steps:
+        
+        1. Validates polymer models and monomer availability
+        2. Copies monomer templates to working directory
+        3. Generates polymer .lt files for each chain
+        4. Creates force field parameter files (OPLS-AA)
+        5. Generates system.lt file
+        6. Runs Moltemplate to create LAMMPS data files
+        7. Processes and organizes output files
+        
+        The method includes comprehensive error checking and validation
+        to ensure all required files are generated correctly.
+        
+        Raises:
+            SystemExit: If any critical step fails or required files are missing
+        """
         try:
-            logger.info(' '.join(["\nlmpdata prepared by Moltemplate.\n"]))
+            logger.info("Starting LAMMPS data file generation using Moltemplate")
             
             poly_index = 0
             for modelii in self.model:
-                logger.info(' '.join(["\nNumber of Molecules = ", str(len(modelii.sequenceSet))]))
-                # loop through all polymers and make corresponding polymer lt files
+                logger.info(f"Processing model with {len(modelii.sequenceSet)} molecules")
+                
+                # Loop through all polymers and make corresponding polymer lt files
                 for moleii in range(len(modelii.sequenceSet)):
-                    # check degrees of polymerization (DOP) of current polymer
+                    # Check degrees of polymerization (DOP) of current polymer
                     if modelii.DOP > 0:
                         if len(modelii.sequenceSet[moleii]) != modelii.DOP:
-                            logger.warning(' '.join(["\nWarning: At molecule# ", str(moleii), " DOP=",
-                                                   str(len(modelii.sequenceSet[moleii])),
-                                                   " != ", str(modelii.DOP), "\n"]))
+                            logger.warning(f"Warning: At molecule# {moleii} DOP={len(modelii.sequenceSet[moleii])} != {modelii.DOP}")
                     else:
-                        logger.error(' '.join(["\nWarning: At molecule#", str(moleii+1), ",",
-                                             "DOP=", str(len(modelii.sequenceSet[moleii])), str(modelii.DOP)]))
+                        logger.error(f"Warning: At molecule#{moleii+1}, DOP={len(modelii.sequenceSet[moleii])} {modelii.DOP}")
 
-                    # check monomer.lt's in the monomer bank
+                    # Check monomer.lt's in the monomer bank
                     for indexii in range(len(modelii.sequenceSet[moleii])):
                         monomer_file = modelii.sequenceSet[moleii][indexii]
                         if not monomer_file.endswith('.lt'):
                             monomer_file += '.lt'
                         if self.check_monomer_bank(monomer_file):
-                            source = Path(self.path_monomer_bank)/monomer_file
+                            source = Path(self.path_monomer_bank) / monomer_file
                             self.copy_to_cwd(source)
                         else:
                             logger.error(f"Error: Cannot find monomer file {monomer_file} in monomer bank at {self.path_monomer_bank}")
                             sys.exit(1)
 
                     if modelii.DOP > 1:
-                        # make poly.lt file
+                        # Make poly.lt file
                         logger.info(f"Creating poly_{poly_index+1}.lt")
                         self.make_poly_lt(poly_index, modelii.sequenceSet[moleii], modelii)
                         poly_index += 1
 
-            # make oplsaa.lt
+            # Generate force field files
             logger.info("Generating oplsaa.lt")
             self.make_oplsaalt()
 
-            # make system.lt file
+            # Generate system.lt file
             logger.info("Creating system.lt")
             self.make_system_lt()
 
@@ -265,7 +359,7 @@ class Polymerization(object):
             if self.is_lopls:
                 self.FFmodify_alkyl_dihedral_oplsaa()
 
-            # invoke moltemplate to generate LAMMPS datafile
+            # Invoke moltemplate to generate LAMMPS datafile
             logger.info("Running moltemplate")
             self.invoke_moltemplate()
 
@@ -287,7 +381,7 @@ class Polymerization(object):
             logger.info("Processing output files")
             self.get_rid_of_lj_cut_coul_long()
 
-            # move files to working directory
+            # Move files to working directory
             self.mv_files()
             logger.info("Successfully completed polymer generation")
             
@@ -552,6 +646,7 @@ class Polymerization(object):
                 # Original linear polymer code
                 offset_cum = 0
                 for indexii in range(len(monomer_set)):
+                    
                     monomer_name = monomer_set[indexii][:-3] if monomer_set[indexii].endswith('.lt') else monomer_set[indexii]
                     
                     write_f.write(f"    monomer[{indexii}] = new {monomer_name}")
@@ -830,7 +925,19 @@ class Polymerization(object):
         write_f.close()
 
     def check_monomer_bank(self, monomer: str) -> bool:
-        """Checks if the specified monomer exists in the monomer bank."""
+        """
+        Check if a monomer template exists in the monomer bank.
+        
+        This method verifies that a specific monomer .lt file exists in the
+        monomer bank directory. It provides detailed logging when a monomer
+        is not found to help with debugging.
+        
+        Args:
+            monomer (str): Name of the monomer file to check (with or without .lt extension)
+        
+        Returns:
+            bool: True if the monomer file exists, False otherwise
+        """
         monomer_path = Path(self.path_monomer_bank) / monomer
         exists = monomer_path.is_file()
         if not exists:
@@ -842,21 +949,35 @@ class Polymerization(object):
         return exists
 
     def copy_to_cwd(self, source: Path) -> None:
-        """Copies the specified source file to the current working directory.
-
+        """
+        Copy the specified source file to the current working directory.
+        
+        This method copies monomer template files from the monomer bank
+        to the current working directory for processing by Moltemplate.
+        
         Args:
             source (Path): The path of the source file to copy.
         """
-        bash="cp "
-        bash=bash+str(source)+" "+self.path_cwd
+        bash = "cp "
+        bash = bash + str(source) + " " + self.path_cwd
         os.system(bash)
 
     def create_ring_polymer_topology(self, poly_index: int, monomer_set: list) -> None:
-        """Creates a ring polymer topology and coordinates based on the provided monomer sequence.
-
+        """
+        Create a ring polymer topology and coordinates based on the provided monomer sequence.
+        
+        This method generates a Moltemplate .lt file for a ring polymer by:
+        1. Importing required monomer templates and force field parameters
+        2. Creating a circular arrangement of monomers
+        3. Defining bonds between adjacent monomers to form a closed ring
+        4. Calculating proper coordinates and rotations for each monomer
+        
+        The ring is created by placing monomers in a circle with appropriate
+        spacing and rotation to ensure proper bonding geometry.
+        
         Args:
-            poly_index (int): The index of the polymer.
-            monomer_set (list): The list of monomers in the ring polymer.
+            poly_index (int): The index of the polymer for file naming.
+            monomer_set (list): The list of monomers in the ring polymer sequence.
         """
         output = self.path_cwd + f"/poly_{poly_index+1}.lt"
 

@@ -646,6 +646,7 @@ class Polymerization(object):
                 # Original linear polymer code
                 offset_cum = 0
                 for indexii in range(len(monomer_set)):
+                    
                     monomer_name = monomer_set[indexii][:-3] if monomer_set[indexii].endswith('.lt') else monomer_set[indexii]
                     
                     write_f.write(f"    monomer[{indexii}] = new {monomer_name}")
