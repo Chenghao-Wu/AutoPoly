@@ -1,196 +1,324 @@
-# AutoPoly.py: Automatic Generation of Data File for Polymers
+# AutoPoly: Automated Polymer Generation and Simulation Package
 
-AutoPoly is a Python package for automatically generating LAMMPS data files for polymer systems. It supports both atomistic (OPLS force field) and coarse-grained (bead-spring) polymer models.
+AutoPoly is a comprehensive Python package for generating polymer structures and preparing them for molecular dynamics simulations using LAMMPS and Moltemplate.
 
-## Why AutoPoly?
+## Overview
 
-- Create polymers with any chain length
-- Support for linear and ring polymer topologies
-- Easy integration with RDKit for custom monomer creation
-- Automated handling of tacticity
-- Built-in support for common polymer types
-- Coarse-grained bead-spring polymer models
+AutoPoly provides tools for:
+- **Polymer Structure Generation**: Create atomistic polymer models with various topologies and tacticity
+- **Force Field Integration**: Seamless integration with OPLS-AA and LOPLS force fields
+- **LAMMPS Preparation**: Generate complete LAMMPS input files and data structures
+- **Bead-Spring Models**: Simplified coarse-grained polymer models for quick simulations
+- **File Management**: Automated organization of simulation files and outputs
+
+## Key Features
+
+### 🧬 Polymer Topologies
+- **Linear Polymers**: Standard linear chain structures
+- **Ring Polymers**: Circular polymer topologies
+- **Custom Sequences**: User-defined monomer sequences
+
+### 🎯 Tacticity Control
+- **Atactic**: Random stereochemistry
+- **Isotactic**: All monomers with same stereochemistry
+- **Syndiotactic**: Alternating stereochemistry
+
+### 🔬 Force Fields
+- **OPLS-AA**: All-atom force field for accurate simulations
+- **LOPLS**: Lipid-optimized force field variant
+- **Custom Parameters**: Support for modified force field parameters
+
+### 📁 File Management
+- **Monomer Bank**: Centralized monomer template library
+- **Output Organization**: Structured file organization
+- **Error Handling**: Comprehensive validation and error reporting
 
 ## Installation
 
-Install AutoPoly via pip:
+### Prerequisites
+- Python 3.7+
+- LAMMPS (for simulations)
+- Moltemplate (for structure generation)
+
+### Install AutoPoly
 ```bash
-git clone https://github.com/Chenghao-Wu/AutoPoly.git
+# Clone the repository
+git clone <repository-url>
 cd AutoPoly
-pip install .
+
+# Install the package
+pip install -e .
 ```
 
-## Supported Models
+## Quick Start
 
-### Atomistic Polymers (OPLS)
-1. PMMA (Tacticity supported)
-2. PS (Tacticity supported)
-3. PE (Tacticity supported)
-4. PI (cis)
-5. PP (Tacticity supported)
-6. PVA (Tacticity supported)
+### 1. Basic Polymer Generation
 
-### Coarse-Grained Models
-- Bead-spring polymer chains
-  - Linear topology
-  - Ring topology
-  - Configurable parameters (mass, bond length, LJ parameters)
-  - 3D spatial distribution for non-overlapping configurations
+```python
+from AutoPoly import System, Polymer, Polymerization
+
+# Create system
+system = System(out="my_polymer")
+
+# Define polymer
+polymer = Polymer(
+    ChainNum=10,
+    Sequence=["ethylene"],
+    DOP=100,
+    topology="linear",
+    tacticity="atactic"
+)
+
+# Generate structure
+polymerization = Polymerization(
+    name="ethylene_polymer",
+    system=system,
+    model=[polymer]
+)
+```
+
+### 2. Bead-Spring Model
+
+```python
+from AutoPoly import BeadSpringPolymer, System
+
+# Create system
+system = System(out="bead_spring")
+
+# Generate bead-spring polymer
+bead_polymer = BeadSpringPolymer(
+    name="test_polymer",
+    system=system,
+    n_chains=5,
+    n_beads=20,
+    topology="linear"
+)
+
+# Generate LAMMPS files
+bead_polymer.generate_data_file()
+```
+
+### 3. Ring Polymer
+
+```python
+# Create ring polymer
+ring_polymer = Polymer(
+    ChainNum=5,
+    Sequence=["styrene"],
+    topology="ring",
+    tacticity="atactic"
+)
+
+# Generate with polymerization
+polymerization = Polymerization(
+    name="ring_styrene",
+    system=system,
+    model=[ring_polymer]
+)
+```
+
+## Package Structure
+
+```
+AutoPoly/
+├── AutoPoly/
+│   ├── __init__.py          # Package initialization
+│   ├── system.py            # System management
+│   ├── polymer.py           # Polymer definition
+│   ├── polymerization.py    # Core polymerization logic
+│   ├── bead_spring.py       # Bead-spring models
+│   ├── conf.py              # Configuration settings
+│   ├── logger.py            # Logging utilities
+│   └── extern/              # External dependencies
+│       ├── Monomer_bank/    # Monomer templates
+│       ├── moltemplate/     # Moltemplate files
+│       └── rdlt.py          # LAMMPS data utilities
+├── examples/                # Usage examples
+├── tests/                   # Test suite
+└── docs/                    # Documentation
+```
+
+## Core Classes
+
+### System
+Manages file paths and directory operations for polymer simulations.
+
+```python
+system = System(out="output_directory")
+```
+
+### Polymer
+Defines polymer properties including topology, tacticity, and monomer sequences.
+
+```python
+polymer = Polymer(
+    ChainNum=10,           # Number of chains
+    Sequence=["monomer"],  # Monomer sequence
+    DOP=100,              # Degree of polymerization
+    topology="linear",     # "linear" or "ring"
+    tacticity="atactic"    # "atactic", "isotactic", "syndiotactic"
+)
+```
+
+### Polymerization
+Core class for generating polymer structures using Moltemplate.
+
+```python
+polymerization = Polymerization(
+    name="project_name",
+    system=system,
+    model=[polymer],
+    is_lopls=False  # Use LOPLS force field
+)
+```
+
+### BeadSpringPolymer
+Simplified bead-spring model generator for coarse-grained simulations.
+
+```python
+bead_polymer = BeadSpringPolymer(
+    name="model_name",
+    system=system,
+    n_chains=5,
+    n_beads=20,
+    topology="linear"
+)
+```
+
+## Configuration
+
+### Logging
+Configure logging levels in `conf.py`:
+
+```python
+LOG = {
+    'ROOT_LEVEL': logging.INFO,
+    'CONSOLE_LEVEL': logging.INFO,
+    'FILE_LEVEL': logging.INFO,
+    'TO_FILE': False
+}
+```
+
+### Output Paths
+Set output directory in `conf.py`:
+
+```python
+OUT_PATH = os.path.join(os.path.expanduser("~"))
+```
 
 ## Examples
 
-### 1. Linear Polymer (PMMA)
+### Linear Polyethylene
 ```python
-import AutoPoly
+from AutoPoly import System, Polymer, Polymerization
 
-# Define the system
-system = AutoPoly.System(out="pmma_linear")
-
-# Create a linear PMMA polymer with 10 chains, each with 50 monomers
-linear_polymer = AutoPoly.Polymer(ChainNum=10, Sequence=["PMMA"]*50, topology="linear")
-
-# Generate the polymer system
-poly = AutoPoly.Polymerization(name="LinearPolymer", 
-                              system=system, 
-                              model=[linear_polymer], 
-                              run=True)
+system = System(out="polyethylene")
+polymer = Polymer(ChainNum=10, Sequence=["ethylene"], DOP=50)
+polymerization = Polymerization(name="PE", system=system, model=[polymer])
 ```
 
-### 2. Bead-Spring Polymer System
+### Ring Polystyrene
 ```python
-import AutoPoly
-from AutoPoly.bead_spring import BeadSpringPolymer
-
-# Define the system
-system = AutoPoly.System(out="bead_spring_test")
-
-# Create a linear bead-spring polymer
-linear_polymer = BeadSpringPolymer(
-    name="linear_polymer",
-    system=system,
-    n_chains=10,
-    n_beads=50,
-    topology="linear",
-    bond_length=1.0,
-    mass=1.0,
-    epsilon=1.0,
-    sigma=1.0
-)
-linear_polymer.generate_data_file()
-
-# Create a ring bead-spring polymer
-ring_polymer = BeadSpringPolymer(
-    name="ring_polymer",
-    system=system,
-    n_chains=60,
-    n_beads=50,
+polymer = Polymer(
+    ChainNum=5,
+    Sequence=["styrene"],
     topology="ring",
-    bond_length=1.0,
-    mass=1.0,
-    epsilon=1.0,
-    sigma=1.0
+    tacticity="atactic"
 )
-ring_polymer.generate_data_file()
+polymerization = Polymerization(name="ring_PS", system=system, model=[polymer])
 ```
 
-The bead-spring model features:
-- Customizable number of chains and beads per chain
-- Linear or ring topology
-- Lennard-Jones non-bonded interactions
-- Harmonic bond potentials
-- Non-overlapping 3D configurations for ring polymers
-- Automatic LAMMPS input script generation
-
-### 3. Mixed Polymer System (PP and PE)
+### Copolymer
 ```python
-# Define the system
-system = AutoPoly.System(out="mixed_polymers")
-
-# Create different polymer types
-pp_ua = AutoPoly.Polymer(ChainNum=2, Sequence=["PPUA"]*20)  # United-atom PP
-pe_ua = AutoPoly.Polymer(ChainNum=2, Sequence=["PEUA"]*10)  # United-atom PE
-pe_aa = AutoPoly.Polymer(ChainNum=3, Sequence=["PEAA"]*15)  # All-atom PE
-
-# Generate the mixed polymer system
-poly = AutoPoly.Polymerization(name="MixedSystem",
-                              system=system,
-                              model=[pp_ua, pe_ua, pe_aa],
-                              run=True)
-```
-
-### 4. Using RDKit to Create Custom Monomers
-```python
-# Create a custom monomer using SMILES
-rdlt = AutoPoly.RDlt(smiles='c1c2ccccc2ccc1')  # Naphthalene
-rdlt.run(to_file='Naphthalene.lt')
-rdlt.store_bank()  # Store in monomer bank for future use
-
-# Create a system using the custom monomer
-system = AutoPoly.System(out="custom_system")
-custom_polymer = AutoPoly.Polymer(ChainNum=50, Sequence=["Naphthalene"])
-
-poly = AutoPoly.Polymerization(name="CustomPolymer",
-                              system=system,
-                              model=[custom_polymer],
-                              run=True)
-```
-
-### 5. Small Molecule System
-```python
-# Create a system of 50 benzene molecules
-system = AutoPoly.System(out="benzene_system")
-benzene = AutoPoly.Polymer(ChainNum=50, Sequence=["Benzene"])
-
-poly = AutoPoly.Polymerization(name="BenzeneSystem",
-                              system=system,
-                              model=[benzene],
-                              run=True)
+polymer = Polymer(
+    ChainNum=10,
+    Sequence=["ethylene", "propylene"],
+    DOP=100,
+    tacticity="syndiotactic"
+)
 ```
 
 ## Output Files
 
-AutoPoly generates:
-- LAMMPS data files (.data)
-- Moltemplate files (.lt) for atomistic models
-- LAMMPS input scripts
-- Force field parameters
-- System configuration files
+AutoPoly generates the following files:
 
-## Features
+### LAMMPS Files
+- `system.data`: Atom coordinates and connectivity
+- `system.in.settings`: Force field parameters
+- `system.in.charges`: Atomic charges
+- `system.in`: LAMMPS input script
+- `system.in.init`: Initialization script
 
-### Atomistic Models
-- OPLS force field support
-- Tacticity control
-- Custom monomer creation via RDKit
-- Moltemplate integration
+### Organization
+```
+project_name/
+├── moltemplate/     # Intermediate files
+├── input/          # Input templates
+├── output/         # LAMMPS files
+└── logs/           # Log files
+```
 
-### Coarse-Grained Models
-- Bead-spring representation
-- Configurable force field parameters
-- 3D spatial distribution
-- Multiple chain topologies
-- Ready-to-run LAMMPS configurations
+## Troubleshooting
 
-## Monomer Bank
+### Common Issues
 
-The package includes a built-in monomer bank with common polymer units. Custom monomers can be created using:
-1. Avogadro (https://avogadro.cc/)
-2. RDKit integration (for custom molecular structures)
+1. **Monomer Not Found**
+   - Check monomer bank path in `extern/Monomer_bank/`
+   - Verify monomer file names match sequence
 
-## Acknowledgments
+2. **Moltemplate Errors**
+   - Ensure Moltemplate is properly installed
+   - Check monomer .lt file syntax
+   - Verify force field parameter files
 
-- Moltemplate: "A Tool for Coarse-Grained Modeling of Complex Biological Matter and Soft Condensed Matter Physics", J. Mol. Biol., 2021, 433(11):166841
-- rdlt: Script for automating OPLS atom type assignment and .lt file generation
+3. **File Permission Errors**
+   - Check write permissions for output directory
+   - Ensure sufficient disk space
 
-## Future Development
+### Debug Mode
+Enable detailed logging:
 
-- [ ] Enhanced coarse-grained model support
-- [ ] Additional polymer architectures
-- [ ] Pre-relaxation using LAMMPS
-- [ ] Integration with LigParGen
-- [ ] Extended force field support
-- [ ] More polymer topologies
+```python
+from AutoPoly.conf import LOG
+LOG['ROOT_LEVEL'] = logging.DEBUG
+LOG['TO_FILE'] = True
+```
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+## License
+
+This project is licensed under the BSD License - see the `license.md` file for details.
+
+## Citation
+
+If you use AutoPoly in your research, please cite:
+
+```bibtex
+@software{autopoly2024,
+  title={AutoPoly: Automated Polymer Generation and Simulation Package},
+  author={Wu, Zhenghao},
+  year={2024},
+  url={https://github.com/your-repo/autopoly}
+}
+```
+
+## Support
+
+For questions and support:
+- Check the documentation
+- Review example files
+- Open an issue on GitHub
+- Contact the maintainers
+
+## Acknowledgments
+
+- Moltemplate developers for the structure generation framework
+- LAMMPS developers for the molecular dynamics engine
+- OPLS-AA force field developers

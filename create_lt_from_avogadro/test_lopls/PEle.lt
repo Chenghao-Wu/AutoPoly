@@ -1,0 +1,33 @@
+import "oplsaa.lt"    # <-- defines the standard "OPLSAA" force field
+import "loplsaa.lt"   # <-- custom parameters for long alkane chains taken from
+                      #     Sui et al. J.Chem.Theory.Comp (2012), 8, 1459
+                      #     To use the ordinary OPLSAA force field parameters,
+                      #     (instead of the Sui et al. parameters), change the
+                      #     atom types below from "@atom:81L","@atom:85LCH2" to
+                      #     "@atom:81" and "@atom:85"  (defined in "oplsaa.lt")
+PEle inherits OPLSAA {
+
+# atom-id  mol-id  atom-type charge      X         Y        Z
+  write("Data Atoms") {
+	$atom:C1 $mol:... @atom:80 0.00    0.058   -0.064   -0.036
+	$atom:C2 $mol:... @atom:82 0.00    1.570    0.040    0.019
+	$atom:H3 $mol:... @atom:85 0.00   -0.255   -0.541   -0.989
+	$atom:H4 $mol:... @atom:85 0.00   -0.305   -0.675    0.817
+	$atom:H5 $mol:... @atom:85 0.00    1.940    0.656   -0.828
+	$atom:H6 $mol:... @atom:85 0.00    2.023   -0.973   -0.039
+	$atom:H7 $mol:... @atom:85 0.00   -0.388    0.950    0.029
+  }
+
+  write('Data Bond List') {
+	$bond:C1C2	$atom:C1	$atom:C2
+	$bond:C1H3	$atom:C1	$atom:H3
+	$bond:C1H4	$atom:C1	$atom:H4
+	$bond:C2H5	$atom:C2	$atom:H5
+	$bond:C2H6	$atom:C2	$atom:H6
+	$bond:C1H7	$atom:C1	$atom:H7
+  }
+} # PEle
+
+# Note: You don't need to supply the partial partial charges of the atoms.
+#       If you like, just fill the fourth column with zeros ("0.000").
+#       Moltemplate and LAMMPS will automatically assign the charge later

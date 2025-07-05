@@ -1,27 +1,63 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Dec 21 12:19:08 2018
+Polymer Definition Module
 
+This module provides the Polymer class for defining polymer properties,
+sequences, and structural characteristics for molecular dynamics simulations.
+
+The Polymer class handles:
+- Polymer chain definitions with various topologies (linear, ring)
+- Tacticity control (atactic, isotactic, syndiotactic)
+- Monomer sequence management
+- Chain generation with proper bonding patterns
+
+Created on Fri Dec 21 12:19:08 2018
 @author: zwu
 """
 import os
 import sys
 import random
+from typing import List, Optional, Union
 
 from .system import logger
 
 class Polymer(object):
+    """
+    Polymer class for defining polymer structures and properties.
+    
+    This class manages polymer chain definitions including topology, tacticity,
+    monomer sequences, and chain generation for molecular dynamics simulations.
+    
+    Attributes:
+        ChainNum (int): Number of polymer chains to generate
+        sequence (list): Original monomer sequence
+        DOP (int): Degree of polymerization
+        topology (str): Polymer topology ('linear' or 'ring')
+        tacticity (str): Polymer tacticity ('atactic', 'isotactic', 'syndiotactic')
+        sequenceSet (list): List of monomer file names for each chain
+        sequenceName (list): List of monomer names for each chain
+        merSet (list): Unique set of monomers used
+        SequnceLen (int): Length of the monomer sequence
+    """
+    
     def __init__(self, ChainNum: int = None, Sequence: list = None, DOP: int = 0, 
                  topology: str = "linear", tacticity: str = 'atactic') -> None:
-        """Initializes the Polymer class.
+        """
+        Initialize the Polymer class.
 
         Args:
-            ChainNum (int): Number of polymer chains.
-            Sequence (list): List of monomer sequences.
-            DOP (int): Degree of polymerization.
-            topology (str): Polymer topology, either "linear" (default) or "ring".
-            tacticity (str): Polymer tacticity ('atactic', 'isotactic', or 'syndiotactic').
+            ChainNum (int, optional): Number of polymer chains. Defaults to None.
+            Sequence (list, optional): List of monomer sequences. Defaults to None.
+            DOP (int, optional): Degree of polymerization. If 0, uses sequence length.
+                               Defaults to 0.
+            topology (str, optional): Polymer topology, either "linear" (default) 
+                                    or "ring". Defaults to "linear".
+            tacticity (str, optional): Polymer tacticity ('atactic', 'isotactic', 
+                                     or 'syndiotactic'). Defaults to 'atactic'.
+        
+        Raises:
+            ValueError: If topology is not 'linear' or 'ring'
         """
         self.ChainNum = ChainNum
         self.sequence = Sequence[0] if isinstance(Sequence[0], list) else Sequence  # Store original sequence
@@ -43,19 +79,40 @@ class Polymer(object):
         self.set_merSet(self.sequence)
         self.set_Sequence()
 
-    def set_merSet(self, merSet):
-        """Sets the merSet for the polymer."""
+    def set_merSet(self, merSet: Union[List[str], str]) -> None:
+        """
+        Set the unique set of monomers used in the polymer.
+        
+        Args:
+            merSet (Union[List[str], str]): List of monomers or single monomer
+        """
         if isinstance(merSet, list):
             self.merSet = list(dict.fromkeys(merSet))  # Remove duplicates
         else:
             self.merSet = [merSet]
 
-    def set_dop(self, dop):
-        """Sets the degree of polymerization."""
+    def set_dop(self, dop: int) -> None:
+        """
+        Set the degree of polymerization.
+        
+        Args:
+            dop (int): Degree of polymerization
+        """
         self.DOP = dop
 
-    def set_Sequence(self):
-        """Sets up the polymer sequence based on tacticity and chain number."""
+    def set_Sequence(self) -> None:
+        """
+        Set up the polymer sequence based on tacticity and chain number.
+        
+        This method generates the monomer file names and names for each chain
+        based on the specified topology and tacticity. It handles:
+        - Linear vs ring topology
+        - Atactic, isotactic, and syndiotactic tacticity
+        - Proper file naming conventions for different monomer positions
+        
+        Raises:
+            SystemExit: If ChainNum is 0 (no chains specified)
+        """
         sequence = self.sequence
         self.SequnceLen = len(sequence)
         self.set_merSet(sequence)
@@ -175,3 +232,49 @@ class Polymer(object):
                             merSet_.append(sequence[merii])
                         self.sequenceSet.append(merSet)
                         self.sequenceName.append(merSet_)
+    
+    def get_sequence_set(self) -> List[List[str]]:
+        """
+        Get the sequence set for all chains.
+        
+        Returns:
+            List[List[str]]: List of monomer file names for each chain
+        """
+        return self.sequenceSet
+    
+    def get_sequence_names(self) -> List[List[str]]:
+        """
+        Get the sequence names for all chains.
+        
+        Returns:
+            List[List[str]]: List of monomer names for each chain
+        """
+        return self.sequenceName
+    
+    def get_mer_set(self) -> List[str]:
+        """
+        Get the unique set of monomers used.
+        
+        Returns:
+            List[str]: Unique list of monomers
+        """
+        return self.merSet
+    
+    def get_chain_info(self) -> dict:
+        """
+        Get comprehensive information about the polymer.
+        
+        Returns:
+            dict: Dictionary containing polymer properties
+        """
+        return {
+            'chain_num': self.ChainNum,
+            'sequence': self.sequence,
+            'dop': self.DOP,
+            'topology': self.topology,
+            'tacticity': self.tacticity,
+            'sequence_length': self.SequnceLen,
+            'mer_set': self.merSet,
+            'sequence_set': self.sequenceSet,
+            'sequence_names': self.sequenceName
+        }
