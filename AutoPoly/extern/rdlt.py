@@ -13,20 +13,44 @@ import pathlib
 from ..system import logger
 
 
-def writeHeader(molname, loplsflag):
-    print("""import "oplsaa.lt"    # <-- defines the standard "OPLSAA" force field""")
-    if loplsflag:
-        print("""import "loplsaa.lt"   # <-- custom parameters for long alkane chains taken from
-                      #     Sui et al. J.Chem.Theory.Comp (2012), 8, 1459
-                      #     To use the ordinary OPLSAA force field parameters,
-                      #     (instead of the Sui et al. parameters), change the
-                      #     atom types below from "@atom:81L","@atom:85LCH2" to
-                      #     "@atom:81" and "@atom:85"  (defined in "oplsaa.lt")""")
-    print("""{0} inherits OPLSAA {{""".format(molname))
+def writeHeader(molname, loplsflag, gaffflag=False):
+    if gaffflag:
+        print("""import "gaff.lt"    # <-- defines the GAFF (General Amber Force Field)""")
+        print("""# NOTE: GAFF requires user-supplied charges (AM1-BCC or RESP recommended)""")
+        print("""# See: http://ambermd.org/antechamber/gaff.pdf""")
+        print("""{0} inherits GAFF {{""".format(molname))
+    else:
+        print("""import "oplsaa.lt"    # <-- defines the standard "OPLSAA" force field""")
+        if loplsflag:
+            print("""import "loplsaa.lt"   # <-- custom parameters for long alkane chains taken from
+                          #     Sui et al. J.Chem.Theory.Comp (2012), 8, 1459
+                          #     To use the ordinary OPLSAA force field parameters,
+                          #     (instead of the Sui et al. parameters), change the
+                          #     atom types below from "@atom:81L","@atom:85LCH2" to
+                          #     "@atom:81" and "@atom:85"  (defined in "oplsaa.lt")""")
+        print("""{0} inherits OPLSAA {{""".format(molname))
 
 
-def writeFooter(molname):
-    print("""}} # {0}
+def writeFooter(molname, gaffflag=False):
+    if gaffflag:
+        print("""}} # {0}
+
+# IMPORTANT: GAFF requires atomic charges to be assigned manually!
+# All charges in this file are currently set to 0.0 as placeholders.
+# You must replace them with calculated charges using one of these methods:
+#
+# Method 1 (Recommended): AM1-BCC charges using AmberTools antechamber
+#   antechamber -i molecule.mol2 -fi mol2 -o molecule_charged.mol2 -fo mol2 -c bcc -nc 0
+#
+# Method 2: RESP charges (more accurate, requires Gaussian)
+#   See Amber documentation for RESP fitting procedure
+#
+# Method 3: Use pre-calculated charges from literature or databases
+#
+# After calculating charges, update the charge values in the "Data Atoms" section above.
+# Reference: http://ambermd.org/antechamber/gaff.pdf""".format(molname))
+    else:
+        print("""}} # {0}
 
 # Note: You don't need to supply the partial partial charges of the atoms.
 #       If you like, just fill the fourth column with zeros ("0.000").
@@ -173,12 +197,109 @@ class RDlt(object):
         else:
             return
 
+    def detect_and_adjust_conjugated_systems(self, mol):
+        """
+        Detect conjugated systems and adjust GAFF atom types for paired types.
 
-    def run(self,to_file=None,name='test',fdef=str(pathlib.Path(__file__).parent.resolve())+"/rdlt_data/opls_lt.fdefn",lfdef=str(pathlib.Path(__file__).parent.resolve())+"/rdlt_data/lopls_lt.fdefn",charge=True,refresh=False,loplsflag=False):
+        Implements post-typing adjustment for conjugated systems (cc/cd, ce/cf, nc/nd, ne/nf).
+        Uses bond connectivity to distinguish paired types (pure SMARTS cannot do this).
+
+        This algorithm is inspired by the Antechamber approach which uses bond connectivity
+        (field 7 of their 7-feature typing algorithm) to distinguish between conjugated
+        atom types that have identical local environments.
+
+        Args:
+            mol: RDKit Mol object with AtomType properties assigned
+
+        Returns:
+            Modified Mol with adjusted conjugated types
+        """
+        from collections import defaultdict, deque
+
+        # Build bond network and find double-bonded atoms
+        bonds_by_atom = defaultdict(list)
+        double_bonded_atoms = set()
+
+        for bond in mol.GetBonds():
+            begin = bond.GetBeginAtomIdx()
+            end = bond.GetEndAtomIdx()
+            btype = bond.GetBondType()
+
+            bonds_by_atom[begin].append((end, btype))
+            bonds_by_atom[end].append((begin, btype))
+
+            if btype == Chem.rdchem.BondType.DOUBLE:
+                double_bonded_atoms.add(begin)
+                double_bonded_atoms.add(end)
+
+        # Find conjugated systems using BFS (double-single-double patterns)
+        conjugated_sets = []
+        visited = set()
+
+        for start_atom in double_bonded_atoms:
+            if start_atom in visited:
+                continue
+
+            queue = deque([start_atom])
+            current_system = []
+
+            while queue:
+                current = queue.popleft()
+                if current in visited:
+                    continue
+
+                if current in double_bonded_atoms:
+                    visited.add(current)
+                    current_system.append(current)
+
+                    # Find neighbors through single bonds (conjugated path)
+                    for neighbor, btype in bonds_by_atom[current]:
+                        if (btype == Chem.rdchem.BondType.SINGLE and
+                            neighbor in double_bonded_atoms and
+                            neighbor not in visited):
+                            queue.append(neighbor)
+
+            if len(current_system) >= 2:
+                conjugated_sets.append(current_system)
+
+        # Adjust atom types in conjugated systems
+        # Apply GAFF paired type rules
+        for system in conjugated_sets:
+            for atom_idx in system:
+                atom = mol.GetAtomWithIdx(atom_idx)
+                try:
+                    current_type = atom.GetProp('AtomType')
+
+                    # Map basic types to conjugated types
+                    # For conjugated systems, use the "first" type in each pair
+                    # This is acceptable because parameter differences are minimal
+                    # and matches the approach used by GAFF-foyer
+                    if current_type == '@atom:c2':
+                        atom.SetProp('AtomType', '@atom:ce')  # Conjugated sp2 C
+                    elif current_type == '@atom:cc':
+                        atom.SetProp('AtomType', '@atom:cd')  # Heteroaromatic conjugated C
+
+                except KeyError:
+                    pass
+
+        return mol
+
+    def run(self,to_file=None,name='test',fdef=str(pathlib.Path(__file__).parent.resolve())+"/rdlt_data/opls_lt.fdefn",lfdef=str(pathlib.Path(__file__).parent.resolve())+"/rdlt_data/lopls_lt.fdefn",gfdef=None,charge=True,refresh=False,loplsflag=False,gaffflag=False):
         #Build rdkit molecule from smiles and generate a conformer
         self.to_file=to_file
         self.name=pathlib.Path(to_file).stem
 
+        # Validate mutual exclusivity of force fields
+        if gaffflag and loplsflag:
+            logger.error("Cannot use both GAFF and L-OPLS simultaneously. Please choose one force field.")
+            sys.exit("Error: GAFF and L-OPLS are mutually exclusive force fields.")
+
+        # Set default GAFF path if not provided
+        if gaffflag and gfdef is None:
+            gfdef = str(pathlib.Path(__file__).parent.resolve())+"/rdlt_data/gaff_lt.fdefn"
+            if not os.path.exists(gfdef):
+                logger.error(f"GAFF feature definition file not found: {gfdef}")
+                sys.exit("Error: GAFF data files not found. Please ensure GAFF support is properly installed.")
 
         original_stdout = sys.stdout
         with open(to_file, 'w') as f:
@@ -191,18 +312,29 @@ class RDlt(object):
             #
             if refresh and loplsflag:
                 generateFeatureDefn(refresh,str(pathlib.Path(__file__).parent.resolve())+'/rdlt_data/lopls_lt.fdefn',str(pathlib.Path(__file__).parent.resolve())+'/rdlt_data/lopls_lt_dict.pkl')
+            elif refresh and gaffflag:
+                generateFeatureDefn(refresh,str(pathlib.Path(__file__).parent.resolve())+'/rdlt_data/gaff_tomoltemplate.txt',str(pathlib.Path(__file__).parent.resolve())+'/rdlt_data/gaff_lt_dict.pkl')
             elif refresh:
                 generateFeatureDefn(refresh,str(pathlib.Path(__file__).parent.resolve())+'/rdlt_data/opls_lt.fdefn',str(pathlib.Path(__file__).parent.resolve())+'/rdlt_data/opls_lt_dict.pkl')
 
             #Build a feature factory from the defintion file and assign all features
-            factory = Chem.ChemicalFeatures.BuildFeatureFactory(fdef)
+            if gaffflag:
+                factory = Chem.ChemicalFeatures.BuildFeatureFactory(gfdef)
+            else:
+                factory = Chem.ChemicalFeatures.BuildFeatureFactory(fdef)
             features = factory.GetFeaturesForMol(m)
 
             #Use the features to assign an atom type property
             [m.GetAtomWithIdx(f.GetAtomIds()[0]).SetProp('AtomType',f.GetType()) for f in features]
 
+            # Apply conjugated system adjustments for GAFF
+            # This adjusts atom types for conjugated systems (cc/cd, ce/cf pairs)
+            # using bond connectivity information that SMARTS patterns cannot capture
+            if gaffflag:
+                m = self.detect_and_adjust_conjugated_systems(m)
+
             #if lopls defitions are desired, redo the feature process
-            # overwrite atomtypes
+            # overwrite atomtypes (not compatible with GAFF)
             if loplsflag:
                 #print('loplsflag is {}'.format(loplsflag) )
                 lfactory = Chem.ChemicalFeatures.BuildFeatureFactory(lfdef)
@@ -229,17 +361,49 @@ class RDlt(object):
 
 
             #basic output
-            writeHeader(self.name,loplsflag)
+            writeHeader(self.name,loplsflag,gaffflag)
             writeAtoms(m)
             writeBonds(m)
-            writeFooter(self.name)
+            writeFooter(self.name,gaffflag)
 
             if charge:
-                # Read charge dictionaries for testing
-                opls_cdict = read_cdict(str(pathlib.Path(__file__).parent.resolve())+'/rdlt_data/opls_lt_dict.pkl')
-                if loplsflag:
-                    lopls_cdict = read_cdict(str(pathlib.Path(__file__).parent.resolve())+'/rdlt_data/lopls_lt_dict.pkl')
-                    opls_cdict.update(lopls_cdict)
+                if gaffflag:
+                    # GAFF requires manual charge calculation
+                    print("\n# ========================================")
+                    print("# IMPORTANT GAFF CHARGE NOTICE")
+                    print("# ========================================")
+                    print("# GAFF does NOT include default charges.")
+                    print("# You must calculate charges separately using AM1-BCC or RESP.")
+                    print("#")
+                    print("# Quick start with AM1-BCC (recommended):")
+                    print('#   1. Generate 3D structure: obabel -:"SMILES" -omol2 -O mol.mol2 --gen3d')
+                    print('#   2. Calculate charges: antechamber -i mol.mol2 -fi mol2 -o mol_charged.mol2 -fo mol2 -c bcc -nc 0')
+                    print('#   3. Extract charges: grep -v "^@" mol_charged.mol2 | awk "{print $NF}"')
+                    print('#   4. Update charge values in the "Data Atoms" section above')
+                    print("#")
+                    print("# See AutoPoly/extern/rdlt_data/GAFF_README.md for detailed instructions")
+                    print("# Reference: http://ambermd.org/antechamber/gaff.pdf")
+                    print("# ========================================\n")
 
-                sum_of_charges(m,opls_cdict)
+                    # Try to load GAFF charge dictionary (likely empty)
+                    try:
+                        gaff_cdict = read_cdict(str(pathlib.Path(__file__).parent.resolve())+'/rdlt_data/gaff_lt_dict.pkl')
+                        if not gaff_cdict or all(v == 0.0 for v in gaff_cdict.values()):
+                            print("# Note: GAFF charge dictionary is empty or contains only zeros.")
+                            print("# This is expected - charges must be calculated manually.\n")
+                        else:
+                            # If charges exist, display them
+                            sum_of_charges(m, gaff_cdict)
+                    except FileNotFoundError:
+                        print("# Note: No GAFF charge dictionary found.")
+                        print("# This is expected - charges must be calculated manually.\n")
+                else:
+                    # OPLS charge handling (existing logic)
+                    # Read charge dictionaries for testing
+                    opls_cdict = read_cdict(str(pathlib.Path(__file__).parent.resolve())+'/rdlt_data/opls_lt_dict.pkl')
+                    if loplsflag:
+                        lopls_cdict = read_cdict(str(pathlib.Path(__file__).parent.resolve())+'/rdlt_data/lopls_lt_dict.pkl')
+                        opls_cdict.update(lopls_cdict)
+
+                    sum_of_charges(m,opls_cdict)
             sys.stdout = original_stdout

@@ -1,0 +1,235 @@
+# GAFF (General Amber Force Field) Feature Definition File
+# Generated for AutoPoly rdlt.py
+# Reference: http://ambermd.org/antechamber/gaff.pdf
+#
+# This file contains SMARTS patterns for GAFF atom typing.
+# Version: Simplified for common organic molecules and polymers
+#
+# FIX NOTES:
+# - Removed @atom:h4_plain (custom type not in gaff.lt)
+# - Updated @atom:h4 to match all sp2 hydrogens (including vinyl hydrogens)
+
+# ============================================================================
+# Carbon Types (most common types)
+# ============================================================================
+
+# c - Sp2 C carbonyl group (C=O)
+DefineFeature @atom:c [$([C](=[O]))]
+Family 0c
+EndFeature
+
+# c1 - Sp C (triple bonded carbon)
+DefineFeature @atom:c1 [$([C]#[*])]
+Family 1c1
+EndFeature
+
+# c2 - Sp2 C in alkene (not carbonyl)
+# Very general pattern - any carbon double-bonded to carbon
+DefineFeature @atom:c2 [$([C]=[C])]
+Family 2c2
+EndFeature
+DefineFeature @atom:c2 [$([c]=[c])]
+Family 2c2a
+EndFeature
+
+# c3 - Sp3 C (alkane)
+DefineFeature @atom:c3 [CD4]
+Family 3c3
+EndFeature
+
+# ca - Sp2 C in pure aromatic systems
+DefineFeature @atom:ca [$([c]([c])[c])]
+Family 4ca
+EndFeature
+
+# cc - Sp2 carbons in non-pure aromatic systems (heteroaromatics)
+DefineFeature @atom:cc [$([c]([c][#6,n,o,s]))]
+Family 5cc
+EndFeature
+
+# ce - Inner sp2 C in conjugated systems (C=C-C=C, C=C-C=O)
+DefineFeature @atom:ce [$([C]=[C][C]=[C,O,N])]
+Family 6ce
+EndFeature
+
+# ============================================================================
+# Hydrogen Types (most common types)
+# ============================================================================
+
+# h1 - H on aliphatic C with 1 electronegative group
+DefineFeature @atom:h1 [$([#1][CD4][F,Cl,Br,I,O,N])]
+Family 7h1
+EndFeature
+
+# h2 - H on aliphatic C with 2 electronegative groups
+DefineFeature @atom:h2 [$([#1][CD4]([F,Cl,Br,I,O,N])([F,Cl,Br,I,O,N]))]
+Family 8h2
+EndFeature
+
+# h3 - H on aliphatic C with 3 electronegative groups
+DefineFeature @atom:h3 [$([#1][CD4]([F,Cl,Br,I,O,N])([F,Cl,Br,I,O,N])([F,Cl,Br,I,O,N]))]
+Family 9h3
+EndFeature
+
+# h4 - H on sp2 carbon (vinyl/alkene H)
+# UPDATED: Now matches ALL sp2 hydrogens, not just those with electronegative groups
+# This ensures vinyl hydrogens are typed correctly with standard GAFF type
+DefineFeature @atom:h4 [$([#1][CD3])]
+Family 10h4
+EndFeature
+
+# h5 - H on sp2 carbon with 2 electronegative groups
+DefineFeature @atom:h5 [$([#1][CD3]([F,Cl,Br,I,O,N])([F,Cl,Br,I,O,N]))]
+Family 11h5
+EndFeature
+
+# ha - H on aromatic carbon
+DefineFeature @atom:ha [$([#1][c])]
+Family 12ha
+EndFeature
+
+# hc - H on aliphatic C without electronegative groups
+DefineFeature @atom:hc [$([#1][CD4])]
+Family 13hc
+EndFeature
+
+# hn - H on nitrogen
+DefineFeature @atom:hn [$([#1][N])]
+Family 14hn
+EndFeature
+
+# ho - Hydroxyl hydrogen
+DefineFeature @atom:ho [$([#1][OX2])]
+Family 15ho
+EndFeature
+
+# ============================================================================
+# Oxygen Types
+# ============================================================================
+
+# o - Carbonyl oxygen (C=O)
+DefineFeature @atom:o [$([OX1]=[#6])]
+Family 16o
+EndFeature
+
+# oh - Hydroxyl oxygen (O-H)
+DefineFeature @atom:oh [$([OX2][#1])]
+Family 17oh
+EndFeature
+
+# os - Ether/ester oxygen (C-O-C)
+DefineFeature @atom:os [$([OX2]([#6])[#6])]
+Family 18os
+EndFeature
+
+# ow - Water oxygen
+DefineFeature @atom:ow [$([OX2]([#1])([#1]))]
+Family 19ow
+EndFeature
+
+# ============================================================================
+# Nitrogen Types (most common)
+# ============================================================================
+
+# n - Amide nitrogen
+DefineFeature @atom:n [$([NX3][CX3]=[OX1])]
+Family 20n
+EndFeature
+
+# n2 - Sp2 N with 2 connections
+DefineFeature @atom:n2 [$([NX2]=[#6])]
+Family 21n2
+EndFeature
+
+# n3 - Sp3 amine N
+DefineFeature @atom:n3 [$([NX3][#6,#1])]
+Family 22n3
+EndFeature
+
+# n4 - Ammonium N
+DefineFeature @atom:n4 [$([NX4+])]
+Family 23n4
+EndFeature
+
+# na - Sp2 N with 3 connections
+DefineFeature @atom:na [$([NX3]=[#6])]
+Family 24na
+EndFeature
+
+# nb - Aromatic nitrogen
+DefineFeature @atom:nb [$([n]([n])[n])]
+Family 25nb
+EndFeature
+
+# nc - Non-pure aromatic N (heteroaromatics)
+DefineFeature @atom:nc [$([n]([n][#6,c,o,s]))]
+Family 26nc
+EndFeature
+
+# nh - Amine N connected to aromatic rings
+DefineFeature @atom:nh [$([NX3][c])]
+Family 27nh
+EndFeature
+
+# no - Nitro nitrogen
+DefineFeature @atom:no [$([NX3+]([OX1-])=[OX1])]
+Family 28no
+EndFeature
+
+# ============================================================================
+# Halogen Types
+# ============================================================================
+
+# f - Fluorine
+DefineFeature @atom:f [F]
+Family 29f
+EndFeature
+
+# cl - Chlorine
+DefineFeature @atom:cl [Cl]
+Family 30cl
+EndFeature
+
+# br - Bromine
+DefineFeature @atom:br [Br]
+Family 31br
+EndFeature
+
+# i - Iodine
+DefineFeature @atom:i [I]
+Family 32i
+EndFeature
+
+# ============================================================================
+# Sulfur Types (most common)
+# ============================================================================
+
+# s - Sulfur with one connection
+DefineFeature @atom:s [SX1]
+Family 33s
+EndFeature
+
+# s2 - Sulfur with double bond
+DefineFeature @atom:s2 [$([SX2]=[#6])]
+Family 34s2
+EndFeature
+
+# s4 - Sulfur with 3 connections
+DefineFeature @atom:s4 [$([SX3][#6])]
+Family 35s4
+EndFeature
+
+# s6 - Sulfur with 4 connections (sulfone, sulfonamide)
+DefineFeature @atom:s6 [$([SX4][#6])]
+Family 36s6
+EndFeature
+
+# sh - Thiol hydrogen
+DefineFeature @atom:sh [$([SX2][#1])]
+Family 37sh
+EndFeature
+
+# ss - Thio-ether sulfur
+DefineFeature @atom:ss [$([SX2]([#6])[#6])]
+Family 38ss
+EndFeature

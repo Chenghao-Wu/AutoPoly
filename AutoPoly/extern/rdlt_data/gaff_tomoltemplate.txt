@@ -1,0 +1,115 @@
+# GAFF to Moltemplate Conversion Table
+# Generated for AutoPoly rdlt.py
+# Reference: http://ambermd.org/antechamber/gaff.pdf
+#
+# Format: Element | Symbol | GAFF_Name | SMARTS_Pattern | Moltemplate_Type | Charge | Description
+#
+# Note: GAFF does NOT include default charges. Users must calculate charges
+# separately using AM1-BCC or RESP methods. All charges below are set to 0.0
+# as placeholders and must be replaced with calculated charges.
+
+# ============================================================================
+# Carbon Types (18 types)
+# ============================================================================
+
+C  |  c   |  gaff_c     |  [$([C](=[O]))]                           |  @atom:c   |  0.0  |  "Sp2 C carbonyl group"
+C  |  c1  |  gaff_c1    |  [C#C]                                     |  @atom:c1  |  0.0  |  "Sp C"
+C  |  c2  |  gaff_c2    |  [$([CD3]=[CD3])]                          |  @atom:c2  |  0.0  |  "Sp2 C"
+C  |  c3  |  gaff_c3    |  [CD4]                                     |  @atom:c3  |  0.0  |  "Sp3 C"
+C  |  ca  |  gaff_ca    |  [$([c]([c])[c])]                          |  @atom:ca  |  0.0  |  "Sp2 C in pure aromatic systems"
+C  |  cp  |  gaff_cp    |  [$([c](c)(c)-[c](c)c)]                    |  @atom:cp  |  0.0  |  "Head Sp2 C connecting two rings in biphenyl"
+C  |  cq  |  gaff_cq    |  [$([c](c)(c)-[c](c)c)]                    |  @atom:cq  |  0.0  |  "Head Sp2 C in biphenyl (identical to cp)"
+C  |  cc  |  gaff_cc    |  [$([c]([c][#6,n,o,s]))]                   |  @atom:cc  |  0.0  |  "Sp2 C in non-pure aromatic systems"
+C  |  cd  |  gaff_cd    |  [$([c]([c][#6,n,o,s]))]                   |  @atom:cd  |  0.0  |  "Sp2 C in non-pure aromatic (identical to cc)"
+C  |  ce  |  gaff_ce    |  [$([C]=[C][C]=[C])]                       |  @atom:ce  |  0.0  |  "Inner Sp2 C in conjugated systems"
+C  |  cf  |  gaff_cf    |  [$([C]=[C][C]=[C])]                       |  @atom:cf  |  0.0  |  "Inner Sp2 C in conjugated (identical to ce)"
+C  |  cg  |  gaff_cg    |  [C#CC#C]                                  |  @atom:cg  |  0.0  |  "Inner Sp C in conjugated systems"
+C  |  ch  |  gaff_ch    |  [C#CC#C]                                  |  @atom:ch  |  0.0  |  "Inner Sp C in conjugated (identical to cg)"
+C  |  cx  |  gaff_cx    |  [$([CD4]1([CD4])([CD4])[CD4]1)]            |  @atom:cx  |  0.0  |  "Sp3 C in triangle systems (cyclopropane)"
+C  |  cy  |  gaff_cy    |  [$([CD4]1([CD4])([CD4])([CD4])[CD4]1)]     |  @atom:cy  |  0.0  |  "Sp3 C in square systems (cyclobutane)"
+C  |  cu  |  gaff_cu    |  [$([CD3]1([CD3])([CD3])[CD3]1)]            |  @atom:cu  |  0.0  |  "Sp2 C in triangle systems"
+C  |  cv  |  gaff_cv    |  [$([CD3]1([CD3])([CD3])([CD3])[CD3]1)]     |  @atom:cv  |  0.0  |  "Sp2 C in square systems"
+C  |  cz  |  gaff_cz    |  [$([C]([N])=[N])]                         |  @atom:cz  |  0.0  |  "Sp2 C in guanidine group"
+
+# ============================================================================
+# Hydrogen Types (13 types)
+# ============================================================================
+
+H  |  h1  |  gaff_h1    |  [$([#1][CD4][F,Cl,Br,I,O,N])]             |  @atom:h1  |  0.0  |  "H on aliphatic C with 1 electronegative group"
+H  |  h2  |  gaff_h2    |  [$([#1][CD4]([F,Cl,Br,I,O,N])([F,Cl,Br,I,O,N])] |  @atom:h2  |  0.0  |  "H on aliphatic C with 2 electronegative groups"
+H  |  h3  |  gaff_h3    |  [$([#1][CD4]([F,Cl,Br,I,O,N])([F,Cl,Br,I,O,N])([F,Cl,Br,I,O,N])] |  @atom:h3  |  0.0  |  "H on aliphatic C with 3 electronegative groups"
+H  |  h4  |  gaff_h4    |  [$([#1][CD3][F,Cl,Br,I,O,N])]              |  @atom:h4  |  0.0  |  "H on non-sp3 C with 1 electronegative group"
+H  |  h5  |  gaff_h5    |  [$([#1][CD3]([F,Cl,Br,I,O,N])([F,Cl,Br,I,O,N])] |  @atom:h5  |  0.0  |  "H on non-sp3 C with 2 electronegative groups"
+H  |  ha  |  gaff_ha    |  [$([#1][c])]                              |  @atom:ha  |  0.0  |  "H on aromatic C"
+H  |  hc  |  gaff_hc    |  [$([#1][CD4;!$([CD4][F,Cl,Br,I,O,N])])]    |  @atom:hc  |  0.0  |  "H on aliphatic C without electronegative groups"
+H  |  hn  |  gaff_hn    |  [$([#1][N])]                              |  @atom:hn  |  0.0  |  "H on N"
+H  |  ho  |  gaff_ho    |  [$([#1][OX2])]                            |  @atom:ho  |  0.0  |  "Hydroxyl H"
+H  |  hp  |  gaff_hp    |  [$([#1][P])]                              |  @atom:hp  |  0.0  |  "H on phosphate"
+H  |  hs  |  gaff_hs    |  [$([#1][S])]                              |  @atom:hs  |  0.0  |  "H on S"
+H  |  hw  |  gaff_hw    |  [$([#1][OX2][#1])]                        |  @atom:hw  |  0.0  |  "H in water"
+H  |  hx  |  gaff_hx    |  [$([#1][CD4][n+,N+,o+])]                  |  @atom:hx  |  0.0  |  "H on C next to positively charged group"
+
+# ============================================================================
+# Halogen Types (4 types)
+# ============================================================================
+
+F  |  f   |  gaff_f     |  [F]                                       |  @atom:f   |  0.0  |  "Fluorine"
+Cl |  cl  |  gaff_cl    |  [Cl]                                      |  @atom:cl  |  0.0  |  "Chlorine"
+Br |  br  |  gaff_br    |  [Br]                                      |  @atom:br  |  0.0  |  "Bromine"
+I  |  i   |  gaff_i     |  [I]                                       |  @atom:i   |  0.0  |  "Iodine"
+
+# ============================================================================
+# Nitrogen Types (12 types)
+# ============================================================================
+
+N  |  n   |  gaff_n     |  [$([NX3][CX3]=[OX1])]                     |  @atom:n   |  0.0  |  "Sp2 N in amide groups"
+N  |  n1  |  gaff_n1    |  [N#C]                                     |  @atom:n1  |  0.0  |  "Sp N"
+N  |  n2  |  gaff_n2    |  [$([NX2]=[#6])]                           |  @atom:n2  |  0.0  |  "aliphatic Sp2 N with two connected atoms"
+N  |  n3  |  gaff_n3    |  [$([NX3][#6,#1])]                         |  @atom:n3  |  0.0  |  "Sp3 N with three connected atoms (amine)"
+N  |  n4  |  gaff_n4    |  [$([NX4+])]                               |  @atom:n4  |  0.0  |  "Sp3 N with four connected atoms (ammonium)"
+N  |  na  |  gaff_na    |  [$([NX3]=[#6])]                           |  @atom:na  |  0.0  |  "Sp2 N with three connected atoms"
+N  |  nb  |  gaff_nb    |  [$([n]([n])[n])]                          |  @atom:nb  |  0.0  |  "Sp2 N in pure aromatic systems"
+N  |  nc  |  gaff_nc    |  [$([n]([n][#6,c,o,s]))]                   |  @atom:nc  |  0.0  |  "Sp2 N in non-pure aromatic systems"
+N  |  nd  |  gaff_nd    |  [$([n]([n][#6,c,o,s]))]                   |  @atom:nd  |  0.0  |  "Sp2 N in non-pure aromatic (identical to nc)"
+N  |  ne  |  gaff_ne    |  [$([N]=[N][N]=[N])]                       |  @atom:ne  |  0.0  |  "Inner Sp2 N in conjugated systems"
+N  |  nf  |  gaff_nf    |  [$([N]=[N][N]=[N])]                       |  @atom:nf  |  0.0  |  "Inner Sp2 N in conjugated (identical to ne)"
+N  |  nh  |  gaff_nh    |  [$([NX3][c])]                             |  @atom:nh  |  0.0  |  "Amine N connected to aromatic rings"
+N  |  no  |  gaff_no    |  [$([NX3+]([OX1-])=[OX1])]                 |  @atom:no  |  0.0  |  "Nitro N"
+
+# ============================================================================
+# Oxygen Types (4 types)
+# ============================================================================
+
+O  |  o   |  gaff_o     |  [$([OX1]=[#6])]                           |  @atom:o   |  0.0  |  "O with one connected atom (carbonyl)"
+O  |  oh  |  gaff_oh    |  [$([OX2H])]                               |  @atom:oh  |  0.0  |  "O in hydroxyl group"
+O  |  os  |  gaff_os    |  [$([OX2]([#6])[#6])]                      |  @atom:os  |  0.0  |  "Ether and ester oxygen"
+O  |  ow  |  gaff_ow    |  [$([OX2]([#1])[#1])]                      |  @atom:ow  |  0.0  |  "O in water"
+
+# ============================================================================
+# Phosphorus Types (11 types)
+# ============================================================================
+
+P  |  p2  |  gaff_p2    |  [$([PX2])]                                |  @atom:p2  |  0.0  |  "Phosphate with two connected atoms"
+P  |  p3  |  gaff_p3    |  [$([PX3][H])]                             |  @atom:p3  |  0.0  |  "Phosphate with three connected atoms (PH3)"
+P  |  p4  |  gaff_p4    |  [$([PX4]=[OX1])]                          |  @atom:p4  |  0.0  |  "Phosphate with three connected atoms (O=P(CH3)2)"
+P  |  p5  |  gaff_p5    |  [$([PX5]([OX1])([OX1])([OX1])[OX1])]       |  @atom:p5  |  0.0  |  "Phosphate with four connected atoms (O=P(OH)3)"
+P  |  pb  |  gaff_pb    |  [$([p]([p])[p])]                          |  @atom:pb  |  0.0  |  "Sp2 P in pure aromatic systems"
+P  |  pc  |  gaff_pc    |  [$([p]([p][#6,c,o,s]))]                   |  @atom:pc  |  0.0  |  "Sp2 P in non-pure aromatic systems"
+P  |  pd  |  gaff_pd    |  [$([p]([p][#6,c,o,s]))]                   |  @atom:pd  |  0.0  |  "Sp2 P in non-pure aromatic (identical to pc)"
+P  |  pe  |  gaff_pe    |  [$([P]=[P][P]=[P])]                       |  @atom:pe  |  0.0  |  "Inner Sp2 P in conjugated systems"
+P  |  pf  |  gaff_pf    |  [$([P]=[P][P]=[P])]                       |  @atom:pf  |  0.0  |  "Inner Sp2 P in conjugated (identical to pe)"
+P  |  px  |  gaff_px    |  [$([PX4]=[P]=[P])]                        |  @atom:px  |  0.0  |  "Special p4 in conjugated systems"
+P  |  py  |  gaff_py    |  [$([PX5]([P])([P])[P])]                    |  @atom:py  |  0.0  |  "Special p5 in conjugated systems"
+
+# ============================================================================
+# Sulfur Types (9 types)
+# ============================================================================
+
+S  |  s   |  gaff_s     |  [SX1]                                     |  @atom:s   |  0.0  |  "S with one connected atom"
+S  |  s2  |  gaff_s2    |  [$([SX2]=[#6])]                           |  @atom:s2  |  0.0  |  "S with two connected atoms, at least one double bond"
+S  |  s4  |  gaff_s4    |  [$([SX3][#6])]                            |  @atom:s4  |  0.0  |  "S with three connected atoms"
+S  |  s6  |  gaff_s6    |  [$([SX4][#6])]                            |  @atom:s6  |  0.0  |  "S with four connected atoms (sulfone, sulfonamide)"
+S  |  sh  |  gaff_sh    |  [$([SX2][H])]                             |  @atom:sh  |  0.0  |  "Sp3 S connected with H"
+S  |  ss  |  gaff_ss    |  [$([SX2]([#6])[#6])]                      |  @atom:ss  |  0.0  |  "Sp3 S in thio-ester and thio-ether"
+S  |  sx  |  gaff_sx    |  [$([SX3]=[S]=[S])]                        |  @atom:sx  |  0.0  |  "Special s4 in conjugated systems"
+S  |  sy  |  gaff_sy    |  [$([SX4]([S])([S])[S])]                   |  @atom:sy  |  0.0  |  "Special s6 in conjugated systems"
