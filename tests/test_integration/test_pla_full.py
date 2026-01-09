@@ -83,7 +83,7 @@ class TestPLAMonomerGeneration:
         # Generate variants from lactic acid
         # Lactic acid dimer (lactide): CC1OC(=O)C(C)OC(=O)C1
         # Or use monomeric lactic acid: CC(C(=O)O)O
-        variants = generator.generate_variants(smiles="CC(C(=O)O)O")
+        variants = generator.generate_variants(smiles="[*]CC(C(=O)O)O[*]")
 
         # Check that all variants were generated
         assert 'internal' in variants
@@ -107,7 +107,7 @@ class TestPLAMonomerGeneration:
             verbose=False
         )
 
-        variants = generator.generate_variants(smiles="CC(C(=O)O)O")
+        variants = generator.generate_variants(smiles="[*]CC(C(=O)O)O[*]")
         files = generator.generate_lt_files(variants, generate_t1=False)
 
         # Check that files were generated
@@ -135,7 +135,7 @@ class TestPLAMonomerGeneration:
             verbose=False
         )
 
-        variants = generator.generate_variants(smiles="CC(C(=O)O)O")
+        variants = generator.generate_variants(smiles="[*]CC(C(=O)O)O[*]")
         files = generator.generate_lt_files(variants, generate_t1=False)
 
         # Read the internal variant file
@@ -222,7 +222,7 @@ class TestPLAAtomTyping:
             verbose=False
         )
 
-        variants = generator.generate_variants(smiles="CC(C(=O)O)O")
+        variants = generator.generate_variants(smiles="[*]CC(C(=O)O)O[*]")
 
         # Check that atoms have AtomType property
         for variant_name in ['internal', 'left_end', 'right_end']:
@@ -245,7 +245,7 @@ class TestPLAAtomTyping:
             verbose=False
         )
 
-        variants = generator.generate_variants(smiles="CC(C(=O)O)O")
+        variants = generator.generate_variants(smiles="[*]CC(C(=O)O)O[*]")
         mol = variants['internal']
 
         # Check carbon atoms

@@ -49,6 +49,7 @@ This replaces the previous carbon-only hard-coded approach with a flexible, exte
 ```python
 generator = MonomerGenerator(
     base_name="ethanol",
+    output_dir="./monomers",
     mechanism='none',
     is_gaff=False
 )
@@ -71,6 +72,7 @@ variants = generator.generate_variants(smiles="CCO")
 ```python
 generator = MonomerGenerator(
     base_name="PE",
+    output_dir="./monomers",
     mechanism='vinyl_addition',
     is_gaff=False
 )
@@ -92,6 +94,7 @@ variants = generator.generate_variants(smiles="C=C")
 ```python
 generator = MonomerGenerator(
     base_name="PLA",
+    output_dir="./monomers",
     mechanism='esterification',
     is_gaff=True  # GAFF recommended for polyesters
 )
@@ -113,6 +116,7 @@ variants = generator.generate_variants(smiles="CC(C(=O)O)O")
 ```python
 generator = MonomerGenerator(
     base_name="Nylon66",
+    output_dir="./monomers",
     mechanism='amidation',
     is_gaff=True  # GAFF recommended for polyamides
 )
@@ -134,6 +138,7 @@ variants = generator.generate_variants(smiles="NCC(=O)O")
 ```python
 generator = MonomerGenerator(
     base_name="PEG",
+    output_dir="./monomers",
     mechanism='etherification',
     is_gaff=False  # OPLS-AA works for polyethers
 )
@@ -180,6 +185,7 @@ You can also explicitly specify the mechanism:
 ```python
 generator = MonomerGenerator(
     base_name="PLA",
+    output_dir="./monomers",
     mechanism='esterification',  # Explicit mechanism
     is_gaff=True
 )
@@ -203,6 +209,7 @@ print(mechanism)  # 'none'
 # Generate single molecule
 generator = MonomerGenerator(
     base_name="lactic_acid",
+    output_dir="./monomers",
     mechanism='none',
     is_gaff=True
 )
@@ -222,6 +229,7 @@ print(mechanism)  # 'esterification'
 # Generate polymer
 generator = MonomerGenerator(
     base_name="PLA",
+    output_dir="./monomers",
     mechanism='esterification',
     is_gaff=True
 )
@@ -253,6 +261,7 @@ from AutoPy.monomer_generator import MonomerGenerator
 # Auto-detect mechanism (default)
 generator = MonomerGenerator(
     base_name="PLA",
+    output_dir="./monomers",
     is_gaff=True
 )
 # Mechanism will be auto-detected based on SMILES and DOP
@@ -260,6 +269,7 @@ generator = MonomerGenerator(
 # Explicit mechanism
 generator = MonomerGenerator(
     base_name="PLA",
+    output_dir="./monomers",
     mechanism='esterification',
     is_gaff=True
 )
@@ -490,6 +500,7 @@ skip = modifier.should_skip_hydrogen_removal(element, type_name)
 # Vinyl: OPLS-AA
 generator = MonomerGenerator(
     base_name="PE",
+    output_dir="./monomers",
     mechanism='vinyl_addition',
     is_gaff=False  # OPLS-AA
 )
@@ -497,6 +508,7 @@ generator = MonomerGenerator(
 # Polyester: GAFF
 generator = MonomerGenerator(
     base_name="PLA",
+    output_dir="./monomers",
     mechanism='esterification',
     is_gaff=True  # GAFF
 )
@@ -518,6 +530,7 @@ generator = MonomerGenerator(
 ```python
 generator = MonomerGenerator(
     base_name="PLA",
+    output_dir="./monomers",
     # mechanism omitted - will auto-detect
     is_gaff=True
 )
@@ -527,6 +540,7 @@ generator = MonomerGenerator(
 ```python
 generator = MonomerGenerator(
     base_name="PLA",
+    output_dir="./monomers",
     mechanism='esterification',  # Force specific mechanism
     is_gaff=True
 )
@@ -553,6 +567,7 @@ print(f"Detected: {mechanism}")
 # Force mechanism if needed
 generator = MonomerGenerator(
     base_name="custom",
+    output_dir="./monomers",
     mechanism='esterification',  # Force specific mechanism
     is_gaff=True
 )
@@ -569,6 +584,7 @@ generator = MonomerGenerator(
 # Try different force field
 generator = MonomerGenerator(
     base_name="PLA",
+    output_dir="./monomers",
     mechanism='esterification',
     is_gaff=True  # Try GAFF instead of OPLS
 )
@@ -585,6 +601,7 @@ generator = MonomerGenerator(
 # Explicitly specify mechanism
 generator = MonomerGenerator(
     base_name="custom",
+    output_dir="./monomers",
     mechanism='esterification',
     is_gaff=True
 )

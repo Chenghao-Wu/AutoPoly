@@ -21,6 +21,7 @@ from typing import List, Optional, Union
 
 from .system import logger
 
+
 class Polymer:
     """
     Polymer class for defining polymer structures and properties.
@@ -30,12 +31,13 @@ class Polymer:
     
     Attributes:
         ChainNum (int): Number of polymer chains to generate
-        sequence (list): Original monomer sequence
+        sequence (list): Original monomer sequence (base SMILES)
         DOP (int): Degree of polymerization
         topology (str): Polymer topology ('linear' or 'ring')
         tacticity (str): Polymer tacticity ('atactic', 'isotactic', 'syndiotactic')
-        sequenceSet (list): List of monomer file names for each chain
+        sequenceSet (list): List of monomer identifiers for each chain (includes _T1 markers)
         sequenceName (list): List of monomer names for each chain
+        tacticitySet (list): List of tacticity choices (bool) for each position in each chain
         merSet (list): Unique set of monomers used
         SequenceLen (int): Length of the monomer sequence
     """
@@ -72,6 +74,7 @@ class Polymer:
         # Initialize empty lists
         self.sequenceSet = []
         self.sequenceName = []
+        self.tacticitySet = []  # Store tacticity choices separately
         self.merSet = []
 
         # Validate topology
@@ -110,16 +113,20 @@ class Polymer:
 
     def set_Sequence(self) -> None:
         """
-        Set up the polymer sequence based on tacticity and chain number.
+        Generate monomer identifier sequences for polymer chains.
 
-        This method generates the monomer file names and names for each chain
-        based on the specified topology and tacticity. It handles:
+        This method generates identifier sequences for each chain. Each identifier
+        consists of the base SMILES and a tacticity marker (_T1) if applicable.
+        
+        The identifiers are NOT pure SMILES - they are strings used by the workflow
+        to determine which variant files to use:
+        - Base identifier: position-based connection pattern (for workflow's variant selection)
+        - Tacticity marker: "_T1" suffix indicates use of T1 chirality variant
+
+        Handles:
         - Linear vs ring topology
         - Atactic, isotactic, and syndiotactic tacticity
-        - Proper file naming conventions for different monomer positions
-
-        The sequence defines the monomer pattern that repeats DOP times.
-        For example, sequence=['A', 'B'] with DOP=6 creates A-B-A-B-A-B.
+        - Copolymers (mixed sequences)
 
         Raises:
             SystemExit: If ChainNum is 0 (no chains specified)
@@ -127,143 +134,91 @@ class Polymer:
         # Clear existing sequences before regenerating
         self.sequenceSet = []
         self.sequenceName = []
+        self.tacticitySet = []
 
         sequence = self.sequence
         self.SequenceLen = len(sequence)
         self.set_merSet(sequence)
-        # Don't overwrite DOP - it represents chain length, not sequence length
 
         if self.ChainNum == 0:
-            logger.error("Error : Please set number of chains ")
+            logger.error("Error: Please set number of chains")
             sys.exit()
 
+        # For isotactic polymers, make the chirality choice once per polymer instance
+        if self.tacticity == 'isotactic' and not hasattr(self, '_isotactic_use_t1'):
+            self._isotactic_use_t1 = random.choice([True, False])
+
         for chainii in range(self.ChainNum):
-            merSet = []
-            merSet_ = []
+            identifier_sequence = []
+            tacticity_choices = []
 
-            if self.topology == "ring":
-                # For ring polymers, all monomers are equivalent
-                for merii in range(self.DOP):
-                    # Cycle through sequence elements
-                    seq_idx = merii % self.SequenceLen
-                    # Remove any existing .lt extension and add it cleanly
-                    base_name = sequence[seq_idx].replace('.lt', '')
-                    merSet.append(f"{base_name}i.lt")  # Add internal monomer suffix
-                    merSet_.append(f"{base_name}i")    # Name without extension
-                self.sequenceSet.append(merSet)
-                self.sequenceName.append(merSet_)
-            else:
-                # Original logic for linear polymers
-                if self.tacticity == 'atactic':
-                    if self.DOP > 1:
-                        for merii in range(self.DOP):
-                            # Cycle through sequence elements
-                            seq_idx = merii % self.SequenceLen
-                            if merii == 0:
-                                if bool(random.choice([True, False])):
-                                    merSet.append(sequence[seq_idx]+"le_T1.lt")
-                                    merSet_.append(sequence[seq_idx]+"le_T1")
-                                else:
-                                    merSet.append(sequence[seq_idx]+"le.lt")
-                                    merSet_.append(sequence[seq_idx]+"le")
-                            elif merii == self.DOP-1:
-                                if bool(random.choice([True, False])):
-                                    merSet.append(sequence[seq_idx]+"re_T1.lt")
-                                    merSet_.append(sequence[seq_idx]+"re_T1")
-                                else:
-                                    merSet.append(sequence[seq_idx]+"re.lt")
-                                    merSet_.append(sequence[seq_idx]+"re")
-                            else:
-                                if bool(random.choice([True, False])):
-                                    merSet.append(sequence[seq_idx]+"i_T1.lt")
-                                    merSet_.append(sequence[seq_idx]+"i_T1")
-                                else:
-                                    merSet.append(sequence[seq_idx]+"i.lt")
-                                    merSet_.append(sequence[seq_idx]+"i")
-                        self.sequenceSet.append(merSet)
-                        self.sequenceName.append(merSet_)
-                    elif self.DOP == 1:
-                        for merii in range(self.DOP):
-                            merSet.append(sequence[merii]+".lt")
-                            merSet_.append(sequence[merii])
-                        self.sequenceSet.append(merSet)
-                        self.sequenceName.append(merSet_)
-                elif self.tacticity == 'isotactic':
-                    chosenTac =".lt"
-                    chosenTac_name=''
-                    if self.DOP>1:
-                        for merii in range(self.DOP):
-                            # Cycle through sequence elements
-                            seq_idx = merii % self.SequenceLen
-                            if merii==0:
-                                merSet.append(sequence[seq_idx]+"le"+chosenTac)
-                                merSet_.append(sequence[seq_idx]+"le"+chosenTac_name)
-                            elif merii == self.DOP-1:
-                                merSet.append(sequence[seq_idx]+"re"+chosenTac)
-                                merSet_.append(sequence[seq_idx]+"re"+chosenTac_name)
-                            else:
-                                merSet.append(sequence[seq_idx]+"i"+chosenTac)
-                                merSet_.append(sequence[seq_idx]+"i"+chosenTac_name)
-                        self.sequenceSet.append(merSet)
-                        self.sequenceName.append(merSet_)
-                    elif self.DOP==1:
-                        for merii in range(self.DOP):
-                            merSet.append(sequence[merii]+".lt")
-                            merSet_.append(sequence[merii])
-                        self.sequenceSet.append(merSet)
-                        self.sequenceName.append(merSet_)
+            for i in range(self.DOP):
+                # Cycle through base sequence (for copolymers)
+                seq_idx = i % self.SequenceLen
+                base_smiles = sequence[seq_idx]
 
-                elif self.tacticity == 'syndiotactic':
+                # Remove any existing .lt extension if present
+                base_smiles = base_smiles.replace('.lt', '')
 
-                    randbool = bool(random.choice([True, False]))
-                    if randbool:
-                        startTac="_T1.lt"
-                        nextTac =".lt"
-                        startTac_name="_T1"
-                        nextTac_name =""
-                    else:
-                        startTac=".lt"
-                        nextTac ="_T1.lt"
-                        startTac_name=""
-                        nextTac_name ="_T1"
+                # Determine tacticity for this position
+                use_t1 = self._get_tacticity_choice(i)
+                tacticity_choices.append(use_t1)
 
-                    if self.DOP>1:
-                        for merii in range(self.DOP):
-                            # Cycle through sequence elements
-                            seq_idx = merii % self.SequenceLen
-                            if merii%2==0:
-                                currentTac=startTac
-                                currentTac_name = startTac_name
-                            else:
-                                currentTac=nextTac
-                                currentTac_name=nextTac_name
+                # Create identifier with tacticity marker
+                # Note: This is an identifier string, not a pure SMILES
+                identifier = base_smiles + ("_T1" if use_t1 else "")
+                identifier_sequence.append(identifier)
 
-                            if merii==0:
-                                merSet.append(sequence[seq_idx]+"le"+currentTac)
-                                merSet_.append(sequence[seq_idx]+"le"+currentTac_name)
-                            elif merii == self.DOP-1:
-                                merSet.append(sequence[seq_idx]+"re"+currentTac)
-                                merSet_.append(sequence[seq_idx]+"re"+currentTac_name)
-                            else:
-                                merSet.append(sequence[seq_idx]+"i"+currentTac)
-                                merSet_.append(sequence[seq_idx]+"i"+currentTac_name)
-                        self.sequenceSet.append(merSet)
-                        self.sequenceName.append(merSet_)
-                    elif self.DOP==1:
-                        for merii in range(self.DOP):
-                            merSet.append(sequence[merii]+".lt")
-                            merSet_.append(sequence[merii])
-                        self.sequenceSet.append(merSet)
-                        self.sequenceName.append(merSet_)
-        print(self.sequenceSet)
-        print(self.sequenceName)
-    
+            self.sequenceSet.append(identifier_sequence)
+            self.sequenceName.append(identifier_sequence)
+            self.tacticitySet.append(tacticity_choices)
+
+        logger.debug(f"Generated {len(self.sequenceSet)} chains with DOP={self.DOP}")
+
+    def _get_tacticity_choice(self, position: int) -> bool:
+        """
+        Determine tacticity (T1 variant) choice for a given position.
+
+        Args:
+            position: Position in the polymer chain (0-based)
+
+        Returns:
+            bool: True if T1 variant should be used, False otherwise
+
+        Tacticity rules:
+        - Isotactic: All monomers have same chirality (decided once per instance)
+        - Syndiotactic: Alternating chirality (regular, T1, regular, T1, ...)
+        - Atactic: Random chirality assignment
+        """
+        if self.tacticity == 'isotactic':
+            return self._isotactic_use_t1
+
+        elif self.tacticity == 'syndiotactic':
+            return position % 2 == 1
+
+        else:  # atactic
+            return random.choice([True, False])
+
+    def get_tacticity_for_chain(self, chain_idx: int) -> List[bool]:
+        """
+        Get tacticity choices for a specific chain.
+        
+        Args:
+            chain_idx: Index of the chain (0-based)
+            
+        Returns:
+            List[bool]: List of T1 choices for each position in the chain
+        """
+        if 0 <= chain_idx < len(self.tacticitySet):
+            return self.tacticitySet[chain_idx]
+        return []
+
     def get_sequence_set(self) -> List[List[str]]:
         """
         Get the sequence set for all chains.
         
         Returns:
-            List[List[str]]: List of monomer file names for each chain
+            List[List[str]]: List of monomer identifiers for each chain
         """
         return self.sequenceSet
     
@@ -301,5 +256,6 @@ class Polymer:
             'sequence_length': self.SequenceLen,
             'mer_set': self.merSet,
             'sequence_set': self.sequenceSet,
-            'sequence_names': self.sequenceName
+            'sequence_names': self.sequenceName,
+            'tacticity_set': self.tacticitySet
         }

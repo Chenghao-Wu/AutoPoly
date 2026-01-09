@@ -123,10 +123,11 @@ from AutoPy.monomer_generator import MonomerGenerator
 
 generator = MonomerGenerator(
     base_name="PLA",
+    output_dir="./monomers",
     mechanism='esterification',
     is_gaff=True
 )
-variants = generator.generate_variants(smiles="CC(C(=O)O)O")
+variants = generator.generate_variants(smiles="[*]CC(C(=O)O)O[*]")
 files = generator.generate_lt_files(variants)
 ```
 
@@ -143,7 +144,7 @@ generator = MonomerGenerator(
     mechanism='amidation',
     is_gaff=True
 )
-variants = generator.generate_variants(smiles="NCC(=O)O")
+variants = generator.generate_variants(smiles="[*]NCC(=O)O[*]")
 files = generator.generate_lt_files(variants)
 ```
 
@@ -157,10 +158,11 @@ files = generator.generate_lt_files(variants)
 ```python
 generator = MonomerGenerator(
     base_name="PEG",
+    output_dir="./monomers",
     mechanism='etherification',
     is_gaff=False  # OPLS-AA
 )
-variants = generator.generate_variants(smiles="OCCO")
+variants = generator.generate_variants(smiles="[*]OCCO[*]")
 files = generator.generate_lt_files(variants)
 ```
 
@@ -184,10 +186,11 @@ AutoPoly preserves support for generating single molecules and systems of indepe
 ```python
 generator = MonomerGenerator(
     base_name="ethanol",
+    output_dir="./monomers",
     mechanism='none',  # Non-polymerizable
     is_gaff=False
 )
-variants = generator.generate_variants(smiles="CCO")
+variants = generator.generate_variants(smiles="[*]CCO[*]")
 files = generator.generate_lt_files(variants)
 # Generates: ethanol.lt (single molecule, no le/re/i variants)
 ```
@@ -218,10 +221,11 @@ poly = Polymerization(
 # Lactic acid has COOH and OH groups, but DOP=1 means keep them intact
 generator = MonomerGenerator(
     base_name="lactic_acid",
+    output_dir="./monomers",
     mechanism='none',  # Don't polymerize
     is_gaff=True
 )
-variants = generator.generate_variants(smiles="CC(C(=O)O)O")
+variants = generator.generate_variants(smiles="[*]CC(C(=O)O)O[*]")
 files = generator.generate_lt_files(variants)
 # Generates: lactic_acid.lt (plain, with all functional groups)
 ```
@@ -235,25 +239,84 @@ files = generator.generate_lt_files(variants)
 
 ---
 
-## pSMILES for Ring Polymers
+## pSMILES (Required for All Monomers)
 
-For ring (cyclic) polymers, use pSMILES notation with wildcard atoms `[*]` to indicate connection points:
+**pSMILES** (polymer SMILES) with wildcard atoms `[*]` is **required** for all monomer generation in AutoPoly. The wildcards explicitly mark the connection points where polymerization occurs.
 
-**Syntax:** Replace the connection points in your monomer with `[*]`
+**Syntax:** Add `[*]` wildcards at the two connection points in your monomer SMILES
 
-### Polyethylene Ring
-**pSMILES:** `[*]C=C[*]`
+### Why pSMILES is Required
+- **Explicit connection points**: Forces users to specify exactly where polymerization occurs
+- **Avoids ambiguity**: Prevents incorrect monomer generation from heuristic guessing
+- **Works for all polymers**: Linear, ring, vinyl, condensation, single molecules
+
+### How to Convert SMILES to pSMILES
+1. Identify the two atoms where polymer bonds will form
+2. Replace hydrogen atoms on those positions with `[*]` wildcards
+3. The wildcards mark connection points (left and right)
+
+### Examples
+
+#### Polyethylene (Vinyl Polymer)
+**SMILES:** `C=C`
+**pSMILES:** `[*]C=C[*]`  ← Wildcards mark both ends of double bond
 
 ```python
-polymer = Polymer(ChainNum=5, Sequence=["[*]C=C[*]"]*30, topology="ring")
+from AutoPoly.monomer_generator import MonomerGenerator
+
+generator = MonomerGenerator(base_name="PE", output_dir="./monomers", mechanism='vinyl_addition')
+variants = generator.generate_variants(smiles="[*]C=C[*]")
+files = generator.generate_lt_files(variants)
 ```
 
-### PMMA Ring
-**pSMILES:** `[*]C=C(C)C(=O)OC[*]`
+#### Polylactic Acid (Condensation Polymer)
+**SMILES:** `CC(C(=O)O)O`
+**pSMILES:** `[*]CC(C(=O)O)O[*]`  ← Wildcards mark alcohol and carboxyl ends
 
 ```python
-polymer = Polymer(ChainNum=5, Sequence=["[*]C=C(C)C(=O)OC[*]"]*30,
-                  topology="ring", tacticity="atactic", force_field="gaff")
+generator = MonomerGenerator(
+    base_name="PLA",
+    output_dir="./monomers",
+    mechanism='esterification',
+    is_gaff=True
+)
+variants = generator.generate_variants(smiles="[*]CC(C(=O)O)O[*]")
+files = generator.generate_lt_files(variants)
+```
+
+#### Nylon-6,6 (Polyamide)
+**SMILES:** `NCC(=O)O`
+**pSMILES:** `[*]NCC(=O)O[*]`  ← Wildcards mark amine and carboxyl ends
+
+```python
+generator = MonomerGenerator(
+    base_name="Nylon66",
+    output_dir="./monomers",
+    mechanism='amidation',
+    is_gaff=True
+)
+variants = generator.generate_variants(smiles="[*]NCC(=O)O[*]")
+files = generator.generate_lt_files(variants)
+```
+
+#### Single Molecules (DOP=1)
+Even for non-polymerizable molecules, pSMILES is required:
+
+```python
+generator = MonomerGenerator(
+    base_name="ethanol",
+    output_dir="./monomers",
+    mechanism='none',
+    is_gaff=False
+)
+variants = generator.generate_variants(smiles="[*]CCO[*]")
+files = generator.generate_lt_files(variants)
+```
+
+**Important:** You must provide exactly 2 wildcard atoms (`[*]`) in your pSMILES. If you don't, AutoPoly will raise an error:
+```
+MonomerGeneratorError: pSMILES must contain exactly 2 wildcard atoms ([*] or *).
+Got: C=C. Example correct pSMILES: '[*]C=C[*]'
 ```
 
 ---

@@ -19,11 +19,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 import pytest
 from rdkit import Chem
+import logging
 
 from AutoPoly.polymerization_mechanism import (
     PolymerizationMechanism,
     detect_mechanism
 )
+from AutoPoly.polymerization_patterns import PATTERN_VINYL
 
 
 class TestVinylDetection:
@@ -308,3 +310,161 @@ class TestPriorityOrder:
         # The implementation checks esterification before amidation
         # This is verified by reading the code
         assert True  # Placeholder
+
+
+class TestHasPattern:
+    """Test _has_pattern private method."""
+
+    def test_has_pattern_vinyl_detection(self):
+        """Test _has_pattern detects vinyl C=C bond."""
+        detector = PolymerizationMechanism(verbose=False)
+        mol = Chem.MolFromSmiles("C=C")
+        mol_with_h = Chem.AddHs(mol)
+
+        result = detector._has_pattern(mol_with_h, PATTERN_VINYL.smarts)
+        assert result is True
+
+    def test_has_pattern_no_match(self):
+        """Test _has_pattern returns False for non-matching pattern."""
+        detector = PolymerizationMechanism(verbose=False)
+        mol = Chem.MolFromSmiles("CCO")  # Ethanol
+        mol_with_h = Chem.AddHs(mol)
+
+        result = detector._has_pattern(mol_with_h, PATTERN_VINYL.smarts)
+        assert result is False
+
+    def test_has_pattern_invalid_smarts(self):
+        """Test _has_pattern handles invalid SMARTS gracefully."""
+        detector = PolymerizationMechanism(verbose=False)
+        mol = Chem.MolFromSmiles("CCO")
+        mol_with_h = Chem.AddHs(mol)
+
+        invalid_smarts = "[Invalid:SMILES]"
+        result = detector._has_pattern(mol_with_h, invalid_smarts)
+        assert result is False
+
+    def test_has_pattern_multiple_matches(self):
+        """Test _has_pattern with molecule containing multiple matches."""
+        detector = PolymerizationMechanism(verbose=False)
+        mol = Chem.MolFromSmiles("C=CC=C")  # Butadiene
+        mol_with_h = Chem.AddHs(mol)
+
+        result = detector._has_pattern(mol_with_h, PATTERN_VINYL.smarts)
+        assert result is True  # Should match at least one
+
+
+class TestCountFunctionalGroups:
+    """Test _count_functional_groups private method."""
+
+    def test_count_functional_groups_carboxyl(self):
+        """Test counting carboxyl groups."""
+        detector = PolymerizationMechanism(verbose=False)
+        mol = Chem.MolFromSmiles("CC(C(=O)O)O")  # Lactic acid
+        mol_with_h = Chem.AddHs(mol)
+
+        carboxyl_smarts = '[CX3](=[OX1])[OX2H1]'
+        count = detector._count_functional_groups(mol_with_h, carboxyl_smarts)
+        assert count == 1
+
+    def test_count_functional_groups_multiple(self):
+        """Test counting multiple functional groups."""
+        detector = PolymerizationMechanism(verbose=False)
+        mol = Chem.MolFromSmiles("C(C(=O)O)C(=O)O")  # Diacid
+        mol_with_h = Chem.AddHs(mol)
+
+        carboxyl_smarts = '[CX3](=[OX1])[OX2H1]'
+        count = detector._count_functional_groups(mol_with_h, carboxyl_smarts)
+        assert count == 2
+
+    def test_count_functional_groups_zero(self):
+        """Test counting when no groups present."""
+        detector = PolymerizationMechanism(verbose=False)
+        mol = Chem.MolFromSmiles("CCCC")  # Butane
+        mol_with_h = Chem.AddHs(mol)
+
+        carboxyl_smarts = '[CX3](=[OX1])[OX2H1]'
+        count = detector._count_functional_groups(mol_with_h, carboxyl_smarts)
+        assert count == 0
+
+    def test_count_functional_groups_invalid_smarts(self):
+        """Test _count_functional_groups handles invalid SMARTS."""
+        detector = PolymerizationMechanism(verbose=False)
+        mol = Chem.MolFromSmiles("CCO")
+        mol_with_h = Chem.AddHs(mol)
+
+        invalid_smarts = "[Invalid]"
+        count = detector._count_functional_groups(mol_with_h, invalid_smarts)
+        assert count == 0
+
+    def test_count_functional_groups_alcohols(self):
+        """Test counting alcohol groups."""
+        detector = PolymerizationMechanism(verbose=False)
+        mol = Chem.MolFromSmiles("OCCO")  # Ethylene glycol
+        mol_with_h = Chem.AddHs(mol)
+
+        alcohol_smarts = '[$([OX2H])]'
+        count = detector._count_functional_groups(mol_with_h, alcohol_smarts)
+        assert count == 2
+
+
+class TestBackboneAtoms:
+    """Test get_backbone_atoms method."""
+
+    def test_get_backbone_atoms_vinyl(self):
+        """Test get_backbone_atoms for vinyl mechanism."""
+        detector = PolymerizationMechanism(verbose=False)
+        mol = Chem.MolFromSmiles("C=C")
+
+        backbone = detector.get_backbone_atoms(mol, 'vinyl_addition')
+        assert len(backbone) == 2
+        # Should return the two carbons
+        for idx in backbone:
+            atom = mol.GetAtomWithIdx(idx)
+            assert atom.GetSymbol() == 'C'
+
+    def test_get_backbone_atoms_esterification(self):
+        """Test get_backbone_atoms for esterification."""
+        detector = PolymerizationMechanism(verbose=False)
+        mol = Chem.MolFromSmiles("CC(=O)O")  # Acetic acid
+
+        backbone = detector.get_backbone_atoms(mol, 'esterification')
+        assert len(backbone) >= 1
+        # Should have at least the carboxyl carbon
+
+    def test_get_backbone_atoms_none_mechanism(self):
+        """Test get_backbone_atoms for 'none' mechanism."""
+        detector = PolymerizationMechanism(verbose=False)
+        mol = Chem.MolFromSmiles("CCO")
+
+        backbone = detector.get_backbone_atoms(mol, 'none')
+        assert len(backbone) == 0
+
+    def test_get_backbone_atoms_matches_connection(self):
+        """Test that backbone atoms match connection atoms for vinyl."""
+        detector = PolymerizationMechanism(verbose=False)
+        mol = Chem.MolFromSmiles("C=C")
+
+        backbone = detector.get_backbone_atoms(mol, 'vinyl_addition')
+        connection = detector.get_connection_atoms(mol, 'vinyl_addition')
+
+        assert set(backbone) == set(connection)
+
+
+class TestConnectionAtomsEdgeCases:
+    """Test edge cases in get_connection_atoms for different mechanisms."""
+
+    def test_connection_atoms_no_pattern_match(self):
+        """Test get_connection_atoms when pattern doesn't match."""
+        detector = PolymerizationMechanism(verbose=False)
+        mol = Chem.MolFromSmiles("CCO")
+
+        connection = detector.get_connection_atoms(mol, 'vinyl_addition')
+        assert len(connection) == 0
+
+    def test_connection_atoms_invalid_mechanism(self):
+        """Test get_connection_atoms with invalid mechanism."""
+        detector = PolymerizationMechanism(verbose=False)
+        mol = Chem.MolFromSmiles("C=C")
+
+        connection = detector.get_connection_atoms(mol, 'invalid_mechanism')
+        assert len(connection) == 0

@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Linear Polylactic Acid (PLA) Polymer Tutorial
+Linear Polymethyl Methacrylate (PMMA) Polymer Tutorial - GAFF Force Field
 
-This script demonstrates how to generate atomistic linear Polylactic Acid (PLA)
-polymer structures for LAMMPS simulations using AutoPoly's SMILES-based approach.
+This script demonstrates how to generate atomistic linear Polymethyl Methacrylate (PMMA)
+polymer structures for LAMMPS simulations using AutoPoly's pSMILES-based approach
+with the GAFF (General AMBER Force Field).
 
 Key Concepts Demonstrated:
-- SMILES notation for monomer definition
-- Esterification mechanism for PLA (C-O backbone)
-- Automatic monomer variant generation
-- GAFF force field for polyesters
+- pSMILES notation for monomer definition (using [*] wildcards for connection points)
+- Vinyl addition mechanism for PMMA (C-C backbone)
+- Automatic monomer variant generation via MonomerGenerator
+- GAFF force field for organic polymers
 - LAMMPS data file generation via Moltemplate
 
 Author: AutoPoly Development Team
@@ -25,31 +26,40 @@ from pathlib import Path
 # ============================================================================
 
 """
-POLYLACTIC ACID (PLA) CONFIGURATION
-====================================
+POLYMETHYL METHACRYLATE (PMMA) CONFIGURATION - GAFF
+====================================================
 
-SMILES: "CC(C(=O)O)O"
-  Chemical Name: Lactic acid (2-hydroxypropanoic acid)
-  Functional Groups: Hydroxyl (-OH), Carboxyl (-COOH)
-  Chirality: One chiral center at C2
+pSMILES: "[*]CC([*])(C)C(=O)OC"
+  Chemical Name: Methyl methacrylate (MMA) repeat unit
+  Functional Groups: Backbone carbons (connection points), Methyl (C), Ester (COOCH3)
+  Connection Points: [*] marks where monomers connect in the polymer chain
 
-Polymerization Mechanism: Esterification
-  Reaction: -COOH + -OH -> -COO- + H2O
-  Backbone: Alternating C-O bonds (heteroatom backbone)
-  Connection Atoms: Carbon (from carboxyl) and Oxygen (from hydroxyl)
+Polymerization Mechanism: Vinyl Addition
+  Reaction: C=C double bond opens to form C-C single bonds
+  Backbone: All carbon backbone (C-C single bonds)
+  Connection Atoms: Both backbone carbons marked with [*]
 
-Force Field: GAFF (General Amber Force Field)
-  Recommended for polyesters due to better ester group parameters
-  Note: GAFF charges are set to 0.00 and require manual calculation
-         using AM1-BCC or RESP methods
+pSMILES NOTATION:
+  - [*] wildcards indicate connection points for polymerization
+  - For PMMA: [*]CC([*])(C)C(=O)OC
+    - First [*]: connects to previous monomer (or H at chain start)
+    - Second [*]: connects to next monomer (or H at chain end)
+  - AutoPoly generates first/middle/last variants automatically
+
+Force Field: GAFF (General AMBER Force Field)
+  - Developed for organic molecules and drug-like compounds
+  - Uses letter-based atom types (c3, hc, os, c, o, etc.)
+  - Well-suited for polymers with diverse functional groups
+  - Requires AM1-BCC or RESP charges for accurate electrostatics
+  - Reference: Wang et al., J. Comput. Chem. 2004, 25, 1157-1174
 """
 
-PLA_SMILES = "CC(C(=O)O)O"   # Lactic acid SMILES notation
+PMMA_SMILES = "[*]CC([*])(C)C(=O)OC"  # pSMILES with [*] connection points for backbone carbons
 CHAIN_NUM = 10               # Number of polymer chains
 DOP = 50                     # Degree of polymerization (monomers per chain)
 TOPOLOGY = "linear"          # Linear chain topology
 TACTICITY = "atactic"        # Random stereochemistry
-FORCE_FIELD = "gaff"         # GAFF force field (recommended for polyesters)
+FORCE_FIELD = "gaff"         # GAFF force field (General AMBER Force Field)
 
 # ============================================================================
 # SECTION 2: Imports and Setup
@@ -88,7 +98,7 @@ def create_system():
     The System class manages file paths and creates output directories.
 
     Output Structure:
-        pla_tutorial/
+        pmma_tutorial_gaff/
         ├── moltemplate/    # Intermediate Moltemplate files
         ├── input/          # Generated .lt monomer files
         └── output/         # Final LAMMPS input files
@@ -98,8 +108,8 @@ def create_system():
     print("=" * 70)
 
     try:
-        # Create System object
-        system = System(out="pla_tutorial")
+        # Create System object with GAFF-specific output directory
+        system = System(out="pmma_tutorial_gaff")
 
         output_path = system.get_folder_path()
         print(f"\nOutput directory: {output_path}")
@@ -112,34 +122,34 @@ def create_system():
         sys.exit(1)
 
 # ============================================================================
-# SECTION 4: Define Linear PLA Polymer
+# SECTION 4: Define Linear PMMA Polymer
 # ============================================================================
 
-def define_pla_polymer():
+def define_pmmapolymer():
     """
-    Step 2: Define Linear PLA Polymer
+    Step 2: Define Linear PMMA Polymer
 
-    The Polymer class defines polymer structure using SMILES notation.
+    The Polymer class defines polymer structure using pSMILES notation.
 
     Key Parameters:
     - ChainNum: Number of polymer chains
-    - Sequence: List of monomer SMILES strings
+    - Sequence: List of monomer pSMILES strings (with [*] connection points)
     - DOP: Degree of polymerization (monomers per chain)
     - topology: Chain topology ("linear" or "ring")
     - tacticity: Stereochemistry arrangement
 
-    For PLA:
-    - SMILES "CC(C(=O)O)O" represents lactic acid
-    - Esterification creates C-O backbone bonds
-    - Atactic tacticity = random chiral configuration
+    For PMMA:
+    - pSMILES "[*]CC([*])(C)C(=O)OC" represents MMA repeat unit
+    - [*] marks backbone connection points
+    - Atactic tacticity = random configuration (most common commercially)
     """
     print("\n" + "=" * 70)
-    print("STEP 2: Defining Linear PLA Polymer")
+    print("STEP 2: Defining Linear PMMA Polymer")
     print("=" * 70)
 
     print("\nPolymer Configuration:")
-    print(f"  Monomer SMILES: {PLA_SMILES}")
-    print(f"  Chemical Name: Lactic acid (2-hydroxypropanoic acid)")
+    print(f"  Monomer pSMILES: {PMMA_SMILES}")
+    print(f"  Chemical Name: Methyl methacrylate (MMA)")
     print(f"  Number of Chains: {CHAIN_NUM}")
     print(f"  Degree of Polymerization: {DOP}")
     print(f"  Total Monomers: {CHAIN_NUM * DOP}")
@@ -150,7 +160,7 @@ def define_pla_polymer():
         # Create Polymer object
         polymer = Polymer(
             ChainNum=CHAIN_NUM,
-            Sequence=[PLA_SMILES],  # Lactic acid SMILES
+            Sequence=[PMMA_SMILES],  # MMA pSMILES with [*] connection points
             DOP=DOP,
             topology=TOPOLOGY,
             tacticity=TACTICITY
@@ -168,101 +178,117 @@ def define_pla_polymer():
         sys.exit(1)
 
 # ============================================================================
-# SECTION 5: Explain Esterification Mechanism
+# SECTION 5: Explain GAFF Force Field
 # ============================================================================
 
-def explain_esterification():
+def explain_gaff_force_field():
     """
-    Step 3: Esterification Mechanism for PLA
+    Step 3: GAFF Force Field Overview
 
-    This section explains how PLA polymerization works and why it differs
-    from vinyl addition polymers like polyethylene.
+    This section explains the GAFF force field and its advantages
+    for organic polymer simulations.
     """
     print("\n" + "=" * 70)
-    print("STEP 3: Understanding PLA Esterification")
+    print("STEP 3: Understanding GAFF Force Field")
     print("=" * 70)
 
     print("""
-WHAT IS ESTERIFICATION?
------------------------
-Esterification is a condensation reaction where:
-  - Carboxylic acid (-COOH) reacts with alcohol (-OH)
-  - Produces ester linkage (-COO-) + water (H2O)
-  - Forms polymer backbone with alternating C-O bonds
+WHAT IS GAFF?
+-------------
+GAFF (General AMBER Force Field) is a force field designed for:
+  - Organic molecules and drug-like compounds
+  - Diverse functional groups (esters, ethers, amides, etc.)
+  - Compatible with AMBER protein force fields
+  - Widely used in pharmaceutical and materials science
 
-PLA POLYMERIZATION:
--------------------
-Monomer: Lactic acid (CH3-CH(OH)-COOH)
+GAFF ATOM TYPES:
+----------------
+GAFF uses letter-based atom type naming:
+  - c3: sp3 carbon (tetrahedral)
+  - c : sp2 carbonyl carbon (C=O)
+  - hc: hydrogen on sp3 carbon
+  - os: ether/ester oxygen (-O-)
+  - o : carbonyl oxygen (C=O)
 
-Reaction:
-  n HO-CH(CH3)-COOH -> [-O-CH(CH3)-CO-]n + n H2O
+For PMMA, typical GAFF atom types:
+  - Backbone CH2: c3 + hc
+  - Quaternary C: c3
+  - Methyl CH3: c3 + hc
+  - Ester C=O: c + o
+  - Ester O-C: os
+  - Methoxy CH3: c3 + hc
 
-Backbone Structure:
-  ...-O-CH(CH3)-C(=O)-O-CH(CH3)-C(=O)-O-...
-       ^       ^      ^       ^
-       O       C      O       C
-       (alternating C-O bonds)
+GAFF VS OPLS-AA:
+----------------
+| Feature          | GAFF              | OPLS-AA           |
+|------------------|-------------------|-------------------|
+| Atom types       | Letter-based      | Numeric           |
+| Origin           | AMBER (AmberTools)| Jorgensen group   |
+| Focus            | Drug molecules    | Proteins/liquids  |
+| Compatibility    | AMBER FF          | CHARMM-like       |
+| Charges          | AM1-BCC/RESP      | OPLS charges      |
 
-Connection Atoms:
-  - Carbon (C): From carboxyl group
-  - Oxygen (O): From hydroxyl group
-  - Bond formed: C-O single bond (ester linkage)
-
-WHY THIS MATTERS:
------------------
-1. Heteroatom backbone: Different from vinyl polymers (C-C backbone)
-2. Polarity: Ester groups are polar, affecting material properties
-3. Biodegradability: Ester bonds are hydrolytically cleavable
-4. Crystallinity: Affects thermal and mechanical properties
-
-AUTOPOLY AUTO-DETECTION:
-------------------------
-AutoPoly automatically detects esterification when:
-  - SMILES contains both -COOH and -OH groups
-  - Distance between groups allows cyclization
-  - DOP > 1 (polymer mode, not single molecule)
+WHY USE GAFF FOR PMMA?
+----------------------
+1. Excellent coverage of ester functional groups
+2. Well-parameterized for organic molecules
+3. Compatible with common charge methods (AM1-BCC)
+4. Widely validated for polymer simulations
+5. Good transferability to similar compounds
     """)
 
 # ============================================================================
-# SECTION 6: Explain Monomer Generation
+# SECTION 6: Explain Monomer Generation with GAFF
 # ============================================================================
 
 def explain_monomer_generation():
     """
-    Step 4: Automatic Monomer Generation
+    Step 4: Automatic Monomer Generation with GAFF
 
     This section explains how AutoPoly automatically generates monomer
-    variants from SMILES strings. This happens internally during Polymerization.
+    variants with GAFF atom types from pSMILES strings.
     """
     print("\n" + "=" * 70)
-    print("STEP 4: Automatic Monomer Generation")
+    print("STEP 4: Automatic Monomer Generation (GAFF)")
     print("=" * 70)
 
     print("""
-For PLA (SMILES: "CC(C(=O)O)O"), AutoPoly will automatically:
+For PMMA (pSMILES: "[*]CC([*])(C)C(=O)OC"), AutoPoly will automatically:
 
-1. DETECT ESTERIFICATION MECHANISM:
-   - Carboxyl group (-COOH) provides Carbon connection
-   - Hydroxyl group (-OH) provides Oxygen connection
-   - Forms ester linkage (-COO-) during polymerization
+1. PARSE pSMILES AND BUILD CHAIN:
+   - [*] wildcards mark the backbone connection points
+   - MonomerGenerator builds a short chain (3+ monomers)
+   - GAFF atom types assigned based on chemical environment
 
 2. GENERATE 6 MONOMER VARIANT FILES:
-   monomer_0i.lt       - Internal monomer (middle of chain)
-   monomer_0le.lt      - Left-end monomer (chain start)
-   monomer_0re.lt      - Right-end monomer (chain end)
-   monomer_0i_T1.lt    - Internal variant (mirror chirality)
-   monomer_0le_T1.lt   - Left-end variant (mirror chirality)
-   monomer_0re_T1.lt   - Right-end variant (mirror chirality)
+   monomer_0_0le.lt     - Left-end monomer (first, chain start)
+   monomer_0_1i.lt      - Internal monomer (middle of chain)
+   monomer_0_49re.lt    - Right-end monomer (last, chain end)
+   monomer_0_0le_T1.lt  - Left-end variant (mirror tacticity)
+   monomer_0_1i_T1.lt   - Internal variant (mirror tacticity)
+   monomer_0_49re_T1.lt - Right-end variant (mirror tacticity)
 
 3. ASSIGN GAFF ATOM TYPES:
-   - C, H, O atoms typed according to GAFF definitions
-   - Connection points modified for polymerization
-   - Partial charges set to 0.00 (manual calculation required)
+   - Uses SMARTS patterns from gaff_lt.fdefn
+   - Letter-based types: c3, hc, c, o, os
+   - Partial charges set to 0.00 (AM1-BCC calculation required)
 
-4. OPTIMIZE GEOMETRY:
-   - Generate 3D coordinates using ETKDG method
-   - Align backbone along X-axis
-   - Prepare for chain assembly
+4. LT FILE FORMAT (GAFF):
+   - Imports "gaff.lt" (GAFF force field definition)
+   - Class inherits from GAFF
+   - Atom types use @atom:c3, @atom:hc, etc.
+
+EXAMPLE GAFF LT FILE:
+---------------------
+import "gaff.lt"
+monomer_0_1i inherits GAFF {
+  write("Data Atoms") {
+    $atom:C1 $mol:... @atom:c3 0.00   0.000  0.000  0.000
+    $atom:C2 $mol:... @atom:c3 0.00   1.540  0.000  0.000
+    $atom:H3 $mol:... @atom:hc 0.00  -0.350  1.000  0.000
+    ...
+  }
+}
 
 NOTE: This process happens AUTOMATICALLY in Polymerization!
 You don't need to manually generate monomers.
@@ -277,19 +303,19 @@ def run_polymerization(system, polymer):
     Step 5: Run Polymerization to Generate LAMMPS Files
 
     The Polymerization class orchestrates the complete workflow:
-    1. Generates monomer variants from SMILES
+    1. Generates monomer variants from SMILES with GAFF typing
     2. Creates polymer chains
-    3. Generates force field parameters
+    3. Generates GAFF force field parameters
     4. Runs Moltemplate to create LAMMPS data files
 
     Key Features:
     - Automatic SMILES to monomer conversion
-    - Force field integration (GAFF/OPLS-AA)
+    - GAFF force field integration
     - Moltemplate automation
     - Complete LAMMPS input generation
     """
     print("\n" + "=" * 70)
-    print("STEP 5: Running Polymerization")
+    print("STEP 5: Running Polymerization (GAFF)")
     print("=" * 70)
 
     print("\nStarting polymerization process...")
@@ -301,7 +327,7 @@ def run_polymerization(system, polymer):
         # Create Polymerization object
         # This automatically triggers the full workflow
         polymerization = Polymerization(
-            name="pla_linear",
+            name="pmma_linear_gaff",
             system=system,
             model=[polymer],
             force_field=FORCE_FIELD,
@@ -318,7 +344,7 @@ def run_polymerization(system, polymer):
 
     except ValueError as e:
         print(f"\nError: Invalid parameter: {e}")
-        print("Solution: Check SMILES string and force field choice")
+        print("Solution: Check pSMILES string and force field choice")
         sys.exit(1)
 
     except RuntimeError as e:
@@ -338,36 +364,35 @@ def run_polymerization(system, polymer):
 
 def explain_outputs(system):
     """
-    Step 6: Explain Generated Output Files
+    Step 6: Explain Generated Output Files (GAFF)
 
-    AutoPoly generates a complete set of LAMMPS input files.
+    AutoPoly generates a complete set of LAMMPS input files using GAFF.
     This section explains what files are created and what they contain.
     """
     print("\n" + "=" * 70)
-    print("STEP 6: Generated Output Files")
+    print("STEP 6: Generated Output Files (GAFF)")
     print("=" * 70)
 
-    output_path = Path(system.get_folder_path()) / "pla_linear"
+    output_path = Path(system.get_folder_path()) / "pmma_linear_gaff"
 
     print("\nOutput directory structure:")
     print(f"""
 {output_path}/
-├── input/               # Moltemplate input files (reusable)
-│   ├── monomer_0i.lt   # Internal monomer (middle of chain)
-│   ├── monomer_0le.lt  # Left-end monomer (chain start)
-│   ├── monomer_0re.lt  # Right-end monomer (chain end)
-│   ├── monomer_0i_T1.lt  # Internal (mirror chirality)
-│   ├── monomer_0le_T1.lt # Left-end (mirror)
-│   ├── monomer_0re_T1.lt # Right-end (mirror)
-│   ├── poly_1.lt       # Polymer chain definitions
-│   ├── gaff.lt         # GAFF force field import
-│   └── gaff.lt.prm     # GAFF parameters
+├── input/                   # Moltemplate input files (reusable)
+│   ├── monomer_0_0le.lt     # Left-end monomer (inherits GAFF)
+│   ├── monomer_0_1i.lt      # Internal monomer (inherits GAFF)
+│   ├── monomer_0_49re.lt    # Right-end monomer (inherits GAFF)
+│   ├── monomer_0_0le_T1.lt  # Left-end (mirror tacticity)
+│   ├── monomer_0_1i_T1.lt   # Internal (mirror tacticity)
+│   ├── monomer_0_49re_T1.lt # Right-end (mirror tacticity)
+│   ├── poly_1.lt            # Polymer chain definitions
+│   └── gaff.lt              # GAFF force field import
 │
-└── output/             # LAMMPS input files (ready for simulation)
-    ├── system.data     # Atom positions, topology
-    ├── system.in       # LAMMPS input script
-    ├── system.in.settings  # Force field parameters
-    └── system.in.charges    # Atomic charges (0.00 for GAFF)
+└── output/                  # LAMMPS input files (ready for simulation)
+    ├── system.data          # Atom positions, topology
+    ├── system.in            # LAMMPS input script
+    ├── system.in.settings   # GAFF force field parameters
+    └── system.in.charges    # Atomic charges (0.00 - needs AM1-BCC)
     """)
 
     # Check if files exist and display info
@@ -406,34 +431,39 @@ def explain_outputs(system):
 
 def explain_next_steps():
     """
-    Step 7: Next Steps for Running LAMMPS Simulations
+    Step 7: Next Steps for Running LAMMPS Simulations with GAFF
 
     This section provides guidance on what to do after generating
-    the PLA polymer structure.
+    the PMMA polymer structure with GAFF.
     """
     print("\n" + "=" * 70)
-    print("STEP 7: Next Steps for LAMMPS Simulations")
+    print("STEP 7: Next Steps for LAMMPS Simulations (GAFF)")
     print("=" * 70)
 
     print("""
-IMPORTANT NOTES:
-----------------
+IMPORTANT NOTES FOR GAFF:
+-------------------------
 1. GAFF CHARGES:
    - All atomic charges are currently set to 0.00
    - You MUST calculate partial charges using:
-     * AM1-BCC method (faster, reasonable accuracy)
-     * RESP method (more accurate, requires quantum calculations)
-   - Update pla_tutorial/pla_linear/output/system.in.charges
+     * AM1-BCC method (recommended for GAFF)
+     * RESP method (more accurate, requires Gaussian)
+   - Update pmma_tutorial_gaff/pmma_linear_gaff/output/system.in.charges
 
-2. CHARGE CALCULATION TOOLS:
-   - Antechamber (from AmberTools): antechamber -c bcc -m molecule.mol2
-   - Open Babel: obabel -ismi -h -o mol2
-   - RESP: Gaussian quantum chemistry calculations
+2. AM1-BCC CHARGE CALCULATION:
+   Using Antechamber (from AmberTools):
+   $ antechamber -i molecule.mol2 -fi mol2 -o molecule_bcc.mol2 \\
+                 -fo mol2 -c bcc -s 2
+
+   Or using Open Babel + Antechamber:
+   $ obabel -ismi "CC(C)(C(=O)OC)C" -omol2 -O monomer.mol2 --gen3d
+   $ antechamber -i monomer.mol2 -fi mol2 -o monomer_bcc.mol2 \\
+                 -fo mol2 -c bcc -s 2
 
 3. LAMMPS SIMULATION:
-   - Review pla_tutorial/pla_linear/output/system.in
+   - Review pmma_tutorial_gaff/pmma_linear_gaff/output/system.in
    - Modify simulation parameters as needed
-   - Run: lmp -in pla_tutorial/pla_linear/output/system.in
+   - Run: lmp -in pmma_tutorial_gaff/pmma_linear_gaff/output/system.in
 
 4. RECOMMENDED EQUILIBRATION PROTOCOL:
    a) Energy minimization: minimize 1.0e-4 1000 10000
@@ -441,21 +471,32 @@ IMPORTANT NOTES:
    c) NPT compression: Apply pressure to reach target density
    d) Production run: 10-100 ns depending on properties
 
-PLA-SPECIFIC CONSIDERATIONS:
-----------------------------
-- Glass transition: ~330 K (depends on tacticity)
-- Density: ~1.24-1.25 g/cm³ (amorphous)
-- Crystallinity: Isotactic > syndiotactic > atactic
-- Degradation: Ester bonds can hydrolyze at high T
+GAFF-SPECIFIC CONSIDERATIONS:
+-----------------------------
+- GAFF uses harmonic bond/angle potentials
+- Dihedral parameters from AMBER parameterization
+- 1-4 scaling: 1/2 for electrostatics, 1/2 for vdW
+- Combine with AM1-BCC charges for best results
+- Compatible with TIP3P water model
+
+PMMA-SPECIFIC CONSIDERATIONS:
+------------------------------
+- Glass transition: ~378 K (105 °C)
+- Density: ~1.18-1.20 g/cm³ (amorphous)
+- Tacticity: Atactic (most common commercial grade)
+- Optical clarity: Highly transparent
+- Weather resistance: Good outdoor durability
+- Applications: Optical lenses, displays, coatings
 
 VALIDATION CHECKLIST:
 --------------------
-- [ ] Calculate partial charges (AM1-BCC or RESP)
+- [ ] Calculate AM1-BCC partial charges
 - [ ] Update system.in.charges file
-- [ ] Check density (~1.24 g/cm³ for amorphous PLA)
+- [ ] Check density (~1.18 g/cm³ for amorphous PMMA)
 - [ ] Verify bond lengths and angles
 - [ ] Test energy conservation in NVE ensemble
-- [ ] Check glass transition temperature
+- [ ] Check glass transition temperature (~378 K)
+- [ ] Compare with OPLS-AA results if available
     """)
 
 # ============================================================================
@@ -464,12 +505,12 @@ VALIDATION CHECKLIST:
 
 def main():
     """
-    Execute Complete PLA Polymer Generation Workflow
+    Execute Complete PMMA Polymer Generation Workflow (GAFF)
 
     This function demonstrates the complete workflow:
     1. Create System for output management
-    2. Define PLA polymer using SMILES
-    3. Explain esterification mechanism
+    2. Define PMMA polymer using pSMILES
+    3. Explain GAFF force field
     4. Explain automatic monomer generation
     5. Run polymerization (automatic monomer generation)
     6. Explain output files
@@ -478,12 +519,12 @@ def main():
     Total execution time: ~2-5 minutes for 10 chains of 50 monomers
     """
     print("\n" + "=" * 70)
-    print("AUTOPOLY LINEAR PLA TUTORIAL")
+    print("AUTOPOLY LINEAR PMMA TUTORIAL (GAFF FORCE FIELD)")
     print("=" * 70)
-    print("\nGenerating linear Polylactic Acid (PLA) polymer structure")
-    print("for LAMMPS molecular dynamics simulations.")
+    print("\nGenerating linear Polymethyl Methacrylate (PMMA) polymer structure")
+    print("for LAMMPS molecular dynamics simulations using GAFF.")
     print("\nConfiguration:")
-    print(f"  Monomer: Lactic acid (SMILES: {PLA_SMILES})")
+    print(f"  Monomer: Methyl methacrylate (pSMILES: {PMMA_SMILES})")
     print(f"  Chains: {CHAIN_NUM}")
     print(f"  DOP: {DOP}")
     print(f"  Force Field: {FORCE_FIELD.upper()}")
@@ -493,10 +534,10 @@ def main():
         system = create_system()
 
         # Step 2: Define Polymer
-        polymer = define_pla_polymer()
+        polymer = define_pmmapolymer()
 
-        # Step 3: Explain esterification mechanism
-        explain_esterification()
+        # Step 3: Explain GAFF force field
+        explain_gaff_force_field()
 
         # Step 4: Explain monomer generation
         explain_monomer_generation()
@@ -513,8 +554,8 @@ def main():
         print("\n" + "=" * 70)
         print("TUTORIAL COMPLETED SUCCESSFULLY!")
         print("=" * 70)
-        print("\nGenerated files are in: pla_tutorial/")
-        print("Thank you for using AutoPoly!")
+        print("\nGenerated files are in: pmma_tutorial_gaff/")
+        print("Thank you for using AutoPoly with GAFF!")
 
     except KeyboardInterrupt:
         print("\n\nTutorial interrupted by user.")
@@ -531,3 +572,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

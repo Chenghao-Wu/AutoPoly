@@ -109,7 +109,7 @@ class TestNylonMonomerGeneration:
         )
 
         # Generate variants from amino acid (glycine)
-        variants = generator.generate_variants(smiles="NCC(=O)O")
+        variants = generator.generate_variants(smiles="[*]NCC(=O)O[*]")
 
         # Check that all variants were generated
         assert 'internal' in variants
@@ -133,7 +133,7 @@ class TestNylonMonomerGeneration:
             verbose=False
         )
 
-        variants = generator.generate_variants(smiles="NCC(=O)O")
+        variants = generator.generate_variants(smiles="[*]NCC(=O)O[*]")
         files = generator.generate_lt_files(variants, generate_t1=False)
 
         # Check that files were generated
@@ -156,7 +156,7 @@ class TestNylonMonomerGeneration:
             verbose=False
         )
 
-        variants = generator.generate_variants(smiles="NCC(=O)O")
+        variants = generator.generate_variants(smiles="[*]NCC(=O)O[*]")
         files = generator.generate_lt_files(variants, generate_t1=False)
 
         # Read the internal variant file
@@ -243,7 +243,7 @@ class TestNylonAtomTyping:
             verbose=False
         )
 
-        variants = generator.generate_variants(smiles="NCC(=O)O")
+        variants = generator.generate_variants(smiles="[*]NCC(=O)O[*]")
 
         # Check that atoms have AtomType property
         for variant_name in ['internal', 'left_end', 'right_end']:
@@ -266,7 +266,7 @@ class TestNylonAtomTyping:
             verbose=False
         )
 
-        variants = generator.generate_variants(smiles="NCC(=O)O")
+        variants = generator.generate_variants(smiles="[*]NCC(=O)O[*]")
         mol = variants['internal']
 
         # Check carbon atoms
@@ -412,7 +412,7 @@ class TestNylonRealWorldExamples:
         )
 
         # Use amino acid as proxy
-        variants = generator.generate_variants(smiles="NCC(=O)O")
+        variants = generator.generate_variants(smiles="[*]NCC(=O)O[*]")
 
         # Should generate successfully
         assert 'internal' in variants

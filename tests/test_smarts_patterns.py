@@ -25,7 +25,13 @@ from AutoPoly.polymerization_patterns import (
     get_pattern,
     get_all_mechanisms,
     get_polymerization_mechanisms,
-    validate_mechanism
+    validate_mechanism,
+    get_condensation_mechanisms,
+    PATTERN_NONE,
+    PATTERN_VINYL,
+    PATTERN_ESTER,
+    PATTERN_AMIDE,
+    PATTERN_ETHER
 )
 
 
@@ -247,3 +253,61 @@ class TestCondensationFlag:
         """Test that etherification is condensation."""
         pattern = POLYMERIZATION_PATTERNS['etherification']
         assert pattern.is_condensation == True
+
+
+class TestCondensationMechanisms:
+    """Test get_condensation_mechanisms function."""
+
+    def test_get_condensation_mechanisms_returns_list(self):
+        """Test that get_condensation_mechanisms returns a list."""
+        mechanisms = get_condensation_mechanisms()
+        assert isinstance(mechanisms, list)
+
+    def test_get_condensation_mechanisms_content(self):
+        """Test that get_condensation_mechanisms returns correct mechanisms."""
+        mechanisms = get_condensation_mechanisms()
+        expected = {'esterification', 'amidation', 'etherification'}
+        assert set(mechanisms) == expected
+
+    def test_get_condensation_mechanisms_excludes_vinyl(self):
+        """Test that vinyl_addition is not in condensation mechanisms."""
+        mechanisms = get_condensation_mechanisms()
+        assert 'vinyl_addition' not in mechanisms
+        assert 'none' not in mechanisms
+
+
+class TestPatternAliases:
+    """Test pattern alias constants."""
+
+    def test_pattern_none_alias(self):
+        """Test PATTERN_NONE alias points to 'none' pattern."""
+        assert PATTERN_NONE.name == 'none'
+        assert PATTERN_NONE.smarts is None
+
+    def test_pattern_vinyl_alias(self):
+        """Test PATTERN_VINYL alias points to vinyl_addition."""
+        assert PATTERN_VINYL.name == 'vinyl_addition'
+        assert PATTERN_VINYL.connection_atoms == ['C', 'C']
+
+    def test_pattern_ester_alias(self):
+        """Test PATTERN_ESTER alias points to esterification."""
+        assert PATTERN_ESTER.name == 'esterification'
+        assert PATTERN_ESTER.connection_atoms == ['C', 'O']
+
+    def test_pattern_amide_alias(self):
+        """Test PATTERN_AMIDE alias points to amidation."""
+        assert PATTERN_AMIDE.name == 'amidation'
+        assert PATTERN_AMIDE.connection_atoms == ['C', 'N']
+
+    def test_pattern_ether_alias(self):
+        """Test PATTERN_ETHER alias points to etherification."""
+        assert PATTERN_ETHER.name == 'etherification'
+        assert PATTERN_ETHER.connection_atoms == ['O', 'O']
+
+    def test_aliases_match_dict_entries(self):
+        """Test that aliases match POLYMERIZATION_PATTERNS dict entries."""
+        assert PATTERN_NONE == POLYMERIZATION_PATTERNS['none']
+        assert PATTERN_VINYL == POLYMERIZATION_PATTERNS['vinyl_addition']
+        assert PATTERN_ESTER == POLYMERIZATION_PATTERNS['esterification']
+        assert PATTERN_AMIDE == POLYMERIZATION_PATTERNS['amidation']
+        assert PATTERN_ETHER == POLYMERIZATION_PATTERNS['etherification']

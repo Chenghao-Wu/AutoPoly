@@ -217,6 +217,7 @@ from AutoPoly.monomer_generator import MonomerGenerator
 # Create generator with GAFF
 generator = MonomerGenerator(
     base_name="PMMA",
+    output_dir="./monomers",
     is_gaff=True  # Use GAFF instead of OPLS
 )
 

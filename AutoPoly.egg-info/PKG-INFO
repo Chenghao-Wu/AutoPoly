@@ -1,12 +1,22 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.4
 Name: AutoPoly
-Version: 0.0.1
+Version: 1.0.0
 Summary: AutoPoly
 Author: Zhenghao Wu
 Author-email: zhenghao.wu95@gmail.com
 Keywords: python,molecular dynamics
 Requires-Dist: numpy>=1.8.0
 Requires-Dist: rdkit>=2022.09.1
-Requires-Dist: pathlib>=1.0.1
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
+Requires-Dist: pytest-mock>=3.10.0; extra == "dev"
+Dynamic: author
+Dynamic: author-email
+Dynamic: description
+Dynamic: keywords
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: summary
 
 Build your LAMMPS data file

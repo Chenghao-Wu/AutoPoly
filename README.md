@@ -17,6 +17,8 @@ pip install -e .
 pip install -e ".[dev]"
 ```
 
+**Note:** The `psmiles` package (for pSMILES canonicalization) is automatically installed from GitHub during installation.
+
 ```python
 from AutoPoly import System, Polymer, Polymerization
 
@@ -48,6 +50,7 @@ polymerization = Polymerization(
 - **Force Fields** - OPLS-AA, LOPLS, and GAFF support
 - **Bead-Spring Models** - Coarse-grained simulations
 - **LAMMPS Integration** - Complete input file generation
+- **Automatic pSMILES Canonicalization** - Ensures consistent polymer SMILES representation
 
 ## Basic Usage
 
@@ -97,6 +100,23 @@ bead_polymer = BeadSpringPolymer(
 bead_polymer.generate_data_file()
 ```
 
+## pSMILES Canonicalization
+
+AutoPoly automatically canonicalizes all pSMILES input using the [psmiles package](https://github.com/kuennethgroup/psmiles), ensuring consistent representation of polymer structures.
+
+**Benefits:**
+- Equivalent pSMILES always produce identical results
+- Automatic validation catches invalid input
+- Follows polymer SMILES best practices
+
+**Example:**
+```python
+# All of these are equivalent after canonicalization:
+generator.generate_variants("[*]CC([*])c1ccccc1")
+generator.generate_variants("C(c1ccccc1)(C[*])[*]")
+generator.generate_variants("*CC(C*)c1ccccc1")  # all produce same result
+```
+
 ## API Reference
 
 ### System
@@ -117,7 +137,7 @@ Defines polymer structure and properties.
 - `topology` (str): "linear" or "ring"
 - `tacticity` (str): "atactic", "isotactic", or "syndiotactic"
 
-**Note**: All monomers must be specified using SMILES notation. Common examples:
+**Note**: All monomers must be specified using **pSMILES notation** (SMILES with `[*]` wildcards). The input is automatically canonicalized for consistency. Common examples:
 - Ethylene: `"C=C"` or `"[*]C=C[*]"` (for linear/ring polymers)
 - Propylene: `"C=C(C)"` or `"[*]C=C(C)[*]"`
 - Styrene: `"C=C(C1=CC=CC=C1)"` or `"[*]C=C(C1=CC=CC=C1)[*]"`
@@ -152,6 +172,17 @@ Creates coarse-grained bead-spring models.
 - **Troubleshooting** → See common issues below
 
 ## Troubleshooting
+
+**psmiles package errors:**
+- The psmiles package is required and should be installed automatically
+- If installation fails: `pip install git+https://github.com/kuennethgroup/psmiles.git`
+- Ensure you have Git installed if using direct Git dependency
+
+**Invalid pSMILES errors:**
+- All monomers must use pSMILES notation with exactly 2 wildcard atoms ([*] or *)
+- Example valid: `"[*]C=C[*]"` or `"*C=C*"`
+- Example invalid: `"C=C"` (missing wildcards)
+- Check the [SMILES_GUIDE.md](docs/SMILES_GUIDE.md) for more details
 
 **Monomer not found:**
 - Check `extern/Monomer_bank/` for available monomers

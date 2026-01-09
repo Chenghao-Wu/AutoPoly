@@ -132,3 +132,129 @@ def sample_syndiotactic_polymer():
         tacticity="syndiotactic"
     )
     return polymer
+
+
+@pytest.fixture
+def sample_monomer_lt_file():
+    """
+    Create a sample monomer .lt file for testing.
+
+    This fixture creates a temporary .lt file with properly formatted
+    moltemplate atom data for testing monomer processing functions.
+
+    Returns:
+        Path: Path to the created .lt file
+    """
+    fd, temp_path = tempfile.mkstemp(suffix='.lt')
+    temp_file = Path(temp_path)
+
+    lt_content = """# Test monomer file
+write("Data Atoms") {
+  $atom:C1  @atom:opls_135  1  0.0  0.0  0.0
+  $atom:H2  @atom:opls_140  2  1.0  0.0  0.0
+  $atom:H3  @atom:opls_140  3  0.0  1.0  0.0
+  $atom:C4  @atom:opls_135  4  1.54  0.0  0.0
+}
+"""
+    temp_file.write_text(lt_content)
+
+    yield temp_file
+
+    # Cleanup
+    os.close(fd)
+    temp_file.unlink()
+
+
+@pytest.fixture
+def sample_settings_file():
+    """
+    Create a sample system.in.settings file for testing.
+
+    This fixture creates a temporary LAMMPS settings file with
+    pair_coeff entries for testing the get_rid_of_lj_cut_coul_long function.
+
+    Returns:
+        Path: Path to the created settings file
+    """
+    fd, temp_path = tempfile.mkstemp(suffix='.in.settings')
+    temp_file = Path(temp_path)
+
+    settings_content = """# LAMMPS settings file
+pair_style hybrid/overlay lj/cut/coul/long 10.0 10.0 coul/long 10.0
+pair_coeff * * lj/cut/coul/long 0.0 0.0
+pair_coeff 1 2 lj/cut/coul/long 0.1 2.5
+pair_coeff 2 3 lj/cut/coul/long 0.2 3.0
+"""
+    temp_file.write_text(settings_content)
+
+    yield temp_file
+
+    # Cleanup
+    os.close(fd)
+    temp_file.unlink()
+
+
+@pytest.fixture
+def mock_rdkit_mol():
+    """
+    Create a mock RDKit molecule object for testing.
+
+    This fixture creates a simple RDKit molecule (ethylene) for
+    testing mechanism detection and pattern matching functions
+    that require RDKit Mol objects.
+
+    Returns:
+        Chem.Mol: RDKit molecule object
+    """
+    from rdkit import Chem
+    return Chem.MolFromSmiles("C=C")
+
+
+@pytest.fixture
+def mock_rdkit_mol_with_h():
+    """
+    Create a mock RDKit molecule with explicit hydrogens.
+
+    Returns:
+        Chem.Mol: RDKit molecule object with hydrogens
+    """
+    from rdkit import Chem
+    mol = Chem.MolFromSmiles("CCO")
+    return Chem.AddHs(mol)
+
+
+@pytest.fixture
+def sample_psmiles_list():
+    """
+    Provide a list of sample pSMILES strings for testing.
+
+    Returns:
+        list: List of pSMILES strings representing various monomers
+    """
+    return [
+        "[*]C=C[*]",              # Polyethylene
+        "[*]C=C(C)C(=O)OC[*]",    # PMMA
+        "[*]C=C(C)c1ccccc1[*]",   # Polystyrene
+        "[*]C(C)(C)C(=O)O[*]",    # PLA (esterification)
+        "[*]C(=O)N[*]",           # Nylon (amidation)
+    ]
+
+
+@pytest.fixture
+def temp_monomer_dir():
+    """
+    Create a temporary directory for monomer file operations.
+
+    This fixture creates a temporary directory that can be used
+    for testing monomer generation and file operations without
+    polluting the actual monomer bank.
+
+    Returns:
+        Path: Path to temporary directory
+    """
+    temp_dir = Path(tempfile.mkdtemp(prefix="autopoly_monomer_test_"))
+
+    yield temp_dir
+
+    # Cleanup
+    shutil.rmtree(temp_dir)
