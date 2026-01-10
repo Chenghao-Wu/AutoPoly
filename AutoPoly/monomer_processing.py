@@ -10,7 +10,6 @@ files, counting atoms, and evaluating offset distances.
 Created on 2026-01-06
 @author: zwu
 """
-import sys
 import re
 import numpy as np
 from pathlib import Path
@@ -18,6 +17,7 @@ from typing import Tuple, List, Dict
 
 from .system import logger
 from .monomer_generator import MonomerGenerator
+from .exceptions import GenerationError
 
 
 def generate_monomer_from_psmiles(
@@ -81,8 +81,89 @@ def generate_monomer_from_psmiles(
         return monomer_name, counter
 
     except Exception as e:
-        logger.error(f"Failed to generate monomer from pSMILES/SMILES '{psmiles}': {e}")
-        sys.exit(1)
+        raise GenerationError(
+            f"Failed to generate monomer from pSMILES/SMILES '{psmiles}': {e}"
+        ) from e
+
+
+def generate_molecule_from_smiles(
+    smiles: str,
+    molecule_name: str,
+    path_cwd: str,
+    force_field: str,
+    generated_cache: dict,
+    counter: int
+) -> Tuple[str, int]:
+    """
+    Generate .lt file for a single molecule from SMILES string.
+
+    This function creates a single .lt file for a non-polymer molecule (e.g., water,
+    benzene, ethanol) from a regular SMILES string WITHOUT wildcards. This is different
+    from generate_monomer_from_psmiles() which is for polymer monomers with wildcards.
+
+    Args:
+        smiles (str): SMILES string WITHOUT wildcards (e.g., "O", "CCO", "c1ccccc1")
+        molecule_name (str): Name for the molecule (e.g., "water", "ethanol", "benzene")
+        path_cwd (str): Current working directory path
+        force_field (str): Force field to use ("oplsaa", "gaff", or "lopls")
+        generated_cache (dict): Cache mapping SMILES to molecule names (modified in-place)
+        counter (int): Current counter value for unique molecule naming
+
+    Returns:
+        Tuple[str, int]: (molecule_filename, updated_counter) where:
+            - molecule_filename: Generated molecule .lt filename (e.g., "water.lt")
+            - updated_counter: Incremented counter value
+
+    Raises:
+        SystemExit: If molecule generation fails
+
+    Example:
+        >>> molecule_name, counter = generate_molecule_from_smiles(
+        ...     smiles="O",
+        ...     molecule_name="water",
+        ...     path_cwd="./monomers",
+        ...     force_field="gaff",
+        ...     generated_cache={},
+        ...     counter=0
+        ... )
+    """
+    # Check cache (per-system caching)
+    cache_key = f"molecule_{smiles}_{force_field}"
+    if cache_key in generated_cache:
+        logger.info(f"Using cached molecule for SMILES: {smiles}")
+        return generated_cache[cache_key], counter
+
+    # Use provided molecule_name for the .lt file
+    base_name = molecule_name
+    filename = f"{base_name}.lt"
+
+    try:
+        # Create MonomerGenerator with correct API
+        generator = MonomerGenerator(
+            base_name=base_name,
+            force_field=force_field,
+            output_dir=path_cwd,
+            verbose=False
+        )
+
+        # Generate molecule variant from SMILES (no wildcards)
+        # This uses from_single_molecule() which is designed for non-polymer molecules
+        variant = generator.from_single_molecule(smiles=smiles, molecule_name=base_name)
+
+        # Write .lt file using write_single_molecule()
+        # For molecules, we typically don't need T1 variants (no tacticity)
+        generator.write_single_molecule(variant, generate_t1=False)
+
+        # Cache the mapping
+        generated_cache[cache_key] = filename
+
+        logger.info(f"Generated molecule '{filename}' from SMILES: {smiles}")
+        return filename, counter
+
+    except Exception as e:
+        raise GenerationError(
+            f"Failed to generate molecule from SMILES '{smiles}': {e}"
+        ) from e
 
 
 def generate_sequence_variants_for_polymerization(
@@ -146,10 +227,11 @@ def generate_sequence_variants_for_polymerization(
         )
 
         # Generate variants using from_smiles()
-        # Use at least 3 monomers to get first/middle/last variants
-        n_monomers = max(3, dop)
-        logger.info(f"Generating {n_monomers} sequence variants for {base_name} ({topology} topology)")
-        
+        # Always use 3 monomers to get first/middle/last variants
+        # This is a performance optimization - we only need these 3 positions
+        n_monomers = 3
+        logger.info(f"Generating 3 sequence variants (first, middle, last) for {base_name} ({topology} topology)")
+
         variants = generator.from_smiles(smiles=base_smiles, n_monomers=n_monomers)
         
         # For ring topology, we need all middle variants (both connections active)
@@ -222,10 +304,9 @@ def generate_sequence_variants_for_polymerization(
         return variant_name_mapping, counter
 
     except Exception as e:
-        logger.error(f"Failed to generate sequence variants from SMILES '{base_smiles}': {e}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)
+        raise GenerationError(
+            f"Failed to generate sequence variants from SMILES '{base_smiles}': {e}"
+        ) from e
 
 
 def n_monomer_atoms(merltfile: str, path_cwd: str) -> int:
@@ -266,8 +347,9 @@ def n_monomer_atoms(merltfile: str, path_cwd: str) -> int:
                 if not line:
                     break
     else:
-        logger.error(f"in n_monomer_atoms(): {merltfile_path} file cannot open.")
-        sys.exit(1)
+        raise GenerationError(
+            f"Monomer file not found: {merltfile_path}"
+        )
 
     return n_atoms
 

@@ -29,7 +29,6 @@ Dependencies:
 Created on Fri Dec 21 12:19:08 2018
 @author: zwu
 """
-import sys
 import os
 from pathlib import Path
 import subprocess
@@ -38,10 +37,10 @@ import re
 import numpy as np
 from typing import List, Optional, Dict, Any, Set, Tuple
 from .system import logger
+from .exceptions import ValidationError
 from .monomer_generator import MonomerGenerator
 from .file_management import (
     create_working_directory,
-    create_folder as create_folder_func,
     get_rid_of_lj_cut_coul_long,
     mv_files
 )
@@ -66,7 +65,7 @@ class Polymerization:
         path_master (str): Path to external dependencies
         path_moltemplatesrc (str): Path to Moltemplate source
         path_oplsaaprm (str): Path to OPLS-AA force field parameters
-        is_lopls (bool): Whether to use LOPLS force field
+        force_field (str): Force field to use ("oplsaa", "gaff", or "lopls")
         model (list): List of polymer models to generate
         rotate (float): Rotation angle for monomer placement
         offset_spacing (float): Spacing between polymer chains
@@ -77,8 +76,7 @@ class Polymerization:
     """
     
     def __init__(self, name: str = None, system: object = None, model: list = None,
-                 run: bool = True, is_lopls: bool = False,
-                 force_field: str = "oplsaa") -> None:
+                 run: bool = True, force_field: str = "oplsaa") -> None:
         """
         Initialize the Polymerization class.
 
@@ -87,46 +85,38 @@ class Polymerization:
             system (object, optional): System object containing folder path. Defaults to None.
             model (list, optional): List of models for polymerization. Defaults to None.
             run (bool, optional): Flag to run the process immediately. Defaults to True.
-            is_lopls (bool, optional): Whether to use LOPLS force field. Defaults to False.
-                                       DEPRECATED: Use force_field="lopls" instead.
             force_field (str, optional): Force field to use. Options: "oplsaa", "gaff", "lopls".
                                         Defaults to "oplsaa".
 
         Raises:
             SystemExit: If required directories or files are not found
         """
-        # Deprecation warning for is_lopls
-        if is_lopls:
-            logger.warning("The 'is_lopls' parameter is deprecated. Use 'force_field=\"lopls\"' instead.")
-            if force_field == "oplsaa":  # Only override if user hasn't explicitly set force_field
-                force_field = "lopls"
-
         # Validate force_field parameter
         valid_force_fields = ["oplsaa", "gaff", "lopls"]
         if force_field not in valid_force_fields:
-            logger.error(f"Invalid force_field '{force_field}'. Must be one of: {valid_force_fields}")
-            sys.exit(1)
+            raise ValidationError(
+                f"Invalid force_field '{force_field}'. Must be one of: {valid_force_fields}"
+            )
 
         self.name = name
         self.system = system
-        self.path_cwd = f"{self.system.get_folder_path()}/{self.name}/moltemplate/"
-        self.path_master = f"{Path(__file__).parent.resolve()}/extern/"
-        self.path_moltemplatesrc = f"{self.path_master}moltemplate/src/"
+        self.path_cwd = str(Path(self.system.get_folder_path()) / self.name / "moltemplate/")
+        self.path_master = str(Path(__file__).parent.resolve() / "extern/")
+        self.path_moltemplatesrc = str(Path(self.path_master) / "moltemplate" / "src/")
 
         # SMILES to monomer name cache for dynamic generation
         self._generated_smiles = {}
         self._smiles_to_name_counter = 0
 
-        self.is_lopls = is_lopls
         self.force_field = force_field
 
         # Set force field parameter path based on force_field type
         if force_field == "gaff":
-            self.path_oplsaaprm = f"{self.path_master}moltemplate/common/gaff.lt"
+            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "common" / "gaff.lt")
         elif force_field == "lopls":
-            self.path_oplsaaprm = f"{self.path_master}moltemplate/loplsaa.prm"
+            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "loplsaa.prm")
         else:  # oplsaa
-            self.path_oplsaaprm = f"{self.path_master}moltemplate/oplsaa.prm"
+            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "oplsaa.prm")
 
         logger.info(f"\n'you are now using parameter set of {self.path_oplsaaprm}\n")
         self.model = model
@@ -179,15 +169,6 @@ class Polymerization:
             SystemExit: If user chooses not to overwrite existing directory
         """
         self.path_cwd = str(create_working_directory(self.system, self.name))
-
-    def create_folder(self) -> None:
-        """
-        Creates the working directory for the polymerization.
-
-        Deprecated: Use create_working_directory instead.
-        """
-        logger.warning("create_folder() is deprecated. Use create_working_directory().")
-        create_folder_func(self.path_cwd)
 
     def set_tacticity(self, tacticity: str) -> None:
         """Sets the tacticity of the polymer.
@@ -309,6 +290,34 @@ class Polymerization:
         # Update the internal counter state
         self._smiles_to_name_counter = counter
         return variant_mapping
+
+    def generate_molecule_from_smiles(self, smiles: str, molecule_name: str):
+        """
+        Generate molecule from SMILES string.
+
+        This method wraps the monomer_processing function with instance-specific
+        parameters like force_field, generated cache, and counter.
+
+        Args:
+            smiles (str): SMILES string WITHOUT wildcards (e.g., "O", "CCO", "c1ccccc1")
+            molecule_name (str): Name for the molecule (e.g., "water", "ethanol", "benzene")
+
+        Returns:
+            tuple: (filename, updated_counter) where:
+                - filename: Generated molecule .lt filename
+                - updated_counter: Incremented counter value
+        """
+        filename, counter = monomer_processing.generate_molecule_from_smiles(
+            smiles,
+            molecule_name,
+            self.path_cwd,
+            self.force_field,
+            self._generated_smiles,
+            self._smiles_to_name_counter
+        )
+        # Update the internal counter state
+        self._smiles_to_name_counter = counter
+        return filename, counter
 
     def make_lmp_data_file_by_moltemplate(self) -> None:
         """

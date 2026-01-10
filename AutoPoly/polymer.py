@@ -15,11 +15,13 @@ The Polymer class handles:
 Created on Fri Dec 21 12:19:08 2018
 @author: zwu
 """
-import sys
 import random
 from typing import List, Optional, Union
 
 from .system import logger
+from .exceptions import ValidationError
+from .conf import MAX_DOP, MAX_SEQUENCE_LENGTH, MAX_UNIQUE_MONOMERS
+from .validation import validate_smiles
 
 
 class Polymer:
@@ -85,9 +87,46 @@ class Polymer:
         self.SequenceLen = len(self.sequence)
         self.set_merSet(self.sequence)
 
+        # Validate sequence length
+        if self.SequenceLen > MAX_SEQUENCE_LENGTH:
+            raise ValidationError(
+                f"Sequence length ({self.SequenceLen}) exceeds maximum {MAX_SEQUENCE_LENGTH}. "
+                f"This limit prevents resource exhaustion."
+            )
+
+        # Validate unique monomer count
+        if len(self.merSet) > MAX_UNIQUE_MONOMERS:
+            raise ValidationError(
+                f"Number of unique monomers ({len(self.merSet)}) exceeds maximum {MAX_UNIQUE_MONOMERS}. "
+                f"This limit prevents resource exhaustion."
+            )
+
+        # Validate all unique SMILES in the sequence (only if they look like SMILES)
+        # Skip validation for monomer names (like "PE", "PS") that don't contain wildcards
+        for smiles in self.merSet:
+            try:
+                # Remove .lt extension if present before validation
+                smiles_clean = smiles.replace('.lt', '')
+                # Only validate if it looks like a SMILES string (contains wildcards or brackets)
+                # Monomer names like "PE", "PS" will skip validation
+                if "[" in smiles_clean:  # Looks like a SMILES string
+                    validate_smiles(smiles_clean, allow_wildcards=True)
+            except ValidationError as e:
+                raise ValidationError(
+                    f"Invalid monomer SMILES in sequence: {e}"
+                ) from e
+
         # Set DOP before calling set_Sequence() so it's not overwritten
         # DOP represents chain length, not number of unique monomer types
         self.DOP = DOP if DOP > 0 else len(self.sequence)
+
+        # Validate DOP
+        if self.DOP > MAX_DOP:
+            raise ValidationError(
+                f"DOP ({self.DOP}) exceeds maximum {MAX_DOP}. "
+                f"This limit prevents resource exhaustion."
+            )
+
         self.set_Sequence()
 
     def set_merSet(self, merSet: Union[List[str], str]) -> None:
@@ -141,8 +180,7 @@ class Polymer:
         self.set_merSet(sequence)
 
         if self.ChainNum == 0:
-            logger.error("Error: Please set number of chains")
-            sys.exit()
+            raise ValidationError("ChainNum must be greater than 0")
 
         # For isotactic polymers, make the chirality choice once per polymer instance
         if self.tacticity == 'isotactic' and not hasattr(self, '_isotactic_use_t1'):
