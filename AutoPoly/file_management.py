@@ -8,11 +8,11 @@ polymerization workflow, including directory creation, file movement,
 and settings file modification.
 """
 
-import sys
 import os
 from pathlib import Path
 import shutil
 from .system import logger
+from .exceptions import WorkflowError
 
 
 def create_working_directory(system, name):
@@ -47,37 +47,13 @@ def create_working_directory(system, name):
             logger.info(f"removing {polymer_path}")
             shutil.rmtree(polymer_path)
         else:
-            logger.error("Please remove the existing folder or choose a different name.")
-            sys.exit(1)
+            raise WorkflowError(
+                "Directory exists. Please remove the existing folder or choose a different name."
+            )
 
     # Create directory structure
     moltemplate_path.mkdir(parents=True, exist_ok=True)
     return moltemplate_path
-
-
-def create_folder(path_cwd):
-    """
-    Creates the working directory for the polymerization.
-
-    Deprecated: Use create_working_directory instead.
-
-    Args:
-        path_cwd: Current working directory path
-    """
-    path = Path(path_cwd)
-    parent_path = path.parent
-
-    if parent_path.exists():
-        response = input(f"{parent_path} folder exists, delete and make new?(y/n) ")
-        if response.lower() == 'y':
-            logger.info(f"removing {parent_path}")
-            shutil.rmtree(parent_path)
-        else:
-            logger.error("Please remove the existing folder or choose a different name.")
-            sys.exit(1)
-
-    # Create the directory structure
-    path.mkdir(parents=True, exist_ok=True)
 
 
 def get_rid_of_lj_cut_coul_long(path_cwd):
@@ -93,13 +69,12 @@ def get_rid_of_lj_cut_coul_long(path_cwd):
     Raises:
         SystemExit: If system.in.settings file does not exist
     """
-    in_ = path_cwd + "/system.in.settings"
-    out = path_cwd + "/tmp.data"
+    in_ = Path(path_cwd) / "system.in.settings"
+    out = Path(path_cwd) / "tmp.data"
 
     in_path = Path(in_)
     if not in_path.is_file():
-        logger.error(' '.join(["system.in.settings does not exist please check ", in_]))
-        sys.exit()
+        raise WorkflowError(f"system.in.settings does not exist: {in_}")
 
     # Use context manager to ensure file is properly closed even if exception occurs
     with open(in_, 'r') as read_f, open(out, "w") as write_f:
@@ -124,8 +99,8 @@ def get_rid_of_lj_cut_coul_long(path_cwd):
 
             if not line:
                 break
-    mv = "rm " + in_ + ";mv " + out + " " + in_
-    os.system(mv)
+    # Use atomic Path.replace() instead of unsafe shell command
+    Path(out).replace(in_)
 
 
 def mv_files(path_cwd):
@@ -170,5 +145,4 @@ def mv_files(path_cwd):
                 shutil.move(str(file), str(input_dir))
 
     except Exception as e:
-        logger.error(f"Error moving files: {str(e)}")
-        sys.exit(1)
+        raise WorkflowError(f"Error moving files: {str(e)}") from e
