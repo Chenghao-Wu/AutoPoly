@@ -64,10 +64,10 @@ class TestPolymerSequence:
         sequence = ["PE"] * 5
         poly = Polymer(chain_num=1, sequence=sequence)
         poly.set_Sequence()
-        assert len(poly.sequence_set) == poly.chain_num
-        assert len(poly.sequence_set[0]) == poly.dop
+        assert len(poly.sequenceSet) == poly.chain_num
+        assert len(poly.sequenceSet[0]) == poly.dop
         # Check that base SMILES is in the identifiers (may have _T1 suffix)
-        assert all("PE" in identifier for identifier in poly.sequence_set[0])
+        assert all("PE" in identifier for identifier in poly.sequenceSet[0])
 
     def test_polymer_set_sequence_with_copolymer(self):
         """Test sequence generation with explicit copolymer sequence."""
@@ -75,10 +75,10 @@ class TestPolymerSequence:
         sequence = ["PE", "PS", "PE", "PS"]
         poly = Polymer(chain_num=1, sequence=sequence)
         poly.set_Sequence()
-        assert len(poly.sequence_set[0]) == 4
+        assert len(poly.sequenceSet[0]) == 4
         # Should be PE, PS, PE, PS (exact sequence, no cycling)
         # Check that both PE and PS are present
-        identifiers = "".join(poly.sequence_set[0])
+        identifiers = "".join(poly.sequenceSet[0])
         assert "PE" in identifiers
         assert "PS" in identifiers
 
@@ -92,13 +92,13 @@ class TestPolymerSequence:
             poly.set_Sequence()
 
     def test_polymer_sequence_set_structure(self):
-        """Test that sequence_set has correct structure."""
+        """Test that sequenceSet has correct structure."""
         sequence = ["PE"] * 3
         poly = Polymer(chain_num=2, sequence=sequence)
         poly.set_Sequence()
-        assert len(poly.sequence_set) == 2  # 2 chains
-        assert len(poly.sequence_set[0]) == 3  # dop=3
-        assert len(poly.sequence_set[1]) == 3
+        assert len(poly.sequenceSet) == 2  # 2 chains
+        assert len(poly.sequenceSet[0]) == 3  # dop=3
+        assert len(poly.sequenceSet[1]) == 3
 
     def test_polymer_removes_lt_extension_from_sequence(self):
         """Test that .lt extension is removed from sequence items."""
@@ -112,13 +112,13 @@ class TestPolymerSequence:
 
     def test_polymer_sequence_name_matches_sequence_set(self):
         """Test that sequenceName matches sequenceSet."""
-        poly = Polymer(ChainNum=1, Sequence=["PE"], DOP=3)
+        poly = Polymer(chain_num=1, sequence=["PE"] * 3)
         poly.set_Sequence()
         assert poly.sequenceName == poly.sequenceSet
 
     def test_polymer_multiple_chains_have_independent_sequences(self):
         """Test that multiple chains have independent sequences."""
-        poly = Polymer(ChainNum=3, Sequence=["PE"], DOP=2)
+        poly = Polymer(chain_num=3, sequence=["PE"] * 2)
         poly.set_Sequence()
         assert len(poly.sequenceSet) == 3
         # Each chain should have DOP monomers
@@ -130,26 +130,26 @@ class TestPolymerTacticity:
 
     def test_polymer_isotactic_all_same_chirality(self):
         """Test isotactic tacticity (all same chirality)."""
-        poly = Polymer(ChainNum=1, Sequence=["PE"], DOP=5, tacticity="isotactic")
+        poly = Polymer(chain_num=1, sequence=["PE"] * 5, tacticity="isotactic")
         poly.set_Sequence()
-        tacticity = poly.tacticitySet[0]
+        tacticity = poly.tacticity_set[0]
         # All should be True or all should be False
         assert all(tacticity) or all(not t for t in tacticity)
 
     def test_polymer_syndiotactic_alternating_chirality(self):
         """Test syndiotactic tacticity (alternating chirality)."""
-        poly = Polymer(ChainNum=1, Sequence=["PE"], DOP=5, tacticity="syndiotactic")
+        poly = Polymer(chain_num=1, sequence=["PE"] * 5, tacticity="syndiotactic")
         poly.set_Sequence()
-        chirality = poly.tacticitySet[0]
+        chirality = poly.tacticity_set[0]
         # Should alternate: False, True, False, True, ...
         for i in range(len(chirality) - 1):
             assert chirality[i] != chirality[i + 1]
 
     def test_polymer_atactic_random_chirality(self):
         """Test atactic tacticity (random chirality)."""
-        poly = Polymer(ChainNum=1, Sequence=["PE"], DOP=10, tacticity="atactic")
+        poly = Polymer(chain_num=1, sequence=["PE"] * 10, tacticity="atactic")
         poly.set_Sequence()
-        tacticity = poly.tacticitySet[0]
+        tacticity = poly.tacticity_set[0]
 
         # Should have mix of True and False (not all same)
         # Note: This is probabilistic, but with 10 positions it's very unlikely
@@ -158,18 +158,18 @@ class TestPolymerTacticity:
 
     def test_polymer_tacticity_set_per_chain(self):
         """Test that each chain has its own tacticity."""
-        poly = Polymer(ChainNum=2, Sequence=["PE"], DOP=5, tacticity="isotactic")
+        poly = Polymer(chain_num=2, sequence=["PE"] * 5, tacticity="isotactic")
         poly.set_Sequence()
-        assert len(poly.tacticitySet) == 2  # 2 chains
-        assert len(poly.tacticitySet[0]) == 5  # DOP=5
-        assert len(poly.tacticitySet[1]) == 5
+        assert len(poly.tacticity_set) == 2  # 2 chains
+        assert len(poly.tacticity_set[0]) == 5  # DOP=5
+        assert len(poly.tacticity_set[1]) == 5
 
     def test_polymer_t1_markers_in_identifiers_for_tacticity(self):
         """Test that _T1 markers are added to identifiers when use_t1=True."""
         # For isotactic with use_t1=True, all identifiers should have _T1
-        poly = Polymer(ChainNum=1, Sequence=["PE"], DOP=3, tacticity="isotactic")
+        poly = Polymer(chain_num=1, sequence=["PE"] * 3, tacticity="isotactic")
         poly.set_Sequence()
-        tacticity = poly.tacticitySet[0]
+        tacticity = poly.tacticity_set[0]
 
         # Check that identifiers match tacticity
         for i, identifier in enumerate(poly.sequenceSet[0]):
@@ -184,7 +184,7 @@ class TestPolymerGetters:
 
     def test_polymer_get_mer_set_returns_unique_monomers(self):
         """Test that get_mer() returns unique monomers."""
-        poly = Polymer(ChainNum=1, Sequence=["PE", "PS", "PE"], DOP=3)
+        poly = Polymer(chain_num=1, sequence=["PE", "PS", "PE"])
         poly.set_Sequence()
         mer_set = poly.get_mer_set()
         assert "PE" in mer_set
@@ -193,24 +193,24 @@ class TestPolymerGetters:
         assert len(mer_set) == len(set(mer_set))
 
     def test_polymer_get_sequence_set(self):
-        """Test get_sequence_set returns correct structure."""
-        poly = Polymer(ChainNum=1, Sequence=["PE"], DOP=3)
+        """Test get_sequenceSet returns correct structure."""
+        poly = Polymer(chain_num=1, sequence=["PE"] * 3)
         poly.set_Sequence()
-        seq_set = poly.get_sequence_set()
+        seq_set = poly.get_sequenceSet()
         assert len(seq_set) == 1
         assert len(seq_set[0]) == 3
 
     def test_polymer_get_sequence_names(self):
-        """Test get_sequence_names returns correct structure."""
-        poly = Polymer(ChainNum=1, Sequence=["PE"], DOP=3)
+        """Test get_sequenceNames returns correct structure."""
+        poly = Polymer(chain_num=1, sequence=["PE"] * 3)
         poly.set_Sequence()
-        seq_names = poly.get_sequence_names()
+        seq_names = poly.get_sequenceNames()
         assert len(seq_names) == 1
         assert len(seq_names[0]) == 3
 
     def test_polymer_get_chain_info_returns_complete_dict(self):
         """Test that get_chain_info() returns complete information."""
-        poly = Polymer(ChainNum=1, Sequence=["PE"], DOP=5, tacticity="isotactic")
+        poly = Polymer(chain_num=1, sequence=["PE"] * 5, tacticity="isotactic")
         poly.set_Sequence()
         info = poly.get_chain_info()
 
@@ -219,10 +219,9 @@ class TestPolymerGetters:
         assert 'dop' in info
         assert 'topology' in info
         assert 'tacticity' in info
-        assert 'sequence_length' in info
         assert 'mer_set' in info
-        assert 'sequence_set' in info
-        assert 'sequence_names' in info
+        assert 'sequenceSet' in info
+        assert 'sequenceNames' in info
         assert 'tacticity_set' in info
 
         assert info['chain_num'] == 1
@@ -232,7 +231,7 @@ class TestPolymerGetters:
 
     def test_polymer_get_tacticity_for_chain(self):
         """Test getting tacticity for specific chain."""
-        poly = Polymer(ChainNum=2, Sequence=["PE"], DOP=3)
+        poly = Polymer(chain_num=2, sequence=["PE"] * 3)
         poly.set_Sequence()
         chirality_0 = poly.get_tacticity_for_chain(0)
         chirality_1 = poly.get_tacticity_for_chain(1)
@@ -241,7 +240,7 @@ class TestPolymerGetters:
 
     def test_polymer_get_tacticity_for_invalid_chain(self):
         """Test getting tacticity for invalid chain index."""
-        poly = Polymer(ChainNum=1, Sequence=["PE"], DOP=3)
+        poly = Polymer(chain_num=1, sequence=["PE"] * 3)
         poly.set_Sequence()
         # Invalid chain index should return empty list
         chirality = poly.get_tacticity_for_chain(5)
@@ -253,50 +252,50 @@ class TestPolymerSetters:
 
     def test_polymer_set_mer_set_with_list(self):
         """Test set_merSet with list of monomers."""
-        poly = Polymer(ChainNum=1, Sequence=["PE", "PS"])
+        poly = Polymer(chain_num=1, sequence=["PE", "PS"])
         # Should remove duplicates
-        assert "PE" in poly.merSet
-        assert "PS" in poly.merSet
+        assert "PE" in poly.mer_set
+        assert "PS" in poly.mer_set
 
     def test_polymer_set_mer_set_with_single_string(self):
         """Test set_merSet with single monomer string."""
-        poly = Polymer(ChainNum=1, Sequence=["PE"])
-        assert poly.merSet == ["PE"]
+        poly = Polymer(chain_num=1, sequence=["PE"])
+        assert poly.mer_set == ["PE"]
 
     def test_polymer_set_dop(self):
         """Test set_dop method."""
-        poly = Polymer(ChainNum=1, Sequence=["PE"], DOP=5)
-        assert poly.DOP == 5
+        poly = Polymer(chain_num=1, sequence=["PE"] * 5)
+        assert poly.dop == 5
         poly.set_dop(10)
-        assert poly.DOP == 10
+        assert poly.dop == 10
 
 
 class TestPolymerCopolymers:
     """Test copolymer-specific behavior."""
 
     def test_polymer_copolymer_alternating_sequence(self):
-        """Test that copolymer alternates through sequence."""
-        # With sequence ["PE", "PS"] and DOP=4, should get PE, PS, PE, PS
-        poly = Polymer(ChainNum=1, Sequence=["PE", "PS"], DOP=4)
+        """Test that copolymer uses explicit alternating sequence."""
+        # With explicit sequence ["PE", "PS", "PE", "PS"], should get PE, PS, PE, PS
+        poly = Polymer(chain_num=1, sequence=["PE", "PS", "PE", "PS"])
         poly.set_Sequence()
 
         identifiers = [id.replace("_T1", "") for id in poly.sequenceSet[0]]
-        # Should alternate: PE, PS, PE, PS
+        # Should match explicit sequence: PE, PS, PE, PS
         assert identifiers[0] == "PE"
         assert identifiers[1] == "PS"
         assert identifiers[2] == "PE"
         assert identifiers[3] == "PS"
 
-    def test_polymer_copolymer_longer_than_sequence(self):
-        """Test copolymer when DOP > sequence length."""
-        # With sequence ["PE", "PS", "PP"] and DOP=7, should cycle
-        poly = Polymer(ChainNum=1, Sequence=["PE", "PS", "PP"], DOP=7)
+    def test_polymer_copolymer_explicit_sequence(self):
+        """Test copolymer with explicit sequence (no cycling)."""
+        # With explicit sequence, each position is used exactly once
+        poly = Polymer(chain_num=1, sequence=["PE", "PS", "PP", "PE", "PS", "PP", "PE"])
         poly.set_Sequence()
 
         assert len(poly.sequenceSet[0]) == 7
-        # Should cycle through PE, PS, PP, PE, PS, PP, PE
+        # Should match explicit sequence: PE, PS, PP, PE, PS, PP, PE
         identifiers = [id.replace("_T1", "") for id in poly.sequenceSet[0]]
         assert identifiers[0] == "PE"
         assert identifiers[1] == "PS"
         assert identifiers[2] == "PP"
-        assert identifiers[3] == "PE"  # Cycles back
+        assert identifiers[3] == "PE"

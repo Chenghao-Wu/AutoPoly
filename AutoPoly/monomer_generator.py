@@ -1370,11 +1370,24 @@ class LTWriter:
         conn_left, conn_right = variant.connection_atoms
         
         # Build atom order with connection atoms first (based on variant type)
+        # Convention: first atom = left side, second atom = right side
+        # make_poly_lt uses first_atom as left connection, second_atom as right connection
         if variant.variant_type == 'first':
-            # First monomer: only RIGHT side is a connection point
-            atom_order = [conn_right]
+            # First monomer: need placeholder for left (terminal), conn_right second
+            # Find a heavy atom that is NOT conn_right to be first (the terminal/left side)
+            first_heavy = None
+            for i in range(mol.GetNumAtoms()):
+                atom = mol.GetAtomWithIdx(i)
+                if atom.GetAtomicNum() > 1 and i != conn_right:  # Non-hydrogen, not conn_right
+                    first_heavy = i
+                    break
+            if first_heavy is not None:
+                atom_order = [first_heavy, conn_right]
+            else:
+                atom_order = [conn_right]
         elif variant.variant_type == 'last':
             # Last monomer: only LEFT side is a connection point
+            # make_poly_lt uses first_atom as left connection, so conn_left must be first
             atom_order = [conn_left]
         elif variant.variant_type == 'single':
             # Single monomer: no real connections
