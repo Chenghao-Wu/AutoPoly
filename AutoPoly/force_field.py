@@ -76,11 +76,11 @@ class ForceFieldManager:
 
         # Set force field parameter path based on force_field type
         if force_field == "gaff":
-            self.path_oplsaaprm = f"{self.path_master}moltemplate/common/gaff.lt"
+            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "common" / "gaff.lt")
         elif force_field == "lopls":
-            self.path_oplsaaprm = f"{self.path_master}moltemplate/loplsaa.prm"
+            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "loplsaa.prm")
         else:  # oplsaa
-            self.path_oplsaaprm = f"{self.path_master}moltemplate/oplsaa.prm"
+            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "oplsaa.prm")
 
         logger.info(f"\n'you are now using parameter set of {self.path_oplsaaprm}\n")
 
@@ -109,8 +109,8 @@ class ForceFieldManager:
 
                 # Invoke oplsaa_moltemplate.py to make oplsaa.lt with suppressed output
                 ff_name = "oplsaa.lt"
-                ff_subset = self.path_cwd + "oplsaa_subset.prm"
-                ff_py_script = self.path_moltemplatesrc + "oplsaa_moltemplate.py"
+                ff_subset = str(Path(self.path_cwd) / "oplsaa_subset.prm")
+                ff_py_script = str(Path(self.path_moltemplatesrc) / "oplsaa_moltemplate.py")
 
                 # Redirect both stdout and stderr to devnull
                 # Use cwd parameter instead of shell command to avoid shell injection
@@ -180,7 +180,7 @@ class ForceFieldManager:
             SystemExit: If a monomer file cannot be found or read
         """
         # path to oplsaa_subset.prm file
-        opls_subset_file = self.path_cwd + "oplsaa_subset.prm"
+        opls_subset_file = str(Path(self.path_cwd) / "oplsaa_subset.prm")
 
         atom_keys = []
         for modelii in self.model:
@@ -275,6 +275,48 @@ class ForceFieldManager:
                         break
         write_f.close()
 
+    # Alkyl atom types: CH3 (methyl), CH2 (methylene), CH (methine)
+    ALKYL_ATOM_TYPES = {80, 81, 82}
+
+    def _is_alkyl_dihedral(self, line: str) -> bool:
+        """
+        Check if a line contains an alkyl dihedral specification.
+
+        Args:
+            line: The line to check
+
+        Returns:
+            bool: True if the line specifies a dihedral with all alkyl atoms
+        """
+        if '@dihedral:' not in line:
+            return False
+
+        try:
+            dihedral_spec = line.split("@dihedral:")[1].split()[0]
+            atom_types = [int(x) for x in dihedral_spec.split('-')]
+            return all(atom in self.ALKYL_ATOM_TYPES for atom in atom_types)
+        except (IndexError, ValueError):
+            return False
+
+    def _write_modified_dihedral_line(self, write_f, line: str) -> None:
+        """
+        Write a modified dihedral coefficient line for alkyl chains.
+
+        Args:
+            write_f: File object to write to
+            line: Original line containing dihedral specification
+        """
+        dihedral_spec = line.split("@dihedral:")[1].split()[0]
+        atom_types = [int(x) for x in dihedral_spec.split('-')]
+
+        write_f.write("dihedral_coeff @dihedral:")
+        write_f.write('-'.join(str(x) for x in atom_types))
+        write_f.write(" opls")
+
+        if hasattr(self, 'ff_modify_dihedral'):
+            write_f.write(" " + " ".join(str(x) for x in self.ff_modify_dihedral))
+        write_f.write("\n")
+
     def FFmodify_alkyl_dihedral_oplsaa(self) -> None:
         """
         Modifies alkyl dihedral coefficients in the OPLS-AA force field.
@@ -304,92 +346,41 @@ class ForceFieldManager:
         input_file = Path(self.path_cwd) / "oplsaa.lt"
         output_file = Path(self.path_cwd) / "oplsaa_tmp.lt"
 
+        if not input_file.exists():
+            logger.error("oplsaa.lt file cannot open.")
+            sys.exit(1)
+
+        logger.info("Start modifying alkyl dihedral coefficients")
+
         try:
-            if not input_file.exists():
-                logger.error("oplsaa.lt file cannot open.")
-                sys.exit(1)
-            logger.info(f"Start modifying alkyl dihedral coefficients")
             with open(input_file, 'r') as read_f, open(output_file, 'w') as write_f:
-                is_inside_block = False
-
                 for line in read_f:
-                    line = line.strip()
+                    stripped = line.strip()
+                    words = stripped.split()
 
-                    if not is_inside_block:
-                        write_f.write(f"{line}\n")
-
-                    words = line.split()
-                    if not words:
-                        continue
-
-
-                    if words[0] == 'write_once("In':
+                    # Handle write_once block start
+                    if words and words[0] == 'write_once("In':
+                        write_f.write(stripped + "\n")
                         next_line = next(read_f).strip()
                         next_words = next_line.split()
 
                         if next_words and next_words[0] == "dihedral_coeff":
-                            is_inside_block = True
-                            string_strip = next_line.strip()
-                            if not string_strip.startswith('dihedral_coeff @dihedral:'):
-                                write_f.write(f"{next_line}\n")
-                                continue
-
-                            # Extract atom types from dihedral specification
-                            dihedral_spec = next_line.split("@dihedral:")[1].split()[0]
-                            atom_types = [int(x) for x in dihedral_spec.split('-')]
-
-                            # Check if all atoms are CH3(80), CH2(81), or CH(82)
-                            alkyl_atoms = {80, 81, 82}  # CH3, CH2, CH atoms
-                            if all(atom in alkyl_atoms for atom in atom_types):
-                                # Write modified dihedral coefficients
-                                write_f.write("dihedral_coeff @dihedral:")
-                                write_f.write('-'.join(str(x) for x in atom_types))
-                                write_f.write(" opls")
-
-                                # Write new dihedral coefficients
-                                # Note: ff_modify_dihedral should be defined as a class attribute
-                                if hasattr(self, 'ff_modify_dihedral'):
-                                    write_f.write(" " + " ".join(str(x) for x in self.ff_modify_dihedral))
-                                write_f.write("\n")
+                            if self._is_alkyl_dihedral(next_line):
+                                self._write_modified_dihedral_line(write_f, next_line)
                             else:
-                                write_f.write(f"{next_line}\n")
-                            continue
+                                write_f.write(next_line + "\n")
                         else:
-                            write_f.write(f"{next_line}\n")
+                            write_f.write(next_line + "\n")
+                        continue
 
-                    elif words[0] == "}":
-                        if is_inside_block:
-
-                            write_f.write(f"{line}\n")
-                        is_inside_block = False
-
-                    if is_inside_block:
-                        # Parse dihedral specification
-                        string_strip = line.strip()
-                        if not string_strip.startswith('dihedral_coeff @dihedral:'):
-
-                            write_f.write(f"{line}\n")
-                            continue
-
-                        # Extract atom types from dihedral specification
-                        dihedral_spec = line.split("@dihedral:")[1].split()[0]
-                        atom_types = [int(x) for x in dihedral_spec.split('-')]
-
-                        # Check if all atoms are CH3(80), CH2(81), or CH(82)
-                        alkyl_atoms = {80, 81, 82}  # CH3, CH2, CH atoms
-                        if all(atom in alkyl_atoms for atom in atom_types):
-                            # Write modified dihedral coefficients
-                            write_f.write("dihedral_coeff @dihedral:")
-                            write_f.write('-'.join(str(x) for x in atom_types))
-                            write_f.write(" opls")
-
-                            # Write new dihedral coefficients
-                            # Note: ff_modify_dihedral should be defined as a class attribute
-                            if hasattr(self, 'ff_modify_dihedral'):
-                                write_f.write(" " + " ".join(str(x) for x in self.ff_modify_dihedral))
-                            write_f.write("\n")
+                    # Handle lines inside dihedral_coeff block
+                    if words and words[0] == "dihedral_coeff":
+                        if self._is_alkyl_dihedral(stripped):
+                            self._write_modified_dihedral_line(write_f, stripped)
                         else:
-                            write_f.write(f"{line}\n")
+                            write_f.write(stripped + "\n")
+                    else:
+                        write_f.write(stripped + "\n")
 
             # Replace original file with modified version
             shutil.move(str(output_file), str(input_file))

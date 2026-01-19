@@ -37,6 +37,8 @@ logger = logging.getLogger(__name__)
 LEFT_CONN_MAP = 1      # Map number for left connection atom
 RIGHT_CONN_MAP = 2     # Map number for right connection atom
 INTER_BOND_MAP_START = 100  # Starting map number for inter-monomer bond markers
+CHARGE_MAP_START = 10000   # Starting map number for Gasteiger charge tracking (avoid conflicts)
+CAP_H_MAP_START = 20000    # Starting map number for cap H atoms (chain ends)
 TERMINAL_DUMMY_ISOTOPE = 99  # Isotope to mark terminal dummy atoms (chain ends)
 
 # =============================================================================
@@ -610,7 +612,21 @@ class ChainSplitter:
         """
         if self.verbose:
             logger.info(f"Splitting chain into {len(inter_bond_markers)+1} monomers")
-        
+
+        # Extract cap H charge mapping from chain_mol
+        # This was stored by from_smiles() or from_chain() methods
+        cap_h_charge_map = {}
+        if chain_mol.HasProp('_CapHChargeMap'):
+            import json
+            try:
+                cap_h_json = chain_mol.GetProp('_CapHChargeMap')
+                parsed = json.loads(cap_h_json)
+                cap_h_charge_map = {int(k): tuple(v) for k, v in parsed.items()}
+                if self.verbose:
+                    logger.debug(f"Extracted cap_h_charge_map with {len(cap_h_charge_map)} entries")
+            except Exception as e:
+                logger.warning(f"Failed to parse cap H charge map: {e}")
+
         n_monomers = len(inter_bond_markers) + 1
         
         # Convert map numbers to bond indices
@@ -634,16 +650,67 @@ class ChainSplitter:
         
         if self.verbose:
             logger.debug(f"Bond indices to break: {bond_indices_to_break}")
-        
+
+        # Preserve Gasteiger charges through fragmentation
+        # FragmentOnBonds() loses atom properties, so we need to manually track them
+        # Charges are already stored with map numbers from MonomerGenerator
+        gasteiger_charges_by_map_num = {}
+        if force_field.lower() == 'gaff':
+            # Store Gasteiger charges keyed by map number (using existing map numbers)
+            for atom in chain_mol.GetAtoms():
+                map_num = atom.GetAtomMapNum()
+                if map_num > 0:  # Only store charges for atoms with map numbers
+                    try:
+                        charge = atom.GetProp('_GasteigerCharge')
+                        gasteiger_charges_by_map_num[map_num] = charge
+                    except KeyError:
+                        pass  # No charge stored
+
+            if self.verbose:
+                logger.debug(f"Stored {len(gasteiger_charges_by_map_num)} Gasteiger charges")
+                # Debug: print first few charges
+                for i, (map_num, charge) in enumerate(list(gasteiger_charges_by_map_num.items())[:5]):
+                    logger.debug(f"  Map {map_num} -> charge {charge}")
+
         # Fragment on BOND indices (not atom indices!)
         fragmented = Chem.FragmentOnBonds(
             chain_mol,
             bond_indices_to_break,
             addDummies=True
         )
-        
+
         # Get fragments as separate molecules
         fragments = Chem.GetMolFrags(fragmented, asMols=True, sanitizeFrags=False)
+
+        # Restore Gasteiger charges to fragments
+        if gasteiger_charges_by_map_num:
+            restored_count = 0
+            for frag in fragments:
+                for atom in frag.GetAtoms():
+                    map_num = atom.GetAtomMapNum()
+                    if map_num in gasteiger_charges_by_map_num:
+                        atom.SetProp('_GasteigerCharge', str(gasteiger_charges_by_map_num[map_num]))
+                        restored_count += 1
+
+            if self.verbose:
+                logger.debug(f"Restored {restored_count} Gasteiger charges to {len(fragments)} fragments")
+                # Debug: verify restoration by checking first fragment
+                if fragments:
+                    first_frag = fragments[0]
+                    for atom in list(first_frag.GetAtoms())[:5]:
+                        map_num = atom.GetAtomMapNum()
+                        try:
+                            charge = atom.GetProp('_GasteigerCharge')
+                            logger.debug(f"  Verified: atom {atom.GetIdx()} (map={map_num}, elem={atom.GetSymbol()}) has charge {charge}")
+                        except KeyError:
+                            logger.debug(f"  Verified: atom {atom.GetIdx()} (map={map_num}, elem={atom.GetSymbol()}) has NO CHARGE")
+
+            # Clear temporary CHARGE map numbers from original chain
+            # Don't clear INTER_BOND_MAP_START range - those are needed for connection tracking
+            for atom in chain_mol.GetAtoms():
+                map_num = atom.GetAtomMapNum()
+                if map_num >= CHARGE_MAP_START:
+                    atom.SetAtomMapNum(0)
         
         if len(fragments) != n_monomers:
             raise ChainSplittingError(
@@ -664,7 +731,7 @@ class ChainSplitter:
                 variant_type = 'middle'
             
             # Process fragment
-            processed_mol, conn_atoms = self._process_fragment(frag, i, variant_type, force_field)
+            processed_mol, conn_atoms = self._process_fragment(frag, i, variant_type, force_field, cap_h_charge_map)
             
             # Create variant
             variant = MonomerVariant(
@@ -688,20 +755,22 @@ class ChainSplitter:
         frag: Chem.Mol,
         position: int,
         variant_type: str,
-        force_field: str = 'oplsaa'
+        force_field: str,
+        cap_h_charge_map: Dict[int, Tuple[int, str]]
     ) -> Tuple[Chem.Mol, Tuple[int, int]]:
         """
         Process fragment: find connections, handle terminal/connection dummies, generate conformer.
-        
+
         Terminal dummies (isotope 99): Chain ends - cap with H
         Connection dummies (no isotope): Polymerization points - identify as connection atoms
-        
+
         Args:
             frag: Fragment molecule with dummy atoms
             position: Position in chain
             variant_type: 'first', 'middle', 'last', or 'single'
             force_field: Force field type for atom typing ('oplsaa', 'lopls', 'gaff')
-            
+            cap_h_charge_map: Mapping of neighbor_map_num -> (cap_h_map_num, charge) from full chain
+
         Returns:
             Tuple of (processed_mol, (left_conn_idx, right_conn_idx))
         """
@@ -743,24 +812,27 @@ class ChainSplitter:
         
         # 3. Replace terminal dummies with H atoms (cap chain ends)
         # This maintains proper valence for terminal atoms
-        # Track added H atoms and their neighbors for atom typing
-        cap_h_atoms = []  # [(h_idx, neighbor_idx), ...]
-        
+        # Track added H atoms, their neighbors, and neighbor's map number for charge restoration
+        added_cap_h_atoms = []  # [(h_idx, neighbor_idx, neighbor_map_num), ...]
+
         for dummy_idx, neighbor_idx in terminal_dummies:
             # Get the bond type between dummy and neighbor
             bond = rw_mol.GetBondBetweenAtoms(dummy_idx, neighbor_idx)
             bond_type = bond.GetBondType() if bond else Chem.BondType.SINGLE
-            
+
             # Add new H atom
             h_idx = rw_mol.AddAtom(Chem.Atom(1))  # Add hydrogen
-            cap_h_atoms.append((h_idx, neighbor_idx))
-            
+
+            # Get the neighbor's map number (for charge lookup)
+            neighbor_map_num = rw_mol.GetAtomWithIdx(neighbor_idx).GetAtomMapNum()
+            added_cap_h_atoms.append((h_idx, neighbor_idx, neighbor_map_num))
+
             # Add bond from neighbor to new H
             rw_mol.AddBond(neighbor_idx, h_idx, bond_type)
         
         # 3b. Assign atom types to cap H atoms based on force field
         # This ensures the cap atoms have valid force field types
-        for h_idx, neighbor_idx in cap_h_atoms:
+        for h_idx, neighbor_idx, _ in added_cap_h_atoms:
             h_atom = rw_mol.GetAtomWithIdx(h_idx)
             neighbor_atom = rw_mol.GetAtomWithIdx(neighbor_idx)
             
@@ -812,7 +884,45 @@ class ChainSplitter:
         
         # 5. Get molecule
         mol = rw_mol.GetMol()
-        
+
+        # 5b. For GAFF force field, restore cap H charges from full chain
+        # Cap H charges were calculated on the full chain and preserved via cap_h_charge_map
+        if force_field.lower() == 'gaff':
+            restored_count = 0
+            for h_idx, neighbor_idx, neighbor_map_num in added_cap_h_atoms:
+                if neighbor_map_num in cap_h_charge_map:
+                    _, charge = cap_h_charge_map[neighbor_map_num]
+                    # Find the cap H atom in the final molecule by looking for an H atom
+                    # bonded to the atom with the matching neighbor_map_num
+                    neighbor_atom_idx = AtomMapTracker.find_by_map_num(mol, neighbor_map_num)
+                    if neighbor_atom_idx is not None:
+                        # Find the H atom bonded to this neighbor
+                        cap_h_found = False
+                        for neighbor in mol.GetAtomWithIdx(neighbor_atom_idx).GetNeighbors():
+                            if neighbor.GetAtomicNum() == 1:  # Hydrogen
+                                try:
+                                    neighbor.GetProp('_GasteigerCharge')
+                                    # This H already has a charge, skip it
+                                    continue
+                                except KeyError:
+                                    # This is the cap H atom - set its charge
+                                    neighbor.SetProp('_GasteigerCharge', charge)
+                                    cap_h_found = True
+                                    restored_count += 1
+                                    break
+                        if not cap_h_found:
+                            logger.warning(f"Could not find cap H atom for neighbor map {neighbor_map_num}")
+                    else:
+                        logger.warning(f"Could not find neighbor atom with map {neighbor_map_num}")
+                else:
+                    logger.error(
+                        f"Missing cap H charge for neighbor map {neighbor_map_num}. "
+                        f"This should not happen - charges should be preserved from full chain."
+                    )
+
+            if self.verbose:
+                logger.debug(f"Restored {restored_count}/{len(added_cap_h_atoms)} cap H charges from full chain")
+
         # 6. Sanitize molecule
         try:
             Chem.SanitizeMol(mol)
@@ -1122,7 +1232,7 @@ class LTWriter:
         self.force_field = force_field
         self.charge_dict = charge_dict
         self.verbose = verbose
-    
+
     def write_variant(
         self,
         variant: MonomerVariant,
@@ -1301,20 +1411,34 @@ class LTWriter:
             conf = mol.GetConformer(0)
         else:
             conf = None
-        
+
         for atom_idx in atom_order:
             atom = mol.GetAtomWithIdx(atom_idx)
             atom_id = output_atom_ids[atom_idx]
-            
+
             # Get atom type
             try:
                 atom_type = atom.GetProp('AtomType')
             except KeyError:
                 # Fallback atom type based on element
                 atom_type = f"@atom:{atom.GetSymbol().lower()}"
-            
-            # Get charge
-            charge = self.charge_dict.get(atom_type, 0.0)
+
+            # Get charge - try Gasteiger property first (calculated on full chain),
+            # then fallback to charge_dict for OPLS or legacy behavior
+            charge = 0.0
+            if self.force_field.lower() == 'gaff':
+                try:
+                    raw_charge = atom.GetProp('_GasteigerCharge')
+                    charge = float(raw_charge)
+                    # Handle NaN/Inf values (Gasteiger can produce these)
+                    if (charge == float('inf') or
+                        charge == float('-inf') or
+                        charge != charge):  # NaN check
+                        charge = 0.0
+                except (KeyError, ValueError):
+                    charge = 0.0
+            else:
+                charge = self.charge_dict.get(atom_type, 0.0)
             
             # Get coordinates
             if conf is not None:
@@ -1458,16 +1582,137 @@ class MonomerGenerator:
         
         # 2. Assign atom types on CHAIN (correct chemical environment!)
         chain_mol = self.atom_typer.assign_atom_types(chain_mol)
-        
-        # 3. Split into monomers
+
+        # 3. Calculate Gasteiger charges on FULL chain (before splitting!)
+        # This ensures atoms have full chemical environment for charge calculation
+        # NOTE: Gasteiger doesn't work with dummy atoms, so we use map numbers to track atoms
+        if self.force_field.lower() == 'gaff':
+            try:
+                # Assign map numbers to all atoms for tracking
+                for i, atom in enumerate(chain_mol.GetAtoms()):
+                    if atom.GetAtomMapNum() == 0:
+                        atom.SetAtomMapNum(CHARGE_MAP_START + i)
+
+                # Record which atoms are adjacent to terminal dummies (before removing them)
+                # These atoms will later have cap H atoms added by AddHs
+                terminal_neighbor_map_nums = set()
+                for atom in chain_mol.GetAtoms():
+                    if atom.GetIsotope() == TERMINAL_DUMMY_ISOTOPE:
+                        for neighbor in atom.GetNeighbors():
+                            if neighbor.GetAtomicNum() > 0:
+                                map_num = neighbor.GetAtomMapNum()
+                                if map_num > 0:
+                                    terminal_neighbor_map_nums.add(map_num)
+                                break
+
+                # Create a version for charge calculation that preserves chemical environment
+                # Strategy: Remove terminal dummies, then add explicit H atoms
+                # This preserves the chemical environment better than just removing dummies
+                rw_mol = Chem.RWMol(chain_mol)
+
+                # Process dummy atoms: remove all dummies (both terminal and connection)
+                # We'll add explicit H atoms afterwards to satisfy valence
+                dummy_indices = []
+                for atom in rw_mol.GetAtoms():
+                    if atom.GetAtomicNum() == 0:  # Dummy atom
+                        dummy_indices.append(atom.GetIdx())
+
+                # Remove dummies in reverse order to preserve indices
+                for idx in sorted(dummy_indices, reverse=True):
+                    rw_mol.RemoveAtom(idx)
+
+                # Get the molecule without dummies
+                chain_for_charges = rw_mol.GetMol()
+
+                # Sanitize molecule BEFORE AddHs to properly recognize unsatisfied valence
+                try:
+                    Chem.SanitizeMol(chain_for_charges)
+                except Exception as sanitize_error:
+                    logger.warning(f"Sanitization warning before AddHs: {sanitize_error}")
+
+                # Add explicit hydrogens to satisfy valence
+                # This ensures proper chemical environment for charge calculation
+                chain_for_charges = Chem.AddHs(chain_for_charges, addCoords=True)
+
+                # Assign map numbers to cap H atoms added by AddHs
+                # Cap H atoms are those added to atoms that were adjacent to terminal dummies
+                cap_h_charge_map = {}  # {neighbor_map_num: (cap_h_map_num, charge)}
+
+                for atom in chain_for_charges.GetAtoms():
+                    if atom.GetAtomicNum() == 1:  # Hydrogen
+                        # Check if this H was added by AddHs (has no map number yet)
+                        if atom.GetAtomMapNum() == 0:
+                            # Check if this H is bonded to an atom that was adjacent to a terminal dummy
+                            for neighbor in atom.GetNeighbors():
+                                neighbor_map_num = neighbor.GetAtomMapNum()
+                                if neighbor_map_num in terminal_neighbor_map_nums:
+                                    # This is a cap H atom - assign it a map number
+                                    cap_h_map_num = CAP_H_MAP_START + len(cap_h_charge_map)
+                                    atom.SetAtomMapNum(cap_h_map_num)
+                                    cap_h_charge_map[neighbor_map_num] = (cap_h_map_num, None)  # Charge added later
+                                    break
+
+                # Sanitize molecule before calculating Gasteiger charges
+                try:
+                    Chem.SanitizeMol(chain_for_charges)
+                except Exception as sanitize_error:
+                    logger.warning(f"Sanitization warning before charge calc: {sanitize_error}")
+
+                # Calculate Gasteiger charges on the chain with explicit H's
+                AllChem.ComputeGasteigerCharges(chain_for_charges)
+
+                # Store cap H charges with neighbor map number as key
+                for neighbor_map_num, (cap_h_map_num, _) in list(cap_h_charge_map.items()):
+                    cap_h_atom_idx = AtomMapTracker.find_by_map_num(chain_for_charges, cap_h_map_num)
+                    if cap_h_atom_idx is not None:
+                        cap_h_atom = chain_for_charges.GetAtomWithIdx(cap_h_atom_idx)
+                        try:
+                            charge = cap_h_atom.GetProp('_GasteigerCharge')
+                            cap_h_charge_map[neighbor_map_num] = (cap_h_map_num, charge)
+                        except KeyError:
+                            logger.warning(f"Cap H atom map={cap_h_map_num} has no charge")
+
+                # Store charges by map number
+                charges_by_map = {}
+                for atom in chain_for_charges.GetAtoms():
+                    map_num = atom.GetAtomMapNum()
+                    if map_num > 0:
+                        try:
+                            charge = atom.GetProp('_GasteigerCharge')
+                            charges_by_map[map_num] = charge
+                        except KeyError:
+                            pass
+
+                # Transfer charges back to original chain using map numbers
+                for atom in chain_mol.GetAtoms():
+                    map_num = atom.GetAtomMapNum()
+                    if map_num in charges_by_map:
+                        atom.SetProp('_GasteigerCharge', charges_by_map[map_num])
+
+                # Store cap_h_charge_map as molecule property for split_chain to use
+                import json
+                cap_h_json = json.dumps({str(k): v for k, v in cap_h_charge_map.items()})
+                chain_mol.SetProp('_CapHChargeMap', cap_h_json)
+
+                if self.verbose:
+                    logger.info("Calculated Gasteiger charges on full polymer chain")
+                    logger.info(f"Preserved {len(cap_h_charge_map)} cap H charges from full chain")
+            except Exception as e:
+                logger.error(f"Failed to compute Gasteiger charges on chain: {e}")
+
+        # 4. Split into monomers (charges preserved in fragments)
         variants = self.chain_splitter.split_chain(
             chain_mol,
             inter_bond_markers,
             self.base_name,
             self.force_field
         )
-        
-        # 4. Align for LT file generation
+
+        # Clean up cap_h_charge_map property from chain_mol
+        if chain_mol.HasProp('_CapHChargeMap'):
+            chain_mol.ClearProp('_CapHChargeMap')
+
+        # 5. Align for LT file generation
         aligned_variants = [
             self.backbone_aligner.align_for_lt_file(v)
             for v in variants
@@ -1497,16 +1742,137 @@ class MonomerGenerator:
         
         # 1. Assign atom types on chain
         chain_mol = self.atom_typer.assign_atom_types(chain_mol)
-        
-        # 2. Split chain
+
+        # 2. Calculate Gasteiger charges on FULL chain (before splitting!)
+        # This ensures atoms have full chemical environment for charge calculation
+        # NOTE: Gasteiger doesn't work with dummy atoms, so we use map numbers to track atoms
+        if self.force_field.lower() == 'gaff':
+            try:
+                # Assign map numbers to all atoms for tracking
+                for i, atom in enumerate(chain_mol.GetAtoms()):
+                    if atom.GetAtomMapNum() == 0:
+                        atom.SetAtomMapNum(CHARGE_MAP_START + i)
+
+                # Record which atoms are adjacent to terminal dummies (before removing them)
+                # These atoms will later have cap H atoms added by AddHs
+                terminal_neighbor_map_nums = set()
+                for atom in chain_mol.GetAtoms():
+                    if atom.GetIsotope() == TERMINAL_DUMMY_ISOTOPE:
+                        for neighbor in atom.GetNeighbors():
+                            if neighbor.GetAtomicNum() > 0:
+                                map_num = neighbor.GetAtomMapNum()
+                                if map_num > 0:
+                                    terminal_neighbor_map_nums.add(map_num)
+                                break
+
+                # Create a version for charge calculation that preserves chemical environment
+                # Strategy: Remove terminal dummies, then add explicit H atoms
+                # This preserves the chemical environment better than just removing dummies
+                rw_mol = Chem.RWMol(chain_mol)
+
+                # Process dummy atoms: remove all dummies (both terminal and connection)
+                # We'll add explicit H atoms afterwards to satisfy valence
+                dummy_indices = []
+                for atom in rw_mol.GetAtoms():
+                    if atom.GetAtomicNum() == 0:  # Dummy atom
+                        dummy_indices.append(atom.GetIdx())
+
+                # Remove dummies in reverse order to preserve indices
+                for idx in sorted(dummy_indices, reverse=True):
+                    rw_mol.RemoveAtom(idx)
+
+                # Get the molecule without dummies
+                chain_for_charges = rw_mol.GetMol()
+
+                # Sanitize molecule BEFORE AddHs to properly recognize unsatisfied valence
+                try:
+                    Chem.SanitizeMol(chain_for_charges)
+                except Exception as sanitize_error:
+                    logger.warning(f"Sanitization warning before AddHs: {sanitize_error}")
+
+                # Add explicit hydrogens to satisfy valence
+                # This ensures proper chemical environment for charge calculation
+                chain_for_charges = Chem.AddHs(chain_for_charges, addCoords=True)
+
+                # Assign map numbers to cap H atoms added by AddHs
+                # Cap H atoms are those added to atoms that were adjacent to terminal dummies
+                cap_h_charge_map = {}  # {neighbor_map_num: (cap_h_map_num, charge)}
+
+                for atom in chain_for_charges.GetAtoms():
+                    if atom.GetAtomicNum() == 1:  # Hydrogen
+                        # Check if this H was added by AddHs (has no map number yet)
+                        if atom.GetAtomMapNum() == 0:
+                            # Check if this H is bonded to an atom that was adjacent to a terminal dummy
+                            for neighbor in atom.GetNeighbors():
+                                neighbor_map_num = neighbor.GetAtomMapNum()
+                                if neighbor_map_num in terminal_neighbor_map_nums:
+                                    # This is a cap H atom - assign it a map number
+                                    cap_h_map_num = CAP_H_MAP_START + len(cap_h_charge_map)
+                                    atom.SetAtomMapNum(cap_h_map_num)
+                                    cap_h_charge_map[neighbor_map_num] = (cap_h_map_num, None)  # Charge added later
+                                    break
+
+                # Sanitize molecule before calculating Gasteiger charges
+                try:
+                    Chem.SanitizeMol(chain_for_charges)
+                except Exception as sanitize_error:
+                    logger.warning(f"Sanitization warning before charge calc: {sanitize_error}")
+
+                # Calculate Gasteiger charges on the chain with explicit H's
+                AllChem.ComputeGasteigerCharges(chain_for_charges)
+
+                # Store cap H charges with neighbor map number as key
+                for neighbor_map_num, (cap_h_map_num, _) in list(cap_h_charge_map.items()):
+                    cap_h_atom_idx = AtomMapTracker.find_by_map_num(chain_for_charges, cap_h_map_num)
+                    if cap_h_atom_idx is not None:
+                        cap_h_atom = chain_for_charges.GetAtomWithIdx(cap_h_atom_idx)
+                        try:
+                            charge = cap_h_atom.GetProp('_GasteigerCharge')
+                            cap_h_charge_map[neighbor_map_num] = (cap_h_map_num, charge)
+                        except KeyError:
+                            logger.warning(f"Cap H atom map={cap_h_map_num} has no charge")
+
+                # Store charges by map number
+                charges_by_map = {}
+                for atom in chain_for_charges.GetAtoms():
+                    map_num = atom.GetAtomMapNum()
+                    if map_num > 0:
+                        try:
+                            charge = atom.GetProp('_GasteigerCharge')
+                            charges_by_map[map_num] = charge
+                        except KeyError:
+                            pass
+
+                # Transfer charges back to original chain using map numbers
+                for atom in chain_mol.GetAtoms():
+                    map_num = atom.GetAtomMapNum()
+                    if map_num in charges_by_map:
+                        atom.SetProp('_GasteigerCharge', charges_by_map[map_num])
+
+                # Store cap_h_charge_map as molecule property for split_chain to use
+                import json
+                cap_h_json = json.dumps({str(k): v for k, v in cap_h_charge_map.items()})
+                chain_mol.SetProp('_CapHChargeMap', cap_h_json)
+
+                if self.verbose:
+                    logger.info("Calculated Gasteiger charges on full polymer chain")
+                    logger.info(f"Preserved {len(cap_h_charge_map)} cap H charges from full chain")
+            except Exception as e:
+                logger.error(f"Failed to compute Gasteiger charges on chain: {e}")
+
+        # 3. Split chain
         variants = self.chain_splitter.split_chain(
             chain_mol,
             inter_bond_markers,
             self.base_name,
             self.force_field
         )
-        
-        # 3. Align for LT file generation
+
+        # Clean up cap_h_charge_map property from chain_mol
+        if chain_mol.HasProp('_CapHChargeMap'):
+            chain_mol.ClearProp('_CapHChargeMap')
+
+        # 4. Align for LT file generation
         aligned_variants = [
             self.backbone_aligner.align_for_lt_file(v)
             for v in variants

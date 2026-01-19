@@ -67,40 +67,33 @@ def get_rid_of_lj_cut_coul_long(path_cwd):
         path_cwd: Current working directory path
 
     Raises:
-        SystemExit: If system.in.settings file does not exist
+        WorkflowError: If system.in.settings file does not exist
     """
-    in_ = Path(path_cwd) / "system.in.settings"
-    out = Path(path_cwd) / "tmp.data"
+    in_file = Path(path_cwd) / "system.in.settings"
+    out_file = Path(path_cwd) / "tmp.data"
 
-    in_path = Path(in_)
-    if not in_path.is_file():
-        raise WorkflowError(f"system.in.settings does not exist: {in_}")
+    if not in_file.is_file():
+        raise WorkflowError(f"system.in.settings does not exist: {in_file}")
 
-    # Use context manager to ensure file is properly closed even if exception occurs
-    with open(in_, 'r') as read_f, open(out, "w") as write_f:
-        while True:
-            line = read_f.readline()
-            if line.strip() == "":
-                write_f.write("\n")
-            elif line.strip().split()[0] == "pair_coeff":
-                #write_f.write("    pair_coeff ")
-                space_i = 0
-                for ii in line.split():
-                    if ii == "lj/cut/coul/long":
-                        continue
-                    else:
-                        if space_i == 0:
-                            write_f.write("    ")
-                            space_i = space_i + 1
-                        write_f.write(ii + " ")
-                write_f.write("\n")
-            else:
-                write_f.write(line)
+    def filter_line(line):
+        """Filter out lj/cut/coul/long from pair_coeff lines."""
+        stripped = line.strip()
+        if not stripped:
+            return "\n"
 
-            if not line:
-                break
-    # Use atomic Path.replace() instead of unsafe shell command
-    Path(out).replace(in_)
+        parts = stripped.split()
+        if parts[0] == "pair_coeff":
+            # Filter out "lj/cut/coul/long" from pair_coeff lines
+            filtered_parts = [p for p in parts if p != "lj/cut/coul/long"]
+            return "    " + " ".join(filtered_parts) + "\n"
+
+        return line
+
+    with open(in_file, 'r') as read_f, open(out_file, "w") as write_f:
+        write_f.writelines(filter_line(line) for line in read_f)
+
+    # Atomic replace
+    out_file.replace(in_file)
 
 
 def mv_files(path_cwd):

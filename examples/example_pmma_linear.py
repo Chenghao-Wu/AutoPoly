@@ -54,9 +54,14 @@ Force Field: OPLS-AA (Optimized Potentials for Liquid Simulations - All Atom)
 PMMA_SMILES = "[*]CC([*])(C)C(=O)OC"  # pSMILES with [*] connection points for backbone carbons
 CHAIN_NUM = 10               # Number of polymer chains
 DOP = 50                     # Degree of polymerization (monomers per chain)
+# With new API, DOP is derived from sequence length
 TOPOLOGY = "linear"          # Linear chain topology
 TACTICITY = "atactic"        # Random stereochemistry
 FORCE_FIELD = "oplsaa"       # OPLS-AA force field (recommended for vinyl polymers)
+# or gaff force field
+#FORCE_FIELD = "gaff"
+
+
 
 # ============================================================================
 # SECTION 2: Imports and Setup
@@ -152,13 +157,18 @@ def define_pmmapolymer():
     print(f"  Total Monomers: {CHAIN_NUM * DOP}")
     print(f"  Topology: {TOPOLOGY}")
     print(f"  Tacticity: {TACTICITY}")
+    print(f"\nNote: Using new explicit sequence API")
+    print(f"  DOP is automatically derived from len(sequence)")
 
     try:
-        # Create Polymer object
+        # Create explicit sequence (uniform for this example)
+        # With new API, we specify each monomer position explicitly
+        sequence = [PMMA_SMILES] * DOP
+
+        # Create Polymer object with Pythonic naming
         polymer = Polymer(
-            ChainNum=CHAIN_NUM,
-            Sequence=[PMMA_SMILES],  # MMA pSMILES with [*] connection points
-            DOP=DOP,
+            chain_num=CHAIN_NUM,
+            sequence=sequence,  # Explicit sequence
             topology=TOPOLOGY,
             tacticity=TACTICITY
         )

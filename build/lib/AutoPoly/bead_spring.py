@@ -16,8 +16,6 @@ This module is useful for:
 - Educational purposes
 - Testing polymer simulation workflows
 """
-import os
-import sys
 from pathlib import Path
 import numpy as np
 from typing import Optional
@@ -74,7 +72,7 @@ class BeadSpringPolymer:
             
         self.name = name
         self.system = system
-        self.path = f"{self.system.get_FolderPath}/{self.name}" if system else f"./{name}"
+        self.path = f"{self.system.get_folder_path()}/{self.name}" if system else f"./{name}"
         self.n_chains = n_chains
         self.n_beads = n_beads
         self.topology = topology

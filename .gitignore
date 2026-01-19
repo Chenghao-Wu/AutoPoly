@@ -1,0 +1,16 @@
+.pytest_cache/
+.benchmarks/
+MOLECULES.md
+TESTING.md
+AutoPoly.egg-info/
+build/
+dist/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+*.pywz
+*.pyzz
+*.pywzz

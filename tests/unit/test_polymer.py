@@ -10,48 +10,50 @@ class TestPolymerInitialization:
 
     def test_polymer_init_with_default_parameters(self):
         """Test Polymer initialization with defaults."""
-        poly = Polymer(ChainNum=1, Sequence=["PE"])
-        assert poly.ChainNum == 1
-        assert poly.DOP == 1  # Defaults to sequence length
+        poly = Polymer(chain_num=1, sequence=["PE"])
+        assert poly.chain_num == 1
+        assert poly.dop == 1  # Defaults to sequence length
         assert poly.topology == "linear"
         assert poly.tacticity == "atactic"
 
     def test_polymer_init_with_custom_dop(self):
-        """Test Polymer initialization with custom DOP."""
-        poly = Polymer(ChainNum=1, Sequence=["PE"], DOP=5)
-        assert poly.DOP == 5
+        """Test Polymer initialization with custom DOP (DOP is derived from sequence length)."""
+        # With new API, DOP is derived from sequence length, not a parameter
+        sequence = ["PE"] * 5
+        poly = Polymer(chain_num=1, sequence=sequence)
+        assert poly.dop == 5
 
     def test_polymer_init_with_invalid_topology_raises_value_error(self):
         """Test that invalid topology raises ValueError."""
-        with pytest.raises(ValueError, match="Topology must be either 'linear' or 'ring'"):
-            Polymer(ChainNum=1, Sequence=["PE"], topology="invalid")
+        with pytest.raises(ValueError, match="topology must be either 'linear' or 'ring'"):
+            Polymer(chain_num=1, sequence=["PE"], topology="invalid")
 
     def test_polymer_init_with_ring_topology(self):
         """Test Polymer initialization with ring topology."""
-        poly = Polymer(ChainNum=1, Sequence=["PE"], topology="ring")
+        poly = Polymer(chain_num=1, sequence=["PE"], topology="ring")
         assert poly.topology == "ring"
 
     def test_polymer_init_with_nested_sequence(self):
         """Test Polymer initialization with nested sequence."""
         # User might pass [["PE"]] instead of ["PE"]
-        poly = Polymer(ChainNum=1, Sequence=[["PE"]])
+        poly = Polymer(chain_num=1, sequence=[["PE"]])
         assert poly.sequence == ["PE"]
 
     def test_polymer_init_with_copolymer_sequence(self):
         """Test Polymer initialization with copolymer sequence."""
-        poly = Polymer(ChainNum=1, Sequence=["PE", "PS"])
+        poly = Polymer(chain_num=1, sequence=["PE", "PS"])
         assert poly.sequence == ["PE", "PS"]
-        assert len(poly.merSet) == 2
+        assert len(poly.mer_set) == 2
 
     def test_polymer_init_empty_sequence_raises_value_error(self):
         """Test that empty sequence raises ValueError."""
-        with pytest.raises(ValueError, match="Sequence cannot be None or empty"):
-            Polymer(ChainNum=1, Sequence=[])
+        with pytest.raises(ValidationError, match="sequence cannot be empty"):
+            Polymer(chain_num=1, sequence=[])
 
     def test_polymer_init_none_sequence_raises_value_error(self):
         """Test that None sequence raises ValueError."""
-        with pytest.raises(ValueError, match="Sequence cannot be None or empty"):
-            Polymer(ChainNum=1, Sequence=None)
+        with pytest.raises(ValidationError, match="sequence cannot be empty"):
+            Polymer(chain_num=1, sequence=None)
 
 
 class TestPolymerSequence:
@@ -59,44 +61,49 @@ class TestPolymerSequence:
 
     def test_polymer_set_sequence_with_single_monomer(self):
         """Test sequence generation with single monomer type."""
-        poly = Polymer(ChainNum=1, Sequence=["PE"], DOP=5)
+        sequence = ["PE"] * 5
+        poly = Polymer(chain_num=1, sequence=sequence)
         poly.set_Sequence()
-        assert len(poly.sequenceSet) == poly.ChainNum
-        assert len(poly.sequenceSet[0]) == poly.DOP
+        assert len(poly.sequence_set) == poly.chain_num
+        assert len(poly.sequence_set[0]) == poly.dop
         # Check that base SMILES is in the identifiers (may have _T1 suffix)
-        assert all("PE" in identifier for identifier in poly.sequenceSet[0])
+        assert all("PE" in identifier for identifier in poly.sequence_set[0])
 
     def test_polymer_set_sequence_with_copolymer(self):
-        """Test sequence generation with copolymer (alternating)."""
-        poly = Polymer(ChainNum=1, Sequence=["PE", "PS"], DOP=4)
+        """Test sequence generation with explicit copolymer sequence."""
+        # With new API, explicit sequence - NO CYCLING
+        sequence = ["PE", "PS", "PE", "PS"]
+        poly = Polymer(chain_num=1, sequence=sequence)
         poly.set_Sequence()
-        assert len(poly.sequenceSet[0]) == 4
-        # Should alternate: PE, PS, PE, PS (or similar pattern)
+        assert len(poly.sequence_set[0]) == 4
+        # Should be PE, PS, PE, PS (exact sequence, no cycling)
         # Check that both PE and PS are present
-        identifiers = "".join(poly.sequenceSet[0])
+        identifiers = "".join(poly.sequence_set[0])
         assert "PE" in identifiers
         assert "PS" in identifiers
 
-    def test_polymer_set_sequence_with_zero_chain_num_raises_system_exit(self):
-        """Test that ChainNum=0 raises ValidationError."""
-        # Create polymer with ChainNum=1 first to avoid ValidationError in __init__
-        poly = Polymer(ChainNum=1, Sequence=["PE"])
-        # Then set ChainNum to 0 and call set_Sequence
-        poly.ChainNum = 0
-        with pytest.raises(ValidationError, match="ChainNum must be greater than 0"):
+    def test_polymer_set_sequence_with_zero_chain_num_raises_validation_error(self):
+        """Test that chain_num=0 raises ValidationError."""
+        # Create polymer with chain_num=1 first to avoid ValidationError in __init__
+        poly = Polymer(chain_num=1, sequence=["PE"])
+        # Then set chain_num to 0 and call set_Sequence
+        poly.chain_num = 0
+        with pytest.raises(ValidationError, match="chain_num must be greater than 0"):
             poly.set_Sequence()
 
     def test_polymer_sequence_set_structure(self):
-        """Test that sequenceSet has correct structure."""
-        poly = Polymer(ChainNum=2, Sequence=["PE"], DOP=3)
+        """Test that sequence_set has correct structure."""
+        sequence = ["PE"] * 3
+        poly = Polymer(chain_num=2, sequence=sequence)
         poly.set_Sequence()
-        assert len(poly.sequenceSet) == 2  # 2 chains
-        assert len(poly.sequenceSet[0]) == 3  # DOP=3
-        assert len(poly.sequenceSet[1]) == 3
+        assert len(poly.sequence_set) == 2  # 2 chains
+        assert len(poly.sequence_set[0]) == 3  # dop=3
+        assert len(poly.sequence_set[1]) == 3
 
     def test_polymer_removes_lt_extension_from_sequence(self):
         """Test that .lt extension is removed from sequence items."""
-        poly = Polymer(ChainNum=1, Sequence=["PE.lt"], DOP=3)
+        sequence = ["PE.lt"] * 3
+        poly = Polymer(chain_num=1, sequence=sequence)
         poly.set_Sequence()
         # Should remove .lt extension from identifiers
         # All identifiers should contain "PE" but not "PE.lt"
