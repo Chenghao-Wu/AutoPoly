@@ -1447,7 +1447,7 @@ class LTWriter:
             else:
                 x, y, z = 0.0, 0.0, 0.0
             
-            f.write(f'\t$atom:{atom_id} $mol:... {atom_type} {charge:.2f}')
+            f.write(f'\t$atom:{atom_id} $mol:... {atom_type} {charge:.4f}')
             f.write(f'    {x:.3f}   {y:.3f}   {z:.3f}\n')
         
         f.write('  }\n\n')
@@ -2071,7 +2071,7 @@ class MonomerGenerator:
                 else:
                     x, y, z = 0.0, 0.0, 0.0
                 
-                f.write(f'\t$atom:{atom_id} $mol:... {atom_type} {charge:.2f}')
+                f.write(f'\t$atom:{atom_id} $mol:... {atom_type} {charge:.4f}')
                 f.write(f'    {x:.3f}   {y:.3f}   {z:.3f}\n')
             
             f.write('  }\n\n')
