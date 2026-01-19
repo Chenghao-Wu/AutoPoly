@@ -1579,8 +1579,40 @@ class MonomerGenerator:
         
         # 1. Build chain
         chain_mol, inter_bond_markers = self.chain_builder.build_chain(smiles, n_monomers)
-        
-        # 2. Assign atom types on CHAIN (correct chemical environment!)
+
+        # 1b. Cap terminal dummies BEFORE typing
+        # This ensures terminal atoms have correct chemistry (e.g., alcohol OH, not ether O-dummy)
+        # for SMARTS pattern matching. Without this, terminal atoms bonded to dummies fail to match
+        # patterns that require specific neighbor atoms (e.g., ether O needs C-O-C, not dummy-O-C)
+        rw_mol = Chem.RWMol(chain_mol)
+
+        # First collect terminal dummies and their neighbors (don't modify while iterating)
+        terminal_dummies_to_cap = []  # [(dummy_idx, neighbor_idx, bond_type), ...]
+        for atom in rw_mol.GetAtoms():
+            if atom.GetAtomicNum() == 0 and atom.GetIsotope() == TERMINAL_DUMMY_ISOTOPE:
+                dummy_idx = atom.GetIdx()
+                # Find the real neighbor atom
+                for neighbor in atom.GetNeighbors():
+                    if neighbor.GetAtomicNum() > 0:
+                        neighbor_idx = neighbor.GetIdx()
+                        bond = rw_mol.GetBondBetweenAtoms(dummy_idx, neighbor_idx)
+                        bond_type = bond.GetBondType() if bond else Chem.BondType.SINGLE
+                        terminal_dummies_to_cap.append((dummy_idx, neighbor_idx, bond_type))
+                        break
+
+        # Now add H atoms to cap terminal positions
+        for dummy_idx, neighbor_idx, bond_type in terminal_dummies_to_cap:
+            h_idx = rw_mol.AddAtom(Chem.Atom(1))
+            rw_mol.AddBond(neighbor_idx, h_idx, bond_type)
+
+        # Remove terminal dummy atoms (reverse order to preserve indices)
+        dummy_indices = [d[0] for d in terminal_dummies_to_cap]
+        for idx in sorted(dummy_indices, reverse=True):
+            rw_mol.RemoveAtom(idx)
+
+        chain_mol = rw_mol.GetMol()
+
+        # 2. Assign atom types on CHAIN (now terminal atoms have correct chemistry!)
         chain_mol = self.atom_typer.assign_atom_types(chain_mol)
 
         # 3. Calculate Gasteiger charges on FULL chain (before splitting!)
