@@ -5,6 +5,17 @@
 
 AutoPoly is a Python package for generating polymer structures and preparing them for molecular simulations.
 
+## ⚠️ BREAKING CHANGE NOTICE (v1.0)
+
+**Version 1.0 is a major breaking release** with complete API modernization:
+
+- **Pythonic naming**: `chain_num` instead of `ChainNum`, `sequence` instead of `Sequence`
+- **Explicit sequences**: Specify exact monomer at each position (no cycling mode)
+- **DOP derived from sequence**: No separate `DOP` parameter needed
+- **Block copolymers**: Now supported with explicit monomer placement
+
+**See [Migration Guide](#migration-guide-to-v10) below for details.**
+
 ## Quick Start
 
 ```bash
@@ -25,12 +36,15 @@ from AutoPoly import System, Polymer, Polymerization
 # Create a linear polyethylene system
 system = System(out="my_simulation")
 
-# Define polymer using SMILES notation
-# "C=C" is the SMILES string for ethylene (polyethylene monomer)
+# Define polymer using explicit pSMILES sequence
+# Use a helper function for uniform polymers
+def create_uniform_sequence(smiles: str, length: int) -> list:
+    """Create a uniform sequence of given length."""
+    return [smiles] * length
+
 polymer = Polymer(
-    ChainNum=10,
-    Sequence=["C=C"],
-    DOP=100,
+    chain_num=10,
+    sequence=create_uniform_sequence("[*]CC[*]", 100),
     topology="linear",
     tacticity="atactic"
 )
@@ -45,40 +59,69 @@ polymerization = Polymerization(
 
 ## Key Features
 
+- **Explicit Monomer Sequences** - Create block copolymers with precise monomer placement
 - **Multiple Topologies** - Linear and ring polymer structures
 - **Tacticity Control** - Atactic, isotactic, and syndiotactic configurations
 - **Force Fields** - OPLS-AA, LOPLS, and GAFF support
 - **Bead-Spring Models** - Coarse-grained simulations
 - **LAMMPS Integration** - Complete input file generation
 - **Automatic pSMILES Canonicalization** - Ensures consistent polymer SMILES representation
+- **Resource Protection** - Built-in validation prevents resource exhaustion
 
 ## Basic Usage
 
-### Linear Polymer
+### Linear Polymer (Uniform)
 
 ```python
 from AutoPoly import System, Polymer, Polymerization
 
 system = System(out="output_dir")
-# Use SMILES strings for monomers (C=C = ethylene)
+
+# Helper function for uniform polymers
+def create_uniform_sequence(smiles: str, length: int) -> list:
+    return [smiles] * length
+
+# Use pSMILES with [*] connection points
 polymer = Polymer(
-    ChainNum=10,
-    Sequence=["C=C"],
-    DOP=50,
+    chain_num=10,
+    sequence=create_uniform_sequence("[*]CC[*]", 50),
     topology="linear",
     tacticity="isotactic"
 )
 polymerization = Polymerization(name="polyethylene", system=system, model=[polymer])
 ```
 
+### Linear Polymer (Block Copolymer)
+
+**NEW in v1.0**: Create block copolymers with explicit monomer placement:
+
+```python
+# ABA triblock copolymer: 2 PE, 3 PS, 2 PE
+sequence = [
+    "[*]CC[*]",      # Position 0: Ethylene (Block A)
+    "[*]CC[*]",      # Position 1: Ethylene (Block A)
+    "[*]C=C[*]",     # Position 2: Styrene (Block B)
+    "[*]C=C[*]",     # Position 3: Styrene (Block B)
+    "[*]C=C[*]",     # Position 4: Styrene (Block B)
+    "[*]CC[*]",      # Position 5: Ethylene (Block A)
+    "[*]CC[*]"       # Position 6: Ethylene (Block A)
+]
+
+polymer = Polymer(
+    chain_num=5,
+    sequence=sequence,  # DOP is automatically 7
+    topology="linear",
+    tacticity="atactic"
+)
+```
+
 ### Ring Polymer
 
 ```python
-# For ring polymers, use SMILES with [*] wildcards (pSMILES notation)
+# Ring polymer with explicit sequence
 polymer = Polymer(
-    ChainNum=5,
-    Sequence=["[*]C=C[*]"],  # pSMILES for ring closure
-    DOP=30,
+    chain_num=5,
+    sequence=["[*]CC[*]"] * 30,  # 30 monomer units
     topology="ring",
     tacticity="atactic"
 )
@@ -128,22 +171,52 @@ output_path = system.get_folder_path()
 ```
 
 ### Polymer
-Defines polymer structure and properties.
+Defines polymer structure and properties with explicit monomer sequences.
 
 **Parameters:**
-- `ChainNum` (int): Number of chains
-- `Sequence` (list): Monomer sequence as SMILES or pSMILES strings
-- `DOP` (int): Degree of polymerization
+- `chain_num` (int): Number of polymer chains
+- `sequence` (list): Explicit monomer sequence as pSMILES strings (e.g., `["[*]CC[*]", "[*]C=C[*]"]`)
 - `topology` (str): "linear" or "ring"
 - `tacticity` (str): "atactic", "isotactic", or "syndiotactic"
 
-**Note**: All monomers must be specified using **pSMILES notation** (SMILES with `[*]` wildcards). The input is automatically canonicalized for consistency. Common examples:
-- Ethylene: `"C=C"` or `"[*]C=C[*]"` (for linear/ring polymers)
-- Propylene: `"C=C(C)"` or `"[*]C=C(C)[*]"`
-- Styrene: `"C=C(C1=CC=CC=C1)"` or `"[*]C=C(C1=CC=CC=C1)[*]"`
-- Methyl methacrylate: `"C=C(C)C(=O)OC"` or `"[*]C=C(C)C(=O)OC[*]"`
+**Important Notes:**
+- DOP is automatically derived from `len(sequence)` - no separate DOP parameter
+- All monomers must use **pSMILES notation** with `[*]` wildcards for connection points
+- Sequence is explicit - each position corresponds to one monomer unit
+- For uniform polymers, use the helper function: `[smiles] * length`
+
+**Common Monomer pSMILES:**
+- Ethylene: `"[*]CC[*]"`
+- Propylene: `"[*]CC(C)[*]"`
+- Styrene: `"[*]Cc1ccccc1[*]"`
+- Methyl methacrylate: `"[*]CC([*])(C)C(=O)OC"`
 
 For a complete SMILES reference guide with more monomers, see [docs/SMILES_GUIDE.md](docs/SMILES_GUIDE.md)
+
+**Examples:**
+
+```python
+# Uniform polymer
+poly = Polymer(
+    chain_num=10,
+    sequence=["[*]CC[*]"] * 50,  # DOP = 50
+    topology="linear",
+    tacticity="isotactic"
+)
+
+# Block copolymer (NEW)
+poly = Polymer(
+    chain_num=5,
+    sequence=[
+        "[*]CC[*]",    # Position 0
+        "[*]CC[*]",    # Position 1
+        "[*]C=C[*]",   # Position 2
+        "[*]CC[*]"     # Position 3
+    ],  # DOP = 4
+    topology="linear",
+    tacticity="atactic"
+)
+```
 
 ### Polymerization
 Generates polymer structures using Moltemplate.
@@ -164,6 +237,177 @@ Creates coarse-grained bead-spring models.
 - `bond_length` (float): Equilibrium bond length
 - `mass` (float): Bead mass
 
+## Migration Guide (to v1.0)
+
+### Breaking Changes Summary
+
+**This is a major breaking release.** All existing code must be updated.
+
+| Old API (Pre-1.0) | New API (v1.0) | Notes |
+|------------------|----------------|-------|
+| `ChainNum=10` | `chain_num=10` | Pythonic naming |
+| `Sequence=["PE"]` | `sequence=["[*]CC[*]"] * 50` | Explicit SMILES |
+| `DOP=50` | *removed* | Derived from `len(sequence)` |
+| Cycling behavior | *removed* | No automatic sequence repetition |
+
+### Migration Examples
+
+#### Example 1: Uniform Polymer
+
+**Before (Old API - No Longer Supported):**
+```python
+from AutoPoly import Polymer
+
+poly = Polymer(
+    ChainNum=10,      # OLD: CamelCase
+    Sequence=["PE"],  # OLD: Monomer names
+    DOP=50,           # OLD: Separate DOP parameter
+    topology="linear",
+    tacticity="atactic"
+)
+# OLD BEHAVIOR: Cycled ["PE"] 50 times
+```
+
+**After (New API):**
+```python
+from AutoPoly import Polymer
+
+# Option 1: Direct list multiplication
+poly = Polymer(
+    chain_num=10,  # NEW: Pythonic snake_case
+    sequence=["[*]CC[*]"] * 50,  # NEW: Explicit pSMILES
+    topology="linear",
+    tacticity="atactic"
+)
+
+# Option 2: Using helper function (recommended for clarity)
+def create_uniform_sequence(smiles: str, length: int) -> list:
+    return [smiles] * length
+
+poly = Polymer(
+    chain_num=10,
+    sequence=create_uniform_sequence("[*]CC[*]", 50),
+    topology="linear",
+    tacticity="atactic"
+)
+```
+
+#### Example 2: Block Copolymers (Now Possible!)
+
+**Before (Old API - Not Possible):**
+```python
+# Could not create block copolymers
+# Only uniform polymers supported
+```
+
+**After (New API):**
+```python
+# ABA triblock copolymer: 2 PE, 3 PS, 2 PE
+sequence = [
+    "[*]CC[*]",      # Position 0: Ethylene
+    "[*]CC[*]",      # Position 1: Ethylene
+    "[*]C=C[*]",     # Position 2: Styrene
+    "[*]C=C[*]",     # Position 3: Styrene
+    "[*]C=C[*]",     # Position 4: Styrene
+    "[*]CC[*]",      # Position 5: Ethylene
+    "[*]CC[*]"       # Position 6: Ethylene
+]
+
+poly = Polymer(
+    chain_num=5,
+    sequence=sequence,  # DOP is automatically 7
+    topology="linear",
+    tacticity="atactic"
+)
+```
+
+#### Example 3: Multiple Unique Monomers
+
+**Before (Old API - Cycling Mode):**
+```python
+# Would cycle through monomers
+poly = Polymer(
+    ChainNum=5,
+    Sequence=["PE", "PS"],  # Would cycle: PE, PS, PE, PS, ...
+    DOP=8,
+    topology="linear"
+)
+# Result: PE, PS, PE, PS, PE, PS, PE, PS (4 cycles)
+```
+
+**After (New API - Explicit Sequence):**
+```python
+# Specify exact sequence (no cycling)
+sequence = [
+    "[*]CC[*]",      # PE
+    "[*]C=C[*]",     # PS
+    "[*]CC[*]",      # PE
+    "[*]C=C[*]",     # PS
+    "[*]CC[*]",      # PE
+    "[*]C=C[*]",     # PS
+    "[*]CC[*]",      # PE
+    "[*]C=C[*]"      # PS
+]
+
+poly = Polymer(
+    chain_num=5,
+    sequence=sequence,  # Explicit sequence, DOP = 8
+    topology="linear",
+    tacticity="isotactic"
+)
+```
+
+### Key Behavioral Changes
+
+1. **No More Cycling Mode**
+   - Old: `Sequence=["A", "B"]` with `DOP=6` → `A, B, A, B, A, B`
+   - New: Must specify full sequence explicitly
+
+2. **Explicit SMILES Required**
+   - Old: Monomer names like `"PE"`, `"PS"`
+   - New: pSMILES strings like `"[*]CC[*]"`, `"[*]C=C[*]"`
+
+3. **DOP is Derived**
+   - Old: `DOP` parameter controls sequence repetition
+   - New: `DOP = len(sequence)` automatically
+
+4. **Pythonic Naming**
+   - Old: `ChainNum`, `Sequence`, `DOP`
+   - New: `chain_num`, `sequence`, `dop` (read-only)
+
+### Validation and Resource Limits
+
+**New in v1.0**: Built-in validation protects against resource exhaustion:
+
+```python
+from AutoPoly.exceptions import ValidationError
+
+# Sequence too long
+try:
+    poly = Polymer(
+        chain_num=1,
+        sequence=["[*]CC[*]"] * 15000  # Exceeds MAX_SEQUENCE_LENGTH
+    )
+except ValidationError as e:
+    print(f"Protected: {e}")
+    # "Sequence length (15000) exceeds maximum 10000"
+
+# Too many unique monomers
+try:
+    poly = Polymer(
+        chain_num=1,
+        sequence=[f"[*]C{i}C[*]" for i in range(150)]  # Exceeds MAX_UNIQUE_MONOMERS
+    )
+except ValidationError as e:
+    print(f"Protected: {e}")
+    # "Number of unique monomers (150) exceeds maximum 100"
+```
+
+**Resource Limits:**
+- `MAX_DOP = 10000` - Maximum degree of polymerization
+- `MAX_SEQUENCE_LENGTH = 10000` - Maximum sequence length
+- `MAX_UNIQUE_MONOMERS = 100` - Maximum unique monomer types
+
 ## Advanced Documentation
 
 - **Full Examples** → [example/README.md](example/README.md)
@@ -173,20 +417,26 @@ Creates coarse-grained bead-spring models.
 
 ## Troubleshooting
 
+**API-related errors:**
+- `TypeError: __init__() got an unexpected keyword argument 'ChainNum'`: Use `chain_num` instead (Pythonic naming)
+- `TypeError: __init__() got an unexpected keyword argument 'DOP'`: DOP is derived from sequence length
+- `TypeError: __init__() got an unexpected keyword argument 'Sequence'`: Use `sequence` instead
+
+**Sequence-related errors:**
+- `ValidationError: sequence cannot be empty`: Provide at least one monomer in sequence
+- `ValidationError: Sequence length exceeds maximum`: Reduce sequence length below 10000
+- `ValidationError: Invalid SMILES`: Ensure all monomers use valid pSMILES notation with `[*]` wildcards
+
 **psmiles package errors:**
 - The psmiles package is required and should be installed automatically
 - If installation fails: `pip install git+https://github.com/kuennethgroup/psmiles.git`
 - Ensure you have Git installed if using direct Git dependency
 
 **Invalid pSMILES errors:**
-- All monomers must use pSMILES notation with exactly 2 wildcard atoms ([*] or *)
-- Example valid: `"[*]C=C[*]"` or `"*C=C*"`
-- Example invalid: `"C=C"` (missing wildcards)
+- All monomers must use pSMILES notation with exactly 2 wildcard atoms ([*])
+- Example valid: `"[*]CC[*]"`
+- Example invalid: `"CC"` (missing wildcards)
 - Check the [SMILES_GUIDE.md](docs/SMILES_GUIDE.md) for more details
-
-**Monomer not found:**
-- Check `extern/Monomer_bank/` for available monomers
-- Verify monomer names match your sequence
 
 **Moltemplate errors:**
 - Ensure Moltemplate is installed and in PATH

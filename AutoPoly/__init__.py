@@ -9,6 +9,7 @@ Main Components:
 - System: Utility class for managing file paths and system operations
 - Polymer: Class for defining polymer properties and sequences
 - Polymerization: Core class for generating polymer structures using Moltemplate
+- Molecule: Class for defining small molecule structures (water, benzene, etc.)
 - BeadSpringPolymer: Simplified bead-spring polymer model generator
 
 External Dependencies:
@@ -30,13 +31,9 @@ __all__ = [
     "System",
     "Polymer",
     "Polymerization",
+    "Molecule",
     "BeadSpringPolymer",
     "MonomerGenerator",
-    "PolymerizationMechanism",
-    "ConnectionPointModifier",
-    "detect_mechanism",
-    "get_pattern",
-    "get_all_mechanisms",
     "__version__",
     "__author__",
 ]
@@ -44,8 +41,6 @@ __all__ = [
 from .system import System
 from .polymer import Polymer
 from .polymerization import Polymerization
+from .molecule import Molecule
 from .bead_spring import BeadSpringPolymer
 from .monomer_generator import MonomerGenerator
-from .polymerization_mechanism import PolymerizationMechanism, detect_mechanism
-from .connection_point import ConnectionPointModifier
-from .polymerization_patterns import get_pattern, get_all_mechanisms

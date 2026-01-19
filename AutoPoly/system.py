@@ -16,7 +16,6 @@ Created on Fri Dec 21 12:19:08 2018
 """
 import os
 import sys
-import warnings
 from pathlib import Path
 import subprocess
 import time
@@ -46,33 +45,13 @@ class System:
         """
         self.out = out
         if self.out:
-            self._folder_path = os.path.join(os.getcwd(), self.out)
+            self._folder_path = str(Path.cwd() / self.out)
         else:
-            self._folder_path = os.getcwd()
+            self._folder_path = str(Path.cwd())
 
         # Create output directory if specified
         if self.out:
             self._create_output_directory()
-
-    @property
-    def get_FolderPath(self) -> str:
-        """
-        Get the full path to the output directory (deprecated).
-
-        .. deprecated::
-            Use :meth:`get_folder_path` instead. This property is kept for
-            backward compatibility and will be removed in a future version.
-
-        Returns:
-            str: Full path to the output directory
-        """
-        warnings.warn(
-            "get_FolderPath is deprecated and will be removed in a future version. "
-            "Use get_folder_path() method instead.",
-            DeprecationWarning,
-            stacklevel=2
-        )
-        return self._folder_path
 
     def _create_output_directory(self) -> None:
         """
@@ -101,10 +80,12 @@ class System:
         """
         Get the full path to the output directory.
 
+        This is an alias for get_folder_path() for backward compatibility.
+
         Returns:
             str: Full path to the output directory
         """
-        return self._folder_path
+        return self.get_folder_path()
 
     def change_output_directory(self, new_out: str) -> None:
         """
@@ -114,7 +95,7 @@ class System:
             new_out (str): New output directory name
         """
         self.out = new_out
-        self._folder_path = os.path.join(os.getcwd(), self.out)
+        self._folder_path = str(Path.cwd() / self.out)
         self._create_output_directory()
         logger.info(f"Output directory changed to: {self._folder_path}")
 
@@ -125,7 +106,7 @@ class System:
         This method should be used with caution as it permanently deletes
         all files in the output directory.
         """
-        if os.path.exists(self._folder_path):
+        if Path(self._folder_path).exists():
             try:
                 shutil.rmtree(self._folder_path)
                 logger.info(f"Cleaned up output directory: {self._folder_path}")

@@ -62,181 +62,25 @@ class WorkflowManager:
         6. Runs Moltemplate to create LAMMPS data files
         7. Processes and organizes output files
 
-        The method includes comprehensive error checking and validation
-        to ensure all required files are generated correctly.
-
         Raises:
-            SystemExit: If any critical step fails or required files are missing
+            WorkflowError: If any critical step fails or required files are missing
         """
         try:
             logger.info("Starting LAMMPS data file generation using Moltemplate")
 
-            poly_index = 0
-            for modelii in self.poly.model:
-                # Check if this is a Molecule or Polymer
-                is_molecule = hasattr(modelii, '_is_molecule') and modelii._is_molecule
+            # Process all models (polymers and molecules)
+            poly_index = self._process_all_models()
 
-                if is_molecule:
-                    # Handle molecule generation
-                    logger.info(f"Processing molecule: {modelii.molecule_name} (Count={modelii.Count})")
-                    self._generate_single_molecule(modelii)
-                else:
-                    # Handle polymer generation (existing workflow)
-                    logger.info(f"Processing model with {len(modelii.sequenceSet)} molecules")
-                    base_smiles = modelii.sequence[0]
-                    # Get topology
-                    topology = getattr(modelii, 'topology', 'linear')
+            # Generate force field and system files
+            self._generate_force_field_files()
+            self._generate_system_file()
 
-                    # Get DOP
-                    dop = modelii.DOP
+            # Run moltemplate and validate output
+            self._run_moltemplate_and_validate()
 
-                    logger.info(f"Generating sequence variants for {base_smiles}, DOP={dop}, topology={topology}")
-
-                    # Use new sequence-aware variant generation
-                    # This will generate position-specific variants and extract unique units
-                    variant_mapping = self.poly.generate_sequence_variants_for_polymer(
-                        base_smiles=base_smiles,
-                        dop=dop,
-                        topology=topology,
-                        base_name_prefix="monomer"
-                    )
-
-                    logger.info(f"Generated {len(variant_mapping)} unique variant types: {list(variant_mapping.keys())}")
-
-                    # Build sequenceSet with appropriate .lt files for each position
-                    for chain_idx, chain_smiles in enumerate(modelii.sequenceSet):
-                        monomer_names = []
-                        for pos_idx, smiles in enumerate(chain_smiles):
-                            # Determine variant type based on position and topology
-                            if topology == "ring":
-                                variant_type = "ring"
-                            else:
-                                if pos_idx == 0:
-                                    variant_type = "first"
-                                elif pos_idx == dop - 1:
-                                    variant_type = "last"
-                                else:
-                                    variant_type = "middle"
-
-                            # Check if T1 variant is needed
-                            has_t1 = "_T1" in smiles
-
-                            # Get the filename from variant_mapping
-                            # Use the T1 variant key if T1 is needed, otherwise use standard variant
-                            mapping_key = f"{variant_type}_T1" if has_t1 else variant_type
-
-                            if mapping_key in variant_mapping:
-                                filename = variant_mapping[mapping_key]
-                                monomer_names.append(filename)
-                            else:
-                                raise WorkflowError(
-                                    f"Variant key '{mapping_key}' not found in mapping. "
-                                    f"Available variants: {list(variant_mapping.keys())}"
-                                )
-
-                        modelii.sequenceSet[chain_idx] = monomer_names
-
-                    logger.info(f"Built {len(modelii.sequenceSet)} chain(s) with sequence variants")
-
-                    # Loop through all polymers and make corresponding polymer lt files
-                    for moleii in range(len(modelii.sequenceSet)):
-                        # Check degrees of polymerization (DOP) of current polymer
-                        if modelii.DOP > 0:
-                            if len(modelii.sequenceSet[moleii]) != modelii.DOP:
-                                logger.warning(f"Warning: At molecule# {moleii} DOP={len(modelii.sequenceSet[moleii])} != {modelii.DOP}")
-                        else:
-                            logger.error(f"Warning: At molecule#{moleii+1}, DOP={len(modelii.sequenceSet[moleii])} {modelii.DOP}")
-
-                        if modelii.DOP > 1:
-                            # Make poly.lt file
-                            logger.info(f"Creating poly_{poly_index+1}.lt")
-                            self.make_poly_lt(poly_index, modelii.sequenceSet[moleii], modelii)
-                            poly_index += 1
-
-            # Generate force field files
-            logger.info(f"Generating {self.poly.force_field}.lt")
-            # Pass model to ff_manager for force field subset generation
-            self.poly.ff_manager.model = self.poly.model
-            self.poly.ff_manager.make_force_field_lt()
-
-            # Generate system.lt file
-            logger.info("Creating system.lt")
-            self.make_system_lt()
-
-            # Modify alkyl dihedral coefficients if needed (skip for GAFF)
-            if self.poly.force_field == "lopls":
-                self.poly.ff_manager.FFmodify_alkyl_dihedral_oplsaa()
-
-            # Invoke moltemplate to generate LAMMPS datafile
-            logger.info("Running moltemplate")
-            self.invoke_moltemplate()
-
-            # Validate that output_ttree was created and contains required data files
-            # This catches cases where moltemplate runs but doesn't generate complete atom data
-            output_ttree_dir = Path(self.poly.path_cwd) / "output_ttree"
-            if not output_ttree_dir.exists():
-                raise WorkflowError(
-                    f"Moltemplate failed to create output_ttree directory at {output_ttree_dir}. "
-                    "This indicates moltemplate did not run successfully"
-                )
-
-            # Check for critical data files that should contain actual atom/topology data
-            required_data_files = [
-                "Data Atoms",
-                "Data Bond List"
-            ]
-
-            missing_data_files = []
-            for data_file in required_data_files:
-                data_file_path = output_ttree_dir / data_file
-                if not data_file_path.exists():
-                    missing_data_files.append(data_file)
-                else:
-                    # Additional check: verify file is not empty
-                    if data_file_path.stat().st_size == 0:
-                        logger.error(f"Data file exists but is empty: {data_file}")
-                        missing_data_files.append(f"{data_file} (empty)")
-
-            if missing_data_files:
-                logger.error(f"Moltemplate failed to generate required data files: {missing_data_files}")
-                logger.error("This usually indicates a problem with monomer file syntax or moltemplate execution.")
-                logger.error("Troubleshooting steps:")
-                logger.error("1. Check that monomer .lt files have correct moltemplate syntax")
-                logger.error("2. Verify that molecules inherit from the correct force field class")
-                raise WorkflowError(
-                    f"Critical data files missing in {output_ttree_dir}. "
-                    "Ensure write(\"Data Atoms\") sections are present in monomer files"
-                )
-
-            # Check if the required files exist before proceeding
-            # Note: system.in.charges is optional for GAFF (charges calculated separately)
-            required_files = ['system.in.settings', 'system.data']
-            optional_files = ['system.in.charges'] if self.poly.force_field == "gaff" else []
-
-            missing_files = []
-            for file in required_files:
-                if not (Path(self.poly.path_cwd) / file).exists():
-                    missing_files.append(file)
-
-            if missing_files:
-                logger.error(f"Moltemplate failed to generate required files: {', '.join(missing_files)}")
-                logger.error("Check the following:")
-                logger.error("1. All monomer .lt files exist and are valid")
-                raise WorkflowError(
-                    "Required LAMMPS input files not generated. "
-                    "Check that polymer .lt files and system.lt are properly formatted"
-                )
-
-            # Log warning about missing charges file for GAFF
-            if self.poly.force_field == "gaff" and not (Path(self.poly.path_cwd) / "system.in.charges").exists():
-                logger.warning("Note: system.in.charges not generated for GAFF")
-                logger.warning("GAFF requires manual charge calculation using AM1-BCC or RESP")
-                logger.warning("All atomic charges are currently set to 0.00")
-
+            # Finalize output
             logger.info("Processing output files")
             self.poly.get_rid_of_lj_cut_coul_long()
-
-            # Move files to working directory
             self.poly.mv_files()
             logger.info("Successfully completed polymer generation")
 
@@ -244,6 +88,185 @@ class WorkflowManager:
             raise WorkflowError(
                 f"Error in make_lmp_data_file_by_moltemplate: {str(e)}"
             ) from e
+
+    def _process_all_models(self) -> int:
+        """
+        Process all models in the system.
+
+        Returns:
+            int: The final polymer index
+        """
+        poly_index = 0
+        for modelii in self.poly.model:
+            if hasattr(modelii, '_is_molecule') and modelii._is_molecule:
+                self._generate_single_molecule(modelii)
+            else:
+                poly_index = self._process_polymer_model(modelii, poly_index)
+        return poly_index
+
+    def _process_polymer_model(self, model: object, poly_index: int) -> int:
+        """
+        Process a single polymer model.
+
+        Args:
+            model: The polymer model to process
+            poly_index: Current polymer index
+
+        Returns:
+            int: Updated polymer index
+        """
+        base_smiles = model.sequence[0]
+        topology = getattr(model, 'topology', 'linear')
+        dop = model.dop
+
+        logger.info(f"Generating sequence variants for {base_smiles}, DOP={dop}, topology={topology}")
+
+        variant_mapping = self.poly.generate_sequence_variants_for_polymer(
+            base_smiles=base_smiles,
+            dop=dop,
+            topology=topology,
+            base_name_prefix="monomer"
+        )
+
+        logger.info(f"Generated {len(variant_mapping)} unique variant types: {list(variant_mapping.keys())}")
+
+        # Build sequenceSet with appropriate .lt files for each position
+        self._build_sequence_set(model, variant_mapping, topology, dop)
+        logger.info(f"Built {len(model.sequenceSet)} chain(s) with sequence variants")
+
+        # Generate polymer .lt files
+        for chain_idx in range(len(model.sequenceSet)):
+            if model.dop > 1:
+                logger.info(f"Creating poly_{poly_index+1}.lt")
+                self.make_poly_lt(poly_index, model.sequenceSet[chain_idx], model)
+                poly_index += 1
+
+        return poly_index
+
+    def _build_sequence_set(
+        self,
+        model: object,
+        variant_mapping: dict,
+        topology: str,
+        dop: int
+    ) -> None:
+        """
+        Build the sequenceSet with appropriate .lt files for each position.
+
+        Args:
+            model: The polymer model
+            variant_mapping: Mapping of variant types to filenames
+            topology: Polymer topology
+            dop: Degree of polymerization
+        """
+        for chain_idx, chain_smiles in enumerate(model.sequenceSet):
+            monomer_names = []
+            for pos_idx, smiles in enumerate(chain_smiles):
+                variant_type = self._determine_variant_type(topology, pos_idx, dop)
+                has_t1 = "_T1" in smiles
+                mapping_key = f"{variant_type}_T1" if has_t1 else variant_type
+
+                if mapping_key not in variant_mapping:
+                    raise WorkflowError(
+                        f"Variant key '{mapping_key}' not found in mapping. "
+                        f"Available variants: {list(variant_mapping.keys())}"
+                    )
+                monomer_names.append(variant_mapping[mapping_key])
+
+            model.sequenceSet[chain_idx] = monomer_names
+
+    def _determine_variant_type(self, topology: str, pos_idx: int, dop: int) -> str:
+        """
+        Determine the variant type based on position and topology.
+
+        Args:
+            topology: Polymer topology (linear or ring)
+            pos_idx: Position in the chain
+            dop: Degree of polymerization
+
+        Returns:
+            str: Variant type (first, middle, last, or ring)
+        """
+        if topology == "ring":
+            return "ring"
+        if pos_idx == 0:
+            return "first"
+        if pos_idx == dop - 1:
+            return "last"
+        return "middle"
+
+    def _generate_force_field_files(self) -> None:
+        """Generate force field parameter files."""
+        logger.info(f"Generating {self.poly.force_field}.lt")
+        self.poly.ff_manager.model = self.poly.model
+        self.poly.ff_manager.make_force_field_lt()
+
+        # Modify alkyl dihedral coefficients if needed (skip for GAFF)
+        if self.poly.force_field == "lopls":
+            self.poly.ff_manager.FFmodify_alkyl_dihedral_oplsaa()
+
+    def _generate_system_file(self) -> None:
+        """Generate the system.lt file."""
+        logger.info("Creating system.lt")
+        self.make_system_lt()
+
+    def _run_moltemplate_and_validate(self) -> None:
+        """Run moltemplate and validate the output."""
+        logger.info("Running moltemplate")
+        self.invoke_moltemplate()
+        self._validate_moltemplate_output()
+        self._check_required_files()
+        self._log_gaff_charges_warning()
+
+    def _validate_moltemplate_output(self) -> None:
+        """Validate that moltemplate created the required output files."""
+        output_ttree_dir = Path(self.poly.path_cwd) / "output_ttree"
+        if not output_ttree_dir.exists():
+            raise WorkflowError(
+                f"Moltemplate failed to create output_ttree directory at {output_ttree_dir}"
+            )
+
+        required_data_files = ["Data Atoms", "Data Bond List"]
+        missing_data_files = []
+
+        for data_file in required_data_files:
+            data_file_path = output_ttree_dir / data_file
+            if not data_file_path.exists():
+                missing_data_files.append(data_file)
+            elif data_file_path.stat().st_size == 0:
+                logger.error(f"Data file exists but is empty: {data_file}")
+                missing_data_files.append(f"{data_file} (empty)")
+
+        if missing_data_files:
+            logger.error(f"Moltemplate failed to generate required data files: {missing_data_files}")
+            raise WorkflowError(
+                f"Critical data files missing in {output_ttree_dir}. "
+                "Ensure write(\"Data Atoms\") sections are present in monomer files"
+            )
+
+    def _check_required_files(self) -> None:
+        """Check that required LAMMPS input files were generated."""
+        required_files = ['system.in.settings', 'system.data']
+        missing_files = [
+            f for f in required_files
+            if not (Path(self.poly.path_cwd) / f).exists()
+        ]
+
+        if missing_files:
+            logger.error(f"Moltemplate failed to generate required files: {', '.join(missing_files)}")
+            raise WorkflowError(
+                "Required LAMMPS input files not generated. "
+                "Check that polymer .lt files and system.lt are properly formatted"
+            )
+
+    def _log_gaff_charges_warning(self) -> None:
+        """Log warning about missing charges file for GAFF."""
+        if self.poly.force_field == "gaff":
+            charges_file = Path(self.poly.path_cwd) / "system.in.charges"
+            if not charges_file.exists():
+                logger.warning("Note: system.in.charges not generated for GAFF")
+                logger.warning("GAFF requires manual charge calculation using AM1-BCC or RESP")
+                logger.warning("All atomic charges are currently set to 0.00")
 
     def invoke_moltemplate(self) -> None:
         """
@@ -349,7 +372,7 @@ class WorkflowManager:
                     # For molecules, import the molecule .lt file (already generated)
                     write_f.write(f"import \"{modelii.sequenceSet[0][0]}\"\n")
                     write_f.write("\n")
-                elif modelii.DOP > 1:
+                elif modelii.dop > 1:
                     # For polymers with DOP>1, import poly_N.lt files
                     n_poly = len(modelii.sequenceSet)
                     for indexi in range(n_poly):
@@ -360,7 +383,7 @@ class WorkflowManager:
                     # For polymers with DOP=1 (single monomers)
                     if len(modelii.merSet) > 1:
                         raise WorkflowError(
-                            f"sequenceLen = {modelii.DOP}, merSet should only have one mer type!"
+                            f"sequenceLen = {modelii.dop}, merSet should only have one mer type!"
                         )
                     # Import constituent monomer.lt's
                     unique_Sequence = [i[0] for i in modelii.sequenceSet]
@@ -393,7 +416,7 @@ class WorkflowManager:
                         radius = self.poly.offset * len(modelii.sequenceSet[0]) / (2 * np.pi)
                         spacing = radius * 2.5  # Use 2.5x the ring radius for good separation
                     else:
-                        spacing = self.poly.offset * (modelii.DOP + 2)
+                        spacing = self.poly.offset * (modelii.dop + 2)
 
                 # Calculate grid arrangement
                 grid_size = int(np.ceil(np.sqrt(n_instances)))  # Arrange in a square grid
@@ -412,7 +435,7 @@ class WorkflowManager:
                         # For molecules, instantiate the molecule type
                         write_f.write(f"molecule_{index+1} = new {modelii.molecule_name}")
                         write_f.write(f".move({pos_x:.4f},{pos_y:.4f},{pos_z:.4f})\n")
-                    elif modelii.DOP > 1:
+                    elif modelii.dop > 1:
                         # For polymers, instantiate the polymer type
                         write_f.write(f"polymer_{index+1} = new poly_{polyindex+1}")
                         write_f.write(f".move({pos_x:.4f},{pos_y:.4f},{pos_z:.4f})\n")

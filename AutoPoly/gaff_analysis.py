@@ -33,7 +33,7 @@ Created on 2025-01-06
 import sys
 import shutil
 from pathlib import Path
-from typing import Set, Dict, List, Tuple
+from typing import Set, Dict, List, Tuple, Optional
 from .system import logger
 
 
@@ -215,6 +215,88 @@ class GAFFAnalyzer:
 
         return sections
 
+    # Helper methods for extracting names and filtering sections
+    @staticmethod
+    def _extract_reference_name(line: str, prefix: str) -> Optional[str]:
+        """
+        Extract a reference name from a line (e.g., @bond:c3-ce -> c3-ce).
+
+        Args:
+            line: The line to extract from
+            prefix: The prefix to look for (e.g., '@bond:', '@angle:')
+
+        Returns:
+            The extracted name or None
+        """
+        for part in line.split():
+            if part.startswith(prefix):
+                return part.split(':')[1]
+        return None
+
+    @staticmethod
+    def _extract_atom_types(line: str) -> List[str]:
+        """
+        Extract atom types from a line.
+
+        Args:
+            line: The line to parse
+
+        Returns:
+            List of atom type strings
+        """
+        atom_types = []
+        for part in line.split():
+            if part.startswith('@atom:'):
+                atom_types.append(part.split(':')[1])
+        return atom_types
+
+    @staticmethod
+    def _should_keep_header_line(line: str) -> bool:
+        """
+        Determine if a header/footer line should be kept.
+
+        Args:
+            line: The line to check
+
+        Returns:
+            True if the line should be kept
+        """
+        stripped = line.strip()
+        if not stripped:
+            return True
+        if stripped.startswith('}'):
+            return False
+        if stripped.startswith('#') and 'end of' in stripped.lower():
+            return False
+        return True
+
+    def _filter_section_by_atom_types(
+        self,
+        lines: List[str],
+        atom_types: Set[str],
+        keyword: str
+    ) -> List[str]:
+        """
+        Filter a section keeping only lines with specified atom types.
+
+        Args:
+            lines: Lines to filter
+            atom_types: Set of atom type names to keep
+            keyword: Keyword that must be present (e.g., 'pair_coeff')
+
+        Returns:
+            Filtered lines
+        """
+        filtered = []
+        for line in lines:
+            if keyword in line and '@atom:' in line:
+                atom_type = self._extract_reference_name(line, '@atom:')
+                if atom_type in atom_types:
+                    filtered.append(line)
+            elif self._should_keep_header_line(line):
+                filtered.append(line)
+        return filtered
+
     def _filter_masses_section(self, masses_lines: List[str], atom_types: Set[str]) -> List[str]:
         """Filter Data Masses section to keep only used atom types.
 
@@ -228,19 +310,11 @@ class GAFFAnalyzer:
         filtered = []
         for line in masses_lines:
             if '@atom:' in line:
-                # Extract atom type
-                parts = line.split()
-                for part in parts:
-                    if part.startswith('@atom:'):
-                        atom_type = part.split(':')[1].split()[0]
-                        if atom_type in atom_types:
-                            filtered.append(line)
-                            break
-            else:
-                # Keep header/footer lines, but NOT closing braces
-                stripped = line.strip()
-                if not (stripped.startswith('}') or (stripped.startswith('#') and 'end of' in stripped.lower())):
+                atom_type = self._extract_reference_name(line, '@atom:')
+                if atom_type in atom_types:
                     filtered.append(line)
+            elif self._should_keep_header_line(line):
+                filtered.append(line)
         return filtered
 
     def _filter_pair_coeffs_section(self, pair_lines: List[str], atom_types: Set[str]) -> List[str]:
@@ -255,22 +329,93 @@ class GAFFAnalyzer:
         Returns:
             Filtered lines
         """
+        return self._filter_section_by_atom_types(pair_lines, atom_types, 'pair_coeff')
+
+    def _filter_section_by_topology(
+        self,
+        coeff_lines: List[str],
+        def_lines: List[str],
+        used_types: Set[str],
+        reference_prefix: str,
+        normalize_func: callable = None
+    ) -> Tuple[List[str], List[str]]:
+        """
+        Generic filter for coefficients and definitions based on topology types.
+
+        Args:
+            coeff_lines: Lines from coefficient section
+            def_lines: Lines from definition section
+            used_types: Set of used topology type strings
+            reference_prefix: Reference prefix (e.g., '@bond:', '@angle:')
+            normalize_func: Optional function to normalize type strings for comparison
+
+        Returns:
+            Tuple of (filtered_coeff_lines, filtered_def_lines)
+        """
+        # Identify which references to keep
+        keep_refs = set()
+
+        for line in def_lines:
+            if reference_prefix in line and '@atom:' in line:
+                atom_types = self._extract_atom_types(line)
+                type_str = normalize_func(atom_types) if normalize_func else '-'.join(atom_types)
+
+                if type_str in used_types:
+                    ref_name = self._extract_reference_name(line, reference_prefix)
+                    if ref_name:
+                        keep_refs.add(ref_name)
+
+        # Filter using the common filtering logic
+        filtered_coeffs = self._filter_lines_by_reference(coeff_lines, keep_refs, reference_prefix)
+        filtered_defs = self._filter_lines_by_reference(def_lines, keep_refs, reference_prefix)
+
+        return filtered_coeffs, filtered_defs
+
+    def _normalize_bond_type(self, atom_types: List[str]) -> str:
+        """Normalize bond type by sorting atom types alphabetically."""
+        if len(atom_types) == 2:
+            return '-'.join(sorted(atom_types))
+        return '-'.join(atom_types)
+
+    def _normalize_angle_type(self, atom_types: List[str]) -> str:
+        """Normalize angle type with sorted outer atoms."""
+        if len(atom_types) == 3:
+            center = atom_types[1]
+            outer1, outer2 = atom_types[0], atom_types[2]
+            if outer1 > outer2:
+                outer1, outer2 = outer2, outer1
+            return f"{outer1}-{center}-{outer2}"
+        return '-'.join(atom_types)
+
+    def _normalize_dihedral_type(self, atom_types: List[str]) -> str:
+        """Normalize dihedral type (order matters for dihedrals)."""
+        return '-'.join(atom_types)
+
+    def _filter_lines_by_reference(
+        self,
+        lines: List[str],
+        keep_refs: Set[str],
+        reference_prefix: str
+    ) -> List[str]:
+        """
+        Filter lines keeping only those with references in keep_refs.
+
+        Args:
+            lines: Lines to filter
+            keep_refs: Set of reference names to keep
+            reference_prefix: Reference prefix to check (e.g., '@bond:')
+
+        Returns:
+            Filtered lines
+        """
         filtered = []
-        for line in pair_lines:
-            if 'pair_coeff' in line and '@atom:' in line:
-                # Extract atom type
-                parts = line.split()
-                for part in parts:
-                    if part.startswith('@atom:'):
-                        atom_type = part.split(':')[1]
-                        if atom_type in atom_types:
-                            filtered.append(line)
-                            break
-            else:
-                # Keep non-pair_coeff lines but skip closing braces
-                stripped = line.strip()
-                if not (stripped.startswith('}') or (stripped.startswith('#') and 'end of' in stripped.lower())):
+        for line in lines:
+            if reference_prefix in line:
+                ref_name = self._extract_reference_name(line, reference_prefix)
+                if ref_name and ref_name in keep_refs:
                     filtered.append(line)
+            elif self._should_keep_header_line(line):
+                filtered.append(line)
         return filtered
 
     def _filter_bond_section(self,
@@ -289,69 +434,10 @@ class GAFFAnalyzer:
         Returns:
             Tuple of (filtered_coeff_lines, filtered_def_lines)
         """
-        # First, identify which bonds to keep
-        keep_bonds = set()
-
-        for line in bond_def_lines:
-            if '@bond:' in line and '@atom:' in line:
-                # Extract atom types from definition
-                parts = line.split()
-                bond_types = []
-                for part in parts:
-                    if part.startswith('@atom:'):
-                        atom_type = part.split(':')[1]
-                        bond_types.append(atom_type)
-
-                # Normalize bond type (alphabetically sort) and check if used
-                if len(bond_types) == 2:
-                    normalized_bond = '-'.join(sorted(bond_types))
-                    if normalized_bond in used_bond_types:
-                        # Extract bond name: @bond:c3-ce
-                        bond_name = None
-                        for part in parts:
-                            if part.startswith('@bond:'):
-                                bond_name = part.split(':')[1]
-                                break
-                        if bond_name:
-                            keep_bonds.add(bond_name)
-
-        # Filter coefficients
-        filtered_coeffs = []
-        for line in bond_coeff_lines:
-            if '@bond:' in line:
-                bond_name = None
-                parts = line.split()
-                for part in parts:
-                    if part.startswith('@bond:'):
-                        bond_name = part.split(':')[1]
-                        break
-                if bond_name and bond_name in keep_bonds:
-                    filtered_coeffs.append(line)
-            elif (not line.strip() or 'write_once' in line or
-                  ('#' in line and not line.strip().startswith('#end of'))):
-                # Keep empty lines, section headers, comments (but not closing braces)
-                if not line.strip().startswith('}'):
-                    filtered_coeffs.append(line)
-
-        # Filter definitions
-        filtered_defs = []
-        for line in bond_def_lines:
-            if '@bond:' in line:
-                bond_name = None
-                parts = line.split()
-                for part in parts:
-                    if part.startswith('@bond:'):
-                        bond_name = part.split(':')[1]
-                        break
-                if bond_name and bond_name in keep_bonds:
-                    filtered_defs.append(line)
-            elif (not line.strip() or 'write_once' in line or
-                  ('#' in line and not line.strip().startswith('#end of'))):
-                # Keep empty lines, section headers, comments (but not closing braces)
-                if not line.strip().startswith('}'):
-                    filtered_defs.append(line)
-
-        return filtered_coeffs, filtered_defs
+        return self._filter_section_by_topology(
+            bond_coeff_lines, bond_def_lines, used_bond_types,
+            '@bond:', self._normalize_bond_type
+        )
 
     def _filter_angle_section(self,
                              angle_coeff_lines: List[str],
@@ -369,77 +455,10 @@ class GAFFAnalyzer:
         Returns:
             Tuple of (filtered_coeff_lines, filtered_def_lines)
         """
-        # First, identify which angles to keep
-        keep_angles = set()
-
-        for line in angle_def_lines:
-            if '@angle:' in line and '@atom:' in line:
-                # Extract atom types from definition
-                parts = line.split()
-                angle_types = []
-                for part in parts:
-                    if part.startswith('@atom:'):
-                        atom_type = part.split(':')[1]
-                        angle_types.append(atom_type)
-
-                # Normalize angle type (outer1-center-outer2 with outer atoms sorted)
-                if len(angle_types) == 3:
-                    # Middle atom is the center
-                    center = angle_types[1]
-                    outer1, outer2 = angle_types[0], angle_types[2]
-
-                    # Sort outer atoms alphabetically
-                    if outer1 > outer2:
-                        outer1, outer2 = outer2, outer1
-
-                    normalized_angle = f"{outer1}-{center}-{outer2}"
-                    if normalized_angle in used_angle_types:
-                        # Extract angle name: @angle:c3-ce-c3
-                        angle_name = None
-                        for part in parts:
-                            if part.startswith('@angle:'):
-                                angle_name = part.split(':')[1]
-                                break
-                        if angle_name:
-                            keep_angles.add(angle_name)
-
-        # Filter coefficients
-        filtered_coeffs = []
-        for line in angle_coeff_lines:
-            if '@angle:' in line:
-                angle_name = None
-                parts = line.split()
-                for part in parts:
-                    if part.startswith('@angle:'):
-                        angle_name = part.split(':')[1]
-                        break
-                if angle_name and angle_name in keep_angles:
-                    filtered_coeffs.append(line)
-            elif (not line.strip() or 'write_once' in line or
-                  ('#' in line and not line.strip().startswith('#end of'))):
-                # Keep empty lines, section headers, comments (but not closing braces)
-                if not line.strip().startswith('}'):
-                    filtered_coeffs.append(line)
-
-        # Filter definitions
-        filtered_defs = []
-        for line in angle_def_lines:
-            if '@angle:' in line:
-                angle_name = None
-                parts = line.split()
-                for part in parts:
-                    if part.startswith('@angle:'):
-                        angle_name = part.split(':')[1]
-                        break
-                if angle_name and angle_name in keep_angles:
-                    filtered_defs.append(line)
-            elif (not line.strip() or 'write_once' in line or
-                  ('#' in line and not line.strip().startswith('#end of'))):
-                # Keep empty lines, section headers, comments (but not closing braces)
-                if not line.strip().startswith('}'):
-                    filtered_defs.append(line)
-
-        return filtered_coeffs, filtered_defs
+        return self._filter_section_by_topology(
+            angle_coeff_lines, angle_def_lines, used_angle_types,
+            '@angle:', self._normalize_angle_type
+        )
 
     def _filter_dihedral_section(self,
                                 dihedral_coeff_lines: List[str],
@@ -457,69 +476,10 @@ class GAFFAnalyzer:
         Returns:
             Tuple of (filtered_coeff_lines, filtered_def_lines)
         """
-        # First, identify which dihedrals to keep
-        keep_dihedrals = set()
-
-        for line in dihedral_def_lines:
-            if '@dihedral:' in line and '@atom:' in line:
-                # Extract atom types from definition
-                parts = line.split()
-                dihedral_types = []
-                for part in parts:
-                    if part.startswith('@atom:'):
-                        atom_type = part.split(':')[1]
-                        dihedral_types.append(atom_type)
-
-                # Check if this dihedral type is used (exact match, order matters)
-                if len(dihedral_types) == 4:
-                    dihedral_type_str = '-'.join(dihedral_types)
-                    if dihedral_type_str in used_dihedral_types:
-                        # Extract dihedral name: @dihedral:c3-ce-c3-h
-                        dihedral_name = None
-                        for part in parts:
-                            if part.startswith('@dihedral:'):
-                                dihedral_name = part.split(':')[1]
-                                break
-                        if dihedral_name:
-                            keep_dihedrals.add(dihedral_name)
-
-        # Filter coefficients
-        filtered_coeffs = []
-        for line in dihedral_coeff_lines:
-            if '@dihedral:' in line:
-                dihedral_name = None
-                parts = line.split()
-                for part in parts:
-                    if part.startswith('@dihedral:'):
-                        dihedral_name = part.split(':')[1]
-                        break
-                if dihedral_name and dihedral_name in keep_dihedrals:
-                    filtered_coeffs.append(line)
-            elif (not line.strip() or 'write_once' in line or
-                  ('#' in line and not line.strip().startswith('#end of'))):
-                # Keep empty lines, section headers, comments (but not closing braces)
-                if not line.strip().startswith('}'):
-                    filtered_coeffs.append(line)
-
-        # Filter definitions
-        filtered_defs = []
-        for line in dihedral_def_lines:
-            if '@dihedral:' in line:
-                dihedral_name = None
-                parts = line.split()
-                for part in parts:
-                    if part.startswith('@dihedral:'):
-                        dihedral_name = part.split(':')[1]
-                        break
-                if dihedral_name and dihedral_name in keep_dihedrals:
-                    filtered_defs.append(line)
-            elif (not line.strip() or 'write_once' in line or
-                  ('#' in line and not line.strip().startswith('#end of'))):
-                # Keep empty lines, section headers, comments (but not closing braces)
-                if not line.strip().startswith('}'):
-                    filtered_defs.append(line)
-
-        return filtered_coeffs, filtered_defs
+        return self._filter_section_by_topology(
+            dihedral_coeff_lines, dihedral_def_lines, used_dihedral_types,
+            '@dihedral:', self._normalize_dihedral_type
+        )
 
     def _filter_improper_section(self,
                                 improper_coeff_lines: List[str],
@@ -537,69 +497,10 @@ class GAFFAnalyzer:
         Returns:
             Tuple of (filtered_coeff_lines, filtered_def_lines)
         """
-        # First, identify which impropers to keep
-        keep_impropers = set()
-
-        for line in improper_def_lines:
-            if '@improper:' in line and '@atom:' in line:
-                # Extract atom types from definition
-                parts = line.split()
-                improper_types = []
-                for part in parts:
-                    if part.startswith('@atom:'):
-                        atom_type = part.split(':')[1]
-                        improper_types.append(atom_type)
-
-                # Check if this improper type is used (exact match, order matters)
-                if len(improper_types) == 4:
-                    improper_type_str = '-'.join(improper_types)
-                    if improper_type_str in used_improper_types:
-                        # Extract improper name: @improper:X-c3-ce-c3
-                        improper_name = None
-                        for part in parts:
-                            if part.startswith('@improper:'):
-                                improper_name = part.split(':')[1]
-                                break
-                        if improper_name:
-                            keep_impropers.add(improper_name)
-
-        # Filter coefficients
-        filtered_coeffs = []
-        for line in improper_coeff_lines:
-            if '@improper:' in line:
-                improper_name = None
-                parts = line.split()
-                for part in parts:
-                    if part.startswith('@improper:'):
-                        improper_name = part.split(':')[1]
-                        break
-                if improper_name and improper_name in keep_impropers:
-                    filtered_coeffs.append(line)
-            elif (not line.strip() or 'write_once' in line or
-                  ('#' in line and not line.strip().startswith('#end of'))):
-                # Keep empty lines, section headers, comments (but not closing braces)
-                if not line.strip().startswith('}'):
-                    filtered_coeffs.append(line)
-
-        # Filter definitions
-        filtered_defs = []
-        for line in improper_def_lines:
-            if '@improper:' in line:
-                improper_name = None
-                parts = line.split()
-                for part in parts:
-                    if part.startswith('@improper:'):
-                        improper_name = part.split(':')[1]
-                        break
-                if improper_name and improper_name in keep_impropers:
-                    filtered_defs.append(line)
-            elif (not line.strip() or 'write_once' in line or
-                  ('#' in line and not line.strip().startswith('#end of'))):
-                # Keep empty lines, section headers, comments (but not closing braces)
-                if not line.strip().startswith('}'):
-                    filtered_defs.append(line)
-
-        return filtered_coeffs, filtered_defs
+        return self._filter_section_by_topology(
+            improper_coeff_lines, improper_def_lines, used_improper_types,
+            '@improper:', self._normalize_dihedral_type  # Same normalization as dihedral
+        )
 
     def _extract_bonds_from_monomers(self, monomer_files: List[str]) -> Set[str]:
         """Extract bond type pairs from monomer .lt files.
@@ -874,8 +775,8 @@ class GAFFAnalyzer:
             model: Model object containing sequence information with monomer file names
         """
         try:
-            gaff_src = f"{self.path_master}moltemplate/common/gaff.lt"
-            gaff_dst = self.path_cwd + "gaff_subset.lt"
+            gaff_src = str(Path(self.path_master) / "moltemplate" / "common" / "gaff.lt")
+            gaff_dst = str(Path(self.path_cwd) / "gaff_subset.lt")
 
             # Check if source file exists
             if not Path(gaff_src).exists():
@@ -903,7 +804,7 @@ class GAFFAnalyzer:
             if not monomer_files:
                 logger.warning("  No monomer files found!")
                 logger.warning("  Falling back to full gaff.lt")
-                shutil.copy(gaff_src, self.path_cwd + "gaff.lt")
+                shutil.copy(gaff_src, str(Path(self.path_cwd) / "gaff.lt"))
                 return
 
             logger.info(f"  Found {len(monomer_files)} monomer files")
@@ -916,7 +817,7 @@ class GAFFAnalyzer:
             if not atom_types:
                 logger.warning("  No atom types found in monomers!")
                 logger.warning("  Falling back to full gaff.lt")
-                shutil.copy(gaff_src, self.path_cwd + "gaff.lt")
+                shutil.copy(gaff_src, str(Path(self.path_cwd) / "gaff.lt"))
                 return
 
             # Step 3: Extract bond types from monomers and add inter-monomer possibilities
@@ -1179,7 +1080,7 @@ class GAFFAnalyzer:
             logger.info(f"  File size: {original_size} -> {subset_size} bytes ({reduction:.1f}% reduction)")
 
             # Create symlink from gaff.lt to gaff_subset.lt for monomer compatibility
-            gaff_link = self.path_cwd + "gaff.lt"
+            gaff_link = str(Path(self.path_cwd) / "gaff.lt")
             if Path(gaff_link).exists():
                 Path(gaff_link).unlink()
             Path(gaff_link).symlink_to("gaff_subset.lt")
@@ -1190,4 +1091,4 @@ class GAFFAnalyzer:
             import traceback
             traceback.print_exc()
             logger.warning("Falling back to full gaff.lt")
-            shutil.copy(gaff_src, self.path_cwd + "gaff.lt")
+            shutil.copy(gaff_src, str(Path(self.path_cwd) / "gaff.lt"))

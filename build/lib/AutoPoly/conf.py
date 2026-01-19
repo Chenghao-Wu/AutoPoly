@@ -10,6 +10,7 @@ The configuration includes:
 - Output path settings for generated files
 - Logging level configurations
 - File output settings
+- Resource limits to prevent DoS attacks
 
 Configuration can be modified by changing the values in the LOG dictionary
 or by setting the OUT_PATH variable.
@@ -18,9 +19,6 @@ import logging
 import os
 
 # Output path configuration
-# Default: Use user's home directory
-# Alternative: Use package directory
-# OUT_PATH = os.path.join(os.path.dirname(__file__), 'out')
 OUT_PATH = os.path.join(os.path.expanduser("~"))
 
 # Logging configuration dictionary
@@ -30,3 +28,9 @@ LOG = {
     'FILE_LEVEL': logging.INFO,      # File output level
     'TO_FILE': False                 # Whether to log to file (True/False)
 }
+
+# Resource limits to prevent DoS attacks
+# These limits prevent resource exhaustion from excessively large values
+MAX_DOP = 10000  # Maximum degree of polymerization
+MAX_SEQUENCE_LENGTH = 10000  # Maximum sequence length
+MAX_UNIQUE_MONOMERS = 100  # Maximum unique monomer types

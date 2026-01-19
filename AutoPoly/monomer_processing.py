@@ -13,11 +13,49 @@ Created on 2026-01-06
 import re
 import numpy as np
 from pathlib import Path
-from typing import Tuple, List, Dict
+from typing import Tuple, List, Dict, Optional
 
 from .system import logger
 from .monomer_generator import MonomerGenerator
 from .exceptions import GenerationError
+
+
+def _create_generator(base_name: str, force_field: str, output_dir: str) -> MonomerGenerator:
+    """
+    Create a MonomerGenerator instance with standard parameters.
+
+    Args:
+        base_name: Base name for generated files
+        force_field: Force field to use ("oplsaa", "gaff", or "lopls")
+        output_dir: Output directory path
+
+    Returns:
+        Configured MonomerGenerator instance
+    """
+    return MonomerGenerator(
+        base_name=base_name,
+        force_field=force_field,
+        output_dir=output_dir,
+        verbose=False
+    )
+
+
+def _check_cache(cache_key, cache: dict, counter: int) -> Optional[Tuple[str, int]]:
+    """
+    Check if a result is cached and return it if available.
+
+    Args:
+        cache_key: Key to look up in cache
+        cache: Cache dictionary
+        counter: Current counter value
+
+    Returns:
+        (cached_value, counter) if found, None otherwise
+    """
+    if cache_key in cache:
+        logger.info(f"Using cached result for: {cache_key}")
+        return cache[cache_key], counter
+    return None
 
 
 def generate_monomer_from_psmiles(
@@ -35,48 +73,31 @@ def generate_monomer_from_psmiles(
     or SMILES (for molecules) string.
 
     Args:
-        psmiles (str): pSMILES string (e.g., "[*]C=C[*]") or SMILES string (e.g., "CC(=O)C")
-        path_cwd (str): Current working directory path
-        force_field (str): Force field to use ("oplsaa", "gaff", or "lopls")
-        generated_cache (dict): Cache mapping pSMILES to monomer names (modified in-place)
-        counter (int): Current counter value for unique monomer naming
+        psmiles: pSMILES string (e.g., "[*]C=C[*]") or SMILES string (e.g., "CC(=O)C")
+        path_cwd: Current working directory path
+        force_field: Force field to use ("oplsaa", "gaff", or "lopls")
+        generated_cache: Cache mapping pSMILES to monomer names (modified in-place)
+        counter: Current counter value for unique monomer naming
 
     Returns:
-        Tuple[str, int]: (monomer_name, updated_counter) where:
-            - monomer_name: Generated monomer base name (e.g., "monomer_0")
-            - updated_counter: Incremented counter value
+        Tuple[str, int]: (monomer_name, updated_counter)
 
     Raises:
-        SystemExit: If monomer generation fails
+        GenerationError: If monomer generation fails
     """
-    # Check cache (per-system caching)
-    if psmiles in generated_cache:
-        logger.info(f"Using cached monomer for pSMILES/SMILES: {psmiles}")
-        return generated_cache[psmiles], counter
+    cached = _check_cache(psmiles, generated_cache, counter)
+    if cached:
+        return cached
 
-    # Generate unique monomer name
     monomer_name = f"monomer_{counter}"
     counter += 1
 
     try:
-        # Create MonomerGenerator with correct API
-        generator = MonomerGenerator(
-            base_name=monomer_name,
-            force_field=force_field,
-            output_dir=path_cwd,
-            verbose=False
-        )
-
-        # Generate variants from SMILES using from_smiles()
-        # This builds a chain, assigns atom types, and splits into variants
+        generator = _create_generator(monomer_name, force_field, path_cwd)
         variants = generator.from_smiles(smiles=psmiles, n_monomers=3)
-
-        # Write .lt files using write_lt_files()
         generator.write_lt_files(variants, generate_t1=True)
 
-        # Cache the mapping
         generated_cache[psmiles] = monomer_name
-
         logger.info(f"Generated monomer '{monomer_name}' from pSMILES/SMILES: {psmiles}")
         return monomer_name, counter
 
@@ -98,24 +119,21 @@ def generate_molecule_from_smiles(
     Generate .lt file for a single molecule from SMILES string.
 
     This function creates a single .lt file for a non-polymer molecule (e.g., water,
-    benzene, ethanol) from a regular SMILES string WITHOUT wildcards. This is different
-    from generate_monomer_from_psmiles() which is for polymer monomers with wildcards.
+    benzene, ethanol) from a regular SMILES string WITHOUT wildcards.
 
     Args:
-        smiles (str): SMILES string WITHOUT wildcards (e.g., "O", "CCO", "c1ccccc1")
-        molecule_name (str): Name for the molecule (e.g., "water", "ethanol", "benzene")
-        path_cwd (str): Current working directory path
-        force_field (str): Force field to use ("oplsaa", "gaff", or "lopls")
-        generated_cache (dict): Cache mapping SMILES to molecule names (modified in-place)
-        counter (int): Current counter value for unique molecule naming
+        smiles: SMILES string WITHOUT wildcards (e.g., "O", "CCO", "c1ccccc1")
+        molecule_name: Name for the molecule (e.g., "water", "ethanol", "benzene")
+        path_cwd: Current working directory path
+        force_field: Force field to use ("oplsaa", "gaff", or "lopls")
+        generated_cache: Cache mapping SMILES to molecule names (modified in-place)
+        counter: Current counter value for unique molecule naming
 
     Returns:
-        Tuple[str, int]: (molecule_filename, updated_counter) where:
-            - molecule_filename: Generated molecule .lt filename (e.g., "water.lt")
-            - updated_counter: Incremented counter value
+        Tuple[str, int]: (molecule_filename, updated_counter)
 
     Raises:
-        SystemExit: If molecule generation fails
+        GenerationError: If molecule generation fails
 
     Example:
         >>> molecule_name, counter = generate_molecule_from_smiles(
@@ -127,36 +145,19 @@ def generate_molecule_from_smiles(
         ...     counter=0
         ... )
     """
-    # Check cache (per-system caching)
     cache_key = f"molecule_{smiles}_{force_field}"
-    if cache_key in generated_cache:
-        logger.info(f"Using cached molecule for SMILES: {smiles}")
-        return generated_cache[cache_key], counter
+    cached = _check_cache(cache_key, generated_cache, counter)
+    if cached:
+        return cached
 
-    # Use provided molecule_name for the .lt file
-    base_name = molecule_name
-    filename = f"{base_name}.lt"
+    filename = f"{molecule_name}.lt"
 
     try:
-        # Create MonomerGenerator with correct API
-        generator = MonomerGenerator(
-            base_name=base_name,
-            force_field=force_field,
-            output_dir=path_cwd,
-            verbose=False
-        )
-
-        # Generate molecule variant from SMILES (no wildcards)
-        # This uses from_single_molecule() which is designed for non-polymer molecules
-        variant = generator.from_single_molecule(smiles=smiles, molecule_name=base_name)
-
-        # Write .lt file using write_single_molecule()
-        # For molecules, we typically don't need T1 variants (no tacticity)
+        generator = _create_generator(molecule_name, force_field, path_cwd)
+        variant = generator.from_single_molecule(smiles=smiles, molecule_name=molecule_name)
         generator.write_single_molecule(variant, generate_t1=False)
 
-        # Cache the mapping
         generated_cache[cache_key] = filename
-
         logger.info(f"Generated molecule '{filename}' from SMILES: {smiles}")
         return filename, counter
 
@@ -183,120 +184,57 @@ def generate_sequence_variants_for_polymerization(
     polymer chain (first, middle, last for linear; all middle for ring).
 
     Args:
-        base_smiles (str): Base monomer SMILES with wildcards (e.g., "[*]C=C[*]")
-        dop (int): Degree of polymerization (number of monomers in chain)
-        topology (str): Topology type ("linear" or "ring")
-        path_cwd (str): Current working directory path
-        force_field (str): Force field to use ("oplsaa", "gaff", or "lopls")
-        generated_cache (dict): Cache mapping (base_smiles, dop, topology) to monomer names
-        counter (int): Current counter value for unique monomer naming
-        base_name_prefix (str): Prefix for monomer names (default: "monomer")
+        base_smiles: Base monomer SMILES with wildcards (e.g., "[*]C=C[*]")
+        dop: Degree of polymerization (number of monomers in chain)
+        topology: Topology type ("linear" or "ring")
+        path_cwd: Current working directory path
+        force_field: Force field to use ("oplsaa", "gaff", or "lopls")
+        generated_cache: Cache mapping (base_smiles, dop, topology) to monomer names
+        counter: Current counter value for unique monomer naming
+        base_name_prefix: Prefix for monomer names (default: "monomer")
 
     Returns:
-        Tuple[Dict[str, str], int]: (variant_name_mapping, updated_counter) where:
-            - variant_name_mapping: Dict mapping variant keys to .lt filenames
-              {
-                  'first': 'monomer_0_0le.lt',
-                  'middle': 'monomer_0_1i.lt',
-                  'last': 'monomer_0_2re.lt',
-                  'first_T1': 'monomer_0_0le_T1.lt',
-                  ...
-              }
-            - updated_counter: Incremented counter value
+        Tuple[Dict[str, str], int]: (variant_name_mapping, updated_counter)
 
     Raises:
-        SystemExit: If monomer generation fails
+        GenerationError: If monomer generation fails
     """
-    # Check cache (per-system caching)
     cache_key = (base_smiles, dop, topology)
-    if cache_key in generated_cache:
-        logger.info(f"Using cached sequence variants for SMILES: {base_smiles}, DOP={dop}, topology={topology}")
-        return generated_cache[cache_key], counter
+    cached = _check_cache(cache_key, generated_cache, counter)
+    if cached:
+        return cached
 
-    # Generate unique base name for this polymer
     base_name = f"{base_name_prefix}_{counter}"
     counter += 1
 
     try:
-        # Create MonomerGenerator with correct API
-        generator = MonomerGenerator(
-            base_name=base_name,
-            force_field=force_field,
-            output_dir=path_cwd,
-            verbose=False
-        )
+        generator = _create_generator(base_name, force_field, path_cwd)
 
-        # Generate variants using from_smiles()
-        # Always use 3 monomers to get first/middle/last variants
-        # This is a performance optimization - we only need these 3 positions
         n_monomers = 3
         logger.info(f"Generating 3 sequence variants (first, middle, last) for {base_name} ({topology} topology)")
 
         variants = generator.from_smiles(smiles=base_smiles, n_monomers=n_monomers)
-        
-        # For ring topology, we need all middle variants (both connections active)
-        # For linear, we need first, middle, and last
-        # The from_smiles already creates proper variant_types
-        
+
         # Extract unique variants by variant_type
-        # For linear: first (position 0), middle (position 1), last (position n-1)
-        # For ring: all should be middle type (but from_smiles creates them as first/middle/last)
         unique_variants = {}
         for variant in variants:
             vtype = variant.variant_type
-            # Keep first occurrence of each variant_type
             if vtype not in unique_variants:
                 unique_variants[vtype] = variant
-        
+
         # For ring topology, use middle variants for all positions
         if topology == "ring":
             if 'middle' in unique_variants:
-                # Rename middle to 'ring' for clarity
-                ring_variant = unique_variants['middle']
-                unique_variants = {'ring': ring_variant}
+                unique_variants = {'ring': unique_variants['middle']}
             elif 'first' in unique_variants:
-                # If no middle (DOP=2), use first as ring
                 unique_variants = {'ring': unique_variants['first']}
-        
+
         logger.info(f"Extracted {len(unique_variants)} unique variant types: {list(unique_variants.keys())}")
 
-        # Generate .lt files for unique variants
         lt_files = generator.write_lt_files(list(unique_variants.values()), generate_t1=True)
         logger.info(f"Generated {len(lt_files)} .lt files for {base_name}")
 
-        # Create mapping from variant_type to filename
-        # The write_lt_files returns a list of file paths
-        # File naming convention: {base_name}_{position}{suffix}.lt
-        # where suffix is 'le' (first), 'i' (middle), 're' (last), 'single'
-        variant_name_mapping = {}
-        
-        for variant in unique_variants.values():
-            vtype = variant.variant_type
-            pos = variant.position
-            
-            # Determine filename suffix based on variant_type
-            if vtype == 'first':
-                suffix = 'le'
-            elif vtype == 'last':
-                suffix = 're'
-            elif vtype == 'single':
-                suffix = 'single'
-            elif vtype == 'ring':
-                # Ring uses middle variant with 'i' suffix
-                suffix = 'i'
-            else:  # middle
-                suffix = 'i'
-            
-            # Build filename (without _T1)
-            filename = f"{base_name}_{pos}{suffix}.lt"
-            filename_t1 = f"{base_name}_{pos}{suffix}_T1.lt"
-            
-            # Store mapping
-            variant_name_mapping[vtype] = filename
-            variant_name_mapping[f"{vtype}_standard"] = filename
-            variant_name_mapping[f"{vtype}_T1"] = filename_t1
-
-        # Cache the mapping
+        variant_name_mapping = _build_variant_mapping(unique_variants, base_name)
         generated_cache[cache_key] = variant_name_mapping
 
         logger.info(f"Generated sequence variants for '{base_name}' from SMILES: {base_smiles}")
@@ -307,6 +245,43 @@ def generate_sequence_variants_for_polymerization(
         raise GenerationError(
             f"Failed to generate sequence variants from SMILES '{base_smiles}': {e}"
         ) from e
+
+
+def _build_variant_mapping(unique_variants: dict, base_name: str) -> Dict[str, str]:
+    """
+    Build mapping from variant types to .lt filenames.
+
+    Args:
+        unique_variants: Dictionary of variant_type -> variant objects
+        base_name: Base name for the files
+
+    Returns:
+        Dictionary mapping variant_type keys to filenames
+    """
+    variant_name_mapping = {}
+
+    for variant in unique_variants.values():
+        vtype = variant.variant_type
+        pos = variant.position
+
+        # Determine filename suffix based on variant_type
+        suffix_map = {
+            'first': 'le',
+            'last': 're',
+            'single': 'single',
+            'ring': 'i',
+            'middle': 'i'
+        }
+        suffix = suffix_map.get(vtype, 'i')
+
+        filename = f"{base_name}_{pos}{suffix}.lt"
+        filename_t1 = f"{base_name}_{pos}{suffix}_T1.lt"
+
+        variant_name_mapping[vtype] = filename
+        variant_name_mapping[f"{vtype}_standard"] = filename
+        variant_name_mapping[f"{vtype}_T1"] = filename_t1
+
+    return variant_name_mapping
 
 
 def n_monomer_atoms(merltfile: str, path_cwd: str) -> int:
