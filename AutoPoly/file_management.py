@@ -117,8 +117,8 @@ def mv_files(path_cwd):
         parent_dir = moltemplate_dir.parent
 
         # Create output and input directories if they don't exist
-        output_dir = parent_dir / "output"
-        input_dir = parent_dir / "input"
+        output_dir = moltemplate_dir / "output"
+        input_dir = moltemplate_dir / "input"
         output_dir.mkdir(exist_ok=True)
         input_dir.mkdir(exist_ok=True)
 

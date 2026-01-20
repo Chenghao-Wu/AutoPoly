@@ -169,12 +169,16 @@ class ForceFieldManager:
         The process:
         1. Parses all monomer .lt files to extract atom types used
         2. Removes duplicate atom types and sorts them
-        3. Reads the master OPLS-AA parameter file
-        4. Writes only the relevant parameters to oplsaa_subset.prm
+        3. First pass: extracts atom classes for the used atom types
+        4. Second pass: writes filtered parameters for all sections
 
         The generated subset file includes:
-        - Atom type definitions for all atoms in the system
-        - All other parameter sections (bonds, angles, dihedrals, etc.)
+        - Atom type definitions for atoms in the system
+        - VDW parameters filtered by atom type
+        - Bond parameters filtered by atom class pairs
+        - Angle parameters filtered by atom class triplets
+        - Torsion parameters filtered by atom class quads (with wildcard support)
+        - Improper torsion parameters filtered by atom class quads (with wildcard support)
 
         Raises:
             SystemExit: If a monomer file cannot be found or read
@@ -231,49 +235,150 @@ class ForceFieldManager:
         # Cleaning up the stored data. Remove duplicate atoms types
         atom_types = list(dict.fromkeys(atom_keys))
         # Convert the vectors string to vector int in order to sort the atom_types in ascending order
-        atom_types = sorted([int(i) for i in atom_types])
+        atom_types_set = set(int(i) for i in atom_types)
+        atom_types = sorted(atom_types_set)
 
-        # Read the master opls file and store the ones that match the atom_types into new subset file
-        write_f = open(opls_subset_file, "w")
+        # FIRST PASS: Extract atom classes for the used atom types
+        atom_classes = set()
+        path_oplsaaprm = Path(self.path_oplsaaprm)
+        if not path_oplsaaprm.is_file():
+            logger.error(f"OPLS-AA parameter file not found: {self.path_oplsaaprm}")
+            sys.exit(1)
 
         with open(self.path_oplsaaprm, 'r') as read_f:
-            path_oplsaaprm = Path(self.path_oplsaaprm)
-            if path_oplsaaprm.is_file():
-                check_switch = False
-                while True:
-                    prm_line = read_f.readline()
-                    if len(prm_line.strip()) != 0:
-
-                        if prm_line.strip() == "##  Atom Type Definitions  ##":
-                            check_switch = True
-                            write_f.write(prm_line + "\n")
-                            prm_line = read_f.readline()
-                            write_f.write(prm_line + "\n")
-                            prm_line = read_f.readline()
-                            write_f.write(prm_line + "\n")
+            for line in read_f:
+                stripped = line.strip()
+                if stripped.startswith('atom'):
+                    parts = stripped.split()
+                    if len(parts) >= 3:
+                        try:
+                            atom_type = int(parts[1])
+                            atom_class = int(parts[2])
+                            if atom_type in atom_types_set:
+                                atom_classes.add(atom_class)
+                        except ValueError:
                             continue
-                        elif prm_line.strip() == "################################":
-                            check_switch = False
-                            write_f.write(prm_line + "\n")
-                            continue
-                        elif check_switch:
 
-                            stringvector = prm_line.split()
+        logger.info(f"OPLS-AA subset: {len(atom_types)} atom types, {len(atom_classes)} atom classes")
 
+        # SECOND PASS: Write filtered output
+        # Section markers for OPLS-AA parameter file
+        SECTION_MARKERS = {
+            '##  Atom Type Definitions  ##': 'atom',
+            '##  Van der Waals Parameters  ##': 'vdw',
+            '##  Bond Stretching Parameters  ##': 'bond',
+            '##  Angle Bending Parameters  ##': 'angle',
+            '##  Torsional Parameters  ##': 'torsion',
+            '##  Improper Torsional Parameters  ##': 'imptors',
+            '##   Urey-Bradley Parameters  ##': 'ureybrad',
+            '##  Atomic Partial Charge Parameters  ##': 'charge',
+            '##  Biopolymer Atom Type Conversions  ##': 'biotype',
+        }
 
-                            for checkii in range(len(atom_types)):
+        def should_include_parameter(line: str, section: str) -> bool:
+            """Check if a parameter line should be included based on the current section."""
+            parts = line.split()
+            if len(parts) < 2:
+                return True  # Empty or header lines
 
-                                if atom_types[checkii] == int(stringvector[1]):
-                                    write_f.write(prm_line + "\n")
-                                    break
-                        else:
-                            write_f.write(prm_line + "\n")
-                    else:
-                        write_f.write(prm_line + "\n")
+            keyword = parts[0].lower()
 
-                    if not prm_line:
+            # Filter based on section type
+            if keyword == 'atom' and section == 'atom':
+                # Atom type definitions: filter by atom type (column 1)
+                if len(parts) >= 2:
+                    try:
+                        return int(parts[1]) in atom_types_set
+                    except ValueError:
+                        return True
+
+            elif keyword == 'vdw' and section == 'vdw':
+                # VDW parameters: filter by atom type (column 1)
+                if len(parts) >= 2:
+                    try:
+                        return int(parts[1]) in atom_types_set
+                    except ValueError:
+                        return True
+
+            elif keyword == 'bond' and section == 'bond':
+                # Bond parameters: filter by atom class pair (columns 1-2)
+                if len(parts) >= 3:
+                    try:
+                        class1 = int(parts[1])
+                        class2 = int(parts[2])
+                        return class1 in atom_classes and class2 in atom_classes
+                    except ValueError:
+                        return True
+
+            elif keyword == 'angle' and section == 'angle':
+                # Angle parameters: filter by atom class triplet (columns 1-3)
+                if len(parts) >= 4:
+                    try:
+                        class1 = int(parts[1])
+                        class2 = int(parts[2])
+                        class3 = int(parts[3])
+                        return class1 in atom_classes and class2 in atom_classes and class3 in atom_classes
+                    except ValueError:
+                        return True
+
+            elif keyword == 'torsion' and section == 'torsion':
+                # Torsion parameters: filter by atom class quad (columns 1-4)
+                # Class 0 is a wildcard, so we only check non-zero classes
+                if len(parts) >= 5:
+                    try:
+                        classes = [int(parts[i]) for i in range(1, 5)]
+                        # Keep if all non-zero classes are in atom_classes
+                        non_zero_classes = [c for c in classes if c != 0]
+                        return all(c in atom_classes for c in non_zero_classes)
+                    except ValueError:
+                        return True
+
+            elif keyword == 'imptors' and section == 'imptors':
+                # Improper torsion parameters: filter by atom class quad (columns 1-4)
+                # Class 0 is a wildcard, so we only check non-zero classes
+                if len(parts) >= 5:
+                    try:
+                        classes = [int(parts[i]) for i in range(1, 5)]
+                        # Keep if all non-zero classes are in atom_classes
+                        non_zero_classes = [c for c in classes if c != 0]
+                        return all(c in atom_classes for c in non_zero_classes)
+                    except ValueError:
+                        return True
+
+            elif keyword == 'charge' and section == 'charge':
+                # Charge parameters: filter by atom type (column 1)
+                if len(parts) >= 2:
+                    try:
+                        return int(parts[1]) in atom_types_set
+                    except ValueError:
+                        return True
+
+            # For other sections or non-parameter lines, include them
+            return True
+
+        current_section = None
+        with open(self.path_oplsaaprm, 'r') as read_f, open(opls_subset_file, 'w') as write_f:
+            for line in read_f:
+                stripped = line.strip()
+
+                # Check for section markers
+                for marker, section_name in SECTION_MARKERS.items():
+                    if marker in stripped:
+                        current_section = section_name
                         break
-        write_f.close()
+
+                # Determine if this line should be written
+                if current_section in ('atom', 'vdw', 'bond', 'angle', 'torsion', 'imptors', 'charge'):
+                    # Check if it's a parameter line that needs filtering
+                    if stripped and not stripped.startswith('#') and not stripped.startswith('##'):
+                        if should_include_parameter(stripped, current_section):
+                            write_f.write(line)
+                    else:
+                        # Header/comment lines - always write
+                        write_f.write(line)
+                else:
+                    # For other sections (force field definition, literature, etc.), write as-is
+                    write_f.write(line)
 
     # Alkyl atom types: CH3 (methyl), CH2 (methylene), CH (methine)
     ALKYL_ATOM_TYPES = {80, 81, 82}
