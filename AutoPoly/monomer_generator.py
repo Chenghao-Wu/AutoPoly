@@ -1625,6 +1625,9 @@ class MonomerGenerator:
 
         chain_mol = rw_mol.GetMol()
 
+        # Sanitize molecule to reinitialize RingInfo after atom removal operations
+        Chem.SanitizeMol(chain_mol)
+
         # 2. Assign atom types on CHAIN (now terminal atoms have correct chemistry!)
         chain_mol = self.atom_typer.assign_atom_types(chain_mol)
 
