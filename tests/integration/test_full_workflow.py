@@ -18,26 +18,26 @@ class TestFullWorkflow:
         system = System(out=str(output_dir))
 
         # Create polymer
-        poly = Polymer(ChainNum=1, Sequence=["PE"], DOP=5, tacticity="isotactic")
+        poly = Polymer(chain_num=1, sequence=["PE"] * 5, tacticity="isotactic")
         poly.set_Sequence()
 
         # Verify polymer structure
         assert len(poly.sequenceSet) == 1
         assert len(poly.sequenceSet[0]) == 5
         # Isotactic: all chirality values should be the same
-        assert all(poly.tacticitySet[0]) or all(not t for t in poly.tacticitySet[0])
+        assert all(poly.tacticity_set[0]) or all(not t for t in poly.tacticity_set[0])
 
     def test_ps_atactic_polymer_workflow_structure(self, tmp_path):
         """Test PS atactic polymer with random chirality."""
         output_dir = tmp_path / "ps_test"
         system = System(out=str(output_dir))
 
-        poly = Polymer(ChainNum=1, Sequence=["PS"], DOP=3, tacticity="atactic")
+        poly = Polymer(chain_num=1, sequence=["PS"] * 3, tacticity="atactic")
         poly.set_Sequence()
 
         # Verify chirality is assigned (random but deterministic)
-        assert len(poly.tacticitySet[0]) == 3
-        assert all(isinstance(t, bool) for t in poly.tacticitySet[0])
+        assert len(poly.tacticity_set[0]) == 3
+        assert all(isinstance(t, bool) for t in poly.tacticity_set[0])
 
     def test_water_molecule_workflow(self, tmp_path):
         """Test water molecule generation."""
@@ -57,7 +57,7 @@ class TestFullWorkflow:
         output_dir = tmp_path / "copolymer_test"
         system = System(out=str(output_dir))
 
-        poly = Polymer(ChainNum=1, Sequence=["PE", "PS"], DOP=4)
+        poly = Polymer(chain_num=1, sequence=["PE", "PS", "PE", "PS"])
         poly.set_Sequence()
 
         # Verify copolymer structure
@@ -71,7 +71,7 @@ class TestFullWorkflow:
         output_dir = tmp_path / "ring_test"
         system = System(out=str(output_dir))
 
-        poly = Polymer(ChainNum=1, Sequence=["PE"], DOP=5, topology="ring")
+        poly = Polymer(chain_num=1, sequence=["PE"] * 5, topology="ring")
         poly.set_Sequence()
 
         # Verify ring topology
@@ -83,24 +83,24 @@ class TestFullWorkflow:
         output_dir = tmp_path / "multi_chain_test"
         system = System(out=str(output_dir))
 
-        poly = Polymer(ChainNum=3, Sequence=["PE"], DOP=4, tacticity="isotactic")
+        poly = Polymer(chain_num=3, sequence=["PE"] * 4, tacticity="isotactic")
         poly.set_Sequence()
 
         # Verify multiple chains
         assert len(poly.sequenceSet) == 3
         assert all(len(chain) == 4 for chain in poly.sequenceSet)
-        assert len(poly.tacticitySet) == 3
+        assert len(poly.tacticity_set) == 3
 
     def test_syndiotactic_polymer_workflow(self, tmp_path):
         """Test syndiotactic polymer with alternating chirality."""
         output_dir = tmp_path / "syndiotactic_test"
         system = System(out=str(output_dir))
 
-        poly = Polymer(ChainNum=1, Sequence=["PE"], DOP=6, tacticity="syndiotactic")
+        poly = Polymer(chain_num=1, sequence=["PE"] * 6, tacticity="syndiotactic")
         poly.set_Sequence()
 
         # Verify alternating chirality
-        chirality = poly.tacticitySet[0]
+        chirality = poly.tacticity_set[0]
         for i in range(len(chirality) - 1):
             assert chirality[i] != chirality[i + 1]
 
