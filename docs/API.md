@@ -1,496 +1,759 @@
-# AutoPoly API Documentation
+# AutoPoly API Reference
 
-Complete API reference for AutoPoly package.
+Complete API documentation for all AutoPoly classes and functions (v1.0+).
 
 ## Table of Contents
 
 - [System](#system)
 - [Polymer](#polymer)
+- [Molecule](#molecule)
 - [Polymerization](#polymerization)
 - [BeadSpringPolymer](#beadspringpolymer)
+- [MonomerGenerator](#monomergenerator)
 
 ---
 
 ## System
 
-Manages file paths and directory operations for polymer simulations.
+Manages file paths and output directories for simulation setup.
 
-### Class: `System`
+### Class Definition
 
 ```python
-from AutoPoly import System
-
-system = System(out="output_directory")
+class System:
+    """Utility class for managing file paths and system operations."""
 ```
 
 ### Constructor
 
 ```python
-System(out: str = None) -> None
+System(out: str)
 ```
 
 **Parameters:**
-- `out` (str, optional): Output directory name. If None, uses current working directory.
+- `out` (str): Name of the output directory where simulation files will be generated
+
+**Example:**
+```python
+from AutoPoly import System
+
+system = System(out="my_simulation")
+output_path = system.get_folder_path()
+print(f"Files will be saved to: {output_path}")
+```
 
 ### Methods
 
 #### `get_folder_path()`
 
-Get the full path to the output directory.
+Returns the full path to the output directory.
 
+**Returns:**
+- `str`: Absolute path to the output folder
+
+**Example:**
 ```python
+system = System(out="pe_simulation")
 path = system.get_folder_path()
-# Returns: "/path/to/output_directory"
 ```
-
-**Returns:** `str` - Full path to the output directory
-
----
-
-#### `get_output_path()`
-
-Alias for `get_folder_path()`.
-
-**Returns:** `str` - Full path to the output directory
-
----
-
-#### `change_output_directory(new_out: str)`
-
-Change the output directory to a new location.
-
-```python
-system.change_output_directory("new_output")
-```
-
-**Parameters:**
-- `new_out` (str): New output directory name
-
----
-
-#### `cleanup_output_directory()`
-
-Remove the output directory and all its contents.
-
-```python
-system.cleanup_output_directory()
-```
-
-**Warning:** This permanently deletes all files in the output directory.
-
----
-
-#### `get_FolderPath` (Deprecated)
-
-**Deprecated:** Use `get_folder_path()` instead.
 
 ---
 
 ## Polymer
 
-Defines polymer structures and properties including topology, tacticity, and monomer sequences.
+Defines polymer structure and properties with explicit monomer sequences.
 
-### Class: `Polymer`
+### Class Definition
 
 ```python
-from AutoPoly import Polymer
+class Polymer:
+    """
+    Represents a polymer with explicit monomer sequence.
 
-polymer = Polymer(
-    ChainNum=10,
-    Sequence=["PE", "PE"],
-    DOP=100,
-    topology="linear",
-    tacticity="atactic"
-)
+    Uses complement SMILES format where:
+    - First position: 1 wildcard on right (e.g., "CC[*]")
+    - Middle positions: 2 wildcards (e.g., "[*]CC[*]")
+    - Last position: 1 wildcard on left (e.g., "[*]CC")
+    """
 ```
 
 ### Constructor
 
 ```python
 Polymer(
-    ChainNum: int = None,
-    Sequence: list = None,
-    DOP: int = 0,
+    chain_num: int,
+    sequence: list,
     topology: str = "linear",
     tacticity: str = "atactic"
-) -> None
+)
 ```
 
 **Parameters:**
-- `ChainNum` (int, optional): Number of polymer chains. Defaults to None.
-- `Sequence` (list, optional): List of monomer names. Defaults to None.
-- `DOP` (int, optional): Degree of polymerization. If 0, uses sequence length. Defaults to 0.
-- `topology` (str, optional): Polymer topology, either "linear" (default) or "ring". Defaults to "linear".
-- `tacticity` (str, optional): Polymer tacticity - "atactic" (default), "isotactic", or "syndiotactic". Defaults to "atactic".
 
-**Raises:**
-- `ValueError`: If topology is not 'linear' or 'ring', or if Sequence is None/empty.
+- `chain_num` (int): Number of polymer chains to generate
+  - Must be positive integer
+  - Example: `chain_num=10` creates 10 independent chains
+
+- `sequence` (list): Explicit monomer sequence as complement SMILES strings
+  - Each element is a pSMILES string representing one monomer unit
+  - DOP is automatically `len(sequence)`
+  - Use complement SMILES format with proper wildcards
+  - Example: `["CC[*]", "[*]CC[*]", "[*]CC[*]", "[*]CC"]`
+
+- `topology` (str, optional): Chain topology. Default: `"linear"`
+  - `"linear"`: Linear polymer chain with two end groups
+  - `"ring"`: Cyclic polymer (no end groups)
+
+- `tacticity` (str, optional): Stereochemistry configuration. Default: `"atactic"`
+  - `"atactic"`: Random stereochemistry
+  - `"isotactic"`: Same stereochemistry at all stereocenters
+  - `"syndiotactic"`: Alternating stereochemistry
+
+**Examples:**
+
+```python
+from AutoPoly import Polymer
+
+# Uniform linear polymer
+poly = Polymer(
+    chain_num=10,
+    sequence=["CC[*]"] + ["[*]CC[*]"] * 48 + ["[*]CC"],  # DOP = 50
+    topology="linear",
+    tacticity="isotactic"
+)
+
+# Block copolymer with complement SMILES
+sequence = [
+    "CC[*]",         # First: ethylene
+    "[*]CC[*]",      # Middle: ethylene
+    "[*]C=C[*]",     # Middle: styrene
+    "[*]C=C[*]",     # Middle: styrene
+    "[*]CC"          # Last: ethylene
+]
+poly = Polymer(
+    chain_num=5,
+    sequence=sequence,  # DOP = 5
+    topology="linear",
+    tacticity="atactic"
+)
+
+# Ring polymer
+ring_poly = Polymer(
+    chain_num=5,
+    sequence=["[*]CC[*]"] * 30,  # All middle positions for ring
+    topology="ring",
+    tacticity="atactic"
+)
+```
+
+### Properties
+
+#### `dop` (read-only)
+
+Degree of polymerization, automatically derived from sequence length.
+
+```python
+poly = Polymer(
+    chain_num=10,
+    sequence=["CC[*]"] + ["[*]CC[*]"] * 48 + ["[*]CC"]
+)
+print(poly.dop)  # Output: 50
+```
+
+#### `mer_set` (read-only)
+
+Set of unique monomer types in the sequence.
+
+```python
+sequence = ["[*]CC[*]", "[*]CC[*]", "[*]C=C[*]"]
+poly = Polymer(chain_num=5, sequence=sequence)
+print(poly.mer_set)  # Output: {"[*]CC[*]", "[*]C=C[*]"}
+```
 
 ### Methods
 
-#### `set_merSet(merSet: Union[List[str], str])`
-
-Set the unique set of monomers used in the polymer.
-
-```python
-polymer.set_merSet(["PE", "PS"])
-```
-
-**Parameters:**
-- `merSet` (Union[List[str], str]): List of monomers or single monomer
-
----
-
-#### `set_dop(dop: int)`
-
-Set the degree of polymerization.
-
-```python
-polymer.set_dop(200)
-```
-
-**Parameters:**
-- `dop` (int): Degree of polymerization
-
----
-
-#### `set_Sequence()`
-
-Set up the polymer sequence based on tacticity and chain number.
-
-This method generates the monomer file names and names for each chain based on the specified topology and tacticity.
-
-```python
-polymer.set_Sequence()
-```
-
----
-
-#### `get_sequence_set()`
-
-Get the sequence set for all chains.
-
-```python
-sequences = polymer.get_sequence_set()
-# Returns: [["PEle.lt", "PEre.lt"], ["PEi.lt", ...]]
-```
-
-**Returns:** `List[List[str]]` - List of monomer file names for each chain
-
----
-
-#### `get_sequence_names()`
-
-Get the sequence names for all chains.
-
-```python
-names = polymer.get_sequence_names()
-# Returns: [["PEle", "PEre"], ["PEi", ...]]
-```
-
-**Returns:** `List[List[str]]` - List of monomer names for each chain
-
----
-
-#### `get_mer_set()`
-
-Get the unique set of monomers used.
-
-```python
-monomers = polymer.get_mer_set()
-# Returns: ["PE", "PS"]
-```
-
-**Returns:** `List[str]` - Unique list of monomers
-
----
-
 #### `get_chain_info()`
 
-Get comprehensive information about the polymer.
+Returns complete information about the polymer chain.
 
+**Returns:**
+- `dict`: Dictionary containing chain properties
+
+**Example:**
 ```python
-info = polymer.get_chain_info()
-# Returns: {
-#   'chain_num': 10,
-#   'sequence': ['PE', 'PE'],
-#   'dop': 100,
-#   'topology': 'linear',
-#   'tacticity': 'atactic',
-#   'sequence_length': 2,
-#   'mer_set': ['PE'],
-#   'sequence_set': [...],
-#   'sequence_names': [...]
+poly = Polymer(
+    chain_num=10,
+    sequence=["[*]CC[*]"] * 50,
+    topology="linear",
+    tacticity="isotactic"
+)
+
+info = poly.get_chain_info()
+print(info)
+# {
+#     'chain_num': 10,
+#     'dop': 50,
+#     'topology': 'linear',
+#     'tacticity': 'isotactic',
+#     'unique_monomers': 1,
+#     'sequence_length': 50
 # }
 ```
 
-**Returns:** `dict` - Dictionary containing polymer properties
+### Validation
+
+The Polymer class enforces resource limits to prevent excessive memory usage:
+
+```python
+from AutoPoly.exceptions import ValidationError
+
+# Exceeding MAX_SEQUENCE_LENGTH (10000)
+try:
+    poly = Polymer(chain_num=1, sequence=["[*]CC[*]"] * 15000)
+except ValidationError as e:
+    print(e)  # "Sequence length (15000) exceeds maximum 10000"
+
+# Exceeding MAX_UNIQUE_MONOMERS (100)
+try:
+    sequence = [f"[*]C{i}C[*]" for i in range(150)]
+    poly = Polymer(chain_num=1, sequence=sequence)
+except ValidationError as e:
+    print(e)  # "Number of unique monomers (150) exceeds maximum 100"
+```
+
+**Resource Limits:**
+- `MAX_SEQUENCE_LENGTH = 10000`
+- `MAX_UNIQUE_MONOMERS = 100`
+
+---
+
+## Molecule
+
+Defines small molecule structures (solvents, additives) using regular SMILES notation.
+
+### Class Definition
+
+```python
+class Molecule:
+    """
+    Represents small molecules like solvents or additives.
+
+    Unlike Polymer class which uses complement SMILES with wildcards,
+    Molecule uses regular SMILES notation without [*] wildcards.
+    """
+```
+
+### Constructor
+
+```python
+Molecule(
+    Count: int,
+    Smiles: str,
+    Name: str
+)
+```
+
+**Parameters:**
+
+- `Count` (int): Number of molecules to generate
+  - Must be positive integer
+  - Example: `Count=100` creates 100 water molecules
+
+- `Smiles` (str): Regular SMILES string (no wildcards)
+  - Must be valid SMILES notation
+  - Do NOT use `[*]` wildcards
+  - Example: `"O"` for water, `"CCO"` for ethanol
+
+- `Name` (str): Identifier for the molecule type
+  - Used for file naming and identification
+  - Example: `"water"`, `"benzene"`, `"ethanol"`
+
+**Examples:**
+
+```python
+from AutoPoly import Molecule
+
+# Water molecules
+water = Molecule(
+    Count=100,
+    Smiles="O",
+    Name="water"
+)
+
+# Ethanol molecules
+ethanol = Molecule(
+    Count=20,
+    Smiles="CCO",
+    Name="ethanol"
+)
+
+# Benzene molecules
+benzene = Molecule(
+    Count=50,
+    Smiles="c1ccccc1",
+    Name="benzene"
+)
+```
+
+### Common SMILES Strings
+
+**Solvents:**
+- Water: `"O"`
+- Methanol: `"CO"`
+- Ethanol: `"CCO"`
+- Acetone: `"CC(=O)C"`
+- DMSO: `"CS(C)=O"`
+- Benzene: `"c1ccccc1"`
+- Toluene: `"Cc1ccccc1"`
+
+**Hydrocarbons:**
+- Methane: `"C"`
+- Ethane: `"CC"`
+- Propane: `"CCC"`
+- Cyclohexane: `"C1CCCCC1"`
+
+**Acids/Bases:**
+- Acetic acid: `"CC(=O)O"`
+- Ammonia: `"N"`
+
+### Properties
+
+#### `molecule_name` (read-only)
+
+Returns the name identifier for the molecule.
+
+```python
+water = Molecule(Count=100, Smiles="O", Name="water")
+print(water.molecule_name)  # Output: "water"
+```
 
 ---
 
 ## Polymerization
 
-Core class for generating polymer structures using Moltemplate and preparing them for LAMMPS simulations.
+Generates polymer structures and LAMMPS input files using Moltemplate.
 
-### Class: `Polymerization`
+### Class Definition
 
 ```python
-from AutoPoly import Polymerization
+class Polymerization:
+    """
+    Core class for generating polymer structures.
 
-polymerization = Polymerization(
-    name="project_name",
-    system=system,
-    model=[polymer],
-    force_field="oplsaa"
-)
+    Coordinates the workflow:
+    1. Monomer generation from SMILES
+    2. Moltemplate file creation
+    3. LAMMPS data file generation
+    4. Force field parameter assignment
+    """
 ```
 
 ### Constructor
 
 ```python
 Polymerization(
-    name: str = None,
-    system: object = None,
-    model: list = None,
+    name: str,
+    system: System,
+    model: list,
     run: bool = True,
-    path_monomer_bank: str = None,
-    is_lopls: bool = False,
     force_field: str = "oplsaa"
-) -> None
-```
-
-**Parameters:**
-- `name` (str, optional): Name of the polymerization project. Defaults to None.
-- `system` (object, optional): System object containing folder path. Defaults to None.
-- `model` (list, optional): List of Polymer objects for polymerization. Defaults to None.
-- `run` (bool, optional): Flag to run the process immediately. Defaults to True.
-- `path_monomer_bank` (str, optional): Path to the monomer bank. Defaults to None.
-- `is_lopls` (bool, optional): **Deprecated:** Use `force_field="lopls"` instead. Whether to use LOPLS force field. Defaults to False.
-- `force_field` (str, optional): Force field to use - "oplsaa" (default), "gaff", or "lopls". Defaults to "oplsaa".
-
-**Raises:**
-- `SystemExit`: If required directories or files are not found, or if invalid force_field is specified.
-
-### Methods
-
-#### `create_working_directory()`
-
-Create and manage the working directory structure for the polymerization.
-
-```python
-polymerization.create_working_directory()
-```
-
----
-
-#### `set_tacticity(tacticity: str)`
-
-Set the tacticity of the polymer.
-
-```python
-polymerization.set_tacticity("isotactic")
-```
-
-**Parameters:**
-- `tacticity` (str): The tacticity to set
-
----
-
-## BeadSpringPolymer
-
-Simplified bead-spring polymer model generator for coarse-grained LAMMPS simulations.
-
-### Class: `BeadSpringPolymer`
-
-```python
-from AutoPoly import BeadSpringPolymer
-
-bead_polymer = BeadSpringPolymer(
-    name="coarse_grained",
-    system=system,
-    n_chains=5,
-    n_beads=20,
-    topology="linear"
-)
-```
-
-### Constructor
-
-```python
-BeadSpringPolymer(
-    name: str = None,
-    system: object = None,
-    n_chains: int = 1,
-    n_beads: int = 10,
-    topology: str = "linear",
-    bond_length: float = 1.0,
-    mass: float = 1.0,
-    epsilon: float = 1.0,
-    sigma: float = 1.0
-) -> None
-```
-
-**Parameters:**
-- `name` (str, optional): Name for the output files. Defaults to None.
-- `system` (object, optional): System object containing path information. Defaults to None.
-- `n_chains` (int, optional): Number of polymer chains. Defaults to 1.
-- `n_beads` (int, optional): Number of beads per chain. Defaults to 10.
-- `topology` (str, optional): "linear" (default) or "ring". Defaults to "linear".
-- `bond_length` (float, optional): Equilibrium bond length. Defaults to 1.0.
-- `mass` (float, optional): Mass of each bead. Defaults to 1.0.
-- `epsilon` (float, optional): LJ energy parameter. Defaults to 1.0.
-- `sigma` (float, optional): LJ distance parameter. Defaults to 1.0.
-
-**Raises:**
-- `ValueError`: If topology is not 'linear' or 'ring'
-
-### Methods
-
-#### `generate_data_file()`
-
-Generate LAMMPS data file for bead-spring polymer.
-
-```python
-bead_polymer.generate_data_file()
-```
-
-This method creates:
-- `polymer.data` - LAMMPS data file with atoms and bonds
-- `in.polymer` - LAMMPS input script
-
----
-
-#### `get_system_info()`
-
-Get comprehensive information about the bead-spring polymer system.
-
-```python
-info = bead_polymer.get_system_info()
-# Returns: {
-#   'name': 'coarse_grained',
-#   'n_chains': 5,
-#   'n_beads_per_chain': 20,
-#   'topology': 'linear',
-#   'total_beads': 100,
-#   'total_bonds': 95,
-#   'bond_length': 1.0,
-#   'mass': 1.0,
-#   'epsilon': 1.0,
-#   'sigma': 1.0,
-#   'output_path': '/path/to/output'
-# }
-```
-
-**Returns:** `dict` - Dictionary containing system properties
-
----
-
-#### `modify_parameters(**kwargs)`
-
-Modify polymer parameters after initialization.
-
-```python
-bead_polymer.modify_parameters(
-    n_chains=10,
-    n_beads=30,
-    bond_length=1.5,
-    mass=2.0
 )
 ```
 
 **Parameters:**
-- `**kwargs`: Keyword arguments for parameters to modify
-  - Valid params: `n_chains`, `n_beads`, `topology`, `bond_length`, `mass`, `epsilon`, `sigma`
 
-**Raises:**
-- `ValueError`: If topology is modified to invalid value
+- `name` (str): Project name for the simulation
+  - Used for file naming
+  - Example: `"polyethylene_simulation"`
 
----
+- `system` (System): System object defining output directory
+  - Created with `System(out="folder_name")`
 
-## Common Workflows
+- `model` (list): List of Polymer and/or Molecule objects
+  - Can contain only Polymer objects
+  - Can contain only Molecule objects
+  - Can mix Polymer and Molecule objects
+  - Example: `[polymer1, polymer2, water_molecule]`
 
-### Basic Atomistic Polymer
+- `run` (bool, optional): Execute generation immediately. Default: `True`
+  - `True`: Generate files immediately upon object creation
+  - `False`: Defer generation (call manually later)
+
+- `force_field` (str, optional): Force field to use. Default: `"oplsaa"`
+  - Options: `"oplsaa"`, `"lopls"`, `"gaff"`, `"gaff2"`, `"dreiding"`, `"compass"`
+  - See [Force Field Guide](FORCE_FIELDS.md) for selection guidance
+
+**Examples:**
 
 ```python
-from AutoPoly import System, Polymer, Polymerization
+from AutoPoly import System, Polymer, Molecule, Polymerization
 
-# 1. Create system
+# Example 1: Single polymer
 system = System(out="pe_simulation")
-
-# 2. Define polymer
 polymer = Polymer(
-    ChainNum=10,
-    Sequence=["PE"],
-    DOP=100,
-    topology="linear",
-    tacticity="atactic"
+    chain_num=10,
+    sequence=["CC[*]"] + ["[*]CC[*]"] * 48 + ["[*]CC"]
 )
 
-# 3. Generate structure
 polymerization = Polymerization(
     name="polyethylene",
     system=system,
     model=[polymer],
     force_field="oplsaa"
 )
+
+# Example 2: Polymer mixture
+pe = Polymer(
+    chain_num=5,
+    sequence=["CC[*]"] + ["[*]CC[*]"] * 48 + ["[*]CC"]
+)
+ps = Polymer(
+    chain_num=5,
+    sequence=["Cc1ccccc1[*]"] + ["[*]Cc1ccccc1[*]"] * 48 + ["[*]Cc1ccccc1"]
+)
+
+polymerization = Polymerization(
+    name="pe_ps_blend",
+    system=system,
+    model=[pe, ps],
+    force_field="oplsaa"
+)
+
+# Example 3: Polymer + solvent
+pe = Polymer(
+    chain_num=10,
+    sequence=["CC[*]"] + ["[*]CC[*]"] * 48 + ["[*]CC"]
+)
+water = Molecule(Count=100, Smiles="O", Name="water")
+
+polymerization = Polymerization(
+    name="pe_in_water",
+    system=system,
+    model=[pe, water],
+    force_field="gaff"
+)
+
+# Example 4: Molecule-only system
+water = Molecule(Count=100, Smiles="O", Name="water")
+ethanol = Molecule(Count=20, Smiles="CCO", Name="ethanol")
+
+polymerization = Polymerization(
+    name="water_ethanol",
+    system=system,
+    model=[water, ethanol],
+    force_field="gaff"
+)
 ```
 
-### Coarse-Grained Simulation
+### Force Fields
+
+Six force fields are supported:
+
+| Force Field | String Value | Best For |
+|------------|--------------|----------|
+| OPLS-AA | `"oplsaa"` | General organic polymers |
+| LOPLS | `"lopls"` | Liquid-phase simulations |
+| GAFF | `"gaff"` | Small molecules, drug-like compounds |
+| GAFF2 | `"gaff2"` | Updated GAFF with improved parameters |
+| DREIDING | `"dreiding"` | Generic force field, metals/inorganics |
+| COMPASS | `"compass"` | Commercial polymers, condensed phases |
+
+See [docs/FORCE_FIELDS.md](FORCE_FIELDS.md) for detailed comparison and selection guide.
+
+### Output Files
+
+After successful execution, the output directory contains:
+
+```
+project_name/
+├── moltemplate/           # Intermediate Moltemplate files
+│   ├── monomer1.lt
+│   ├── monomer2.lt
+│   └── system.lt
+├── system.data            # LAMMPS data file (coordinates, topology)
+├── system.in              # LAMMPS input script
+└── system.in.settings     # Force field parameters
+```
+
+### Exceptions
+
+```python
+from AutoPoly.exceptions import ValidationError
+
+# Invalid force field
+try:
+    polymerization = Polymerization(
+        name="test",
+        system=system,
+        model=[polymer],
+        force_field="invalid"
+    )
+except ValidationError as e:
+    print(e)  # "Invalid force_field 'invalid'. Must be one of: ..."
+```
+
+---
+
+## BeadSpringPolymer
+
+Creates coarse-grained bead-spring polymer models for simplified simulations.
+
+### Class Definition
+
+```python
+class BeadSpringPolymer:
+    """
+    Coarse-grained bead-spring polymer model.
+
+    Uses simple harmonic bonds instead of detailed atomistic interactions.
+    Useful for:
+    - Rapid prototyping
+    - Large-scale simulations
+    - Studying polymer physics
+    """
+```
+
+### Constructor
+
+```python
+BeadSpringPolymer(
+    name: str,
+    system: System,
+    n_chains: int,
+    n_beads: int,
+    topology: str = "linear",
+    bond_length: float = 1.0,
+    mass: float = 1.0
+)
+```
+
+**Parameters:**
+
+- `name` (str): Name for the bead-spring system
+
+- `system` (System): System object defining output directory
+
+- `n_chains` (int): Number of polymer chains
+
+- `n_beads` (int): Number of beads per chain
+  - Equivalent to degree of polymerization in atomistic models
+
+- `topology` (str, optional): Chain topology. Default: `"linear"`
+  - `"linear"`: Linear chain
+  - `"ring"`: Ring polymer
+
+- `bond_length` (float, optional): Equilibrium bond length. Default: `1.0`
+  - In reduced units (LJ units typically)
+
+- `mass` (float, optional): Bead mass. Default: `1.0`
+  - In reduced units
+
+**Example:**
 
 ```python
 from AutoPoly import System, BeadSpringPolymer
 
-system = System(out="cg_simulation")
-polymer = BeadSpringPolymer(
-    name="cg_polymer",
+system = System(out="bead_spring_simulation")
+
+# Linear bead-spring polymer
+bead_polymer = BeadSpringPolymer(
+    name="coarse_grained",
     system=system,
     n_chains=5,
-    n_beads=50,
-    topology="ring"
+    n_beads=20,
+    topology="linear",
+    bond_length=1.0,
+    mass=1.0
 )
-polymer.generate_data_file()
-```
 
-### Multiple Polymers
+# Generate data file
+bead_polymer.generate_data_file()
 
-```python
-# Linear PE
-pe = Polymer(ChainNum=5, Sequence=["PE"], DOP=50, topology="linear")
-
-# Ring PS
-ps = Polymer(ChainNum=3, Sequence=["PS"], DOP=30, topology="ring")
-
-# Generate both
-polymerization = Polymerization(
-    name="mixed_system",
+# Ring bead-spring polymer
+ring_bead_polymer = BeadSpringPolymer(
+    name="ring_cg",
     system=system,
-    model=[pe, ps]
+    n_chains=10,
+    n_beads=50,
+    topology="ring",
+    bond_length=0.97,
+    mass=1.0
+)
+ring_bead_polymer.generate_data_file()
+```
+
+### Methods
+
+#### `generate_data_file()`
+
+Generates LAMMPS data file for the bead-spring system.
+
+**Returns:**
+- None (writes file to disk)
+
+**Output:**
+Creates `system.data` file in the output directory with bead-spring topology.
+
+---
+
+## MonomerGenerator
+
+Advanced class for generating monomer variants with tacticity and complement SMILES.
+
+### Class Definition
+
+```python
+class MonomerGenerator:
+    """
+    Generates monomer structure variants.
+
+    Handles:
+    - Tacticity (isotactic, syndiotactic, atactic)
+    - Complement SMILES (first/middle/last positions)
+    - 3D structure generation
+    - Force field typing
+    """
+```
+
+### Usage
+
+This is an internal class typically used by the `Polymerization` workflow. Advanced users can use it directly for custom monomer generation.
+
+**Example:**
+
+```python
+from AutoPoly import MonomerGenerator
+
+generator = MonomerGenerator()
+
+# Generate isotactic styrene variants
+variants = generator.generate_variants(
+    "[*]Cc1ccccc1[*]",
+    tacticity="isotactic"
+)
+
+# variants contains first/middle/last SMILES strings with proper stereochemistry
+```
+
+---
+
+## Exceptions
+
+AutoPoly defines custom exceptions for error handling:
+
+### ValidationError
+
+Raised when input validation fails.
+
+```python
+from AutoPoly.exceptions import ValidationError
+
+try:
+    poly = Polymer(chain_num=0, sequence=["[*]CC[*]"])
+except ValidationError as e:
+    print(f"Validation failed: {e}")
+```
+
+**Common causes:**
+- Empty sequence
+- Invalid SMILES
+- Sequence length exceeds limit
+- Too many unique monomers
+- Invalid force field
+- Zero or negative chain_num
+
+---
+
+## Helper Functions
+
+### Creating Uniform Sequences
+
+For uniform polymers, use list multiplication:
+
+```python
+# Create 100 units of the same monomer
+sequence = ["[*]CC[*]"] * 100
+
+# Or define a helper function
+def create_uniform_sequence(smiles: str, length: int) -> list:
+    """Create uniform sequence of given length."""
+    return [smiles] * length
+
+sequence = create_uniform_sequence("[*]CC[*]", 100)
+```
+
+### Creating Block Copolymers
+
+Build sequences by concatenating blocks:
+
+```python
+# ABA triblock
+block_a = ["[*]CC[*]"] * 10
+block_b = ["[*]C=C[*]"] * 20
+sequence = block_a + block_b + block_a
+
+# Or more explicitly
+sequence = (
+    ["[*]CC[*]"] * 10 +      # Block A (ethylene)
+    ["[*]C=C[*]"] * 20 +     # Block B (styrene)
+    ["[*]CC[*]"] * 10        # Block A (ethylene)
 )
 ```
 
-## Type Hints
+---
 
-AutoPoly uses Python type hints for better IDE support:
+## Complete Workflow Example
 
-```python
-from typing import List, Optional, Union
-
-def get_folder_path(self) -> str: ...
-def set_merSet(self, merSet: Union[List[str], str]) -> None: ...
-```
-
-## Error Handling
+Here's a complete example showing all major components:
 
 ```python
-# Invalid topology
-try:
-    polymer = Polymer(topology="invalid")
-except ValueError as e:
-    print(f"Error: {e}")
+from AutoPoly import System, Polymer, Molecule, Polymerization
 
-# Missing monomer files
-try:
-    polymerization = Polymerization(name="test", system=system, model=[polymer])
-except SystemExit as e:
-    print("Check monomer bank path")
+# Step 1: Create system
+system = System(out="complete_example")
+
+# Step 2: Define polymers
+# Block copolymer using complement SMILES
+pe_block = ["CC[*]"] + ["[*]CC[*]"] * 8 + ["[*]CC"]
+ps_block = ["[*]C=C[*]"] * 5
+aba_sequence = pe_block + ps_block + pe_block
+
+aba_copolymer = Polymer(
+    chain_num=5,
+    sequence=aba_sequence,
+    topology="linear",
+    tacticity="atactic"
+)
+
+# Ring polymer
+ring_polymer = Polymer(
+    chain_num=3,
+    sequence=["[*]CC[*]"] * 30,
+    topology="ring",
+    tacticity="isotactic"
+)
+
+# Step 3: Define solvent
+water = Molecule(Count=100, Smiles="O", Name="water")
+
+# Step 4: Generate system
+polymerization = Polymerization(
+    name="complex_system",
+    system=system,
+    model=[aba_copolymer, ring_polymer, water],
+    force_field="gaff"
+)
+
+print("System generated successfully!")
+print(f"Output: {system.get_folder_path()}")
 ```
+
+---
+
+## Additional Resources
+
+- [Complement SMILES Guide](COMPLEMENT_SMILES.md) - Deep dive on SMILES format
+- [Force Field Selection](FORCE_FIELDS.md) - Detailed force field comparison
+- [Troubleshooting](TROUBLESHOOTING.md) - Common issues and solutions
+- [Migration Guide](../MIGRATION.md) - Upgrading from v0.x to v1.0
+- [Examples Directory](../examples/) - Full working examples
