@@ -13,6 +13,8 @@ AutoPoly generates polymer structures and prepares them for molecular dynamics s
 - **Ring & Linear** - Both topologies supported
 - **Automatic Setup** - Generates complete LAMMPS input files
 
+Note: The current atom typing systems (for all force fields) relies on SMARTS pattern which is built mannuly. The correct SMARTS pattern can be built via a data-driven method as BESMARTS. We are currently exploring this for better atom typing system.
+
 ## Quick Start
 
 ### Installation
