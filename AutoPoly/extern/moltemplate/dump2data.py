@@ -1,0 +1,1572 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Author: Andrew Jewett
+# License: MIT License  (See LICENSE.md)
+# Copyright (c) 2014
+
+"""
+dump2data.py
+
+Extract dynamical degrees of freedom from a lammps DUMP file (from the stdin)
+and construct a new DATA file (to the stdout).
+A reference DATA file is needed (argument).
+
+   basic usage
+./dump2data.py orig_file.data < dump.lammpstrj > new_file.data
+   (This extract last snapshot, uses "full" atom_style.)
+
+   options:
+./dump2data.py [-t t -atomstyle style] orig.data < dump.lammpstrj > new.data
+
+"""
+
+
+#g_program_name = 'dump2data.py'
+g_program_name = __file__.split('/')[-1]
+g_date_str = '2022-1-06'
+g_version_str = '0.62.0'
+
+import sys
+from collections import defaultdict
+from operator import itemgetter, attrgetter
+
+
+class InputError(Exception):
+
+    def __init__(self, err_msg):
+        self.err_msg = err_msg
+
+    def __str__(self):
+        return self.err_msg
+
+
+def ErrorLeader(infile, lineno):
+    return '\"' + infile + '\", line ' + str(lineno) + ': '
+
+
+class MiscSettings(object):
+
+    def __init__(self):
+        self.tstart = None
+        self.tstop = None
+        self.timestep_str = ''
+        self.last_snapshot = False
+        self.center_snapshot = False
+        self.output_format = 'data'
+        self.input_format = 'dump'
+        self.multi = True
+        self.skip_interval = 1
+        self.atom_type_intervals = []
+        self.atom_id_intervals = []
+        self.mol_id_intervals = []
+        self.scale = None
+        self.in_coord_file_name = ''
+
+
+
+class AtomStyleSettings(object):
+
+    def __init__(self):
+        # The following new member data indicate which columns store
+        # LAMMPS-specific information.
+        # The next 6 members store keep track of the different columns
+        # of the "Atoms" section of a LAMMPS data file:
+        self.column_names = []  # <--A list of column names (optional)
+        # <--A triplet of integers indicating which columns store coordinate data
+        self.i_coords = []
+        # self.ii_coords= [] #<--A list of triplets of column indexes storing
+        # coordinate data
+        self.ii_vects = []  # <--A list of triplets of column indexes storing directional data
+        #   (such as dipole or ellipsoid orientations)
+        self.i_atomid = None  # <--An integer indicating which column has the atomid
+        self.i_atomtype = None  # <--An integer indicating which column has the atomtype
+        self.i_molid = None  # <--An integer indicating which column has the molid, if applicable
+
+
+
+
+class DataSettings(AtomStyleSettings):
+
+    def __init__(self):
+        AtomStyleSettings.__init__(self)
+        self.contents = ''
+        self.file_name = ''
+
+
+# Atom Styles in LAMMPS as of 2011-7-29
+g_style_map = {'angle':     ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z'],
+               'atomic':    ['atom-ID', 'atom-type', 'x', 'y', 'z'],
+               'body':      ['atom-ID', 'atom-type', 'bodyflag', 'mass', 'x', 'y', 'z'],
+               'bond':      ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z'],
+               'charge':    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z'],
+               'dipole':    ['atom-ID', 'atom-type', 'q', 'x', 'y', 'z', 'mux', 'muy', 'muz'],
+               'dpd':       ['atom-ID', 'atom-type', 'theta', 'x', 'y', 'z'],
+               'electron':  ['atom-ID', 'atom-type', 'q', 'spin', 'eradius', 'x', 'y', 'z'],
+               'ellipsoid': ['atom-ID', 'atom-type', 'ellipsoidflag', 'density', 'x', 'y', 'z'],
+               'full':      ['atom-ID', 'molecule-ID', 'atom-type', 'q', 'x', 'y', 'z'],
+               'line':      ['atom-ID', 'molecule-ID', 'atom-type', 'lineflag', 'density', 'x', 'y', 'z'],
+               'meso':      ['atom-ID', 'atom-type', 'rho', 'e', 'cv', 'x', 'y', 'z'],
+               'molecular': ['atom-ID', 'molecule-ID', 'atom-type', 'x', 'y', 'z'],
+               'peri':      ['atom-ID', 'atom-type', 'volume', 'density', 'x', 'y', 'z'],
+               'smd':       ['atom-ID', 'atom-type', 'molecule-ID' 'volume', 'mass', 'kernel-radius', 'contact-radius', 'x', 'y', 'z'],
+               'sphere':    ['atom-ID', 'atom-type', 'diameter', 'density', 'x', 'y', 'z'],
+               'template':  ['atom-ID', 'molecule-ID', 'template-index', 'template-atom', 'atom-type', 'x', 'y', 'z'],
+               'tri':       ['atom-ID', 'molecule-ID', 'atom-type', 'triangleflag', 'density', 'x', 'y', 'z'],
+               'wavepacket': ['atom-ID', 'atom-type', 'charge', 'spin', 'eradius', 'etag', 'cs_re', 'cs_im', 'x', 'y', 'z'],
+               'hybrid':    ['atom-ID', 'atom-type', 'x', 'y', 'z'],
+               # The following styles were removed from LAMMPS as of 2012-3
+               'colloid':   ['atom-ID', 'atom-type', 'x', 'y', 'z'],
+               'granular':  ['atom-ID', 'atom-type', 'diameter', 'density', 'x', 'y', 'z']}
+
+
+
+
+def AtomStyle2ColNames(atom_style_string):
+
+    atom_style_string = atom_style_string.strip()
+    if len(atom_style_string) == 0:
+        raise InputError('Error(dump2data): Invalid atom_style\n'
+                         '       (The atom_style command was followed by an empty string.)\n')
+    atom_style_args = atom_style_string.split()
+    atom_style = atom_style_args[0]
+
+    hybrid_args = atom_style_args[1:]
+
+    if (atom_style not in g_style_map):
+        if (len(atom_style_args) >= 2):
+            # If the atom_style_string includes at least 2 words, then we
+            # interpret this as a list of the individual column names
+            return atom_style_args
+        else:
+            raise InputError(
+                'Error(dump2data): Unrecognized atom_style: \"' + atom_style + '\"\n')
+
+    if (atom_style != 'hybrid'):
+        return g_style_map[atom_style]
+    else:
+        column_names = ['atom-ID', 'atom-type', 'x', 'y', 'z']
+        if (len(hybrid_args) == 0):
+            raise InputError(
+                'Error(dump2data): atom_style hybrid must be followed by a sub_style.\n')
+        for sub_style in hybrid_args:
+            if (sub_style not in g_style_map):
+                raise InputError(
+                    'Error(dump2data): Unrecognized atom_style: \"' + sub_style + '\"\n')
+            for cname in g_style_map[sub_style]:
+                if cname not in column_names:
+                    column_names.append(cname)
+        return column_names
+
+
+
+
+def ColNames2AidAtypeMolid(column_names):
+    # Because of the diversity of ways that these
+    # numbers are referred to in the LAMMPS documentation,
+    # we have to be flexible and allow the user to refer
+    # to these quantities in a variety of ways.
+    # Hopefully this covers everything:
+
+    i_atomid = None
+    if 'atom-ID' in column_names:
+        i_atomid = column_names.index('atom-ID')
+    elif 'atom−ID' in column_names:  # (− is the character used in the manual)
+        i_atomid = column_names.index('atom−ID')
+    elif 'atomID' in column_names:
+        i_atomid = column_names.index('atomID')
+    elif 'atomid' in column_names:
+        i_atomid = column_names.index('atomid')
+    elif 'id' in column_names:
+        i_atomid = column_names.index('id')
+    elif 'atom' in column_names:
+        i_atomid = column_names.index('atom')
+    elif '$atom' in column_names:
+        i_atomid = column_names.index('$atom')
+    else:
+        raise InputError(
+            'Error(dump2data): List of column names lacks an \"atom-ID\"\n')
+
+    i_atomtype = None
+    if 'atom-type' in column_names:
+        i_atomtype = column_names.index('atom-type')
+    elif 'atom−type' in column_names:  # (− hyphen character used in manual)
+        i_atomtype = column_names.index('atom−type')
+    elif 'atomtype' in column_names:
+        i_atomtype = column_names.index('atomtype')
+    elif 'type' in column_names:
+        i_atomtype = column_names.index('type')
+    elif '@atom' in column_names:
+        i_atomtype = column_names.index('@atom')
+    else:
+        raise InputError(
+            'Error(dump2data): List of column names lacks an \"atom-type\"\n')
+
+    i_molid = None
+    if 'molecule-ID' in column_names:
+        i_molid = column_names.index('molecule-ID')
+    elif 'molecule−ID' in column_names:  # (− hyphen character used in manual)
+        i_molid = column_names.index('molecule−ID')
+    elif 'moleculeID' in column_names:
+        i_molid = column_names.index('moleculeID')
+    elif 'moleculeid' in column_names:
+        i_molid = column_names.index('moleculeid')
+    elif 'molecule' in column_names:
+        i_molid = column_names.index('molecule')
+    elif 'molID' in column_names:
+        i_molid = column_names.index('molID')
+    elif 'molid' in column_names:
+        i_molid = column_names.index('molid')
+    elif 'mol' in column_names:
+        i_molid = column_names.index('mol')
+    elif '$mol' in column_names:
+        i_molid = column_names.index('$mol')
+    else:
+        pass  # some atom_types do not have a valid molecule-ID
+
+    return i_atomid, i_atomtype, i_molid
+
+
+
+def ColNames2Coords(column_names):
+    """ Which of the columns correspond to coordinates
+        which must be transformed using rigid-body
+        (affine: rotation + translation) transformations?
+        This function outputs a list of lists of triplets of integers.
+    """
+    i_x = None
+    i_y = None
+    i_z = None
+    if 'x' in column_names:
+        i_x = column_names.index('x')
+    if 'y' in column_names:
+        i_y = column_names.index('y')
+    if 'z' in column_names:
+        i_z = column_names.index('z')
+    if (((i_x != None) != (i_y != None)) or
+            ((i_y != None) != (i_z != None)) or
+            ((i_z != None) != (i_x != None))):
+        raise InputError(
+            'Error(dump2data): columns must include \"x\", \"y\", and \"z\".\n')
+    return [[i_x, i_y, i_z]]
+
+
+def ColNames2Vects(column_names):
+    """ Which of the columns correspond to coordinates
+        which must be transformed using rotations?
+        Some coordinates like dipole moments and
+        ellipsoid orientations should only be rotated
+        (not translated).
+        This function outputs a list of lists of triplets of integers.
+    """
+    vects = []
+    i_mux = None
+    i_muy = None
+    i_muz = None
+    if 'mux' in column_names:
+        i_mux = column_names.index('mux')
+    if 'muy' in column_names:
+        i_muy = column_names.index('muy')
+    if 'muz' in column_names:
+        i_muz = column_names.index('muz')
+    if (((i_mux != None) != (i_muy != None)) or
+            ((i_muy != None) != (i_muz != None)) or
+            ((i_muz != None) != (i_mux != None))):
+        raise InputError(
+            'Error(dump2data): custom atom_style list must define mux, muy, and muz or none.\n')
+    if i_mux != None:
+        vects.append([i_mux, i_muy, i_muz])
+    i_quati = None
+    i_quatj = None
+    i_quatk = None
+    if 'quati' in column_names:
+        i_quati = column_names.index('quati')
+    if 'quatj' in column_names:
+        i_quatj = column_names.index('quatj')
+    if 'quatk' in column_names:
+        i_quatk = column_names.index('quatk')
+    if (((i_quati != None) != (i_quatj != None)) or
+            ((i_quatj != None) != (i_quatk != None)) or
+            ((i_quatk != None) != (i_quati != None))):
+        raise InputError(
+            'Error(dump2data): custom atom_style list must define quati, quatj, and quatk or none.\n')
+    if i_quati != None:
+        vects.append([i_quati, i_quatj, i_quatk])
+    return vects
+
+
+
+def Str2IntervalUnion(s):
+    """
+    Convert strings like '1-3,5,9-7' into [[1,3],[5,5],[9,7]]
+    """
+    try:
+        tokens = s.split(',')
+        intervals = []
+        for token in tokens:
+            a_str = token
+            b_str = token
+            i_separator = token.find('-')
+            if i_separator == -1:
+                i_separator = token.find('*')
+            if i_separator == -1:
+                i_separator = token.find(':')
+            if i_separator != -1:
+                a_str = token[:i_separator]
+                b_str = token[i_separator+1:]
+            if (len(a_str) == 0) or (a_str in ('-','*',':')):
+                a = 0
+            else:
+                a = int(a_str)
+            if (len(b_str) == 0) or (b_str in ('-','*',':')):
+                b = 0
+            else:
+                b = int(b_str)
+            intervals.append((a,b))
+        return intervals
+    except (ValueError) as err:
+        sys.stderr.write('Error: Incorrect format in numeric interval: "'+s+'"\n')
+        sys.exit(-1)
+
+
+
+
+def ParseArgs(argv,
+              misc_settings,
+              data_settings,
+              warning_strings=None):
+    """
+    Read the arguments passed to the program through the command-line, and
+    store results in misc_settings and data_settings.
+    """
+    # Loop over the remaining arguments not processed yet.
+    # These arguments are specific to the lttree.py program
+    # and are not understood by this program.
+    i = 1
+    while i < len(argv):
+        #sys.stderr.write('argv['+str(i)+'] = \"'+argv[i]+'\"\n')
+        if ((argv[i].lower() == '-atomstyle') or
+            (argv[i].lower() == '-atom_style') or
+            (argv[i].lower() == '-atom-style')):
+            in_init = []
+            if i + 1 >= len(argv):
+                raise InputError('Error(dump2data): ' + argv[i] + ' flag should be followed by a an atom_style name.\n'
+                                 '       (Or single quoted string which includes a space-separated\n'
+                                 '       list of column names.)\n')
+            data_settings.column_names = AtomStyle2ColNames(argv[i + 1])
+            sys.stderr.write('    \"Atoms\" column format:\n')
+            sys.stderr.write(
+                '    ' + (' '.join(data_settings.column_names)) + '\n')
+
+            # ColNames2Coords() and ColNames2Vects() generate lists of
+            # triplets of integers, storing the column numbers containing
+            # x, y, and z coordinate values, and vx,vy,vz direction vectors.
+            data_settings.ii_vects = ColNames2Vects(data_settings.column_names)
+            ii_coords = ColNames2Coords(data_settings.column_names)
+            # This program assumes that there is only one coordinate triplet
+            # (x,y,z) for each atom.  Hence we assume that len(ii_coords)==1
+            assert(len(ii_coords) == 1)
+            data_settings.i_coords = ii_coords[0]
+
+            # Now figure out which columns correspond to atomid, atomtype,
+            # molid
+            data_settings.i_atomid, data_settings.i_atomtype, data_settings.i_molid = ColNames2AidAtypeMolid(
+                data_settings.column_names)
+            del(argv[i:i + 2])
+
+        elif (argv[i].lower() == '-icoord'):
+            if i + 1 >= len(argv):
+                raise InputError('Error(dump2data): ' + argv[i] + ' flag should be followed by list of integers\n'
+                                 '       corresponding to column numbers for coordinates in\n'
+                                 '       the \"Atoms\" section of a LAMMPS data file.\n')
+            ilist = argv[i + 1].split()
+            if (len(ilist) % 3) != 0:
+                raise InputError('Error(dump2data): ' + argv[i] + ' flag should be followed by list of integers.\n'
+                                 '       This is usually a list of 3 intebers, but it can contain more.\n'
+                                 '       The number of cooridnate columns must be divisible by 3,\n'
+                                 '       (even if the simulation is in 2 dimensions)\n')
+
+            #ii_coords = []
+            # for i in range(0, len(ilist)/3):
+            #    cols = [ilist[3*i]+1, ilist[3*i+1]+1, ilist[3*i+2]+1]
+            #    ii_coords.append(cols)
+            # if ((len(ii_coords) != 0) or (len(ii_coords[0]) != 3)):
+            #    raise InputError('Error(dump2data): Argument \"'+argv[i]+'\" must be followed by exactly 3 integers.\n')
+
+            data_settings.i_coords = ilist
+            if (len(i_coords) != 3):
+                raise InputError('Error(dump2data): Argument \"' +
+                                 argv[i] + '\" must be followed by exactly 3 integers.\n')
+
+            data_settings.i_coords = ii_coords[0]
+
+            del(argv[i:i + 2])
+
+        elif (argv[i].lower() == '-ivect'):
+            if i + 1 >= len(argv):
+                raise InputError('Error(dump2data): ' + argv[i] + ' flag should be followed by list of integers\n'
+                                 '       corresponding to column numbers for direction vectors in\n'
+                                 '       the \"Atoms\" section of a LAMMPS data file.\n')
+            ilist = argv[i + 1].split()
+            if (len(ilist) % 3) != 0:
+                raise InputError('Error(dump2data): ' + argv[i] + ' flag should be followed by list of integers.\n'
+                                 '       This is usually a list of 3 intebers, but it can contain more.\n'
+                                 '       The number of cooridnate columns must be divisible by 3,\n'
+                                 '       (even if the simulation is in 2 dimensions)\n')
+
+            data_settings.ii_vects = []
+            for i in range(0, len(ilist) / 3):
+                cols = [ilist[3 * i] + 1, ilist[3 * i + 1] +
+                        1, ilist[3 * i + 2] + 1]
+                setting.ii_vects.append(cols)
+            # This should override any earlier settings as a result of the
+            # -atomstyle argument.  So you can specify a custom list of column
+            # names using -atomstyle "list of column names", and then afterwards
+            # specify which of these columns correspond to direction vectors
+            # using the "-ivect" command line argument later on.
+            # This way, in theory you should be able to read columns from
+            # new custom atom-styles that have not been invented yet.
+            # (Although I haven't tested this.)
+
+            del(argv[i:i + 2])
+        # i_atomid is not really needed for this program, but I load it anyway
+        elif ((argv[i].lower() == '-iatomid') or
+              (argv[i].lower() == '-iid') or
+              (argv[i].lower() == '-iatom-id')):
+            if ((i + 1 >= len(argv)) or (not str.isdigit(argv[i + 1]))):
+                raise InputError('Error(dump2data): ' + argv[i] + ' flag should be followed by an integer\n'
+                                 '       (>=1) indicating which column in the \"Atoms\" section of a\n'
+                                 '       LAMMPS data file contains the atom id number (typically 1).\n'
+                                 '       (This argument is unnecessary if you use the -atomstyle argument.)\n')
+            i_atomid = int(argv[i + 1]) - 1
+            del(argv[i:i + 2])
+        # i_atomtype is not really needed for this program, but I load it
+        # anyway
+        elif ((argv[i].lower() == '-iatomtype') or
+              (argv[i].lower() == '-itype') or
+              (argv[i].lower() == '-iatom-type')):
+            if ((i + 1 >= len(argv)) or (not str.isdigit(argv[i + 1]))):
+                raise InputError('Error(dump2data): ' + argv[i] + ' flag should be followed by an integer\n'
+                                 '       (>=1) indicating which column in the \"Atoms\" section of a\n'
+                                 '       LAMMPS data file contains the atom type.\n'
+                                 '       (This argument is unnecessary if you use the -atomstyle argument.)\n')
+            i_atomtype = int(argv[i + 1]) - 1
+            del(argv[i:i + 2])
+        # i_molid is not really needed for this program, but I load it anyway
+        elif ((argv[i].lower() == '-imolid') or
+              (argv[i].lower() == '-imol') or
+              (argv[i].lower() == '-imol-id') or
+              (argv[i].lower() == '-imoleculeid') or
+              (argv[i].lower() == '-imolecule-id')):
+            if ((i + 1 >= len(argv)) or (not str.isdigit(argv[i + 1]))):
+                raise InputError('Error(dump2data): ' + argv[i] + ' flag should be followed by an integer\n'
+                                 '       (>=1) indicating which column in the \"Atoms\" section of a\n'
+                                 '       LAMMPS data file contains the molecule id number.\n'
+                                 '       (This argument is unnecessary if you use the -atomstyle argument.)\n')
+            del(argv[i:i + 2])
+        # Which snapshot do we want?
+        elif (argv[i].lower() == '-t'):
+            if ((i + 1 >= len(argv)) or (not str.isdigit(argv[i + 1]))):
+                raise InputError('Error(dump2data): ' + argv[i] + ' flag should be followed by an integer indicating\n'
+                                 '       the snapshot you want to extract from the dump file (trajectory).\n'
+                                 '       This integer should match the timestep corresponding to the snapshot\n'
+                                 '       whose coordinates you wish to extract.\n')
+            misc_settings.timestep_str = argv[i + 1]
+            del(argv[i:i + 2])
+            misc_settings.multi = False
+            misc_settings.last_snapshot = False
+
+        elif (argv[i].lower() == '-tstart'):
+            if ((i + 1 >= len(argv)) or (not str.isdigit(argv[i + 1]))):
+                raise InputError('Error(dump2data): ' + argv[i] + ' flag should be followed by an integer indicating\n'
+                                 '       the first snapshot you want to extract from the dump file (trajectory).\n'
+                                 '       This integer should match the timestep corresponding to the snapshot\n'
+                                 '       (after which) you wish to extract coordinates.\n')
+            misc_settings.tstart = float(argv[i + 1])
+            del(argv[i:i + 2])
+            misc_settings.multi = True
+
+        elif (argv[i].lower() == '-tstop'):
+            if ((i + 1 >= len(argv)) or (not str.isdigit(argv[i + 1]))):
+                raise InputError('Error(dump2data): ' + argv[i] + ' flag should be followed by an number indicating\n'
+                                 '       the first snapshot you want to extract from the dump file (trajectory).\n'
+                                 '       Snapshots after this timestep will be ignored.\n')
+            misc_settings.tstop = float(argv[i + 1])
+            del(argv[i:i + 2])
+            misc_settings.multi = True
+
+        elif (argv[i].lower() == '-center'):
+            misc_settings.center_snapshot = True
+            del(argv[i:i + 1])
+
+        elif ((argv[i].lower() == '-raw') or (argv[i].lower() == '-rawout')):
+            misc_settings.output_format = 'raw'
+            del(argv[i:i + 1])
+
+        elif (argv[i].lower() == '-rawin'):
+            misc_settings.input_format = 'raw'
+            misc_settings.multi = False
+            del(argv[i:i + 1])
+
+        elif ((argv[i].lower() == '-xyz') or
+              (argv[i].lower() == '-xyz-type') or
+              (argv[i].lower() == '-xyzout')):
+            misc_settings.output_format = 'xyz'
+            del(argv[i:i + 1])
+
+        elif (argv[i].lower() == '-xyz-id'):
+            misc_settings.output_format = 'xyz-id'
+            del(argv[i:i + 1])
+
+        elif (argv[i].lower() == '-xyz-mol'):
+            misc_settings.output_format = 'xyz-mol'
+            del(argv[i:i + 1])
+
+        elif (argv[i].lower() == '-xyz-type-mol'):
+            misc_settings.output_format = 'xyz-type-mol'
+            del(argv[i:i + 1])
+
+        elif (argv[i].lower() == '-xyzin'):
+            misc_settings.input_format = 'xyz'
+            misc_settings.multi = False
+            del(argv[i:i + 1])
+
+        elif (argv[i].lower() == '-multi'):
+            misc_settings.multi = True
+            del(argv[i:i + 1])
+
+        elif (argv[i].lower() == '-last'):
+            misc_settings.last_snapshot = True
+            misc_settings.multi = False
+            del(argv[i:i + 1])
+
+        elif (argv[i].lower() == '-interval'):
+            misc_settings.skip_interval = int(argv[i + 1])
+            del(argv[i:i + 2])
+
+        elif (argv[i].lower() == '-scale'):
+            misc_settings.scale = float(argv[i + 1])
+            del(argv[i:i + 2])
+
+        elif (argv[i].lower() == '-id'):
+            misc_settings.atom_id_intervals += Str2IntervalUnion(argv[i+1])
+            del(argv[i:i + 2])
+
+        elif (argv[i].lower() == '-type'):
+            misc_settings.atom_type_intervals += Str2IntervalUnion(argv[i+1])
+            del(argv[i:i + 2])
+
+        elif (argv[i].lower() == '-mol'):
+            misc_settings.mol_id_intervals += Str2IntervalUnion(argv[i+1])
+            del(argv[i:i + 2])
+
+        elif ((argv[i].lower() == '-in') or
+              (argv[i].lower() == '-dump')):
+            misc_settings.in_coord_file_name = argv[i+1]
+            del(argv[i:i + 2])
+
+        elif ((argv[i][0] == '-') and (__name__ == "__main__")):
+            raise InputError(
+                'Error(dump2data): Unrecogized command line argument \"' + argv[i] + '\"\n')
+        else:
+            i += 1
+
+    usage_examples = \
+"""    Typical usage:
+dump2data.py orig_file.data < dump.lammpstrj > new_file.data
+      (This extracts last snapshot, uses "full" atom_style.)
+    Additional options:
+dump2data.py -t t -atomstyle style orig.data < dump.lammpstrj > new.data
+"""
+
+    # if __name__ == "__main__":
+
+    if (len(argv) > 2):
+        # if there are more than 2 remaining arguments,
+        #   AND
+        # no other function will process the remaining argument list
+        # (ie. if __name__ == "__main__")
+        #   THEN
+        raise InputError('    ----\n'
+                         'ERROR(dump2data): You have too many arguments (or unrecognized arguments):\n'
+                         '       \"' + (' '.join(argv)) + '\"\n'
+                         '    ----\n'
+                         + usage_examples)
+    elif (len(argv) < 2):
+        if misc_settings.output_format == 'data':
+            raise InputError('    ----\n'
+                             'ERROR(dump2data): Problem with argument list:\n'
+                             '       Expected a LAMMPS .data file as an argument.\n'
+                             '    ----\n'
+                             + usage_examples)
+    else:
+        in_data_file = open(argv[1], 'r')
+        data_settings.file_name = argv[1]
+        data_settings.contents = in_data_file.readlines()
+        in_data_file.close()
+
+    # end of if-then statement for "if __name__ == "__main__""
+
+    if len(data_settings.i_coords) == 0:
+        if warning_strings != None:
+            warning_strings.append(
+                'WARNING(dump2data): atom_style unknown. (Use -atomstyle style. Assuming \"full\")')
+        warn_atom_style_unspecified = True
+        # The default atom_style is "full"
+        data_settings.column_names = AtomStyle2ColNames('full')
+        ii_coords = ColNames2Coords(data_settings.column_names)
+        # This program assumes that there is only one coordinate triplet
+        # (x,y,z) for each atom.  Hence we assume that len(ii_coords)==1
+        assert(len(ii_coords) == 1)
+        data_settings.i_coords = ii_coords[0]
+        data_settings.ii_vects = ColNames2Vects(data_settings.column_names)
+        data_settings.i_atomid, data_settings.i_atomtype, data_settings.i_molid = ColNames2AidAtypeMolid(
+            data_settings.column_names)
+
+        # sys.stderr.write('########################################################\n'
+        # '##            WARNING: atom_style unspecified         ##\n'
+        # '##    --> \"Atoms\" column data has an unknown format.  ##\n'
+        # '##              Assuming atom_style = \"full\"          ##\n'
+        # '########################################################\n'
+        # '## To specify the \"Atoms\" column format you can:      ##\n'
+        # '##   1) Use the -atom_style \"STYLE\"  argument         ##\n'
+        # '##      where \"STYLE\" is a string indicating a LAMMPS ##\n'
+        # '##      atom_style, including hybrid styles.(Standard ##\n'
+        # '##      atom styles defined in 2011 are supported.)   ##\n'
+        # '##   2) Use the -atom_style \"COL_LIST\"    argument    ##\n'
+        # '##      where \"COL_LIST" is a quoted list of strings  ##\n'
+        # '##      indicating the name of each column.           ##\n'
+        # '##      Names \"x\",\"y\",\"z\" are interpreted as          ##\n'
+        # '##      atomic coordinates. \"mux\",\"muy\",\"muz\"         ##\n'
+        # '##      and \"quati\",\"quatj\",\"quatk\" are               ##\n'
+        # '##      interpreted as direction vectors.             ##\n'
+        # '##   3) Use the -icoord \"cx cy cz...\" argument        ##\n'
+        # '##      where \"cx cy cz\" is a list of integers        ##\n'
+        # '##      indicating the column numbers for the x,y,z   ##\n'
+        # '##      coordinates of each atom.                     ##\n'
+        # '##   4) Use the -ivect \"cmux cmuy cmuz...\" argument   ##\n'
+        # '##      where \"cmux cmuy cmuz...\" is a list of        ##\n'
+        # '##      integers indicating the column numbers for    ##\n'
+        # '##      the vector that determines the direction of a ##\n'
+        # '##      dipole or ellipsoid (ie. a rotateable vector).##\n'
+        # '##      (More than one triplet can be specified. The  ##\n'
+        # '##       number of entries must be divisible by 3.)   ##\n'
+        # '##   5) Include a                                     ##\n'
+        # '##      write(\"in_init.txt\"){atom_style ...}          ##\n'
+        # '##      statement in your .ttree file.                ##\n'
+        # '########################################################\n')
+
+
+def GetIntAtomID(pair):
+    return int(pair[0])
+
+
+def WriteSnapshotToData(out_file,
+                        descr_str,
+                        misc_settings,
+                        data_settings,
+                        dump_column_names,
+                        natoms,
+                        coords,
+                        coords_ixiyiz,
+                        vects,
+                        velocities,
+                        atomtypes,
+                        molids,
+                        xlo_str, xhi_str,
+                        ylo_str, yhi_str,
+                        zlo_str, zhi_str,
+                        xy_str, xz_str, yz_str):
+    """
+    Open a data file.  Read the LAMMPS DATA file line by line.
+    When the line contains information which is also in the dump file,
+    replace that information with information from the dump file.
+    (Information from a dump file is stored in the arguments to this function.)
+    The resulting file also has LAMMPS DATA format.
+    """
+
+    section = ''
+    firstline = True
+    for line_orig in data_settings.contents:
+        ic = line_orig.find('#')
+        if ic != -1:
+            line = line_orig[:ic]
+        else:
+            line = line_orig
+        line = line.strip()
+
+        if firstline:  # Construct a new descriptive header line:
+            if descr_str != None:
+                line = descr_str
+            firstline = False
+
+        if (len(line) > 0):
+            # The initial section (section='') is assumed to be
+            # the "LAMMPS Description" section.  This is where the
+            # box boundaries are specified.
+            if section == '':
+                tokens = line.split()
+                if ((len(tokens) >= 2) and
+                        ((tokens[-2] == 'xlo') and (tokens[-1] == 'xhi')) and
+                        ((xlo_str != None) and (xhi_str != None))):
+                    tokens[0] = xlo_str
+                    tokens[1] = xhi_str
+                    line = ' '.join(tokens)
+                elif ((len(tokens) >= 2) and
+                      ((tokens[-2] == 'ylo') and (tokens[-1] == 'yhi')) and
+                      ((ylo_str != None) and (yhi_str != None))):
+                    tokens[0] = ylo_str
+                    tokens[1] = yhi_str
+                    line = ' '.join(tokens)
+                elif ((len(tokens) >= 2) and
+                      ((tokens[-2] == 'zlo') and (tokens[-1] == 'zhi')) and
+                      ((zlo_str != None) and (zhi_str != None))):
+                    tokens[0] = zlo_str
+                    tokens[1] = zhi_str
+                    line = ' '.join(tokens)
+                elif ((len(tokens) >= 3) and
+                      ((tokens[-3] == 'xy') and
+                       (tokens[-2] == 'xz') and
+                       (tokens[-1] == 'yz')) and
+                      ((xy_str != None) and
+                       (xz_str != None) and
+                       (yz_str != None))):
+                    tokens[0] = xy_str
+                    tokens[1] = xz_str
+                    tokens[2] = yz_str
+                    line = ' '.join(tokens)
+            if (line in set(['Masses', 'Velocities', 'Atoms', 'Ellipsoids',
+                             'Bond Coeffs', 'Angle Coeffs',
+                             'Dihedral Coeffs', 'Improper Coeffs',
+                             'Bonds', 'Angles', 'Dihedrals', 'Impropers'])):
+                section = line
+            else:
+                if (section == 'Atoms'):
+                    tokens = line.split()
+                    atomid = tokens[0]
+
+                    # update the atomtype and molID
+                    # (which may change during the simulation)
+                    if atomtypes:
+                        tokens[data_settings.i_atomtype] = atomtypes[atomid]
+                    if molids and data_settings.i_molid:
+                        tokens[data_settings.i_molid] = molids[atomid]
+
+                    if atomid in coords:
+                        # Loop over all of the vector degrees of
+                        # freedom of the particle, excluding coords
+                        # (for example: mu_x, mu_y, mu_z,
+                        #            or quat_i, quat_j, quat_k)
+                        # In principle, depending on the atom_style,
+                        # there could be multiple vectors per atom.
+                        for I in range(0, len(data_settings.ii_vects)):
+                            i_vx = data_settings.ii_vects[I][0]
+                            i_vy = data_settings.ii_vects[I][1]
+                            i_vz = data_settings.ii_vects[I][2]
+                            if atomid in vects:
+                                vxvyvz = vects[atomid][I]
+                                assert((type(vxvyvz) is tuple) and
+                                       (len(vxvyvz) == 3))
+                                if ((i_vx >= len(tokens)) or
+                                    (i_vy >= len(tokens)) or
+                                    (i_vz >= len(tokens))):
+                                    raise InputError('Error(dump2data): Atom style incompatible with data file.\n'
+                                                     '       Specify the atom_style using -atomstyle style.\n')
+                                # Replace the vector components with numbers
+                                # from the dump file
+                                tokens[i_vx] = vxvyvz[0]
+                                tokens[i_vy] = vxvyvz[1]
+                                tokens[i_vz] = vxvyvz[2]
+
+                            else:
+                                if (dump_column_names and
+                                    (data_settings.column_names[i_vx]
+                                        not in dump_column_names)):
+                                    raise InputError('Error(dump2data): You have a vector coordinate in your DATA file named \"' + data_settings.column_names[i_vx] + '\"\n'
+                                                     '       However there are no columns with this name in your DUMP file\n'
+                                                     '       (or the column was not in the expected place).\n'
+                                                     '       Hence, the atom styles in the dump and data files do not match.')
+
+                        # Now loop over the coordinates of each atom.
+                        # for I in range(0,len(data_settings.ii_coords)):
+                        #    xyz = coords[atomid][I]
+                        #            THIS LOOP IS SILLY.
+                        #            EACH ATOM ONLY HAS ONE SET OF X,Y,Z
+                        #            COORDINATES. COMMENTING OUT THIS LOOP:
+                        #    i_x = data_settings.ii_coords[I][0]
+                        #    i_y = data_settings.ii_coords[I][1]
+                        #    i_z = data_settings.ii_coords[I][2]
+                        # USING THIS INSTEAD:
+
+                        xyz = coords[atomid]
+                        i_x = data_settings.i_coords[0]
+                        i_y = data_settings.i_coords[1]
+                        i_z = data_settings.i_coords[2]
+                        if ((i_x >= len(tokens)) or
+                            (i_y >= len(tokens)) or
+                            (i_z >= len(tokens))):
+                            raise InputError('Error(dump2data): Atom style incompatible with data file.\n'
+                                             '       Specify the atom_style using -atomstyle style.\n')
+                        # Replace the coordinates with coordinates from
+                        # the dump file into tokens[i_x]...
+                        tokens[i_x] = str(xyz[0])
+                        tokens[i_y] = str(xyz[1])
+                        tokens[i_z] = str(xyz[2])
+
+                        # Are there there any integer coords
+                        # (ix, iy, iz) in the dump file?
+                        if coords_ixiyiz and coords_ixiyiz[atomid]:
+                            assert(len(coords_ixiyiz[atomid]) == 3)
+                            # Integer coords stored in the DATA file too?
+                            if len(tokens) == len(data_settings.column_names)+3:
+                                # Then replace the last 3 columns of the
+                                # line in the data file with: ix iy iz
+                                tokens[-3] = coords_ixiyiz[atomid][0]
+                                tokens[-2] = coords_ixiyiz[atomid][1]
+                                tokens[-1] = coords_ixiyiz[atomid][2]
+                            else:
+                                if (not misc_settings.center_snapshot):
+                                    # Append them to the end of the line:
+                                    tokens.append(coords_ixiyiz[atomid][0])
+                                    tokens.append(coords_ixiyiz[atomid][1])
+                                    tokens.append(coords_ixiyiz[atomid][2])
+                        else:
+                            # If there are no ixiyiz columns in this snapshot
+                            # then don't include them in the data file either.
+                            if len(tokens) == len(data_settings.column_names)+3:
+                                del tokens[-3:]
+
+                        # Now finally paste all the tokens together:
+                        line = ' '.join(tokens)
+
+                elif (section == 'Velocities'):
+                    tokens = line.split()
+                    atomid = tokens[0]
+                    if atomid in velocities:
+
+                        vxvyvz = velocities[atomid]
+                        if len(tokens) < 4:
+                            raise InputError(
+                                'Error(dump2data): Not enough columns in the \"Velocities\" file.\n')
+                        # Replace the coordinates with coordinates from
+                        # the dump file into tokens[i_x]...
+                        tokens[1] = str(vxvyvz[0])
+                        tokens[2] = str(vxvyvz[1])
+                        tokens[3] = str(vxvyvz[2])
+
+                        # Now finally paste all the tokens together:
+                        line = ' '.join(tokens)
+
+                elif section == '':
+                    # If section == '', then we are in the Header section
+                    # of the DATA file.  In that case, the modifications that
+                    # were made to that line were handled earlier, and there
+                    # is nothing left to do here.
+                    pass
+
+                else: # If we are not in one of the sections containing
+                    #   data that comes from the dump file (eg 'Atoms',
+                    #   'Velocities'), then copy the text directly from
+                    #   the original data file without modification.
+                    #   Since "line" has any comments and whitespace removed,
+                    #   replace it with "line_orig" which has everything.
+                    line = line_orig.rstrip('\n')
+
+        out_file.write(line + '\n')
+
+    return
+
+
+
+
+class SnapshotData(object):
+    """
+    Convert the lines of text in a LAMMPS "dump" file corresponding to
+    a single snapshot (a.k.a. frame, save-point), and store them in
+    separate variables containing to the coordinates, atom types,
+    molecule-ID numbers, etc... of the atoms at that moment in the simulation.
+    """
+    def __init__(self,
+                 lines=[],
+                 misc_settings=None,
+                 data_settings=None):
+
+        self.dump_column_names = []
+        self.coords = defaultdict(list)
+        self.coords_ixiyiz = defaultdict(list)
+        self.vects = defaultdict(list)
+        self.velocities = defaultdict(list)
+        self.atomtypes = defaultdict(list)
+        self.molids = defaultdict(list)
+        self.xlo_str = self.xhi_str = None
+        self.ylo_str = self.yhi_str = None
+        self.zlo_str = self.zhi_str = None
+        self.xy_str = self.xz_str = self.yz_str = None
+        self.natoms = -1
+        self.timestep_str = ''
+
+        i_atomid = i_atomtype = i_molid = -1
+        i_x = i_y = i_z = i_xu = i_yu = i_zu = -1
+        i_xs = i_ys = i_zs = i_xsu = i_ysu = i_zsu = -1
+
+        for line in lines:
+
+            line = line.strip()
+
+            if (line.find('ITEM:') == 0):
+                section = line
+                if (section.find('ITEM: ATOMS ') == 0):
+                    self.dump_column_names = line[12:].split()
+                    i_atomid, i_atomtype, i_molid = \
+                        ColNames2AidAtypeMolid(self.dump_column_names)
+                    #ii_coords = ColNames2Coords(self.dump_column_names)
+
+                    x_already_unwrapped = False
+                    y_already_unwrapped = False
+                    z_already_unwrapped = False
+
+                    if 'x' in self.dump_column_names:
+                        i_x = self.dump_column_names.index('x')
+                    elif 'xu' in self.dump_column_names:
+                        i_xu = self.dump_column_names.index('xu')
+                        x_already_unwrapped = True
+                    elif 'xs' in self.dump_column_names:
+                        i_xs = self.dump_column_names.index('xs')
+                    elif 'xsu' in self.dump_column_names:
+                        i_xsu = self.dump_column_names.index('xsu')
+                        x_already_unwrapped = True
+                    else:
+                        raise InputError('Error(dump2data): \"ATOMS\" section of dump file lacks a \"x\" column.\n' +
+                                         '       (excerpt below)\n' + line)
+
+                    if 'y' in self.dump_column_names:
+                        i_y = self.dump_column_names.index('y')
+                    elif 'yu' in self.dump_column_names:
+                        i_yu = self.dump_column_names.index('yu')
+                        y_already_unwrapped = True
+                    elif 'ys' in self.dump_column_names:
+                        i_ys = self.dump_column_names.index('ys')
+                    elif 'ysu' in self.dump_column_names:
+                        i_ysu = self.dump_column_names.index('ysu')
+                        y_already_unwrapped = True
+                    else:
+                        raise InputError('Error(dump2data): \"ATOMS\" section of dump file lacks a \"y\" column.\n' +
+                                         '       (excerpt below)\n' + line)
+
+                    if 'z' in self.dump_column_names:
+                        i_z = self.dump_column_names.index('z')
+                    elif 'zu' in self.dump_column_names:
+                        i_zu = self.dump_column_names.index('zu')
+                        z_already_unwrapped = True
+                    elif 'zs' in self.dump_column_names:
+                        i_zs = self.dump_column_names.index('zs')
+                    elif 'zsu' in self.dump_column_names:
+                        i_zsu = self.dump_column_names.index('zsu')
+                        z_already_unwrapped = True
+                    else:
+                        raise InputError('Error(dump2data): \"ATOMS\" section of dump file lacks a \"z\" column.\n' +
+                                         '       (excerpt below)\n' + line)
+
+                    ii_vects = ColNames2Vects(self.dump_column_names)
+                    if (len(ii_vects) != len(data_settings.ii_vects)):
+                        raise InputError('Error(dump2data): atom styles in data and dump files differ.\n'
+                                         '      Some needed columns from the atom_styles are missing in the dump file.')
+
+                    i_ix = i_iy = i_iz = -1
+                    if 'ix' in self.dump_column_names:
+                        i_ix = self.dump_column_names.index('ix')
+                    if 'iy' in self.dump_column_names:
+                        i_iy = self.dump_column_names.index('iy')
+                    if 'iz' in self.dump_column_names:
+                        i_iz = self.dump_column_names.index('iz')
+
+                    i_vx = i_vy = i_vz = -1
+                    if 'vx' in self.dump_column_names:
+                        i_vx = self.dump_column_names.index('vx')
+                    if 'vy' in self.dump_column_names:
+                        i_vy = self.dump_column_names.index('vy')
+                    if 'vz' in self.dump_column_names:
+                        i_vz = self.dump_column_names.index('vz')
+
+                elif (section.find('ITEM: BOX BOUNDS') == 0):
+                    avec = [1.0, 0.0, 0.0]
+                    bvec = [0.0, 1.0, 0.0]
+                    cvec = [0.0, 0.0, 1.0]
+
+                elif (section.find('ITEM: TIMESTEP') == 0):
+                    pass
+
+            elif ((len(line) > 0) and (line[0] != '#')):
+                if (section.find('ITEM: TIMESTEP') == 0):
+                    self.timestep_str = line
+                    self.coords = defaultdict(list)
+                    self.coords_ixiyiz = defaultdict(list)
+                    self.vects = defaultdict(list)
+                    self.velocities = defaultdict(list)
+                    self.atomtypes = defaultdict(list)
+                    self.molids = defaultdict(list)
+                    self.xlo_str = self.xhi_str = None
+                    self.ylo_str = self.yhi_str = None
+                    self.zlo_str = self.zhi_str = None
+                    self.xy_str = self.xz_str = self.yz_str = None
+
+                elif (section == 'ITEM: NUMBER OF ATOMS'):
+                    self.natoms = int(line)
+
+                elif (section.find('ITEM: BOX BOUNDS') == 0):
+                    is_triclinic = (section.find('xy xz yz') == 0)
+
+                    tokens = line.split()
+                    if not self.xlo_str:
+                        assert(not self.xhi_str)
+                        self.xlo_str = tokens[0]
+                        self.xhi_str = tokens[1]
+                        avec = [float(self.xhi_str) - float(self.xlo_str),
+                                0.0,
+                                0.0]
+                        if (is_triclinic and (len(tokens) > 2)):
+                            self.xy_str = tokens[2]
+                            # We will use this to recompute avec,bvec later. See
+                            # https://lammps.sandia.gov/doc/Howto_triclinic.html
+
+                    elif not self.ylo_str:
+                        assert(not self.yhi_str)
+                        self.ylo_str = tokens[0]
+                        self.yhi_str = tokens[1]
+                        bvec = [0.0,
+                                float(self.yhi_str) - float(self.ylo_str),
+                                0.0]
+                        if (is_triclinic and (len(tokens) > 2)):
+                            self.xz_str = tokens[2]
+                            # We will use this to recompute bvec later.  See:
+                            # https://lammps.sandia.gov/doc/Howto_triclinic.html
+
+                    elif not self.zlo_str:
+                        assert(not self.zhi_str)
+                        self.zlo_str = tokens[0]
+                        self.zhi_str = tokens[1]
+                        cvec = [0.0,
+                                0.0,
+                                float(self.zhi_str) - float(self.zlo_str)]
+
+                        if is_triclinic:
+                            # https://lammps.sandia.gov/doc/Howto_triclinic.html
+                            self.yz_str = "0.0"
+                            if len(tokens) > 2:
+                                self.yz_str = tokens[2]
+                            # If we are using triclinic boundary conditions,
+                            # then we need to update the way we compute the
+                            # lattice vectors: avec, bvec, cvec.
+                            # This was not possible to do until we had read:
+                            #   self.xy_str, self.xz_str, and self.yz_str.
+                            #
+                            # Now that we have read all 3 of them, recompute
+                            # the avec, bvec, cvec vectors according to:
+                            # https://lammps.sandia.gov/doc/Howto_triclinic.html
+                            #
+                            # When triclinic boundary conditions are used,
+                            # the "BOX BOUNDS" section of the dump file stores
+                            # xlo_bound, xhi_bound, ylo_bound, and yhi_bound
+                            # instead of xlo, xhi, ylo, yhi.  So we need to use
+                            # the following formula to calculate xlo,xhi,ylo,yhi
+                            xlo_bound = float(self.xlo_str)
+                            xhi_bound = float(self.xhi_str)
+                            ylo_bound = float(self.ylo_str)
+                            yhi_bound = float(self.yhi_str)
+                            zlo_bound = float(self.zlo_str)
+                            zhi_bound = float(self.zhi_str)
+                            xy = float(self.xy_str)
+                            xz = float(self.xz_str)
+                            yz = float(self.yz_str)
+                            xlo = xlo_bound - min(0.0, xy, xz, xy+xz)
+                            xhi = xhi_bound - max(0.0, xy, xz, xy+xz)
+                            ylo = ylo_bound - min(0.0, yz)
+                            yhi = yhi_bound - max(0.0, yz)
+                            zlo = zlo_bound
+                            zhi = zhi_bound
+                            # now update "self.xlo_str" and the other strings:
+                            self.xlo_str = str(xlo)
+                            self.xhi_str = str(xhi)
+                            self.ylo_str = str(ylo)
+                            self.yhi_str = str(yhi)
+                            self.zlo_str = str(zlo)
+                            self.zhi_str = str(zhi)
+                            # and compute the avec,bvec,cvec unit cell vectors
+                            avec = [xhi-xlo, 0.0, 0.0]
+                            bvec = [xy, yhi-ylo, 0.0]
+                            cvec = [xz, yz, zhi-zlo]
+
+                elif (section.find('ITEM: ATOMS') == 0):
+                    tokens = line.split()
+                    atomid = tokens[i_atomid]
+                    atomtype = tokens[i_atomtype]
+                    self.atomtypes[atomid] = atomtype
+                    if i_molid:
+                        molid = tokens[i_molid]
+                        self.molids[atomid] = molid
+
+                    if ((i_x != -1) and (i_y != -1) and (i_z != -1)):
+                        x = float(tokens[i_x])  # i_x determined above
+                        y = float(tokens[i_y])
+                        z = float(tokens[i_z])
+
+                    elif ((i_xu != -1) and (i_yu != -1) and (i_zu != -1)):
+                        x = float(tokens[i_xu])  # i_x determined above
+                        y = float(tokens[i_yu])
+                        z = float(tokens[i_zu])
+
+                    elif ((i_xs != -1) and (i_ys != -1) and (i_zs != -1)):
+                        xs = float(tokens[i_xs])  # i_xs determined above
+                        ys = float(tokens[i_ys])
+                        zs = float(tokens[i_zs])
+
+                        x = float(self.xlo_str) + xs * \
+                            avec[0] + ys * bvec[0] + zs * cvec[0]
+                        y = float(self.ylo_str) + xs * \
+                            avec[1] + ys * bvec[1] + zs * cvec[1]
+                        z = float(self.zlo_str) + xs * \
+                            avec[2] + ys * bvec[2] + zs * cvec[2]
+
+                    # avec, bvec, cvec described here:
+                    # https://lammps.sandia.gov/doc/Howto_triclinic.html
+
+                    elif ((i_xsu != -1) and (i_ysu != -1) and (i_zsu != -1)):
+                        xsu = float(tokens[i_xsu])  # i_xs determined above
+                        ysu = float(tokens[i_ysu])
+                        zsu = float(tokens[i_zsu])
+
+                        x = float(self.xlo_str) + xsu * \
+                            avec[0] + ysu * bvec[0] + zsu * cvec[0]
+                        y = float(self.ylo_str) + xsu * \
+                            avec[1] + ysu * bvec[1] + zsu * cvec[1]
+                        z = float(self.zlo_str) + xsu * \
+                            avec[2] + ysu * bvec[2] + zsu * cvec[2]
+
+                    # Now deal with ix, iy, iz
+                    if (i_ix != -1) and (not x_already_unwrapped):
+                        ix = int(tokens[i_ix])
+                        if (misc_settings.center_snapshot or
+                            (misc_settings.output_format != 'data')):
+                            #sys.stderr.write('atomid='+str(atomid)+', ix = '+str(ix)+', avec='+str(avec)+'\n')
+                            x += ix * avec[0]
+                            y += ix * avec[1]
+                            z += ix * avec[2]
+                        else:
+                            if atomid not in self.coords_ixiyiz:
+                                self.coords_ixiyiz[atomid] = ["0", "0", "0"]
+                            self.coords_ixiyiz[atomid][0] = str(ix)
+
+                    if (i_iy != -1) and (not y_already_unwrapped):
+                        iy = int(tokens[i_iy])
+                        if (misc_settings.center_snapshot or
+                            (misc_settings.output_format != 'data')):
+                            #sys.stderr.write('atomid='+str(atomid)+', iy = '+str(iy)+', bvec='+str(bvec)+'\n')
+                            x += iy * bvec[0]
+                            y += iy * bvec[1]
+                            z += iy * bvec[2]
+                        else:
+                            if atomid not in self.coords_ixiyiz:
+                                self.coords_ixiyiz[atomid] = ["0", "0", "0"]
+                            self.coords_ixiyiz[atomid][1] = str(iy)
+
+                    if (i_iz != -1) and (not z_already_unwrapped):
+                        iz = int(tokens[i_iz])
+                        if (misc_settings.center_snapshot or
+                            (misc_settings.output_format != 'data')):
+                            #sys.stderr.write('atomid='+str(atomid)+', iz = '+str(iz)+', cvec='+str(cvec)+'\n')
+                            x += iz * cvec[0]
+                            y += iz * cvec[1]
+                            z += iz * cvec[2]
+                        else:
+                            if atomid not in self.coords_ixiyiz:
+                                self.coords_ixiyiz[atomid] = ["0", "0", "0"]
+                            self.coords_ixiyiz[atomid][2] = str(iz)
+
+                    #self.coords[atomid] = [str(x), str(y), str(z)]
+                    self.coords[atomid] = [x, y, z]
+
+                    vx = 0.0
+                    vy = 0.0
+                    vz = 0.0
+                    if i_vx != -1:
+                        vx = float(tokens[i_vx])
+                    if i_vy != -1:
+                        vy = float(tokens[i_vy])
+                    if i_vz != -1:
+                        vz = float(tokens[i_vz])
+
+                    self.velocities[atomid] = [vx, vy, vz]
+
+                    # NOTE:
+                    # There can be multiple "vects" associated with each atom
+                    # (for example, dipole moments, ellipsoid directions, etc..)
+
+                    if atomid not in self.vects:
+                        self.vects[atomid] = [
+                            None for I in range(0, len(ii_vects))]
+
+                    for I in range(0, len(ii_vects)):
+                        i_vx = ii_vects[I][0]
+                        i_vy = ii_vects[I][1]
+                        i_vz = ii_vects[I][2]
+                        vx_str = tokens[i_vx]
+                        vy_str = tokens[i_vy]
+                        vz_str = tokens[i_vz]
+
+                        # Now the annoying part:
+                        # Which vect is it (mux,muy,muz) or (quati,quatj,quatk)?
+                        # The columns could be listed in a different order
+                        # in the data file and in the dump file.
+                        # Figure out which vector it is in the data file (stored
+                        # in the integer "I_data") so that column names match.
+                        name_vx = self.dump_column_names[i_vx]
+                        name_vy = self.dump_column_names[i_vy]
+                        name_vz = self.dump_column_names[i_vz]
+                        i_vx_data = 0
+                        I_data = -1
+                        # This code is dreadful and inneficient.
+                        # I never want to touch this code again. (Hope it
+                        # works)
+                        while i_vx_data < len(data_settings.column_names):
+                            if name_vx == data_settings.column_names[i_vx_data]:
+                                I_data = 0
+                                while I_data < len(data_settings.ii_vects):
+                                    if (self.dump_column_names[ii_vects[I][0]] ==
+                                        data_settings.column_names[data_settings.ii_vects[I_data][0]]):
+                                        # (This checks the first component, ([0]) I should also 
+                                        # check [1] and [2], but the code is slow enough already.
+                                        # THIS IS TERRIBLE CODE.
+                                        break
+                                    I_data += 1
+
+                            if (0 <= I_data) and (I_data < len(data_settings.ii_vects)):
+                                break
+
+                            i_vx_data += 1
+
+                        if (0 <= I_data) and (I_data < len(data_settings.ii_vects)):
+                            self.vects[atomid][I_data] = (vx_str,vy_str,vz_str)
+                        else:
+                            raise InputError('Error(dump2data): You have a vector coordinate in your dump file named \"' + name_vx + '\"\n'
+                                             '       However there are no columns with this name in your data file\n'
+                                             '       (or the column was not in the expected place).\n'
+                                             '       Hence, the atom styles in the dump and data files do not match.')
+
+
+
+
+
+def InIntervalUnion(i, intervals):
+    """
+    Return whether integer i lies within in at least one of the intervals.
+    (Note: If 0 appears in the upper bound of an interval, it means +infinity.)
+    """
+    if len(intervals) == 0:
+        return True
+    accept = False
+    for interval in intervals:
+        assert(len(interval) == 2)
+        if (interval[0] <= i) and ((i <= interval[1]) or (interval[1] == 0)):
+            accept = True
+    return accept
+
+
+
+
+
+def main():
+    sys.stderr.write(g_program_name + ' v' +
+                     g_version_str + ' ' + g_date_str + ' ')
+    # if sys.version < '3':
+    #    sys.stderr.write(' (python version < 3)\n')
+    # else:
+    sys.stderr.write('\n')
+
+    try:
+        misc_settings = MiscSettings()
+        data_settings = DataSettings()
+        warning_strings = []
+        ParseArgs(sys.argv,
+                  misc_settings,
+                  data_settings,
+                  warning_strings)
+
+        # Open the lammps dump file (trajectory file)
+        # Skip to the line containing the correct snapshot (ie. frame,timestep)
+        # (this is the last snapshot by default).
+        # Read the "BOX BOUNDS" and the "ATOMS" sections.
+        # Store the x,y,z coordinates in the "coords" associative array
+        # (indexed by atom id, which could be non-numeric in general).
+
+        section = ''
+
+        num_snapshots_out = 0
+
+        if misc_settings.in_coord_file_name != '':
+            in_coord_file = open(misc_settings.in_coord_file_name)
+        else:
+            in_coord_file = sys.stdin
+
+        # Skip to the first line containing 'ITEM: TIMESTEP'
+        end_of_file = False
+        while not end_of_file:
+            line = in_coord_file.readline()
+            if line == '':
+                end_of_file = True
+            elif line == 'ITEM: TIMESTEP\n':
+                break
+
+
+        # lines_current_snapshot stores the lines of text that store
+        # information about the current snapshot.  Since we have read a line
+        # containing 'ITEM: TIMESTEP\n', we should add it to this text.
+        lines_current_snapshot = ['ITEM: TIMESTEP\n']
+
+
+        # Now begin parsing the file:
+
+        while not end_of_file:
+
+            # Select the lines of text from the current snapshot
+            # (ie. frame, timestep)
+            timestep_str = ''
+            next_line_is_timestep = True
+            while not end_of_file:
+                line = in_coord_file.readline()
+                if line == '':
+                    end_of_file = True
+                elif line == 'ITEM: TIMESTEP\n':
+                    break
+                else:
+                    if next_line_is_timestep:
+                        timestep_str = line.strip()
+                        next_line_is_timestep = False
+                    lines_current_snapshot.append(line)
+
+            # Should we write the coordinates in this snapshot?
+            write_this_snapshot = False
+
+            if misc_settings.multi:
+
+                write_this_snapshot = True
+                if (misc_settings.tstart and
+                    (int(timestep_str) < misc_settings.tstart)):
+                    write_this_snapshot = False
+                if (misc_settings.tstop and
+                    (int(timestep_str) > misc_settings.tstop)):
+                    write_this_snapshot = False
+
+                if misc_settings.tstart:
+                    tstart = misc_settings.tstart
+                else:
+                    tstart = 0
+
+                if ((int(timestep_str) - tstart)
+                        %
+                    misc_settings.skip_interval) != 0:
+                    write_this_snapshot = False
+
+            else:
+                if misc_settings.last_snapshot:
+                    if end_of_file:
+                        write_this_snapshot = True
+                else:
+                    assert(misc_settings.timestep_str)
+                    if (int(timestep_str) ==
+                        int(misc_settings.timestep_str)):
+                        write_this_snapshot = True
+
+            if write_this_snapshot:
+
+                # Now parse the text in these lines
+
+                snapshot = SnapshotData(lines_current_snapshot,
+                                        misc_settings,
+                                        data_settings)
+
+                # Check for consistency
+                if misc_settings.scale != None:
+                    for atomid in snapshot.coords:
+                        for d in range(0, 3):
+                            crd = float(snapshot.coords[atomid][d])
+                            snapshot.coords[atomid][d]=str(crd*misc_settings.scale)
+
+                if len(snapshot.coords) != snapshot.natoms:
+                    err_msg = 'Number of lines in \"ITEM: ATOMS\" section disagrees with\n' \
+                        + '           \"ITEM: NUMBER OF ATOMS\" declared earlier in this file.\n'
+                    raise InputError(err_msg)
+
+                num_snapshots_out += 1
+
+                # Additional processing needed?
+                if misc_settings.center_snapshot:
+                    cm = [0.0, 0.0, 0.0]
+                    for atomid in snapshot.coords:
+                        for d in range(0, 3):
+                            cm[d] += float(snapshot.coords[atomid][d])
+                    for d in range(0, 3):
+                        cm[d] /= float(len(snapshot.coords))
+                    for atomid in snapshot.coords:
+                        for d in range(0, 3):
+                            snapshot.coords[atomid][d] = "%.7g" % (
+                                float(snapshot.coords[atomid][d]) - cm[d])
+                        snapshot.coords_ixiyiz[atomid] = ["0", "0", "0"]
+                    if misc_settings.output_format != 'data':
+                        for atomid in snapshot.coords:
+                            snapshot.coords_ixiyiz[atomid] = ["0", "0", "0"]
+
+                # Now start writing the snapshot:
+                sys.stderr.write('  (writing snapshot ' + str(num_snapshots_out) +
+                                 ' at timestep ' + snapshot.timestep_str + ')\n')
+
+                # Print the snapshot
+                # First check which format to output the data:
+                if misc_settings.output_format == 'raw':
+                    # Print out the coordinates in simple 3-column text
+                    # format
+                    for atomid, xyz in iter(sorted(snapshot.coords.items(), key=GetIntAtomID)):
+                        # Check and see if whether the atom is one of the
+                        # atoms that was selected by the user.  If not discard.
+                        # (I don't offer this feature for 'data' files because
+                        #  it is harder to implement for this file type.)
+                        if not InIntervalUnion(int(atomid),
+                                misc_settings.atom_id_intervals):
+                            continue
+                        atype = snapshot.atomtypes[atomid]
+                        if not InIntervalUnion(int(atype),
+                                misc_settings.atom_type_intervals):
+                            continue
+                        molid = snapshot.molids[atomid]
+                        if not InIntervalUnion(int(molid),
+                                misc_settings.mol_id_intervals):
+                            continue
+
+                        # Write the coordinates
+                        if misc_settings.scale == None:
+                            sys.stdout.write(
+                                str(xyz[0]) + ' ' + str(xyz[1]) + ' ' + str(xyz[2]) + '\n')
+                        else:
+                            # Only convert to float and back if
+                            # misc_settings.scale != None
+                            sys.stdout.write(str(misc_settings.scale * float(xyz[0])) + ' ' +
+                                             str(misc_settings.scale * float(xyz[1])) + ' ' +
+                                             str(misc_settings.scale * float(xyz[2])) + '\n')
+                    sys.stdout.write('\n')
+
+                elif ((misc_settings.output_format == 'xyz') or
+                      (misc_settings.output_format == 'xyz-id') or
+                      (misc_settings.output_format == 'xyz-mol') or
+                      (misc_settings.output_format == 'xyz-type-mol')):
+                        # Print out the coordinates in simple 3-column text
+                        # format
+                    sys.stdout.write(str(len(snapshot.coords)) + '\n')
+                    descr_str = 'LAMMPS data from timestep ' + snapshot.timestep_str
+                    sys.stdout.write(descr_str + '\n')
+                    for atomid, xyz in iter(sorted(snapshot.coords.items(), key=GetIntAtomID)):
+
+                        # Check and see if whether the atom is one of the
+                        # atoms that was selected by the user. If not discard.
+                        if not InIntervalUnion(int(atomid),
+                                misc_settings.atom_id_intervals):
+                            continue
+                        atype = snapshot.atomtypes[atomid]
+                        if not InIntervalUnion(int(atype),
+                                misc_settings.atom_type_intervals):
+                            continue
+                        molid = snapshot.molids[atomid]
+                        if not InIntervalUnion(int(molid),
+                                misc_settings.mol_id_intervals):
+                            continue
+
+                        if ((misc_settings.output_format == 'xyz') or
+                            (misc_settings.output_format == 'xyz-type)')):
+                            atomtype = snapshot.atomtypes.get(atomid)
+                            if atomtype == None:
+                                raise InputError('xyz ERROR: Your trajectory file lacks atom-type information\n')
+                            first_column = str(atomtype)
+                        elif misc_settings.output_format == 'xyz-id':
+                            first_column = str(atomid)
+                        elif misc_settings.output_format == 'xyz-mol':
+                            molid = snapshot.molids.get(atomid)
+                            if molid == None:
+                                raise InputError('-xyz-mol ERROR: Your trajectory file lacks molecule-id information.\n')
+                            sys.stderr.write(str(molid)+'\n')
+                            first_column = str(molid)
+                        elif misc_settings.output_format == 'xyz-type-mol':
+                            atomtype = snapshot.atomtypes.get(atomid)
+                            if atomtype == None:
+                                raise InputError('xyz-type-mol ERROR: Your trajectory file lacks atom-type information.\n')
+                            molid = snapshot.molids.get(atomid)
+                            if molid == None:
+                                raise InputError('-xyz-type-mol ERROR: Your trajectory file lacks molecule-id information.\n')
+                            first_column = str(atomtype)+'_'+str(molid)
+                        if misc_settings.scale == None:
+                            sys.stdout.write(first_column + ' ' +
+                                             str(xyz[0]) + ' ' +
+                                             str(xyz[1]) + ' ' +
+                                             str(xyz[2]) + '\n')
+                        else:
+                            # Only convert to float and back if
+                            # misc_settings.scale != None
+                            sys.stdout.write(first_column + ' ' +
+                                             str(misc_settings.scale * float(xyz[0])) + ' ' +
+                                             str(misc_settings.scale * float(xyz[1])) + ' ' +
+                                             str(misc_settings.scale * float(xyz[2])) + '\n')
+
+                else:
+                    # Parse the DATA file specified by the user
+                    # and replace appropriate lines or fields with
+                    # the corresponding text from the DUMP file.
+                    descr_str = 'LAMMPS data from timestep ' + snapshot.timestep_str
+                    if (misc_settings.multi and
+                        (misc_settings.output_format == 'data')):
+                        out_file_name = data_settings.file_name + '.'\
+                            + str(num_snapshots_out)
+                        sys.stderr.write(
+                            '  (creating file \"' + out_file_name + '\")\n')
+                        out_file = open(out_file_name, 'w')
+                    else:
+                        out_file = sys.stdout
+
+                    WriteSnapshotToData(out_file,
+                                        descr_str,
+                                        misc_settings,
+                                        data_settings,
+                                        snapshot.dump_column_names,
+                                        snapshot.natoms,
+                                        snapshot.coords,
+                                        snapshot.coords_ixiyiz,
+                                        snapshot.vects,
+                                        snapshot.velocities,
+                                        snapshot.atomtypes,
+                                        snapshot.molids,
+                                        snapshot.xlo_str, snapshot.xhi_str,
+                                        snapshot.ylo_str, snapshot.yhi_str,
+                                        snapshot.zlo_str, snapshot.zhi_str,
+                                        snapshot.xy_str, snapshot.xz_str, snapshot.yz_str)
+
+                    if (misc_settings.multi and
+                        (misc_settings.output_format == 'data')):
+                        out_file.close()
+
+
+            # Clear the contents of lines_current_snapshot
+            # so that it is ready for the next snapshot.
+            lines_current_snapshot = ['ITEM: TIMESTEP\n']
+            # ('ITEM: TIMESTEP\n' is a line we read earlier)
+
+        if misc_settings.in_coord_file_name != '':
+            in_coord_file.close()
+
+        for warning_str in warning_strings:
+            sys.stderr.write(warning_str + '\n')
+
+    except (ValueError, InputError) as err:
+        sys.stderr.write('\n' + str(err) + '\n')
+        sys.exit(-1)
+
+    return
+
+
+if __name__ == '__main__':
+    main()

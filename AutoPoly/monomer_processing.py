@@ -168,8 +168,7 @@ def generate_molecule_from_smiles(
 
 
 def generate_sequence_variants_for_polymerization(
-    base_smiles: str,
-    dop: int,
+    smiles_list: List[str],
     topology: str,
     path_cwd: str,
     force_field: str,
@@ -178,18 +177,20 @@ def generate_sequence_variants_for_polymerization(
     base_name_prefix: str = "monomer"
 ) -> Tuple[Dict[str, str], int]:
     """
-    Generate monomer variants for polymerization using the MonomerGenerator API.
+    Generate monomer variants for polymerization using complement SMILES.
 
-    This function creates position-aware variants for each monomer type in the
-    polymer chain (first, middle, last for linear; all middle for ring).
+    This function creates position-aware variants for each unique SMILES in the
+    complement SMILES list.
 
     Args:
-        base_smiles: Base monomer SMILES with wildcards (e.g., "[*]C=C[*]")
-        dop: Degree of polymerization (number of monomers in chain)
+        smiles_list: List of complement SMILES:
+            - First: 1 wildcard (right connection) e.g., 'CC[*]'
+            - Middle: 2 wildcards (left and right) e.g., '[*]CC[*]'
+            - Last: 1 wildcard (left connection) e.g., '[*]CC'
         topology: Topology type ("linear" or "ring")
         path_cwd: Current working directory path
         force_field: Force field to use ("oplsaa", "gaff", or "lopls")
-        generated_cache: Cache mapping (base_smiles, dop, topology) to monomer names
+        generated_cache: Cache mapping (smiles_list, topology) to monomer names
         counter: Current counter value for unique monomer naming
         base_name_prefix: Prefix for monomer names (default: "monomer")
 
@@ -199,7 +200,7 @@ def generate_sequence_variants_for_polymerization(
     Raises:
         GenerationError: If monomer generation fails
     """
-    cache_key = (base_smiles, dop, topology)
+    cache_key = (tuple(smiles_list), topology)
     cached = _check_cache(cache_key, generated_cache, counter)
     if cached:
         return cached
@@ -210,10 +211,9 @@ def generate_sequence_variants_for_polymerization(
     try:
         generator = _create_generator(base_name, force_field, path_cwd)
 
-        n_monomers = 3
-        logger.info(f"Generating 3 sequence variants (first, middle, last) for {base_name} ({topology} topology)")
+        logger.info(f"Generating {len(smiles_list)} sequence variants for {base_name} ({topology} topology)")
 
-        variants = generator.from_smiles(smiles=base_smiles, n_monomers=n_monomers)
+        variants = generator.from_smiles(smiles_list)
 
         # Extract unique variants by variant_type
         unique_variants = {}
@@ -237,13 +237,13 @@ def generate_sequence_variants_for_polymerization(
         variant_name_mapping = _build_variant_mapping(unique_variants, base_name)
         generated_cache[cache_key] = variant_name_mapping
 
-        logger.info(f"Generated sequence variants for '{base_name}' from SMILES: {base_smiles}")
+        logger.info(f"Generated sequence variants for '{base_name}' from {len(smiles_list)} complement SMILES")
         logger.info(f"Variant mapping keys: {list(variant_name_mapping.keys())}")
         return variant_name_mapping, counter
 
     except Exception as e:
         raise GenerationError(
-            f"Failed to generate sequence variants from SMILES '{base_smiles}': {e}"
+            f"Failed to generate sequence variants from complement SMILES: {e}"
         ) from e
 
 

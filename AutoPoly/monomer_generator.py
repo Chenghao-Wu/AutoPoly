@@ -208,34 +208,37 @@ class AtomMapTracker:
 class SMARTSTyper:
     """
     Assigns force field atom types by parsing RDlt .fdefn files directly.
-    
+
     This standalone implementation:
     - Parses .fdefn files to extract SMARTS patterns
     - Uses RDKit's ChemicalFeatures.BuildFeatureFactory()
     - Matches patterns to assign atom types
-    - Supports OPLS-AA and GAFF force fields
+    - Supports OPLS-AA, GAFF, and GAFF2 force fields
     """
-    
+
     def __init__(self, force_field: str = 'oplsaa', verbose: bool = True):
         """
         Initialize SMARTS typer.
-        
+
         Args:
-            force_field: 'oplsaa' or 'gaff'
+            force_field: 'oplsaa', 'gaff', 'gaff2', or 'lopls'
             verbose: Enable logging
         """
         self.force_field = force_field
         self.verbose = verbose
         
         # Locate .fdefn files
+        # OPLS-AA uses 2024 atom type numbering (types 54-60 for alkanes, etc.)
         module_dir = Path(__file__).parent
-        
-        if force_field == 'gaff':
+
+        if force_field in ('gaff', 'gaff2'):
             self.fdef_path = str(module_dir / 'extern' / 'rdlt_data' / 'gaff_lt.fdefn')
         elif force_field == 'lopls':
+            # LOPLS uses L-suffixed types from loplsaa.lt
             self.fdef_path = str(module_dir / 'extern' / 'rdlt_data' / 'lopls_lt.fdefn')
         else:  # oplsaa
-            self.fdef_path = str(module_dir / 'extern' / 'rdlt_data' / 'opls_lt.fdefn')
+            # Use OPLS-AA 2024 numbering (from oplsaa.lt / moltemplate 2.22.5)
+            self.fdef_path = str(module_dir / 'extern' / 'rdlt_data' / 'opls_lt_2024.fdefn')
         
         # Load charge dictionary
         self.charge_dict = self._load_charges()
@@ -258,50 +261,89 @@ class SMARTSTyper:
             logger.warning(f"Charge dictionary not found: {dict_path}")
             return {}
     
+    def _extract_family_priority(self, family_str: str) -> int:
+        """
+        Extract numeric priority from a family string.
+
+        Family strings in .fdefn files have format like "Family 27nh" where
+        the number indicates priority. Higher numbers = more specific patterns.
+
+        Args:
+            family_str: Family string from feature (e.g., "27nh", "128nq")
+
+        Returns:
+            Priority number (higher = more specific), or 0 if not extractable
+        """
+        import re
+        # Extract leading digits from family string
+        match = re.match(r'^(\d+)', family_str)
+        if match:
+            return int(match.group(1))
+        return 0
+
     def assign_atom_types(self, mol: Chem.Mol) -> Chem.Mol:
         """
-        Assign force field atom types using SMARTS patterns.
-        
+        Assign force field atom types using SMARTS patterns with priority-based matching.
+
+        Uses priority-based matching where higher family numbers indicate more
+        specific patterns that should take precedence. This ensures ring-variant
+        types (ni, nj, nq, etc.) only match atoms actually in small rings, while
+        generic types (nh, n3, etc.) match atoms in regular environments.
+
         IMPORTANT: This should be called on the CHAIN molecule before splitting,
         so atoms have the correct chemical environment for typing.
-        
+
         Args:
             mol: RDKit Mol object (will be modified in-place)
-            
+
         Returns:
             Mol with AtomType properties set on each atom
-            
+
         Raises:
             AtomTypingError: If typing fails
         """
         try:
             # Get features from feature factory
             features = self.factory.GetFeaturesForMol(mol)
-            
-            # Assign atom types based on feature matches
-            typed_atoms = set()
+
+            # Build a dictionary of atom_idx -> (priority, atom_type) to track
+            # the best match for each atom. Higher priority wins.
+            atom_best_match = {}  # atom_idx -> (priority, atom_type)
+
             for feature in features:
                 atom_ids = feature.GetAtomIds()
                 if len(atom_ids) == 0:
                     continue
-                    
+
                 atom_idx = atom_ids[0]
                 atom = mol.GetAtomWithIdx(atom_idx)
-                
+
                 # Skip dummy atoms
                 if atom.GetAtomicNum() == 0:
                     continue
-                
-                # Get atom type from feature
+
+                # Get atom type and priority from feature
                 atom_type = feature.GetType()
+                family_str = feature.GetFamily()
+                priority = self._extract_family_priority(family_str)
+
+                # Keep the highest priority match for this atom
+                current = atom_best_match.get(atom_idx)
+                if current is None or priority > current[0]:
+                    atom_best_match[atom_idx] = (priority, atom_type)
+                    if self.verbose:
+                        logger.debug(
+                            f"Atom {atom_idx} ({atom.GetSymbol()}): {atom_type} "
+                            f"(priority {priority}, family {family_str})"
+                        )
+
+            # Now apply the best matches to the atoms
+            typed_atoms = set()
+            for atom_idx, (priority, atom_type) in atom_best_match.items():
+                atom = mol.GetAtomWithIdx(atom_idx)
                 atom.SetProp('AtomType', atom_type)
                 typed_atoms.add(atom_idx)
-                
-                if self.verbose:
-                    logger.debug(
-                        f"Atom {atom_idx} ({atom.GetSymbol()}): {atom_type}"
-                    )
-            
+
             # Check for untyped atoms (excluding dummy atoms and hydrogens we might add later)
             untyped = []
             for atom in mol.GetAtoms():
@@ -309,18 +351,18 @@ class SMARTSTyper:
                     continue
                 if atom.GetIdx() not in typed_atoms:
                     untyped.append((atom.GetIdx(), atom.GetSymbol()))
-            
+
             if untyped:
                 logger.warning(
                     f"Untyped atoms found: {untyped}. "
                     f"This chemistry may not be fully supported."
                 )
-            
+
             if self.verbose:
                 logger.info(f"Successfully typed {len(typed_atoms)} atoms")
-            
+
             return mol
-            
+
         except Exception as e:
             raise AtomTypingError(f"Atom typing failed: {e}")
 
@@ -388,185 +430,191 @@ class ConformerGenerator:
 
 class ChainBuilder:
     """
-    Builds polymer chains by connecting monomer units.
-    
+    Builds polymer chains by connecting monomer units from complement SMILES.
+
     Uses atom map numbers to track inter-monomer bonds for later splitting.
+
+    Complement SMILES format:
+    - First monomer: 1 wildcard (right side)
+    - Middle monomers: 2 wildcards (left and right)
+    - Last monomer: 1 wildcard (left side)
+    - Single monomer (DOP=1): 0 wildcards
     """
-    
+
     def __init__(self, verbose: bool = True):
         """
         Initialize chain builder.
-        
+
         Args:
             verbose: Enable logging
         """
         self.verbose = verbose
-    
+
     def build_chain(
         self,
-        smiles: str,
-        n_monomers: int
+        smiles_list: List[str]
     ) -> Tuple[Chem.Mol, List[Tuple[int, int]]]:
         """
-        Build a polymer chain by connecting monomer units.
-        
+        Build a polymer chain from a list of complement SMILES.
+
         Args:
-            smiles: SMILES string with wildcards (e.g., "[*]CC[*]")
-            n_monomers: Number of monomer units to connect
-            
+            smiles_list: List of SMILES with wildcards:
+                - First: 1 wildcard (right connection)
+                - Middle: 2 wildcards (left and right)
+                - Last: 1 wildcard (left connection)
+                - Single (DOP=1): 0 wildcards
+
         Returns:
             Tuple of (chain_mol, inter_bond_markers) where:
                 - chain_mol: RDKit Mol object representing the polymer chain
                 - inter_bond_markers: List of (map_num1, map_num2) tuples identifying
                   atoms at inter-monomer bonds (using map numbers, not indices!)
-                  
+
         Raises:
-            ChainBuildingError: If SMILES doesn't have exactly 2 wildcards
+            ChainBuildingError: If SMILES are invalid or wildcard counts don't match expectations
         """
+        n = len(smiles_list)
+
         if self.verbose:
-            logger.info(f"Building chain with {n_monomers} monomers from SMILES: {smiles}")
-        
-        # Step 1: Validate SMILES
-        mol_template = Chem.MolFromSmiles(smiles)
-        if mol_template is None:
-            raise ChainBuildingError(f"Invalid SMILES: {smiles}")
-        
-        # Add explicit hydrogens
-        mol_template = Chem.AddHs(mol_template)
-        
-        # Check for exactly 2 wildcards (dummy atoms)
-        dummy_indices = [atom.GetIdx() for atom in mol_template.GetAtoms() if atom.GetAtomicNum() == 0]
-        if len(dummy_indices) != 2:
-            raise ChainBuildingError(
-                f"SMILES must contain exactly 2 wildcard atoms ([*] or *), got {len(dummy_indices)}"
-            )
-        
-        # Step 2: Mark terminal dummy atoms with special isotope
-        # These are the chain end dummies that should be capped with H after splitting
-        for idx in dummy_indices:
-            mol_template.GetAtomWithIdx(idx).SetIsotope(TERMINAL_DUMMY_ISOTOPE)
-        
-        # Step 3: Build chain
-        chain_mol, inter_bond_markers = self._connect_monomer_units(mol_template, n_monomers)
-        
-        if self.verbose:
-            logger.info(f"Built chain with {chain_mol.GetNumAtoms()} atoms")
-            logger.info(f"Inter-monomer bond markers: {inter_bond_markers}")
-        
-        return chain_mol, inter_bond_markers
-    
-    def _find_dummy_neighbors(self, mol: Chem.Mol) -> Tuple[int, int, int, int]:
-        """
-        Find dummy atoms and their neighbors (connection points).
-        
-        Returns:
-            Tuple of (left_dummy, left_neighbor, right_dummy, right_neighbor)
-        """
-        dummy_info = []
-        for atom in mol.GetAtoms():
-            if atom.GetAtomicNum() == 0:
-                dummy_idx = atom.GetIdx()
-                # Find non-dummy neighbor
-                for neighbor in atom.GetNeighbors():
-                    if neighbor.GetAtomicNum() > 0:
-                        dummy_info.append((dummy_idx, neighbor.GetIdx()))
-                        break
-        
-        if len(dummy_info) != 2:
-            raise ChainBuildingError(f"Expected 2 dummy atoms, found {len(dummy_info)}")
-        
-        # Sort by dummy index to get consistent left/right ordering
-        dummy_info.sort(key=lambda x: x[0])
-        return (dummy_info[0][0], dummy_info[0][1], dummy_info[1][0], dummy_info[1][1])
-    
-    def _connect_monomer_units(
-        self,
-        mol_template: Chem.Mol,
-        n_monomers: int
-    ) -> Tuple[Chem.Mol, List[Tuple[int, int]]]:
-        """
-        Connect multiple monomer units into a chain.
-        
-        Args:
-            mol_template: Monomer Mol object with dummy atoms (wildcards)
-            n_monomers: Number of units to connect
-            
-        Returns:
-            Tuple of (chain_mol, inter_bond_markers)
-        """
+            logger.info(f"Building chain with {n} monomers from complement SMILES")
+
+        if n == 1:
+            # Single monomer: no connections needed
+            mol = Chem.MolFromSmiles(smiles_list[0])
+            if mol is None:
+                raise ChainBuildingError(f"Invalid SMILES: {smiles_list[0]}")
+            mol = Chem.AddHs(mol)
+            return mol, []
+
+        # Start with first monomer
+        first_mol = Chem.MolFromSmiles(smiles_list[0])
+        if first_mol is None:
+            raise ChainBuildingError(f"Invalid first SMILES: {smiles_list[0]}")
+        first_mol = Chem.AddHs(first_mol)
+
+        chain_mol = Chem.RWMol(first_mol)
         inter_bond_markers = []
         map_counter = INTER_BOND_MAP_START
-        
-        # Start with first monomer (make a copy)
-        chain_mol = Chem.RWMol(mol_template)
-        
-        # Find dummy atoms in chain so far
-        left_dummy, left_ne, right_dummy, right_ne = self._find_dummy_neighbors(chain_mol)
-        
+
         # Connect remaining monomers
-        for i in range(1, n_monomers):
+        for i in range(1, n):
+            new_smiles = smiles_list[i]
+            new_mol = Chem.MolFromSmiles(new_smiles)
+            if new_mol is None:
+                raise ChainBuildingError(f"Invalid SMILES at position {i}: {new_smiles}")
+            new_mol = Chem.AddHs(new_mol)
+
             if self.verbose:
-                logger.debug(f"Adding monomer {i+1}/{n_monomers}")
-            
-            # Create a copy of template
-            new_monomer = Chem.RWMol(mol_template)
-            new_left_dummy, new_left_ne, new_right_dummy, new_right_ne = self._find_dummy_neighbors(new_monomer)
-            
+                logger.debug(f"Adding monomer {i+1}/{n}")
+
+            # Find rightmost dummy in current chain (connection point)
+            chain_dummy_idx, chain_neighbor_idx = self._find_rightmost_dummy(chain_mol)
+
+            # Find leftmost dummy in new monomer (connection point)
+            new_dummy_idx, new_neighbor_idx = self._find_leftmost_dummy(new_mol)
+
             # Offset for new monomer atoms
             offset = chain_mol.GetNumAtoms()
-            
-            # Add atoms from new monomer (preserve isotope for terminal tracking)
-            for atom in new_monomer.GetAtoms():
+
+            # Add atoms from new monomer
+            for atom in new_mol.GetAtoms():
                 new_atom = Chem.Atom(atom.GetAtomicNum())
                 new_atom.SetFormalCharge(atom.GetFormalCharge())
                 new_atom.SetNumExplicitHs(atom.GetNumExplicitHs())
-                new_atom.SetIsotope(atom.GetIsotope())  # Preserve isotope marker
                 chain_mol.AddAtom(new_atom)
-            
+
             # Add bonds from new monomer
-            for bond in new_monomer.GetBonds():
+            for bond in new_mol.GetBonds():
                 begin_idx = bond.GetBeginAtomIdx() + offset
                 end_idx = bond.GetEndAtomIdx() + offset
                 bond_type = bond.GetBondType()
                 chain_mol.AddBond(begin_idx, end_idx, bond_type)
-            
-            # Mark the atoms that will form the inter-monomer bond
-            # right_ne of current chain connects to new_left_ne of new monomer
-            chain_mol.GetAtomWithIdx(right_ne).SetAtomMapNum(map_counter)
-            chain_mol.GetAtomWithIdx(new_left_ne + offset).SetAtomMapNum(map_counter + 1)
+
+            # Mark atoms that will form the inter-monomer bond
+            chain_mol.GetAtomWithIdx(chain_neighbor_idx).SetAtomMapNum(map_counter)
+            chain_mol.GetAtomWithIdx(new_neighbor_idx + offset).SetAtomMapNum(map_counter + 1)
             inter_bond_markers.append((map_counter, map_counter + 1))
             map_counter += 2
-            
-            # Form bond between chain's right neighbor and new monomer's left neighbor
-            chain_mol.AddBond(right_ne, new_left_ne + offset, Chem.BondType.SINGLE)
-            
-            # Remove dummy atoms (in reverse order by index)
-            # right_dummy from chain, new_left_dummy from new monomer
-            dummies_to_remove = sorted([right_dummy, new_left_dummy + offset], reverse=True)
+
+            # Form bond between chain's connection point and new monomer's connection point
+            chain_mol.AddBond(chain_neighbor_idx, new_neighbor_idx + offset, Chem.BondType.SINGLE)
+
+            # Remove the connected dummy atoms (in reverse order by index)
+            dummies_to_remove = sorted([chain_dummy_idx, new_dummy_idx + offset], reverse=True)
             for dummy_idx in dummies_to_remove:
                 chain_mol.RemoveAtom(dummy_idx)
-            
-            # Update right_dummy and right_ne for next iteration
-            # After removal, indices shift - need to recalculate
-            chain_mol_temp = chain_mol.GetMol()
-            
-            # Find the rightmost dummy atom in the updated chain
-            for atom in chain_mol_temp.GetAtoms():
-                if atom.GetAtomicNum() == 0:
-                    right_dummy = atom.GetIdx()
-                    for neighbor in atom.GetNeighbors():
-                        if neighbor.GetAtomicNum() > 0:
-                            right_ne = neighbor.GetIdx()
-                            break
-            
-            # Convert back to RWMol for next iteration
-            chain_mol = Chem.RWMol(chain_mol_temp)
-        
+
         # Final molecule
         final_mol = chain_mol.GetMol()
         Chem.SanitizeMol(final_mol)
-        
+
+        if self.verbose:
+            logger.info(f"Built chain with {final_mol.GetNumAtoms()} atoms")
+            logger.info(f"Inter-monomer bond markers: {inter_bond_markers}")
+
         return final_mol, inter_bond_markers
+
+    def _find_rightmost_dummy(self, mol: Chem.Mol) -> Tuple[int, int]:
+        """
+        Find the rightmost dummy atom and its neighbor in a molecule.
+
+        For molecules with multiple dummies, returns the one with highest index.
+
+        Args:
+            mol: RDKit Mol object
+
+        Returns:
+            Tuple of (dummy_idx, neighbor_idx)
+
+        Raises:
+            ChainBuildingError: If no dummy atom found
+        """
+        dummy_info = []
+        for atom in mol.GetAtoms():
+            if atom.GetAtomicNum() == 0:  # Dummy atom
+                dummy_idx = atom.GetIdx()
+                for neighbor in atom.GetNeighbors():
+                    if neighbor.GetAtomicNum() > 0:
+                        dummy_info.append((dummy_idx, neighbor.GetIdx()))
+                        break
+
+        if not dummy_info:
+            raise ChainBuildingError("No dummy atom found in molecule")
+
+        # Return the dummy with highest index (rightmost)
+        dummy_info.sort(key=lambda x: x[0], reverse=True)
+        return dummy_info[0]
+
+    def _find_leftmost_dummy(self, mol: Chem.Mol) -> Tuple[int, int]:
+        """
+        Find the leftmost dummy atom and its neighbor in a molecule.
+
+        For molecules with multiple dummies, returns the one with lowest index.
+
+        Args:
+            mol: RDKit Mol object
+
+        Returns:
+            Tuple of (dummy_idx, neighbor_idx)
+
+        Raises:
+            ChainBuildingError: If no dummy atom found
+        """
+        dummy_info = []
+        for atom in mol.GetAtoms():
+            if atom.GetAtomicNum() == 0:  # Dummy atom
+                dummy_idx = atom.GetIdx()
+                for neighbor in atom.GetNeighbors():
+                    if neighbor.GetAtomicNum() > 0:
+                        dummy_info.append((dummy_idx, neighbor.GetIdx()))
+                        break
+
+        if not dummy_info:
+            raise ChainBuildingError("No dummy atom found in molecule")
+
+        # Return the dummy with lowest index (leftmost)
+        dummy_info.sort(key=lambda x: x[0])
+        return dummy_info[0]
 
 
 # =============================================================================
@@ -600,77 +648,58 @@ class ChainSplitter:
     ) -> List[MonomerVariant]:
         """
         Split chain into monomer fragments.
-        
+
         Args:
             chain_mol: Polymer chain RDKit Mol object (with atom types assigned!)
             inter_bond_markers: List of (map_num1, map_num2) tuples for inter-monomer bonds
             base_name: Base name for monomers
             force_field: Force field name
-            
+
         Returns:
             List of MonomerVariant objects
         """
         if self.verbose:
             logger.info(f"Splitting chain into {len(inter_bond_markers)+1} monomers")
 
-        # Extract cap H charge mapping from chain_mol
-        # This was stored by from_smiles() or from_chain() methods
-        cap_h_charge_map = {}
-        if chain_mol.HasProp('_CapHChargeMap'):
-            import json
-            try:
-                cap_h_json = chain_mol.GetProp('_CapHChargeMap')
-                parsed = json.loads(cap_h_json)
-                cap_h_charge_map = {int(k): tuple(v) for k, v in parsed.items()}
-                if self.verbose:
-                    logger.debug(f"Extracted cap_h_charge_map with {len(cap_h_charge_map)} entries")
-            except Exception as e:
-                logger.warning(f"Failed to parse cap H charge map: {e}")
-
         n_monomers = len(inter_bond_markers) + 1
-        
+
         # Convert map numbers to bond indices
         bond_indices_to_break = []
         for map1, map2 in inter_bond_markers:
             idx1 = AtomMapTracker.find_by_map_num(chain_mol, map1)
             idx2 = AtomMapTracker.find_by_map_num(chain_mol, map2)
-            
+
             if idx1 is None or idx2 is None:
                 raise ChainSplittingError(
                     f"Could not find atoms for map numbers {map1}, {map2}"
                 )
-            
+
             bond = chain_mol.GetBondBetweenAtoms(idx1, idx2)
             if bond is None:
                 raise ChainSplittingError(
                     f"No bond between atoms {idx1} and {idx2}"
                 )
-            
+
             bond_indices_to_break.append(bond.GetIdx())
-        
+
         if self.verbose:
             logger.debug(f"Bond indices to break: {bond_indices_to_break}")
 
         # Preserve Gasteiger charges through fragmentation
         # FragmentOnBonds() loses atom properties, so we need to manually track them
-        # Charges are already stored with map numbers from MonomerGenerator
         gasteiger_charges_by_map_num = {}
         if force_field.lower() == 'gaff':
-            # Store Gasteiger charges keyed by map number (using existing map numbers)
             for atom in chain_mol.GetAtoms():
                 map_num = atom.GetAtomMapNum()
-                if map_num > 0:  # Only store charges for atoms with map numbers
+                if map_num > 0:
                     try:
                         charge = atom.GetProp('_GasteigerCharge')
                         gasteiger_charges_by_map_num[map_num] = charge
                     except KeyError:
-                        pass  # No charge stored
+                        pass
 
             if self.verbose:
                 logger.debug(f"Stored {len(gasteiger_charges_by_map_num)} Gasteiger charges")
-                # Debug: print first few charges
-                for i, (map_num, charge) in enumerate(list(gasteiger_charges_by_map_num.items())[:5]):
-                    logger.debug(f"  Map {map_num} -> charge {charge}")
 
         # Fragment on BOND indices (not atom indices!)
         fragmented = Chem.FragmentOnBonds(
@@ -694,29 +723,18 @@ class ChainSplitter:
 
             if self.verbose:
                 logger.debug(f"Restored {restored_count} Gasteiger charges to {len(fragments)} fragments")
-                # Debug: verify restoration by checking first fragment
-                if fragments:
-                    first_frag = fragments[0]
-                    for atom in list(first_frag.GetAtoms())[:5]:
-                        map_num = atom.GetAtomMapNum()
-                        try:
-                            charge = atom.GetProp('_GasteigerCharge')
-                            logger.debug(f"  Verified: atom {atom.GetIdx()} (map={map_num}, elem={atom.GetSymbol()}) has charge {charge}")
-                        except KeyError:
-                            logger.debug(f"  Verified: atom {atom.GetIdx()} (map={map_num}, elem={atom.GetSymbol()}) has NO CHARGE")
 
             # Clear temporary CHARGE map numbers from original chain
-            # Don't clear INTER_BOND_MAP_START range - those are needed for connection tracking
             for atom in chain_mol.GetAtoms():
                 map_num = atom.GetAtomMapNum()
                 if map_num >= CHARGE_MAP_START:
                     atom.SetAtomMapNum(0)
-        
+
         if len(fragments) != n_monomers:
             raise ChainSplittingError(
                 f"Expected {n_monomers} fragments, got {len(fragments)}"
             )
-        
+
         # Process each fragment
         variants = []
         for i, frag in enumerate(fragments):
@@ -729,10 +747,10 @@ class ChainSplitter:
                 variant_type = 'last'
             else:
                 variant_type = 'middle'
-            
+
             # Process fragment
-            processed_mol, conn_atoms = self._process_fragment(frag, i, variant_type, force_field, cap_h_charge_map)
-            
+            processed_mol, conn_atoms = self._process_fragment(frag, i, variant_type, force_field)
+
             # Create variant
             variant = MonomerVariant(
                 base_name=base_name,
@@ -744,10 +762,10 @@ class ChainSplitter:
                 position=i
             )
             variants.append(variant)
-            
+
             if self.verbose:
                 logger.info(f"Created {variant_type} variant at position {i}")
-        
+
         return variants
     
     def _process_fragment(
@@ -755,31 +773,28 @@ class ChainSplitter:
         frag: Chem.Mol,
         position: int,
         variant_type: str,
-        force_field: str,
-        cap_h_charge_map: Dict[int, Tuple[int, str]]
+        force_field: str
     ) -> Tuple[Chem.Mol, Tuple[int, int]]:
         """
-        Process fragment: find connections, handle terminal/connection dummies, generate conformer.
+        Process fragment: find connection dummies and generate conformer.
 
-        Terminal dummies (isotope 99): Chain ends - cap with H
-        Connection dummies (no isotope): Polymerization points - identify as connection atoms
+        With complement SMILES, terminal groups are already explicit in the input.
+        This method only handles connection dummies created by FragmentOnBonds.
 
         Args:
-            frag: Fragment molecule with dummy atoms
+            frag: Fragment molecule with dummy atoms from fragmentation
             position: Position in chain
             variant_type: 'first', 'middle', 'last', or 'single'
             force_field: Force field type for atom typing ('oplsaa', 'lopls', 'gaff')
-            cap_h_charge_map: Mapping of neighbor_map_num -> (cap_h_map_num, charge) from full chain
 
         Returns:
             Tuple of (processed_mol, (left_conn_idx, right_conn_idx))
         """
         rw_mol = Chem.RWMol(frag)
-        
-        # 1. Classify dummy atoms as terminal (isotope 99) or connection (no isotope)
-        terminal_dummies = []  # [(dummy_idx, neighbor_idx), ...] - will be capped with H
-        connection_dummies = []  # [(dummy_idx, neighbor_idx), ...] - connection points
-        
+
+        # 1. Find all dummy atoms (connection points from fragmentation)
+        connection_dummies = []  # [(dummy_idx, neighbor_idx), ...]
+
         for atom in rw_mol.GetAtoms():
             if atom.GetAtomicNum() == 0:  # Dummy atom
                 dummy_idx = atom.GetIdx()
@@ -788,182 +803,68 @@ class ChainSplitter:
                     if neighbor.GetAtomicNum() > 0:
                         neighbor_idx = neighbor.GetIdx()
                         break
-                
+
                 if neighbor_idx is not None:
-                    if atom.GetIsotope() == TERMINAL_DUMMY_ISOTOPE:
-                        terminal_dummies.append((dummy_idx, neighbor_idx))
-                    else:
-                        connection_dummies.append((dummy_idx, neighbor_idx))
-        
+                    connection_dummies.append((dummy_idx, neighbor_idx))
+
         if self.verbose:
-            logger.debug(f"Terminal dummies (cap with H): {terminal_dummies}")
-            logger.debug(f"Connection dummies (connection points): {connection_dummies}")
-        
+            logger.debug(f"Connection dummies: {connection_dummies}")
+
         # Sort by dummy index for consistent left/right ordering
-        terminal_dummies.sort(key=lambda x: x[0])
         connection_dummies.sort(key=lambda x: x[0])
-        
-        # 2. Mark connection atoms with map numbers (only for connection dummies)
+
+        # 2. Mark connection atoms with map numbers
         for i, (dummy_idx, neighbor_idx) in enumerate(connection_dummies):
             if i == 0:
                 rw_mol.GetAtomWithIdx(neighbor_idx).SetAtomMapNum(LEFT_CONN_MAP)
             elif i == 1:
                 rw_mol.GetAtomWithIdx(neighbor_idx).SetAtomMapNum(RIGHT_CONN_MAP)
-        
-        # 3. Replace terminal dummies with H atoms (cap chain ends)
-        # This maintains proper valence for terminal atoms
-        # Track added H atoms, their neighbors, and neighbor's map number for charge restoration
-        added_cap_h_atoms = []  # [(h_idx, neighbor_idx, neighbor_map_num), ...]
 
-        for dummy_idx, neighbor_idx in terminal_dummies:
-            # Get the bond type between dummy and neighbor
-            bond = rw_mol.GetBondBetweenAtoms(dummy_idx, neighbor_idx)
-            bond_type = bond.GetBondType() if bond else Chem.BondType.SINGLE
-
-            # Add new H atom
-            h_idx = rw_mol.AddAtom(Chem.Atom(1))  # Add hydrogen
-
-            # Get the neighbor's map number (for charge lookup)
-            neighbor_map_num = rw_mol.GetAtomWithIdx(neighbor_idx).GetAtomMapNum()
-            added_cap_h_atoms.append((h_idx, neighbor_idx, neighbor_map_num))
-
-            # Add bond from neighbor to new H
-            rw_mol.AddBond(neighbor_idx, h_idx, bond_type)
-        
-        # 3b. Assign atom types to cap H atoms based on force field
-        # This ensures the cap atoms have valid force field types
-        for h_idx, neighbor_idx, _ in added_cap_h_atoms:
-            h_atom = rw_mol.GetAtomWithIdx(h_idx)
-            neighbor_atom = rw_mol.GetAtomWithIdx(neighbor_idx)
-            
-            if force_field in ('oplsaa', 'lopls'):
-                # OPLS-AA: H on sp3 carbon = type 85 (HC)
-                h_atom.SetProp('AtomType', '@atom:85')
-                
-                # Check if neighbor carbon needs its type updated
-                # This happens when the original typing couldn't match due to dummy atoms
-                if neighbor_atom.GetAtomicNum() == 6:
-                    # Check if the existing type is invalid (e.g., '@atom:c' fallback)
-                    existing_type = neighbor_atom.GetProp('AtomType') if neighbor_atom.HasProp('AtomType') else ''
-                    # Invalid if it's just element symbol or doesn't have numeric part
-                    is_invalid = not existing_type or existing_type in ('@atom:c', '@atom:C', 'c', 'C')
-                    
-                    if is_invalid:
-                        # Count H neighbors to determine sp3 carbon type
-                        h_count = sum(1 for n in neighbor_atom.GetNeighbors() if n.GetAtomicNum() == 1)
-                        
-                        # OPLS-AA sp3 carbon types:
-                        # 80: CH3 (methyl) - 3 H neighbors
-                        # 81: CH2 (methylene) - 2 H neighbors  
-                        # 82: CH (methine) - 1 H neighbor
-                        # 84: C (quaternary) - 0 H neighbors
-                        if h_count >= 3:
-                            neighbor_atom.SetProp('AtomType', '@atom:80')
-                        elif h_count == 2:
-                            neighbor_atom.SetProp('AtomType', '@atom:81')
-                        elif h_count == 1:
-                            neighbor_atom.SetProp('AtomType', '@atom:82')
-                        else:
-                            neighbor_atom.SetProp('AtomType', '@atom:84')
-            else:
-                # GAFF: H on sp3 carbon = hc
-                h_atom.SetProp('AtomType', '@atom:hc')
-                
-                # For terminal carbons in GAFF, use c3 if not already typed
-                if neighbor_atom.GetAtomicNum() == 6:
-                    existing_type = neighbor_atom.GetProp('AtomType') if neighbor_atom.HasProp('AtomType') else ''
-                    is_invalid = not existing_type or existing_type in ('@atom:c', '@atom:C', 'c', 'C')
-                    if is_invalid:
-                        neighbor_atom.SetProp('AtomType', '@atom:c3')
-        
-        # 4. Remove dummy atoms (terminal dummies replaced with H, connection dummies just removed)
-        # We remove ALL dummies, but terminal positions already have H added
-        all_dummy_indices = [d[0] for d in terminal_dummies] + [d[0] for d in connection_dummies]
-        for idx in sorted(all_dummy_indices, reverse=True):
+        # 3. Remove dummy atoms
+        for idx in sorted([d[0] for d in connection_dummies], reverse=True):
             rw_mol.RemoveAtom(idx)
-        
-        # 5. Get molecule
+
+        # 4. Get molecule
         mol = rw_mol.GetMol()
 
-        # 5b. For GAFF force field, restore cap H charges from full chain
-        # Cap H charges were calculated on the full chain and preserved via cap_h_charge_map
-        if force_field.lower() == 'gaff':
-            restored_count = 0
-            for h_idx, neighbor_idx, neighbor_map_num in added_cap_h_atoms:
-                if neighbor_map_num in cap_h_charge_map:
-                    _, charge = cap_h_charge_map[neighbor_map_num]
-                    # Find the cap H atom in the final molecule by looking for an H atom
-                    # bonded to the atom with the matching neighbor_map_num
-                    neighbor_atom_idx = AtomMapTracker.find_by_map_num(mol, neighbor_map_num)
-                    if neighbor_atom_idx is not None:
-                        # Find the H atom bonded to this neighbor
-                        cap_h_found = False
-                        for neighbor in mol.GetAtomWithIdx(neighbor_atom_idx).GetNeighbors():
-                            if neighbor.GetAtomicNum() == 1:  # Hydrogen
-                                try:
-                                    neighbor.GetProp('_GasteigerCharge')
-                                    # This H already has a charge, skip it
-                                    continue
-                                except KeyError:
-                                    # This is the cap H atom - set its charge
-                                    neighbor.SetProp('_GasteigerCharge', charge)
-                                    cap_h_found = True
-                                    restored_count += 1
-                                    break
-                        if not cap_h_found:
-                            logger.warning(f"Could not find cap H atom for neighbor map {neighbor_map_num}")
-                    else:
-                        logger.warning(f"Could not find neighbor atom with map {neighbor_map_num}")
-                else:
-                    logger.error(
-                        f"Missing cap H charge for neighbor map {neighbor_map_num}. "
-                        f"This should not happen - charges should be preserved from full chain."
-                    )
-
-            if self.verbose:
-                logger.debug(f"Restored {restored_count}/{len(added_cap_h_atoms)} cap H charges from full chain")
-
-        # 6. Sanitize molecule
+        # 5. Sanitize molecule
         try:
             Chem.SanitizeMol(mol)
         except Exception as e:
             logger.warning(f"Sanitization warning: {e}")
-        
-        # 7. Generate conformer
+
+        # 6. Generate conformer
         mol = self.conformer_gen.generate_conformer(mol)
-        
-        # 8. Find connection atoms via map numbers
+
+        # 7. Find connection atoms via map numbers
         left_conn = AtomMapTracker.find_by_map_num(mol, LEFT_CONN_MAP)
         right_conn = AtomMapTracker.find_by_map_num(mol, RIGHT_CONN_MAP)
-        
+
         # Handle edge cases based on variant type
         if variant_type == 'first':
-            # First monomer: has terminal on left, connection on right
-            # The connection point should be on the right side
+            # First monomer: only has right connection
             if left_conn is not None and right_conn is None:
-                # Only one connection marked, it's the right connection
                 right_conn = left_conn
-                left_conn = 0  # Will be reassigned
+                left_conn = 0
         elif variant_type == 'last':
-            # Last monomer: has connection on left, terminal on right
+            # Last monomer: only has left connection
             if left_conn is not None and right_conn is None:
-                # left_conn is correct, right_conn is terminal (capped)
-                right_conn = mol.GetNumAtoms() - 1  # Placeholder
+                right_conn = mol.GetNumAtoms() - 1
         elif variant_type == 'single':
-            # Single monomer: both ends are terminal (capped)
+            # Single monomer: no connections
             left_conn = 0
             right_conn = mol.GetNumAtoms() - 1
-        
+
         # Default if None
         if left_conn is None:
             left_conn = 0
         if right_conn is None:
             right_conn = mol.GetNumAtoms() - 1
-        
+
         if self.verbose:
             logger.debug(f"Connection atoms: left={left_conn}, right={right_conn}")
             logger.debug(f"Total atoms after processing: {mol.GetNumAtoms()}")
-        
+
         return mol, (left_conn, right_conn)
 
 
@@ -1348,6 +1249,10 @@ class LTWriter:
             f.write('# NOTE: GAFF requires user-supplied charges (AM1-BCC or RESP recommended)\n')
             f.write('# See: http://ambermd.org/antechamber/gaff.pdf\n')
             f.write(f'{class_name} inherits GAFF {{\n\n')
+        elif variant.force_field == 'gaff2':
+            f.write('import "gaff2.lt"    # <-- defines the GAFF2 (General Amber Force Field 2)\n')
+            f.write('# NOTE: GAFF2 requires user-supplied charges (AM1-BCC or RESP recommended)\n')
+            f.write(f'{class_name} inherits GAFF2 {{\n\n')
         else:
             f.write('import "oplsaa.lt"    # <-- defines the OPLS-AA force field\n')
             f.write(f'{class_name} inherits OPLSAA {{\n\n')
@@ -1542,9 +1447,9 @@ class MonomerGenerator:
         self.verbose = verbose
         
         # Validate force field
-        if force_field not in ['oplsaa', 'gaff', 'lopls']:
+        if force_field not in ['oplsaa', 'gaff', 'gaff2', 'lopls']:
             raise MonomerGeneratorError(
-                f"Unknown force field: '{force_field}'. Use 'oplsaa', 'gaff', or 'lopls'"
+                f"Unknown force field: '{force_field}'. Use 'oplsaa', 'gaff', 'gaff2', or 'lopls'"
             )
         
         # Initialize components
@@ -1565,75 +1470,40 @@ class MonomerGenerator:
     
     def from_smiles(
         self,
-        smiles: str,
-        n_monomers: int = 3
+        smiles_list: List[str]
     ) -> List[MonomerVariant]:
         """
-        Generate monomer variants from SMILES string.
-        
+        Generate monomer variants from complement SMILES list.
+
         Args:
-            smiles: SMILES string with wildcards (e.g., "[*]CC[*]")
-            n_monomers: Number of monomers to build chain with (default 3)
-            
+            smiles_list: List of SMILES with wildcards (complement format):
+                - First: 1 wildcard (right connection) e.g., 'CC[*]'
+                - Middle: 2 wildcards (left and right) e.g., '[*]CC[*]'
+                - Last: 1 wildcard (left connection) e.g., '[*]CC'
+                - Single (DOP=1): 0 wildcards e.g., 'CCCC'
+
         Returns:
             List of MonomerVariant objects
-            
+
         Note:
-            For proper atom typing, we need to build a chain first so atoms
-            have the correct chemical environment. The chain is then split
+            For proper atom typing, we build a chain first so atoms have
+            the correct chemical environment. The chain is then split
             back into individual monomers.
+
+        Example:
+            >>> # Polyethylene, chain length 3:
+            >>> variants = generator.from_smiles(['CC[*]', '[*]CC[*]', '[*]CC'])
         """
         if self.verbose:
-            logger.info(f"Generating monomers from SMILES: {smiles}")
-        
-        if n_monomers < 3:
-            logger.warning("Using at least 3 monomers for proper chemical environment")
-            n_monomers = 3
-        
-        # 1. Build chain
-        chain_mol, inter_bond_markers = self.chain_builder.build_chain(smiles, n_monomers)
+            logger.info(f"Generating monomers from {len(smiles_list)} complement SMILES")
 
-        # 1b. Cap terminal dummies BEFORE typing
-        # This ensures terminal atoms have correct chemistry (e.g., alcohol OH, not ether O-dummy)
-        # for SMARTS pattern matching. Without this, terminal atoms bonded to dummies fail to match
-        # patterns that require specific neighbor atoms (e.g., ether O needs C-O-C, not dummy-O-C)
-        rw_mol = Chem.RWMol(chain_mol)
+        # 1. Build chain from complement SMILES
+        chain_mol, inter_bond_markers = self.chain_builder.build_chain(smiles_list)
 
-        # First collect terminal dummies and their neighbors (don't modify while iterating)
-        terminal_dummies_to_cap = []  # [(dummy_idx, neighbor_idx, bond_type), ...]
-        for atom in rw_mol.GetAtoms():
-            if atom.GetAtomicNum() == 0 and atom.GetIsotope() == TERMINAL_DUMMY_ISOTOPE:
-                dummy_idx = atom.GetIdx()
-                # Find the real neighbor atom
-                for neighbor in atom.GetNeighbors():
-                    if neighbor.GetAtomicNum() > 0:
-                        neighbor_idx = neighbor.GetIdx()
-                        bond = rw_mol.GetBondBetweenAtoms(dummy_idx, neighbor_idx)
-                        bond_type = bond.GetBondType() if bond else Chem.BondType.SINGLE
-                        terminal_dummies_to_cap.append((dummy_idx, neighbor_idx, bond_type))
-                        break
-
-        # Now add H atoms to cap terminal positions
-        for dummy_idx, neighbor_idx, bond_type in terminal_dummies_to_cap:
-            h_idx = rw_mol.AddAtom(Chem.Atom(1))
-            rw_mol.AddBond(neighbor_idx, h_idx, bond_type)
-
-        # Remove terminal dummy atoms (reverse order to preserve indices)
-        dummy_indices = [d[0] for d in terminal_dummies_to_cap]
-        for idx in sorted(dummy_indices, reverse=True):
-            rw_mol.RemoveAtom(idx)
-
-        chain_mol = rw_mol.GetMol()
-
-        # Sanitize molecule to reinitialize RingInfo after atom removal operations
-        Chem.SanitizeMol(chain_mol)
-
-        # 2. Assign atom types on CHAIN (now terminal atoms have correct chemistry!)
+        # 2. Assign atom types on CHAIN (terminal atoms already have correct chemistry!)
         chain_mol = self.atom_typer.assign_atom_types(chain_mol)
 
         # 3. Calculate Gasteiger charges on FULL chain (before splitting!)
-        # This ensures atoms have full chemical environment for charge calculation
-        # NOTE: Gasteiger doesn't work with dummy atoms, so we use map numbers to track atoms
         if self.force_field.lower() == 'gaff':
             try:
                 # Assign map numbers to all atoms for tracking
@@ -1641,114 +1511,15 @@ class MonomerGenerator:
                     if atom.GetAtomMapNum() == 0:
                         atom.SetAtomMapNum(CHARGE_MAP_START + i)
 
-                # Record which atoms are adjacent to terminal dummies (before removing them)
-                # These atoms will later have cap H atoms added by AddHs
-                terminal_neighbor_map_nums = set()
-                for atom in chain_mol.GetAtoms():
-                    if atom.GetIsotope() == TERMINAL_DUMMY_ISOTOPE:
-                        for neighbor in atom.GetNeighbors():
-                            if neighbor.GetAtomicNum() > 0:
-                                map_num = neighbor.GetAtomMapNum()
-                                if map_num > 0:
-                                    terminal_neighbor_map_nums.add(map_num)
-                                break
-
-                # Create a version for charge calculation that preserves chemical environment
-                # Strategy: Remove terminal dummies, then add explicit H atoms
-                # This preserves the chemical environment better than just removing dummies
-                rw_mol = Chem.RWMol(chain_mol)
-
-                # Process dummy atoms: remove all dummies (both terminal and connection)
-                # We'll add explicit H atoms afterwards to satisfy valence
-                dummy_indices = []
-                for atom in rw_mol.GetAtoms():
-                    if atom.GetAtomicNum() == 0:  # Dummy atom
-                        dummy_indices.append(atom.GetIdx())
-
-                # Remove dummies in reverse order to preserve indices
-                for idx in sorted(dummy_indices, reverse=True):
-                    rw_mol.RemoveAtom(idx)
-
-                # Get the molecule without dummies
-                chain_for_charges = rw_mol.GetMol()
-
-                # Sanitize molecule BEFORE AddHs to properly recognize unsatisfied valence
-                try:
-                    Chem.SanitizeMol(chain_for_charges)
-                except Exception as sanitize_error:
-                    logger.warning(f"Sanitization warning before AddHs: {sanitize_error}")
-
-                # Add explicit hydrogens to satisfy valence
-                # This ensures proper chemical environment for charge calculation
-                chain_for_charges = Chem.AddHs(chain_for_charges, addCoords=True)
-
-                # Assign map numbers to cap H atoms added by AddHs
-                # Cap H atoms are those added to atoms that were adjacent to terminal dummies
-                cap_h_charge_map = {}  # {neighbor_map_num: (cap_h_map_num, charge)}
-
-                for atom in chain_for_charges.GetAtoms():
-                    if atom.GetAtomicNum() == 1:  # Hydrogen
-                        # Check if this H was added by AddHs (has no map number yet)
-                        if atom.GetAtomMapNum() == 0:
-                            # Check if this H is bonded to an atom that was adjacent to a terminal dummy
-                            for neighbor in atom.GetNeighbors():
-                                neighbor_map_num = neighbor.GetAtomMapNum()
-                                if neighbor_map_num in terminal_neighbor_map_nums:
-                                    # This is a cap H atom - assign it a map number
-                                    cap_h_map_num = CAP_H_MAP_START + len(cap_h_charge_map)
-                                    atom.SetAtomMapNum(cap_h_map_num)
-                                    cap_h_charge_map[neighbor_map_num] = (cap_h_map_num, None)  # Charge added later
-                                    break
-
-                # Sanitize molecule before calculating Gasteiger charges
-                try:
-                    Chem.SanitizeMol(chain_for_charges)
-                except Exception as sanitize_error:
-                    logger.warning(f"Sanitization warning before charge calc: {sanitize_error}")
-
-                # Calculate Gasteiger charges on the chain with explicit H's
-                AllChem.ComputeGasteigerCharges(chain_for_charges)
-
-                # Store cap H charges with neighbor map number as key
-                for neighbor_map_num, (cap_h_map_num, _) in list(cap_h_charge_map.items()):
-                    cap_h_atom_idx = AtomMapTracker.find_by_map_num(chain_for_charges, cap_h_map_num)
-                    if cap_h_atom_idx is not None:
-                        cap_h_atom = chain_for_charges.GetAtomWithIdx(cap_h_atom_idx)
-                        try:
-                            charge = cap_h_atom.GetProp('_GasteigerCharge')
-                            cap_h_charge_map[neighbor_map_num] = (cap_h_map_num, charge)
-                        except KeyError:
-                            logger.warning(f"Cap H atom map={cap_h_map_num} has no charge")
-
-                # Store charges by map number
-                charges_by_map = {}
-                for atom in chain_for_charges.GetAtoms():
-                    map_num = atom.GetAtomMapNum()
-                    if map_num > 0:
-                        try:
-                            charge = atom.GetProp('_GasteigerCharge')
-                            charges_by_map[map_num] = charge
-                        except KeyError:
-                            pass
-
-                # Transfer charges back to original chain using map numbers
-                for atom in chain_mol.GetAtoms():
-                    map_num = atom.GetAtomMapNum()
-                    if map_num in charges_by_map:
-                        atom.SetProp('_GasteigerCharge', charges_by_map[map_num])
-
-                # Store cap_h_charge_map as molecule property for split_chain to use
-                import json
-                cap_h_json = json.dumps({str(k): v for k, v in cap_h_charge_map.items()})
-                chain_mol.SetProp('_CapHChargeMap', cap_h_json)
+                # Calculate Gasteiger charges
+                AllChem.ComputeGasteigerCharges(chain_mol)
 
                 if self.verbose:
                     logger.info("Calculated Gasteiger charges on full polymer chain")
-                    logger.info(f"Preserved {len(cap_h_charge_map)} cap H charges from full chain")
             except Exception as e:
                 logger.error(f"Failed to compute Gasteiger charges on chain: {e}")
 
-        # 4. Split into monomers (charges preserved in fragments)
+        # 4. Split into monomers
         variants = self.chain_splitter.split_chain(
             chain_mol,
             inter_bond_markers,
@@ -1756,16 +1527,12 @@ class MonomerGenerator:
             self.force_field
         )
 
-        # Clean up cap_h_charge_map property from chain_mol
-        if chain_mol.HasProp('_CapHChargeMap'):
-            chain_mol.ClearProp('_CapHChargeMap')
-
         # 5. Align for LT file generation
         aligned_variants = [
             self.backbone_aligner.align_for_lt_file(v)
             for v in variants
         ]
-        
+
         return aligned_variants
     
     def from_chain(
@@ -1775,25 +1542,23 @@ class MonomerGenerator:
     ) -> List[MonomerVariant]:
         """
         Split pre-assembled chain into monomer variants.
-        
+
         Use this for chains from external sources (e.g., RadonPy's connect_mols).
-        
+
         Args:
             chain_mol: Polymer chain RDKit Mol object
             inter_bond_markers: Map number pairs for inter-monomer bonds
-            
+
         Returns:
             List of MonomerVariant objects with conformers
         """
         if self.verbose:
             logger.info(f"Processing chain with {len(inter_bond_markers)+1} monomers")
-        
+
         # 1. Assign atom types on chain
         chain_mol = self.atom_typer.assign_atom_types(chain_mol)
 
         # 2. Calculate Gasteiger charges on FULL chain (before splitting!)
-        # This ensures atoms have full chemical environment for charge calculation
-        # NOTE: Gasteiger doesn't work with dummy atoms, so we use map numbers to track atoms
         if self.force_field.lower() == 'gaff':
             try:
                 # Assign map numbers to all atoms for tracking
@@ -1801,110 +1566,11 @@ class MonomerGenerator:
                     if atom.GetAtomMapNum() == 0:
                         atom.SetAtomMapNum(CHARGE_MAP_START + i)
 
-                # Record which atoms are adjacent to terminal dummies (before removing them)
-                # These atoms will later have cap H atoms added by AddHs
-                terminal_neighbor_map_nums = set()
-                for atom in chain_mol.GetAtoms():
-                    if atom.GetIsotope() == TERMINAL_DUMMY_ISOTOPE:
-                        for neighbor in atom.GetNeighbors():
-                            if neighbor.GetAtomicNum() > 0:
-                                map_num = neighbor.GetAtomMapNum()
-                                if map_num > 0:
-                                    terminal_neighbor_map_nums.add(map_num)
-                                break
-
-                # Create a version for charge calculation that preserves chemical environment
-                # Strategy: Remove terminal dummies, then add explicit H atoms
-                # This preserves the chemical environment better than just removing dummies
-                rw_mol = Chem.RWMol(chain_mol)
-
-                # Process dummy atoms: remove all dummies (both terminal and connection)
-                # We'll add explicit H atoms afterwards to satisfy valence
-                dummy_indices = []
-                for atom in rw_mol.GetAtoms():
-                    if atom.GetAtomicNum() == 0:  # Dummy atom
-                        dummy_indices.append(atom.GetIdx())
-
-                # Remove dummies in reverse order to preserve indices
-                for idx in sorted(dummy_indices, reverse=True):
-                    rw_mol.RemoveAtom(idx)
-
-                # Get the molecule without dummies
-                chain_for_charges = rw_mol.GetMol()
-
-                # Sanitize molecule BEFORE AddHs to properly recognize unsatisfied valence
-                try:
-                    Chem.SanitizeMol(chain_for_charges)
-                except Exception as sanitize_error:
-                    logger.warning(f"Sanitization warning before AddHs: {sanitize_error}")
-
-                # Add explicit hydrogens to satisfy valence
-                # This ensures proper chemical environment for charge calculation
-                chain_for_charges = Chem.AddHs(chain_for_charges, addCoords=True)
-
-                # Assign map numbers to cap H atoms added by AddHs
-                # Cap H atoms are those added to atoms that were adjacent to terminal dummies
-                cap_h_charge_map = {}  # {neighbor_map_num: (cap_h_map_num, charge)}
-
-                for atom in chain_for_charges.GetAtoms():
-                    if atom.GetAtomicNum() == 1:  # Hydrogen
-                        # Check if this H was added by AddHs (has no map number yet)
-                        if atom.GetAtomMapNum() == 0:
-                            # Check if this H is bonded to an atom that was adjacent to a terminal dummy
-                            for neighbor in atom.GetNeighbors():
-                                neighbor_map_num = neighbor.GetAtomMapNum()
-                                if neighbor_map_num in terminal_neighbor_map_nums:
-                                    # This is a cap H atom - assign it a map number
-                                    cap_h_map_num = CAP_H_MAP_START + len(cap_h_charge_map)
-                                    atom.SetAtomMapNum(cap_h_map_num)
-                                    cap_h_charge_map[neighbor_map_num] = (cap_h_map_num, None)  # Charge added later
-                                    break
-
-                # Sanitize molecule before calculating Gasteiger charges
-                try:
-                    Chem.SanitizeMol(chain_for_charges)
-                except Exception as sanitize_error:
-                    logger.warning(f"Sanitization warning before charge calc: {sanitize_error}")
-
-                # Calculate Gasteiger charges on the chain with explicit H's
-                AllChem.ComputeGasteigerCharges(chain_for_charges)
-
-                # Store cap H charges with neighbor map number as key
-                for neighbor_map_num, (cap_h_map_num, _) in list(cap_h_charge_map.items()):
-                    cap_h_atom_idx = AtomMapTracker.find_by_map_num(chain_for_charges, cap_h_map_num)
-                    if cap_h_atom_idx is not None:
-                        cap_h_atom = chain_for_charges.GetAtomWithIdx(cap_h_atom_idx)
-                        try:
-                            charge = cap_h_atom.GetProp('_GasteigerCharge')
-                            cap_h_charge_map[neighbor_map_num] = (cap_h_map_num, charge)
-                        except KeyError:
-                            logger.warning(f"Cap H atom map={cap_h_map_num} has no charge")
-
-                # Store charges by map number
-                charges_by_map = {}
-                for atom in chain_for_charges.GetAtoms():
-                    map_num = atom.GetAtomMapNum()
-                    if map_num > 0:
-                        try:
-                            charge = atom.GetProp('_GasteigerCharge')
-                            charges_by_map[map_num] = charge
-                        except KeyError:
-                            pass
-
-                # Transfer charges back to original chain using map numbers
-                for atom in chain_mol.GetAtoms():
-                    map_num = atom.GetAtomMapNum()
-                    if map_num in charges_by_map:
-                        atom.SetProp('_GasteigerCharge', charges_by_map[map_num])
-
-                # Store cap_h_charge_map as molecule property for split_chain to use
-                import json
-                cap_h_json = json.dumps({str(k): v for k, v in cap_h_charge_map.items()})
-                chain_mol.SetProp('_CapHChargeMap', cap_h_json)
+                # Calculate Gasteiger charges
+                AllChem.ComputeGasteigerCharges(chain_mol)
 
                 if self.verbose:
                     logger.info("Calculated Gasteiger charges on full polymer chain")
-                    logger.info(f"Preserved {len(cap_h_charge_map)} cap H charges from full chain")
             except Exception as e:
                 logger.error(f"Failed to compute Gasteiger charges on chain: {e}")
 
@@ -1916,16 +1582,12 @@ class MonomerGenerator:
             self.force_field
         )
 
-        # Clean up cap_h_charge_map property from chain_mol
-        if chain_mol.HasProp('_CapHChargeMap'):
-            chain_mol.ClearProp('_CapHChargeMap')
-
         # 4. Align for LT file generation
         aligned_variants = [
             self.backbone_aligner.align_for_lt_file(v)
             for v in variants
         ]
-        
+
         return aligned_variants
     
     def write_lt_files(
@@ -2072,6 +1734,10 @@ class MonomerGenerator:
                 f.write('# NOTE: GAFF requires user-supplied charges (AM1-BCC or RESP recommended)\n')
                 f.write('# See: http://ambermd.org/antechamber/gaff.pdf\n')
                 f.write(f'{variant.base_name} inherits GAFF {{\n\n')
+            elif variant.force_field == 'gaff2':
+                f.write('import "gaff2.lt"    # <-- defines the GAFF2 (General Amber Force Field 2)\n')
+                f.write('# NOTE: GAFF2 requires user-supplied charges (AM1-BCC or RESP recommended)\n')
+                f.write(f'{variant.base_name} inherits GAFF2 {{\n\n')
             else:
                 f.write('import "oplsaa.lt"    # <-- defines the OPLS-AA force field\n')
                 f.write(f'{variant.base_name} inherits OPLSAA {{\n\n')
@@ -2148,32 +1814,34 @@ class MonomerGenerator:
 # =============================================================================
 
 def generate_monomers(
-    smiles: str,
+    smiles_list: List[str],
     base_name: str,
     force_field: str = 'gaff',
     output_dir: str = './monomers',
-    n_monomers: int = 3,
     generate_t1: bool = True,
     verbose: bool = True
 ) -> List[str]:
     """
-    Convenience function to generate monomer LT files from SMILES.
-    
+    Convenience function to generate monomer LT files from complement SMILES.
+
     Args:
-        smiles: SMILES string with wildcards (e.g., "[*]CC[*]")
+        smiles_list: List of SMILES with wildcards (complement format):
+            - First: 1 wildcard (right connection) e.g., 'CC[*]'
+            - Middle: 2 wildcards (left and right) e.g., '[*]CC[*]'
+            - Last: 1 wildcard (left connection) e.g., '[*]CC'
         base_name: Base name for monomers (e.g., "PE")
         force_field: 'oplsaa' or 'gaff'
         output_dir: Directory for output files
-        n_monomers: Number of monomers for chain building
         generate_t1: Generate T1 chirality variants
         verbose: Enable verbose output
-        
+
     Returns:
         List of generated file paths
-        
+
     Example:
+        >>> # Polyethylene chain length 3
         >>> files = generate_monomers(
-        ...     smiles="[*]CC[*]",
+        ...     smiles_list=['CC[*]', '[*]CC[*]', '[*]CC'],
         ...     base_name="PE",
         ...     force_field="gaff",
         ...     output_dir="./pe_monomers"
@@ -2185,10 +1853,10 @@ def generate_monomers(
         output_dir=output_dir,
         verbose=verbose
     )
-    
-    variants = generator.from_smiles(smiles, n_monomers=n_monomers)
+
+    variants = generator.from_smiles(smiles_list)
     files = generator.write_lt_files(variants, generate_t1=generate_t1)
-    
+
     return files
 
 

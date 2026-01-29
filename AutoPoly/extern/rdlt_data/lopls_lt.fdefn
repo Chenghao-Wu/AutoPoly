@@ -1,22 +1,214 @@
+# LOPLS Feature Definitions for RDKit
+#
+# L-suffixed atom types for long hydrocarbon chains from:
+# LOPLS2012 Sui, Pluhackova, Böckmann, J.Chem.Theory.Comp (2012), 8(4),1459
+# LOPLS2015 Pluhackova,...,Böckmann, J.Phys.Chem.B (2015), 119(49), 15287
+#
+# These types have modified charges and LJ parameters for improved
+# representation of long hydrocarbon chains in lipid simulations.
+#
+# Priority numbers 1000+ ensure LOPLS patterns override standard OPLS-AA
+# when both could match (LOPLS patterns are more specific)
 
-DefineFeature @atom:80L [$([CH3D4][C;R0]~[C;R0]~[C;R0])]
+# =============================================================================
+# LOPLS ALKANES (from LOPLS 2012)
+# =============================================================================
+
+# CH3 terminal in long chains (charge -0.222 vs OPLS -0.180)
+DefineFeature @atom:54L [$([CH3D4][CH2D4][CH2D4])]
+Family 1000CT
+EndFeature
+
+# CH2 in long chains (charge -0.148 vs OPLS -0.120)
+DefineFeature @atom:57L [$([CH2D4]([CH2D4])[CH2D4])]
+Family 1001CT
+EndFeature
+
+# H on CH3 in long chains (charge 0.074 vs OPLS 0.060)
+DefineFeature @atom:60LCH3 [$([#1][CH3D4][CH2D4][CH2D4])]
+Family 1000HC
+EndFeature
+
+# H on CH2 in long chains (charge 0.074 vs OPLS 0.060)
+DefineFeature @atom:60LCH2 [$([#1][CH2D4]([CH2D4])[CH2D4])]
+Family 1001HC
+EndFeature
+
+# =============================================================================
+# LOPLS ALKENES (from LOPLS 2012)
+# =============================================================================
+
+# Alkene C (RH-C=) in long chains
+DefineFeature @atom:142L [$([CH1D3](=[CH1D3])[CH2D4][CH2D4])]
+Family 1000CM
+EndFeature
+
+# Alkene H in long chains
+DefineFeature @atom:144L [$([#1][CH1D3](=[CH1D3])[CH2D4])]
+Family 1002HC
+EndFeature
+
+# Alkene C (R2-C=) in long chains
+DefineFeature @atom:141L [$([CH0D3](=[CH0D3])([C])[CH2D4])]
+Family 1001CM
+EndFeature
+
+# Alkene C (H2-C=) terminal
+DefineFeature @atom:143L [$([CH2D3]=[CH1D3][CH2D4])]
+Family 1002CM
+EndFeature
+
+# =============================================================================
+# LOPLS ALCOHOLS (from LOPLS 2015)
+# =============================================================================
+
+# O: mono alcohols in long chains
+DefineFeature @atom:154L [$([OH][CH2D4][CH2D4][CH2D4])]
+Family 1000OH
+EndFeature
+
+# H(O): mono alcohols in long chains
+DefineFeature @atom:155L [$([#1][O][CH2D4][CH2D4][CH2D4])]
+Family 1000HO
+EndFeature
+
+# O: diols
+DefineFeature @atom:169L [$([OH][CH2D4][CH2D4][OH])]
+Family 1001OH
+EndFeature
+
+# H(O): diols
+DefineFeature @atom:170L [$([#1][O][CH2D4][CH2D4][OH])]
+Family 1001HO
+EndFeature
+
+# O: triols
+DefineFeature @atom:171L [$([OH][CH1D4]([CH2D4][OH])[CH2D4][OH])]
+Family 1002OH
+EndFeature
+
+# H(O): triols
+DefineFeature @atom:172L [$([#1][O][CH1D4]([CH2D4][OH])[CH2D4][OH])]
+Family 1002HO
+EndFeature
+
+# =============================================================================
+# LOPLS ESTERS (from LOPLS 2015)
+# =============================================================================
+
+# Ester C=O in long chains
+DefineFeature @atom:465L [$([CD3](=[O])([O])[CH2D4][CH2D4])]
+Family 1000C
+EndFeature
+
+# Ester =O in long chains
+DefineFeature @atom:466L [$([O]=[CD3]([O])[CH2D4][CH2D4])]
+Family 1000O
+EndFeature
+
+# Ester -O- in long chains
+DefineFeature @atom:467L [$([O]([CH2D4][CH2D4])[CD3]=[O])]
+Family 1000OS
+EndFeature
+
+# =============================================================================
+# FALL-BACK TO STANDARD OPLS-AA 2024
+# Standard patterns for non-LOPLS environments
+# =============================================================================
+
+# Standard alkanes (fallback for non-long-chain environments)
+DefineFeature @atom:54 [$([CH3D4][C])]
 Family 0CT
 EndFeature
-DefineFeature @atom:81L [$([CH2D4;R0]([C;R0])[C;R0]~[C;R0])]
+DefineFeature @atom:57 [$([CH2D4]([C])[C])]
 Family 1CT
 EndFeature
-DefineFeature @atom:85LCH3 [$([#1][CH3D4][C;R0]~[C;R0]~[C;R0])]
-Family 2HC
+DefineFeature @atom:58 [$([CH1D4]([C])([C])[C])]
+Family 2CT
 EndFeature
-DefineFeature @atom:85LCH2 [$([#1][CH2D4;R0]([C;R0])[C;R0]~[C;R0])]
-Family 3HC
+DefineFeature @atom:59 [$([CH0D4]([C])([C])([C])[C])]
+Family 3CT
 EndFeature
-DefineFeature @atom:87L [$([CH1D3]([CH2D4;R0][C])=[CD3;R0][CD4])]
-Family 4CM
+DefineFeature @atom:60 [$([#1][CD4;!$([C][O,N,S]);!$([C][F,Cl,Br,I])])]
+Family 0HC
 EndFeature
-DefineFeature @atom:89L [$([#1][CH1D3]([CH2D4;R0][C])=[CD3;R0])]
-Family 5HC
+
+# Standard alkenes
+DefineFeature @atom:141 [$([CH0D3]([#6])([#6])=[#6])]
+Family 0CM
 EndFeature
-DefineFeature @atom:86L [$([CH0D3]([CD4;R0])=[CD3;R0])]
-Family 6CM
+DefineFeature @atom:142 [$([CH1D3]([#6])=[#6])]
+Family 1CM
+EndFeature
+DefineFeature @atom:143 [$([CH2D3]=[#6])]
+Family 2CM
+EndFeature
+DefineFeature @atom:144 [$([#1][CD3])]
+Family 1HC
+EndFeature
+
+# Standard aromatics
+DefineFeature @atom:145 [$([c]([c])[c])]
+Family 0CA
+EndFeature
+DefineFeature @atom:146 [$([#1][c]([c])[c])]
+Family 0HA
+EndFeature
+
+# Standard alcohols
+DefineFeature @atom:154 [$([OH][#6])]
+Family 0OH
+EndFeature
+DefineFeature @atom:155 [$([#1][O][#6])]
+Family 0HO
+EndFeature
+
+# Standard esters
+DefineFeature @atom:465 [$([CD3](=O)[O][C])]
+Family 0C
+EndFeature
+DefineFeature @atom:466 [$([O]=[CD3][O][C])]
+Family 0O
+EndFeature
+DefineFeature @atom:467 [$([O]([C])[CD3]=[O])]
+Family 0OS
+EndFeature
+
+# Standard amides
+DefineFeature @atom:235 [$([CD3](=O)[ND3])]
+Family 1C
+EndFeature
+DefineFeature @atom:236 [$([O]=[CD3][ND3])]
+Family 1O
+EndFeature
+DefineFeature @atom:237 [$([ND3H2][CD3]=[O])]
+Family 0N
+EndFeature
+DefineFeature @atom:238 [$([ND3H1][CD3]=[O])]
+Family 1N
+EndFeature
+DefineFeature @atom:239 [$([ND3H0][CD3]=[O])]
+Family 2N
+EndFeature
+
+# Standard carboxylic acids
+DefineFeature @atom:267 [$([CD3](=O)[OH])]
+Family 2C
+EndFeature
+DefineFeature @atom:268 [$([OH][CD3]=[O])]
+Family 1OH
+EndFeature
+DefineFeature @atom:269 [$([O]=[CD3][OH])]
+Family 2O
+EndFeature
+DefineFeature @atom:270 [$([#1][O][CD3]=[O])]
+Family 1HO
+EndFeature
+
+# Standard carboxylate
+DefineFeature @atom:271 [$([#6](~[#8D1])~[#8D1])]
+Family 3C
+EndFeature
+DefineFeature @atom:272 [$([#8D1]~[#6]~[#8D1])]
+Family 0O2
 EndFeature

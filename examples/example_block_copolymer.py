@@ -20,17 +20,18 @@ from AutoPoly import System, Polymer, Polymerization
 # Create system
 system = System(out="aba_triblock")
 
-# Define explicit monomer sequence
+# Define explicit monomer sequence with complement SMILES format
 # ABA triblock: 2 PE-like, 3 PS-like, 2 PE-like
 # This creates a block copolymer structure
+# Complement SMILES: first position has 1 wildcard (right), middle have 2, last has 1 (left)
 sequence = [
-    "[*]CC[*]",      # Position 0: Ethylene (Block A)
-    "[*]CC[*]",      # Position 1: Ethylene (Block A)
-    "[*]C=C[*]",     # Position 2: Styrene (Block B)
-    "[*]C=C[*]",     # Position 3: Styrene (Block B)
-    "[*]C=C[*]",     # Position 4: Styrene (Block B)
-    "[*]CC[*]",      # Position 5: Ethylene (Block A)
-    "[*]CC[*]"       # Position 6: Ethylene (Block A)
+    "CC[*]",         # Position 0: Ethylene - First (1 wildcard right)
+    "[*]CC[*]",      # Position 1: Ethylene - Middle (2 wildcards)
+    "[*]C=C[*]",     # Position 2: Styrene - Middle (2 wildcards)
+    "[*]C=C[*]",     # Position 3: Styrene - Middle (2 wildcards)
+    "[*]C=C[*]",     # Position 4: Styrene - Middle (2 wildcards)
+    "[*]CC[*]",      # Position 5: Ethylene - Middle (2 wildcards)
+    "[*]CC"          # Position 6: Ethylene - Last (1 wildcard left)
 ]
 
 # Create polymer with explicit sequence

@@ -13,22 +13,22 @@
 # ============================================================================
 
 C  |  c   |  gaff_c     |  [$([C](=[O]))]                           |  @atom:c   |  0.0  |  "Sp2 C carbonyl group"
-C  |  c1  |  gaff_c1    |  [C#C]                                     |  @atom:c1  |  0.0  |  "Sp C"
+C  |  c1  |  gaff_c1    |  [$([C]#C)]                                |  @atom:c1  |  0.0  |  "Sp C"
 C  |  c2  |  gaff_c2    |  [$([CD3]=[CD3])]                          |  @atom:c2  |  0.0  |  "Sp2 C"
 C  |  c3  |  gaff_c3    |  [CD4]                                     |  @atom:c3  |  0.0  |  "Sp3 C"
 C  |  ca  |  gaff_ca    |  [$([c]([c])[c])]                          |  @atom:ca  |  0.0  |  "Sp2 C in pure aromatic systems"
-C  |  cp  |  gaff_cp    |  [$([c](c)(c)-[c](c)c)]                    |  @atom:cp  |  0.0  |  "Head Sp2 C connecting two rings in biphenyl"
-C  |  cq  |  gaff_cq    |  [$([c](c)(c)-[c](c)c)]                    |  @atom:cq  |  0.0  |  "Head Sp2 C in biphenyl (identical to cp)"
+C  |  cp  |  gaff_cp    |  [$([c](c)(c)-[c](c)[c])]                   |  @atom:cp  |  0.0  |  "Head Sp2 C connecting two rings in biphenyl"
+C  |  cq  |  gaff_cq    |  [$([c](c)(c)-[c](c)[c])]                   |  @atom:cq  |  0.0  |  "Head Sp2 C in biphenyl (identical to cp)"
 C  |  cc  |  gaff_cc    |  [$([c]([c][#6,n,o,s]))]                   |  @atom:cc  |  0.0  |  "Sp2 C in non-pure aromatic systems"
 C  |  cd  |  gaff_cd    |  [$([c]([c][#6,n,o,s]))]                   |  @atom:cd  |  0.0  |  "Sp2 C in non-pure aromatic (identical to cc)"
 C  |  ce  |  gaff_ce    |  [$([C]=[C][C]=[C])]                       |  @atom:ce  |  0.0  |  "Inner Sp2 C in conjugated systems"
 C  |  cf  |  gaff_cf    |  [$([C]=[C][C]=[C])]                       |  @atom:cf  |  0.0  |  "Inner Sp2 C in conjugated (identical to ce)"
-C  |  cg  |  gaff_cg    |  [C#CC#C]                                  |  @atom:cg  |  0.0  |  "Inner Sp C in conjugated systems"
-C  |  ch  |  gaff_ch    |  [C#CC#C]                                  |  @atom:ch  |  0.0  |  "Inner Sp C in conjugated (identical to cg)"
-C  |  cx  |  gaff_cx    |  [$([CD4]1([CD4])([CD4])[CD4]1)]            |  @atom:cx  |  0.0  |  "Sp3 C in triangle systems (cyclopropane)"
-C  |  cy  |  gaff_cy    |  [$([CD4]1([CD4])([CD4])([CD4])[CD4]1)]     |  @atom:cy  |  0.0  |  "Sp3 C in square systems (cyclobutane)"
-C  |  cu  |  gaff_cu    |  [$([CD3]1([CD3])([CD3])[CD3]1)]            |  @atom:cu  |  0.0  |  "Sp2 C in triangle systems"
-C  |  cv  |  gaff_cv    |  [$([CD3]1([CD3])([CD3])([CD3])[CD3]1)]     |  @atom:cv  |  0.0  |  "Sp2 C in square systems"
+C  |  cg  |  gaff_cg    |  [$([C]#C)]                                |  @atom:cg  |  0.0  |  "Inner Sp C in conjugated systems"
+C  |  ch  |  gaff_ch    |  [$([C]#C)]                                |  @atom:ch  |  0.0  |  "Inner Sp C in conjugated (identical to cg)"
+C  |  cx  |  gaff_cx    |  [$([CD4][R3])]                             |  @atom:cx  |  0.0  |  "Sp3 C in triangle systems (cyclopropane)"
+C  |  cy  |  gaff_cy    |  [$([CD4][R4])]                             |  @atom:cy  |  0.0  |  "Sp3 C in square systems (cyclobutane)"
+C  |  cu  |  gaff_cu    |  [$([CD3][R3])]                             |  @atom:cu  |  0.0  |  "Sp2 C in triangle systems"
+C  |  cv  |  gaff_cv    |  [$([CD3][R4])]                             |  @atom:cv  |  0.0  |  "Sp2 C in square systems"
 C  |  cz  |  gaff_cz    |  [$([C]([N])=[N])]                         |  @atom:cz  |  0.0  |  "Sp2 C in guanidine group"
 
 # ============================================================================
@@ -63,7 +63,7 @@ I  |  i   |  gaff_i     |  [I]                                       |  @atom:i 
 # ============================================================================
 
 N  |  n   |  gaff_n     |  [$([NX3][CX3]=[OX1])]                     |  @atom:n   |  0.0  |  "Sp2 N in amide groups"
-N  |  n1  |  gaff_n1    |  [N#C]                                     |  @atom:n1  |  0.0  |  "Sp N"
+N  |  n1  |  gaff_n1    |  [$([N]#C)]                                |  @atom:n1  |  0.0  |  "Sp N"
 N  |  n2  |  gaff_n2    |  [$([NX2]=[#6])]                           |  @atom:n2  |  0.0  |  "aliphatic Sp2 N with two connected atoms"
 N  |  n3  |  gaff_n3    |  [$([NX3][#6,#1])]                         |  @atom:n3  |  0.0  |  "Sp3 N with three connected atoms (amine)"
 N  |  n4  |  gaff_n4    |  [$([NX4+])]                               |  @atom:n4  |  0.0  |  "Sp3 N with four connected atoms (ammonium)"

@@ -85,14 +85,14 @@ class Polymerization:
             system (object, optional): System object containing folder path. Defaults to None.
             model (list, optional): List of models for polymerization. Defaults to None.
             run (bool, optional): Flag to run the process immediately. Defaults to True.
-            force_field (str, optional): Force field to use. Options: "oplsaa", "gaff", "lopls".
+            force_field (str, optional): Force field to use. Options: "oplsaa", "gaff", "gaff2", "lopls".
                                         Defaults to "oplsaa".
 
         Raises:
             SystemExit: If required directories or files are not found
         """
         # Validate force_field parameter
-        valid_force_fields = ["oplsaa", "gaff", "lopls"]
+        valid_force_fields = ["oplsaa", "gaff", "gaff2", "lopls"]
         if force_field not in valid_force_fields:
             raise ValidationError(
                 f"Invalid force_field '{force_field}'. Must be one of: {valid_force_fields}"
@@ -102,7 +102,7 @@ class Polymerization:
         self.system = system
         self.path_cwd = str(Path(self.system.get_folder_path()) / self.name / "moltemplate/")
         self.path_master = str(Path(__file__).parent.resolve() / "extern/")
-        self.path_moltemplatesrc = str(Path(self.path_master) / "moltemplate" / "src/")
+        self.path_moltemplatesrc = str(Path(self.path_master) / "moltemplate" / "scripts/")
 
         # SMILES to monomer name cache for dynamic generation
         self._generated_smiles = {}
@@ -111,12 +111,15 @@ class Polymerization:
         self.force_field = force_field
 
         # Set force field parameter path based on force_field type
+        # All force fields now use .lt files from moltemplate/force_fields/
         if force_field == "gaff":
-            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "common" / "gaff.lt")
+            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "gaff.lt")
+        elif force_field == "gaff2":
+            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "gaff2.lt")
         elif force_field == "lopls":
-            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "loplsaa.prm")
+            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "loplsaa.lt")
         else:  # oplsaa
-            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "oplsaa.prm")
+            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "oplsaa.lt")
 
         logger.info(f"\n'you are now using parameter set of {self.path_oplsaaprm}\n")
         self.model = model
@@ -138,10 +141,10 @@ class Polymerization:
             ff_modify_dihedral=self.FFmodify_alkylDihedral
         )
 
-        # Initialize GAFF analyzer if using GAFF force field
+        # Initialize GAFF analyzer if using GAFF or GAFF2 force field
         self.gaff_analyzer = None
-        if force_field == "gaff":
-            self.gaff_analyzer = GAFFAnalyzer(self.path_cwd, self.path_master)
+        if force_field in ("gaff", "gaff2"):
+            self.gaff_analyzer = GAFFAnalyzer(self.path_cwd, self.path_master, force_field)
 
         # Create working directory before proceeding
         self.create_working_directory()
@@ -251,35 +254,35 @@ class Polymerization:
 
     def generate_sequence_variants_for_polymer(
         self,
-        base_smiles: str,
-        dop: int,
+        smiles_list: list,
         topology: str = "linear",
         base_name_prefix: str = "monomer"
     ) -> dict:
         """
-        Generate sequence variants for polymerization using the new workflow.
+        Generate sequence variants for polymerization using complement SMILES.
 
-        This method uses the new generate_sequence_variants() approach which creates
-        position-aware variants and extracts unique repeating units.
+        This method uses the complement SMILES approach where each position in the
+        chain has its own SMILES with explicit terminal groups.
 
         Args:
-            base_smiles (str): Base monomer SMILES with wildcards (e.g., "[*]C=C[*]")
-            dop (int): Degree of polymerization (number of monomers in chain)
+            smiles_list (list): List of complement SMILES:
+                - First: 1 wildcard (right connection) e.g., 'CC[*]'
+                - Middle: 2 wildcards (left and right) e.g., '[*]CC[*]'
+                - Last: 1 wildcard (left connection) e.g., '[*]CC'
             topology (str): Topology type ("linear" or "ring", default: "linear")
             base_name_prefix (str): Prefix for monomer names (default: "monomer")
 
         Returns:
             dict: Mapping from variant_type to .lt filename
             {
-                'first': 'monomer_0_first_0.lt',
-                'middle': 'monomer_0_middle_1.lt',
-                'last': 'monomer_0_last_4.lt',
+                'first': 'monomer_0_0le.lt',
+                'middle': 'monomer_0_1i.lt',
+                'last': 'monomer_0_2re.lt',
                 ...
             }
         """
         variant_mapping, counter = monomer_processing.generate_sequence_variants_for_polymerization(
-            base_smiles=base_smiles,
-            dop=dop,
+            smiles_list=smiles_list,
             topology=topology,
             path_cwd=self.path_cwd,
             force_field=self.force_field,

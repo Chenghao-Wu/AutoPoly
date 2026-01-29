@@ -60,7 +60,10 @@ ETHANOL_SMILES = "CCO"
 ETHANOL_COUNT = 20
 
 # Example 3: Polymer + molecule mixture
-POLYMER_SMILES = "[*]CC[*]"  # Polyethylene pSMILES
+# Complement SMILES for Polyethylene
+PE_FIRST = "CC[*]"
+PE_MIDDLE = "[*]CC[*]"
+PE_LAST = "[*]CC"
 POLYMER_CHAIN_NUM = 5
 POLYMER_DOP = 50
 
@@ -232,7 +235,7 @@ def example_polymer_molecule_mixture():
     print("=" * 70)
 
     print("\nConfiguration:")
-    print(f"  Polymer: Polyethylene (pSMILES: {POLYMER_SMILES})")
+    print(f"  Polymer: Polyethylene (complement SMILES)")
     print(f"  Chains: {POLYMER_CHAIN_NUM}")
     print(f"  DOP: {POLYMER_DOP}")
     print(f"  Solvent: Water (SMILES: {WATER_SMILES}, Count={WATER_COUNT})")
@@ -246,15 +249,16 @@ def example_polymer_molecule_mixture():
 
         # Step 2: Define Polymer
         print("\n--- Step 2: Defining Polyethylene Polymer ---")
+        # Build complement SMILES sequence: first + (DOP-2)*middle + last
+        sequence = [PE_FIRST] + [PE_MIDDLE] * (POLYMER_DOP - 2) + [PE_LAST]
         pe = Polymer(
-            ChainNum=POLYMER_CHAIN_NUM,
-            Sequence=[POLYMER_SMILES],  # pSMILES with [*] wildcards
-            DOP=POLYMER_DOP,
+            chain_num=POLYMER_CHAIN_NUM,
+            sequence=sequence,
             topology="linear"
         )
-        print(f"Created {pe.ChainNum} PE chains")
-        print(f"  DOP: {pe.DOP}")
-        print(f"  Total monomers: {pe.ChainNum * pe.DOP}")
+        print(f"Created {pe.chain_num} PE chains")
+        print(f"  DOP: {pe.dop}")
+        print(f"  Total monomers: {pe.chain_num * pe.dop}")
 
         # Step 3: Define Solvent Molecules
         print("\n--- Step 3: Defining Water Solvent ---")
@@ -299,10 +303,10 @@ def explain_key_differences():
     print("""
 POLYMER CLASS:
   - Purpose: Define polymer chains with repeat units
-  - SMILES: pSMILES with [*] wildcards (e.g., "[*]CC[*]")
-  - Parameters: ChainNum, Sequence, DOP, topology, tacticity
-  - DOP: Can be >1 (chain length)
-  - Variants: Generates first/middle/last monomer variants
+  - SMILES: Complement SMILES format with explicit first/middle/last variants
+  - Parameters: chain_num, sequence, topology, tacticity
+  - DOP: Automatically derived from sequence length
+  - Variants: User provides explicit first/middle/last monomer SMILES
 
 MOLECULE CLASS:
   - Purpose: Define small molecules (solvents, additives)
@@ -318,8 +322,12 @@ SIMILARITIES:
   - Both generate LAMMPS data files via Moltemplate
 
 USAGE PATTERN:
-  # Polymer
-  polymer = Polymer(ChainNum=5, Sequence=["[*]CC[*]"], DOP=100)
+  # Polymer with complement SMILES
+  PE_FIRST = "CC[*]"
+  PE_MIDDLE = "[*]CC[*]"
+  PE_LAST = "[*]CC"
+  sequence = [PE_FIRST] + [PE_MIDDLE] * 98 + [PE_LAST]
+  polymer = Polymer(chain_num=5, sequence=sequence)
 
   # Molecule
   water = Molecule(Count=100, Smiles="O", Name="water")

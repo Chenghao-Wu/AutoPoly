@@ -23,13 +23,18 @@ from AutoPoly import System, Polymer, Polymerization
 # Create system
 system = System(out="pmma_gasteiger")
 
-# Define PMMA polymer
-# SMILES: [*]CC([*])(C)C(=O)OC
+# Define PMMA polymer with complement SMILES format
+# SMILES: First="CC(C)(C(=O)OC)[*]", Middle="[*]CC([*])(C)C(=O)OC", Last="[*]CC(C)(C(=O)OC))"
 # - [*] marks connection points for polymerization
 # - Atactic (random stereochemistry)
+PMMA_FIRST = "CC(C)(C(=O)OC)[*]"
+PMMA_MIDDLE = "[*]CC([*])(C)C(=O)OC"
+PMMA_LAST = "[*]CC(C)(C(=O)OC)"
+sequence = [PMMA_FIRST] + [PMMA_MIDDLE] * 8 + [PMMA_LAST]  # 10 monomers total
+
 polymer = Polymer(
     chain_num=2,  # Number of polymer chains
-    sequence=["[*]CC([*])(C)C(=O)OC"] * 10,  # 10 monomers per chain
+    sequence=sequence,
     topology="linear",  # Linear polymer
     tacticity="atactic"  # Random stereochemistry
 )

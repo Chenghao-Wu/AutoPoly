@@ -221,6 +221,21 @@ EndFeature
 DefineFeature @atom:127 [$([#1][#6]([*;!$([#7,#8])])[O][#6][*;!$([#7,#8])])]
 Family 73HC
 EndFeature
+DefineFeature @atom:127 [$([#1][CH3][O][#6])]
+Family 73HC_TERM1
+EndFeature
+DefineFeature @atom:127 [$([#1][CH2]([#6])[O][#6])]
+Family 73HC_TERM2
+EndFeature
+DefineFeature @atom:127 [$([#1][CH2]([O])[CH2][O])]
+Family 73HC_TERM3
+EndFeature
+DefineFeature @atom:85 [$([#1][CH2][OH])]
+Family 6HC_ALCOH1
+EndFeature
+DefineFeature @atom:85 [$([#1][CH2]([#6][OH])[O])]
+Family 6HC_ALCOH2
+EndFeature
 DefineFeature @atom:128 [$([O](C)[#6][O][#6])]
 Family 74OS
 EndFeature
