@@ -2,7 +2,7 @@
 """Generate 10 commodity polymers for LAMMPS using AutoPoly.
 
 Polymers: PE, PP, PS, PVC, PVAc, PMMA, PAN, PB, PI, PEO
-Force field: OPLS-AA (except PEO uses GAFF)
+Force field: OPLS-AA
 """
 
 import sys
@@ -10,27 +10,78 @@ import argparse
 from pathlib import Path
 from typing import Dict, List
 
+# Complement SMILES for each polymer (first/middle/last variants)
 POLYMER_CONFIGS: Dict[str, Dict] = {
-    "polyethylene": {"smiles": "[*]CC[*]", "chain_num": 10, "dop": 50,
-                     "topology": "linear", "tacticity": "atactic"},
-    "polypropylene": {"smiles": "[*]CC([*])(C)", "chain_num": 10, "dop": 50,
-                      "topology": "linear", "tacticity": "atactic"},
-    "polystyrene": {"smiles": "[*]CC([*])c1ccccc1", "chain_num": 10, "dop": 10,
-                    "topology": "linear", "tacticity": "atactic"},
-    "polyvinyl_chloride": {"smiles": "[*]CC([*])Cl", "chain_num": 10, "dop": 50,
-                           "topology": "linear", "tacticity": "atactic"},
-    "polyvinyl_acetate": {"smiles": "[*]CC([*])OC(=O)C", "chain_num": 10, "dop": 50,
-                          "topology": "linear", "tacticity": "atactic"},
-    "pmma": {"smiles": "[*]CC([*])(C)C(=O)OC", "chain_num": 10, "dop": 50,
-             "topology": "linear", "tacticity": "atactic"},
-    "polyacrylonitrile": {"smiles": "[*]CC([*])C#N", "chain_num": 10, "dop": 50,
-                          "topology": "linear", "tacticity": "atactic"},
-    "polybutadiene": {"smiles": "[*]C=CC[*]", "chain_num": 10, "dop": 50,
-                      "topology": "linear", "tacticity": "atactic"},
-    "polyisoprene": {"smiles": "[*]C=CC(C)[*]", "chain_num": 10, "dop": 50,
-                     "topology": "linear", "tacticity": "atactic"},
-    "polyethylene_oxide": {"smiles": "[*]CCO[*]", "chain_num": 10, "dop": 50,
-                           "topology": "linear", "tacticity": "atactic"}
+    "polyethylene": {
+        "first_smiles": "CC[*]",
+        "middle_smiles": "[*]CC[*]",
+        "last_smiles": "[*]CC",
+        "chain_num": 10, "dop": 50,
+        "topology": "linear", "tacticity": "atactic"
+    },
+    "polypropylene": {
+        "first_smiles": "CC(C)[*]",
+        "middle_smiles": "[*]CC([*])(C)",
+        "last_smiles": "[*]CC(C)",
+        "chain_num": 10, "dop": 50,
+        "topology": "linear", "tacticity": "atactic"
+    },
+    "polystyrene": {
+        "first_smiles": "CC(c1ccccc1)[*]",
+        "middle_smiles": "[*]CC([*])c1ccccc1",
+        "last_smiles": "[*]CC(c1ccccc1)",
+        "chain_num": 10, "dop": 10,
+        "topology": "linear", "tacticity": "atactic"
+    },
+    "polyvinyl_chloride": {
+        "first_smiles": "CC(Cl)[*]",
+        "middle_smiles": "[*]CC([*])Cl",
+        "last_smiles": "[*]CC(Cl)",
+        "chain_num": 10, "dop": 50,
+        "topology": "linear", "tacticity": "atactic"
+    },
+    "polyvinyl_acetate": {
+        "first_smiles": "CC(OC(=O)C)[*]",
+        "middle_smiles": "[*]CC([*])OC(=O)C",
+        "last_smiles": "[*]CC(OC(=O)C)",
+        "chain_num": 10, "dop": 50,
+        "topology": "linear", "tacticity": "atactic"
+    },
+    "pmma": {
+        "first_smiles": "CC(C)(C(=O)OC)[*]",
+        "middle_smiles": "[*]CC([*])(C)C(=O)OC",
+        "last_smiles": "[*]CC(C)(C(=O)OC)",
+        "chain_num": 10, "dop": 50,
+        "topology": "linear", "tacticity": "atactic"
+    },
+    "polyacrylonitrile": {
+        "first_smiles": "CC(C#N)[*]",
+        "middle_smiles": "[*]CC([*])C#N",
+        "last_smiles": "[*]CC(C#N)",
+        "chain_num": 10, "dop": 50,
+        "topology": "linear", "tacticity": "atactic"
+    },
+    "polybutadiene": {
+        "first_smiles": "C=CC[*]",
+        "middle_smiles": "[*]C=CC[*]",
+        "last_smiles": "[*]C=CC",
+        "chain_num": 10, "dop": 50,
+        "topology": "linear", "tacticity": "atactic"
+    },
+    "polyisoprene": {
+        "first_smiles": "C=CC(C)[*]",
+        "middle_smiles": "[*]C=CC(C)[*]",
+        "last_smiles": "[*]C=CC(C)",
+        "chain_num": 10, "dop": 50,
+        "topology": "linear", "tacticity": "atactic"
+    },
+    "polyethylene_oxide": {
+        "first_smiles": "CCO[*]",
+        "middle_smiles": "[*]CCO[*]",
+        "last_smiles": "[*]CCO",
+        "chain_num": 10, "dop": 50,
+        "topology": "linear", "tacticity": "atactic"
+    }
 }
 
 FORCE_FIELD = "oplsaa"
@@ -56,13 +107,19 @@ System, Polymer, Polymerization = setup_imports()
 def generate_single_polymer(polymer_id: str, config: Dict, base_output_dir: str = "commodity_polymers"):
     """Generate a single polymer structure."""
     print(f"\n{'='*60}\nGenerating: {polymer_id}")
-    print(f"pSMILES: {config['smiles']}, Chains: {config['chain_num']}, DOP: {config['dop']}")
+    print(f"pSMILES: {config['middle_smiles']}, Chains: {config['chain_num']}, DOP: {config['dop']}")
 
     try:
         output_path = f"{base_output_dir}/{polymer_id}"
         system = System(out=output_path)
 
-        sequence = [config["smiles"]] * config["dop"]
+        # Build complement SMILES sequence: first + (DOP-2)*middle + last
+        first_smiles = config["first_smiles"]
+        middle_smiles = config["middle_smiles"]
+        last_smiles = config["last_smiles"]
+        dop = config["dop"]
+        sequence = [first_smiles] + [middle_smiles] * (dop - 2) + [last_smiles]
+
         polymer = Polymer(
             chain_num=config["chain_num"],
             sequence=sequence,

@@ -140,7 +140,59 @@ class Polymer:
                 f"This limit prevents resource exhaustion."
             )
 
+        # Validate complement SMILES wildcard pattern
+        self._validate_complement_smiles(self.sequence)
+
         self.set_Sequence()
+
+    def _validate_complement_smiles(self, sequence: list) -> None:
+        """
+        Validate wildcard pattern for complement SMILES.
+
+        Rules:
+        - First monomer: Exactly 1 wildcard (right side connection)
+        - Middle monomers: Exactly 2 wildcards (left and right connections)
+        - Last monomer: Exactly 1 wildcard (left side connection)
+        - Single monomer (DOP=1): Zero wildcards (complete molecule)
+
+        Args:
+            sequence: List of SMILES strings
+
+        Raises:
+            ValidationError: If wildcard pattern doesn't match expected format
+        """
+        n = len(sequence)
+
+        if n == 1:
+            # Single monomer: no wildcards needed (complete molecule)
+            wildcard_count = sequence[0].count('[*]')
+            if wildcard_count != 0:
+                raise ValidationError(
+                    f"Single monomer must have 0 wildcards, got {wildcard_count}"
+                )
+            return
+
+        for i, smiles in enumerate(sequence):
+            wildcard_count = smiles.count('[*]')
+
+            if i == 0:  # First monomer
+                if wildcard_count != 1:
+                    raise ValidationError(
+                        f"First monomer must have exactly 1 wildcard (right side), "
+                        f"got {wildcard_count} in '{smiles}'"
+                    )
+            elif i == n - 1:  # Last monomer
+                if wildcard_count != 1:
+                    raise ValidationError(
+                        f"Last monomer must have exactly 1 wildcard (left side), "
+                        f"got {wildcard_count} in '{smiles}'"
+                    )
+            else:  # Middle monomers
+                if wildcard_count != 2:
+                    raise ValidationError(
+                        f"Middle monomer at position {i} must have exactly 2 wildcards, "
+                        f"got {wildcard_count} in '{smiles}'"
+                    )
 
     def set_merSet(self, merSet: Union[List[str], str]) -> None:
         """

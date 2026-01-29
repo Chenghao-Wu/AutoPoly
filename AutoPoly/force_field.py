@@ -50,10 +50,10 @@ class ForceFieldManager:
         path_cwd (str): Current working directory for the project
         path_master (str): Path to external dependencies
         path_moltemplatesrc (str): Path to Moltemplate source
-        force_field (str): Force field type ("oplsaa", "gaff", or "lopls")
+        force_field (str): Force field type ("oplsaa", "gaff", "gaff2", or "lopls")
         ff_modify_dihedral (np.ndarray): Modified dihedral parameters
         path_oplsaaprm (str): Path to OPLS-AA force field parameters
-        gaff_analyzer (GAFFAnalyzer): GAFF analyzer instance (for GAFF force field)
+        gaff_analyzer (GAFFAnalyzer): GAFF analyzer instance (for GAFF/GAFF2 force field)
     """
 
     def __init__(self, path_cwd: str, path_master: str, path_moltemplatesrc: str,
@@ -75,19 +75,22 @@ class ForceFieldManager:
         self.ff_modify_dihedral = ff_modify_dihedral
 
         # Set force field parameter path based on force_field type
+        # All force fields now use .lt files from moltemplate/force_fields/
         if force_field == "gaff":
-            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "common" / "gaff.lt")
+            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "gaff.lt")
+        elif force_field == "gaff2":
+            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "gaff2.lt")
         elif force_field == "lopls":
-            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "loplsaa.prm")
+            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "loplsaa.lt")
         else:  # oplsaa
-            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "oplsaa.prm")
+            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "oplsaa.lt")
 
         logger.info(f"\n'you are now using parameter set of {self.path_oplsaaprm}\n")
 
-        # Initialize GAFF analyzer if using GAFF force field
+        # Initialize GAFF analyzer if using GAFF/GAFF2 force field
         self.gaff_analyzer = None
-        if force_field == "gaff":
-            self.gaff_analyzer = GAFFAnalyzer(self.path_cwd, self.path_master)
+        if force_field in ("gaff", "gaff2"):
+            self.gaff_analyzer = GAFFAnalyzer(self.path_cwd, self.path_master, force_field)
 
     def make_force_field_lt(self) -> None:
         """
@@ -95,34 +98,46 @@ class ForceFieldManager:
 
         This is the main entry point for force field file generation. It delegates
         to the appropriate method based on the force field type:
-        - For GAFF: creates a filtered subset using GAFFAnalyzer
-        - For OPLS-AA/LOPLS: creates a subset and invokes oplsaa_moltemplate.py
+        - For GAFF/GAFF2: creates a filtered subset using GAFFAnalyzer
+        - For OPLS-AA/LOPLS: copies .lt file directly (new moltemplate 2.22.5 format)
+
+        The new OPLS-AA 2024 .lt files include replace{} directives that automatically
+        convert simple atom types (e.g., @atom:54) to extended format for wildcard
+        matching (e.g., @atom:54_bCT_aCT_dCT_iCT).
 
         Raises:
             SystemExit: If force field file generation fails
         """
         try:
-            if self.force_field == "gaff":
+            if self.force_field in ("gaff", "gaff2"):
                 self.make_gaff_lt()
             else:  # oplsaa or lopls
-                self.make_oplsaa_subset()
+                # Copy .lt file directly - no need for oplsaa_moltemplate.py
+                # The new OPLS-AA 2024 format uses "Data By Type" wildcards
+                src_lt = Path(self.path_oplsaaprm)
+                ff_dir = Path(self.path_master) / "moltemplate" / "force_fields"
 
-                # Invoke oplsaa_moltemplate.py to make oplsaa.lt with suppressed output
-                ff_name = "oplsaa.lt"
-                ff_subset = str(Path(self.path_cwd) / "oplsaa_subset.prm")
-                ff_py_script = str(Path(self.path_moltemplatesrc) / "oplsaa_moltemplate.py")
-
-                # Redirect both stdout and stderr to devnull
-                # Use cwd parameter instead of shell command to avoid shell injection
-                with open(os.devnull, 'w') as devnull:
-                    return_code = subprocess.call([ff_py_script, ff_subset],
-                                                cwd=self.path_cwd,
-                                                stdout=devnull,
-                                                stderr=devnull)
-
-                if return_code != 0:
-                    logger.error(f"Failed to generate {ff_name} file. Check oplsaa_subset.prm for errors.")
+                if not src_lt.exists():
+                    logger.error(f"Force field file not found: {src_lt}")
                     sys.exit(1)
+
+                if self.force_field == "lopls":
+                    # LOPLS: copy loplsaa.lt and its dependency oplsaa2024.lt
+                    shutil.copy(src_lt, Path(self.path_cwd) / "loplsaa.lt")
+                    logger.info(f"Copied {src_lt.name} to loplsaa.lt")
+
+                    # loplsaa.lt imports oplsaa2024.lt
+                    base_lt = ff_dir / "oplsaa2024.lt"
+                    if base_lt.exists():
+                        shutil.copy(base_lt, Path(self.path_cwd) / "oplsaa2024.lt")
+                        logger.info(f"Copied {base_lt.name}")
+                    else:
+                        logger.error(f"Required file not found: {base_lt}")
+                        sys.exit(1)
+                else:
+                    # OPLS-AA: copy oplsaa.lt (which is 2024 version)
+                    shutil.copy(src_lt, Path(self.path_cwd) / "oplsaa.lt")
+                    logger.info(f"Copied {src_lt.name} to oplsaa.lt")
 
         except Exception as e:
             logger.error(f"Error in make_force_field_lt: {str(e)}")
@@ -310,6 +325,7 @@ class ForceFieldManager:
 
         # SECOND PASS: Write filtered output
         # Section markers for OPLS-AA parameter file
+        # Note: biotype section is tracked but excluded (oplsaa_moltemplate.py doesn't handle it)
         SECTION_MARKERS = {
             '##  Atom Type Definitions  ##': 'atom',
             '##  Van der Waals Parameters  ##': 'vdw',
@@ -447,6 +463,9 @@ class ForceFieldManager:
                         break
 
                 # Determine if this line should be written
+                # Skip biotype section - oplsaa_moltemplate.py doesn't handle it
+                if current_section == 'biotype':
+                    continue
                 if current_section in ('atom', 'vdw', 'bond', 'angle', 'torsion', 'imptors', 'charge'):
                     # Check if it's a parameter line that needs filtering
                     if stripped and not stripped.startswith('#') and not stripped.startswith('##'):

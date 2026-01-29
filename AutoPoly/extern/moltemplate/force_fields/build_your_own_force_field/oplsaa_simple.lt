@@ -1,0 +1,272 @@
+#   Force-field example:
+#
+# This is an example of a general force-field file in moltemplate
+# format.  I hope that end-users can read this file and modify
+# it to build their own custom force-field files.
+# This is an abbreviated version of the full "oplsaa2024.lt" file
+# (...which I hope is easier to read.  It contains only the atom
+# types and relevant parameters needed for simple alkanes and alkenes)
+#
+# USAGE: You can create molecules using this force-field this way:
+#
+# MyMolecule inherits OPLSAA {
+#  # atom-id  mol-id atom-type charge    X        Y        Z
+#  write('Data Atoms') {
+#    $atom:C1  $mol @atom:CTH2 0.00  -0.6695    0.000000  0.000000
+#    $atom:H11 $mol @atom:HCen 0.00  -1.234217 -0.854458  0.000000
+#         :              :     :      :         :         :
+#   }
+# }
+#
+# (Do not use this file.  Use the full "oplsaa2024.lt" instead.)
+
+
+
+OPLSAA {
+
+
+  # Below we will use lammps "set" command to assign atom charges
+  # by atom type.  http://lammps.sandia.gov/doc/set.html
+
+  write_once("In Charges") {
+    set type @atom:CT3H        charge -0.18      # "C - CT | -CH3 C: alkane"
+    set type @atom:CT2H        charge -0.12      # "C - CT | -CH2- C: alkanes"
+    set type @atom:CT1H        charge -0.06      # "C - CT | >CH- C: alkanes"
+    set type @atom:CT0H        charge  0.0       # "C - CT | >C< C: alkanes"
+    set type @atom:HCan        charge  0.06      # "H - HC | H: alkanes"
+    set type @atom:CMH2        charge -0.23      # "C - CM | alkene C (H2-C=)"
+    set type @atom:HCen        charge  0.115     # "H - HC | alkene H (H-C=)"
+  } #(end of atom partial charges)
+
+  # NOTE: In addition to setting atom charge by atom type, you can instead add
+  #    write_once("Data Charge By Bond") {
+  #      @atom:A @atom:B 0.05 -0.05
+  #    }
+  # sections to your force-field file.  This defines rules to assign 
+  # incremental charges to pairs of atoms depending on who they are bonded to.
+  # (These are also called "bond_increments".)
+
+
+  write_once("Data Masses") {
+    @atom:CT3H     12.011
+    @atom:CT2H     12.011
+    @atom:CT1H     12.011
+    @atom:CT0H     12.011
+    @atom:HCan     1.008
+    @atom:CMH2     12.011
+    @atom:HCen     1.008
+  } #(end of atom masses)
+
+
+
+  # ---------- EQUIVALENCE CATEGORIES for bonded interaction lookup ----------
+  #  Each type of atom has a separate ID used for looking up bond parameters
+  #  and a separate ID for looking up 3-body angle interaction parameters
+  #  and a separate ID for looking up 4-body dihedral interaction parameters
+  #  and a separate ID for looking up 4-body improper interaction parameters
+  #  The complete @atom type name includes ALL of these ID numbers.  There's
+  #  no need to force the end-user to type the complete name of each atom.
+  #  The "replace" command used below informs moltemplate that the short
+  #  @atom names we have been using above are equivalent to the complete
+  #  @atom names used below:
+
+  replace{ @atom:CT3H @atom:CT3H_bCT_aCT_dCT_iCT }
+  replace{ @atom:CT2H @atom:CT2H_bCT_aCT_dCT_iCT }
+  replace{ @atom:CT1H @atom:CT1H_bCT_aCT_dCT_iCT }
+  replace{ @atom:CT0H  @atom:CT0H_bCT_aCT_dCT_iCT }
+  replace{ @atom:HCan @atom:HCan_bHC_aHC_dHC_iHC }
+  replace{ @atom:CMH2 @atom:CMH2_bCM_aCM_dCM_iCM }
+  replace{ @atom:HCen  @atom:HCen_bHC_aHC_dHC_iHC }
+
+
+  # ------------------ Non-Bonded Interactions: -------------------------
+  # http://lammps.sandia.gov/doc/pair_lj.html
+  # Syntax:
+  # pair_coeff    AtomType1    AtomType2   pair_style_name  parameters...
+
+  write_once("In Settings") {
+    pair_coeff @atom:CT3H_bCT_aCT_dCT_iCT  @atom:CT3H_bCT_aCT_dCT_iCT  0.066 3.5
+    pair_coeff @atom:CT2H_bCT_aCT_dCT_iCT  @atom:CT2H_bCT_aCT_dCT_iCT  0.066 3.5
+    pair_coeff @atom:CT1H_bCT_aCT_dCT_iCT  @atom:CT1H_bCT_aCT_dCT_iCT  0.066 3.5
+    pair_coeff @atom:CT0H_bCT_aCT_dCT_iCT  @atom:CT0H_bCT_aCT_dCT_iCT  0.066 3.5
+    pair_coeff @atom:HCan_bHC_aHC_dHC_iHC  @atom:HCan_bHC_aHC_dHC_iHC  0.03 2.5
+    pair_coeff @atom:CMH2_bCM_aCM_dCM_iCM @atom:CMH2_bCM_aCM_dCM_iCM  0.076 3.55
+    pair_coeff @atom:HCen_bHC_aHC_dHC_iHC  @atom:HCen_bHC_aHC_dHC_iHC  0.03 2.42
+  } #(end of pair_coeffs)
+
+
+
+  # ------- Bonded Interactions: -------
+  # http://lammps.sandia.gov/doc/bond_harmonic.html
+  # Syntax:  
+  # bond_coeff BondTypeName BondStyle  parameters...
+
+  write_once("In Settings") {
+    bond_coeff @bond:CT_CT   268.0 1.529
+    bond_coeff @bond:CT_HC  340.0 1.09
+    bond_coeff @bond:CT_CM   317.0 1.51
+    bond_coeff @bond:HC_CM   340.0 1.08
+    bond_coeff @bond:CM_CM   549.0 1.34
+  } #(end of bond_coeffs)
+
+  # Rules for assigning bond types by atom type:
+  # BondTypeName      AtomType1         AtomType2
+  #   (* = wildcard)
+
+  write_once("Data Bonds By Type") {
+    @bond:CT_CT @atom:*_bCT_a*_d*_i* @atom:*_bCT_a*_d*_i*
+    @bond:CT_HC @atom:*_bCT_a*_d*_i* @atom:*_bHC_a*_d*_i*
+    @bond:CT_CM @atom:*_bCT_a*_d*_i* @atom:*_bCM_a*_d*_i*
+    @bond:HC_CM @atom:*_bHC_a*_d*_i* @atom:*_bCM_a*_d*_i*
+    @bond:CM_CM @atom:*_bCM_a*_d*_i* @atom:*_bCM_a*_d*_i*
+  } #(end of bonds by type)
+
+
+
+  # ------- Angle Interactions -------
+  # http://lammps.sandia.gov/doc/angle_harmonic.html
+  # Syntax:  
+  # angle_coeff AngleTypeName  AngleStyle  parameters...
+
+  write_once("In Settings") {
+    angle_coeff @angle:CT_CT_CT   58.35 112.7
+    angle_coeff @angle:CT_CT_HC  37.5 110.7
+    angle_coeff @angle:CT_CT_CM  63.0 111.1
+    angle_coeff @angle:CT_CM_CT  70.0 130.0
+    angle_coeff @angle:CT_CM_HC  35.0 117.0
+    angle_coeff @angle:CT_CM_CM  70.0 124.0
+    angle_coeff @angle:HC_CT_HC  33.0 107.8
+    angle_coeff @angle:HC_CT_CM  35.0 109.5
+    angle_coeff @angle:HC_CM_HC  35.0 117.0
+    angle_coeff @angle:HC_CM_CM  35.0 120.0
+    angle_coeff @angle:CM_CT_CM  63.0 112.4
+  } #(end of angle_coeffs)
+
+  # Rules for creating angle interactions according to atom type:
+  #   AngleTypeName     AtomType1            AtomType2            AtomType3
+  #   (* = wildcard)
+
+  write_once("Data Angles By Type") {
+    @angle:CT_CT_CT @atom:*_b*_aCT_d*_i* @atom:*_b*_aCT_d*_i* @atom:*_b*_aCT_d*_i*
+    @angle:CT_CT_HC @atom:*_b*_aCT_d*_i* @atom:*_b*_aCT_d*_i* @atom:*_b*_aHC_d*_i*
+    @angle:CT_CT_CM @atom:*_b*_aCT_d*_i* @atom:*_b*_aCT_d*_i* @atom:*_b*_aCM_d*_i*
+    @angle:CT_CM_CT @atom:*_b*_aCT_d*_i* @atom:*_b*_aCM_d*_i* @atom:*_b*_aCT_d*_i*
+    @angle:CT_CM_HC @atom:*_b*_aCT_d*_i* @atom:*_b*_aCM_d*_i* @atom:*_b*_aHC_d*_i*
+    @angle:CT_CM_CM @atom:*_b*_aCT_d*_i* @atom:*_b*_aCM_d*_i* @atom:*_b*_aCM_d*_i*
+    @angle:HC_CT_HC @atom:*_b*_aHC_d*_i* @atom:*_b*_aCT_d*_i* @atom:*_b*_aHC_d*_i*
+    @angle:HC_CT_CM @atom:*_b*_aHC_d*_i* @atom:*_b*_aCT_d*_i* @atom:*_b*_aCM_d*_i*
+    @angle:HC_CM_HC @atom:*_b*_aHC_d*_i* @atom:*_b*_aCM_d*_i* @atom:*_b*_aHC_d*_i*
+    @angle:HC_CM_CM @atom:*_b*_aHC_d*_i* @atom:*_b*_aCM_d*_i* @atom:*_b*_aCM_d*_i*
+    @angle:CM_CT_CM @atom:*_b*_aCM_d*_i* @atom:*_b*_aCT_d*_i* @atom:*_b*_aCM_d*_i*
+  } #(end of angles by type)
+
+
+
+  # ----------- Dihedral Interactions  ------------
+  # http://lammps.sandia.gov/doc/dihedral_opls.html
+  # Syntax:  
+  # dihedral_coeff DihedralTypeName  DihedralStyle  parameters...
+
+  write_once("In Settings") {
+    # General rules:
+    dihedral_coeff @dihedral:X_CM_CM_X  0.0 14.0 0.0 0.0
+    dihedral_coeff @dihedral:X_CT_CT_CT  1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:X_CT_CM_CT  1.711 -0.5 0.663 0.0
+    dihedral_coeff @dihedral:X_CT_CM_HC  0.0 0.0 0.468 0.0
+    dihedral_coeff @dihedral:X_CT_CM_CM  0.5 0.0 0.0 0.0
+
+    # Specific rules (which override the general rules):
+    dihedral_coeff @dihedral:CT_CT_CT_CT  1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:CT_CT_CT_CM  1.3 -0.05 0.2 0.0
+    dihedral_coeff @dihedral:CT_CT_CM_CT  2.817 -0.169 0.543 0.0
+    dihedral_coeff @dihedral:CT_CT_CM_CM  0.346 0.405 -0.904 0.0
+    dihedral_coeff @dihedral:CT_CM_CM_CT  0.0 14.0 0.0 0.0
+    dihedral_coeff @dihedral:CT_CM_CM_HC  0.0 14.0 0.0 0.0
+    dihedral_coeff @dihedral:HC_CT_CT_HC  0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:HC_CT_CT_CM  0.0 0.0 0.366 0.0
+    dihedral_coeff @dihedral:HC_CT_CM_CT  0.0 0.0 0.3 0.0
+    dihedral_coeff @dihedral:HC_CT_CM_HC  0.0 0.0 0.318 0.0
+    dihedral_coeff @dihedral:HC_CT_CM_CM  0.0 0.0 -0.372 0.0
+    dihedral_coeff @dihedral:HC_CM_CM_HC  0.0 14.0 0.0 0.0
+    dihedral_coeff @dihedral:CM_CT_CM_CT  0.0 -8.0 0.0 0.0
+    dihedral_coeff @dihedral:CM_CT_CM_HC  0.0 -8.0 0.0 0.0
+    dihedral_coeff @dihedral:CM_HC_CM_CT  0.0 -8.0 0.0 0.0
+    dihedral_coeff @dihedral:CM_HC_CM_HC  0.0 -8.0 0.0 0.0
+  } #(end of dihedral_coeffs)
+
+  # Rules for creating dihedral interactions according to atom type:
+  #   DihedralTypeName     AtomType1     AtomType2     AtomType3     AtomType4
+  #   (* = wildcard)
+
+  write_once("Data Dihedrals By Type") {
+    @dihedral:X_CM_CM_X   @atom:*              @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dCM_i* @atom:*
+    @dihedral:X_CT_CT_CT  @atom:*              @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCT_i*
+    @dihedral:X_CT_CM_CT  @atom:*              @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dCT_i*
+    @dihedral:X_CT_CM_HC  @atom:*              @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dHC_i*
+    @dihedral:X_CT_CM_CM  @atom:*              @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dCM_i*
+    @dihedral:CT_CT_CT_CT @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCT_i*
+    @dihedral:CT_CT_CT_CM @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCM_i*
+    @dihedral:CT_CT_CM_CT @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dCT_i*
+    @dihedral:CT_CT_CM_CM @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dCM_i*
+    @dihedral:CT_CM_CM_CT @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dCT_i*
+    @dihedral:CT_CM_CM_HC @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dHC_i*
+    @dihedral:HC_CT_CT_HC @atom:*_b*_a*_dHC_i* @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dHC_i*
+    @dihedral:HC_CT_CT_CM @atom:*_b*_a*_dHC_i* @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCM_i*
+    @dihedral:HC_CT_CM_CT @atom:*_b*_a*_dHC_i* @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dCT_i*
+    @dihedral:HC_CT_CM_HC @atom:*_b*_a*_dHC_i* @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dHC_i*
+    @dihedral:HC_CT_CM_CM @atom:*_b*_a*_dHC_i* @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dCM_i*
+    @dihedral:HC_CM_CM_HC @atom:*_b*_a*_dHC_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dHC_i*
+    @dihedral:CM_CT_CM_CT @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dCT_i*
+    @dihedral:CM_CT_CM_HC @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dCT_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dHC_i*
+    @dihedral:CM_HC_CM_CT @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dHC_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dCT_i*
+    @dihedral:CM_HC_CM_HC @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dHC_i* @atom:*_b*_a*_dCM_i* @atom:*_b*_a*_dHC_i*
+  } #(end of dihedrals by type)
+
+
+
+
+  # ---------- Improper Interactions  ----------
+  # http://lammps.sandia.gov/doc/improper_cvff.html
+
+  write_once("In Settings") {
+    improper_coeff @improper:CM_X_X_X  15.0000 -1 2
+  }
+
+  #   ImproperTypeName   AtomType1    AtomType2       AtomType3       AtomType4
+  #   (* = wildcard)
+
+  write_once("Data Impropers By Type (cenIsortJKL.py)") {
+    @improper:CM_X_X_X   @atom:*      @atom:*   @atom:*_b*_a*_d*_iCM   @atom:*
+  }
+
+  # NOTE: Sometimes the default improper-creation rules do not work for a 
+  #       particular force-field.  The "(cenIsortJKL.py)" text above tells
+  #       moltemplate to look for a file named "cenIsortJKL.py" (normally found in
+  #       "src/nbody_alternate_symmetry/") which tells moltemplate to change
+  #       the order in the list of atoms in an improper interaction, or the
+  #       criteria used to decide whether a new improper interaction should
+  #       be created.  The default rules are located in "src/nbody_Impropers.py"
+
+
+  # ------- Choosing LAMMPS Interaction Styles  -------
+  # LAMMPS supports many different kinds of bonded and non-bonded interactions
+  # which can be selected at run time.  Although we specified these above in the
+  # pair_coeff, bond_coeff, angle_coeff, dihedral_coeff, and improper_coeff
+  # commands, we must also specify this in the "In Init" section:
+
+  write_once("In Init") {
+    units real
+    atom_style full
+    bond_style harmonic
+    angle_style harmonic
+    dihedral_style opls
+    improper_style cvff
+    pair_style lj/cut/coul/long 9.0 11.0
+    pair_modify mix geometric
+    special_bonds lj/coul 0.0 0.0 0.5
+    kspace_style pppm 0.0001
+  } #end of init parameters
+
+
+}  # OPLSAA
+

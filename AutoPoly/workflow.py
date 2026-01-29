@@ -106,7 +106,7 @@ class WorkflowManager:
 
     def _process_polymer_model(self, model: object, poly_index: int) -> int:
         """
-        Process a single polymer model.
+        Process a single polymer model using complement SMILES.
 
         Args:
             model: The polymer model to process
@@ -115,15 +115,13 @@ class WorkflowManager:
         Returns:
             int: Updated polymer index
         """
-        base_smiles = model.sequence[0]
         topology = getattr(model, 'topology', 'linear')
         dop = model.dop
 
-        logger.info(f"Generating sequence variants for {base_smiles}, DOP={dop}, topology={topology}")
+        logger.info(f"Generating sequence variants for {len(model.sequence)} complement SMILES, DOP={dop}, topology={topology}")
 
         variant_mapping = self.poly.generate_sequence_variants_for_polymer(
-            base_smiles=base_smiles,
-            dop=dop,
+            smiles_list=model.sequence,
             topology=topology,
             base_name_prefix="monomer"
         )
@@ -356,6 +354,8 @@ class WorkflowManager:
         # Determine force field import based on force_field type
         if self.poly.force_field == "gaff":
             ff_import = 'import "gaff.lt"\n\n'
+        elif self.poly.force_field == "gaff2":
+            ff_import = 'import "gaff2.lt"\n\n'
         else:
             ff_import = 'import "oplsaa.lt"\n\n'
 
@@ -482,6 +482,9 @@ class WorkflowManager:
         if self.poly.force_field == "gaff":
             ff_import = 'import "gaff.lt"\n'
             ff_inherits = "GAFF"
+        elif self.poly.force_field == "gaff2":
+            ff_import = 'import "gaff2.lt"\n'
+            ff_inherits = "GAFF2"
         else:
             ff_import = 'import "oplsaa.lt"\n'
             ff_inherits = "OPLSAA"

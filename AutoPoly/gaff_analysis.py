@@ -50,16 +50,18 @@ class GAFFAnalyzer:
         path_master (str): Path to external dependencies
     """
 
-    def __init__(self, path_cwd: str, path_master: str):
+    def __init__(self, path_cwd: str, path_master: str, force_field: str = "gaff"):
         """
         Initialize the GAFFAnalyzer class.
 
         Args:
             path_cwd (str): Current working directory for the project
             path_master (str): Path to external dependencies directory
+            force_field (str): Force field type ("gaff" or "gaff2")
         """
         self.path_cwd = path_cwd
         self.path_master = path_master
+        self.force_field = force_field
 
     def extract_atom_types(self, model) -> Set[str]:
         """Extract unique GAFF atom types used in monomer files.
@@ -176,12 +178,13 @@ class GAFFAnalyzer:
                 if '}' in stripped:
                     braces_depth -= 1
                     if braces_depth == 0:
-                        # End of section, go back to header
-                        if current_section != 'header':
-                            # Add closing brace to current section
-                            sections[current_section].append(line)
+                        # End of force field namespace, don't include this brace in section
                         current_section = 'header'
                         continue
+                    # Include the closing brace in the current section
+                    # (This closes write_once sections like "In Init")
+                    if current_section in sections and current_section != 'header':
+                        sections[current_section].append(line)
 
                 # Section detection
                 if 'write_once("Data Masses")' in stripped:
@@ -481,26 +484,68 @@ class GAFFAnalyzer:
             '@dihedral:', self._normalize_dihedral_type
         )
 
+    def _matches_with_wildcards(self, pattern_types: List[str], actual_types: List[str]) -> bool:
+        """Check if actual atom types match a pattern that may contain wildcards.
+
+        GAFF improper definitions use '*' as wildcards that match any atom type.
+        For example, pattern ['*', '*', 'ca', 'ha'] should match ['ca', 'ca', 'ca', 'ha'].
+
+        Args:
+            pattern_types: List of atom types from GAFF definition (may contain '*' wildcards)
+            actual_types: List of actual atom types from molecule topology
+
+        Returns:
+            True if the actual types match the pattern (wildcards match anything)
+        """
+        if len(pattern_types) != len(actual_types):
+            return False
+        for pattern, actual in zip(pattern_types, actual_types):
+            if pattern == '*':
+                continue  # Wildcard matches anything
+            if pattern != actual:
+                return False
+        return True
+
     def _filter_improper_section(self,
                                 improper_coeff_lines: List[str],
                                 improper_def_lines: List[str],
                                 used_improper_types: Set[str]) -> Tuple[List[str], List[str]]:
-        """Filter improper coefficients and definitions.
+        """Filter improper coefficients and definitions with wildcard support.
 
-        Keep improper if it's in the used_improper_types set.
+        GAFF defines impropers with wildcards like '@improper:X-X-ca-ha @atom:* @atom:* @atom:ca @atom:ha'.
+        This method matches these wildcard patterns against actual improper types from topology.
 
         Args:
             improper_coeff_lines: Lines from improper_coeff In Settings section
             improper_def_lines: Lines from Data Impropers By Type section
-            used_improper_types: Set of explicitly used improper type strings (e.g., "c-c2-c3-hc")
+            used_improper_types: Set of explicitly used improper type strings (e.g., "ca-ca-ca-ha")
 
         Returns:
             Tuple of (filtered_coeff_lines, filtered_def_lines)
         """
-        return self._filter_section_by_topology(
-            improper_coeff_lines, improper_def_lines, used_improper_types,
-            '@improper:', self._normalize_dihedral_type  # Same normalization as dihedral
-        )
+        # Parse used improper types into lists for wildcard matching
+        used_improper_lists = [t.split('-') for t in used_improper_types]
+
+        # Identify which references to keep
+        keep_refs = set()
+
+        for line in improper_def_lines:
+            if '@improper:' in line and '@atom:' in line:
+                pattern_types = self._extract_atom_types(line)
+
+                # Check if this pattern matches any inferred improper type
+                for actual_types in used_improper_lists:
+                    if self._matches_with_wildcards(pattern_types, actual_types):
+                        ref_name = self._extract_reference_name(line, '@improper:')
+                        if ref_name:
+                            keep_refs.add(ref_name)
+                        break  # Found a match, no need to check more
+
+        # Filter using the common filtering logic
+        filtered_coeffs = self._filter_lines_by_reference(improper_coeff_lines, keep_refs, '@improper:')
+        filtered_defs = self._filter_lines_by_reference(improper_def_lines, keep_refs, '@improper:')
+
+        return filtered_coeffs, filtered_defs
 
     def _extract_bonds_from_monomers(self, monomer_files: List[str]) -> Set[str]:
         """Extract bond type pairs from monomer .lt files.
@@ -727,11 +772,15 @@ class GAFFAnalyzer:
         For each atom with 3+ neighbors (central atom of improper),
         generates all improper combinations.
 
+        GAFF improper convention: atom1-atom2-CENTER-atom4
+        The central trigonal atom is at position 3 (index 2).
+        Example: @improper:X-X-ca-ha has ca as the central atom at position 3.
+
         Args:
             bond_graph: Dict mapping atom_id -> (atom_type, [neighbor_ids])
 
         Returns:
-            Set of improper type strings like "c-c2-c3-hc", etc.
+            Set of improper type strings like "ca-ca-ca-ha", etc.
         """
         impropers = set()
 
@@ -747,12 +796,107 @@ class GAFFAnalyzer:
                             atom2_type = bond_graph[neighbors[j]][0]
                             atom3_type = bond_graph[neighbors[k]][0]
 
-                            # Create improper type: atom1-atom2-atom3-center
-                            # (following GAFF convention where central atom is last)
-                            improper_type = f"{atom1_type}-{atom2_type}-{atom3_type}-{center_type}"
+                            # Create improper type: atom1-atom2-CENTER-atom3
+                            # GAFF convention: central atom is at position 3 (index 2)
+                            improper_type = f"{atom1_type}-{atom2_type}-{center_type}-{atom3_type}"
                             impropers.add(improper_type)
 
         return impropers
+
+    def _get_available_bond_types(self, gaff_file: str) -> Set[str]:
+        """
+        Parse gaff.lt to get all available bond types.
+
+        Args:
+            gaff_file: Path to gaff.lt file
+
+        Returns:
+            Set of available bond type strings (normalized alphabetically)
+        """
+        available = set()
+        in_bond_section = False
+
+        with open(gaff_file, 'r') as f:
+            for line in f:
+                if 'write_once("Data Bonds By Type")' in line:
+                    in_bond_section = True
+                    continue
+                if in_bond_section and '}' in line and not line.strip().startswith('#'):
+                    break
+
+                if in_bond_section and '@bond:' in line and '@atom:' in line:
+                    atom_types = self._extract_atom_types(line)
+                    if len(atom_types) == 2:
+                        # Normalize alphabetically
+                        bond_type = '-'.join(sorted(atom_types))
+                        available.add(bond_type)
+
+        return available
+
+    def _suggest_similar_types(self, missing_type: str, available_types: Set[str]) -> List[str]:
+        """
+        Suggest similar parameter types that might be alternatives.
+
+        Args:
+            missing_type: The missing bond/angle/etc type string
+            available_types: Set of available types
+
+        Returns:
+            List of up to 3 suggested alternatives
+        """
+        suggestions = []
+        parts = missing_type.split('-')
+
+        for avail in available_types:
+            avail_parts = avail.split('-')
+            if len(avail_parts) != len(parts):
+                continue
+
+            # Count matching positions
+            matches = sum(1 for a, b in zip(parts, avail_parts) if a == b)
+
+            # If only one atom type differs, it might be a related type
+            if matches == len(parts) - 1:
+                suggestions.append(avail)
+
+        return sorted(suggestions)[:3]
+
+    def validate_parameter_coverage(
+        self,
+        used_bond_types: Set[str],
+        gaff_file: str
+    ) -> Tuple[bool, List[str]]:
+        """
+        Validate that all required bond types exist in the GAFF parameter file.
+
+        This method checks if the force field has parameters for all bonds
+        that will be created during polymerization. Missing parameters will
+        cause moltemplate to fail with cryptic errors.
+
+        Args:
+            used_bond_types: Set of bond type strings needed (e.g., "c3-nh")
+            gaff_file: Path to gaff.lt file
+
+        Returns:
+            Tuple of (is_valid, error_messages)
+            - is_valid: True if all parameters are present
+            - error_messages: List of error/warning messages if any missing
+        """
+        available_bonds = self._get_available_bond_types(gaff_file)
+        errors = []
+
+        # Check bond types
+        missing_bonds = used_bond_types - available_bonds
+        if missing_bonds:
+            for bond in sorted(missing_bonds):
+                suggestions = self._suggest_similar_types(bond, available_bonds)
+                msg = f"Missing bond parameters for: {bond}"
+                if suggestions:
+                    msg += f" (similar available: {', '.join(suggestions)})"
+                errors.append(msg)
+
+        is_valid = len(errors) == 0
+        return is_valid, errors
 
     def create_gaff_subset(self, model) -> None:
         """Create a subset of GAFF parameters based on the models.
@@ -775,13 +919,17 @@ class GAFFAnalyzer:
             model: Model object containing sequence information with monomer file names
         """
         try:
-            gaff_src = str(Path(self.path_master) / "moltemplate" / "common" / "gaff.lt")
+            # Determine source file based on force field
+            # Use GAFF2 for both "gaff" and "gaff2" force fields since atom typing uses GAFF2 types
+            gaff_src = str(Path(self.path_master) / "moltemplate" / "force_fields" / "gaff2.lt")
+
+            # Use gaff_subset.lt as output for both (symlink will handle naming)
             gaff_dst = str(Path(self.path_cwd) / "gaff_subset.lt")
 
             # Check if source file exists
             if not Path(gaff_src).exists():
                 logger.error(f"GAFF force field file not found: {gaff_src}")
-                logger.error("Please ensure gaff.lt is installed in moltemplate/common/")
+                logger.error(f"Please ensure {Path(gaff_src).name} is installed in moltemplate/")
                 sys.exit(1)
 
             logger.info("Creating GAFF parameter subset...")
@@ -803,8 +951,8 @@ class GAFFAnalyzer:
 
             if not monomer_files:
                 logger.warning("  No monomer files found!")
-                logger.warning("  Falling back to full gaff.lt")
-                shutil.copy(gaff_src, str(Path(self.path_cwd) / "gaff.lt"))
+                logger.warning(f"  Falling back to full {Path(gaff_src).name}")
+                shutil.copy(gaff_src, str(Path(self.path_cwd) / Path(gaff_src).name))
                 return
 
             logger.info(f"  Found {len(monomer_files)} monomer files")
@@ -816,8 +964,8 @@ class GAFFAnalyzer:
 
             if not atom_types:
                 logger.warning("  No atom types found in monomers!")
-                logger.warning("  Falling back to full gaff.lt")
-                shutil.copy(gaff_src, str(Path(self.path_cwd) / "gaff.lt"))
+                logger.warning(f"  Falling back to full {Path(gaff_src).name}")
+                shutil.copy(gaff_src, str(Path(self.path_cwd) / Path(gaff_src).name))
                 return
 
             # Step 3: Extract bond types from monomers and add inter-monomer possibilities
@@ -863,6 +1011,16 @@ class GAFFAnalyzer:
                     continue
 
             logger.info(f"  Found {len(used_angle_types)} unique angle types")
+
+            # Validate that required bond parameters exist in GAFF
+            # Only check the explicitly used bonds (not all possible combinations)
+            explicit_bonds = self._extract_bonds_from_monomers(monomer_files)
+            is_valid, errors = self.validate_parameter_coverage(explicit_bonds, gaff_src)
+            if not is_valid:
+                logger.warning("  Parameter validation warnings:")
+                for err in errors:
+                    logger.warning(f"    {err}")
+                logger.warning("  Some bond types may cause moltemplate errors.")
             logger.info(f"  Found {len(used_dihedral_types)} unique dihedral types")
             logger.info(f"  Found {len(used_improper_types)} unique improper types")
 
@@ -915,12 +1073,13 @@ class GAFFAnalyzer:
 
             with open(gaff_dst, 'w') as f:
                 # Header
-                f.write("# GAFF Force Field Subset\n")
+                ff_name = "GAFF2" if self.force_field == "gaff2" else "GAFF"
+                f.write(f"# {ff_name} Force Field Subset\n")
                 f.write(f"# Generated by AutoPoly from {gaff_src}\n")
                 f.write(f"# Atom types used: {', '.join(sorted(atom_types))}\n")
                 f.write(f"# Total atom types: {len(atom_types)}\n")
                 f.write("\n")
-                f.write("GAFF {\n\n")
+                f.write(f"{ff_name} {{\n\n")
 
                 # Masses
                 f.write("  write_once(\"Data Masses\") {\n")
@@ -1069,7 +1228,8 @@ class GAFFAnalyzer:
                             f.write(f"{line}")
                     f.write("  } #end of init parameters\n\n")
 
-                f.write("} # GAFF\n")
+                ff_name = "GAFF2" if self.force_field == "gaff2" else "GAFF"
+                f.write(f"}} # {ff_name}\n")
 
             # Calculate file size reduction
             original_size = Path(gaff_src).stat().st_size
@@ -1079,16 +1239,17 @@ class GAFFAnalyzer:
             logger.info(f"  Successfully created gaff_subset.lt")
             logger.info(f"  File size: {original_size} -> {subset_size} bytes ({reduction:.1f}% reduction)")
 
-            # Create symlink from gaff.lt to gaff_subset.lt for monomer compatibility
-            gaff_link = str(Path(self.path_cwd) / "gaff.lt")
+            # Create symlink from gaff.lt or gaff2.lt to gaff_subset.lt for monomer compatibility
+            gaff_link_name = "gaff2.lt" if self.force_field == "gaff2" else "gaff.lt"
+            gaff_link = str(Path(self.path_cwd) / gaff_link_name)
             if Path(gaff_link).exists():
                 Path(gaff_link).unlink()
             Path(gaff_link).symlink_to("gaff_subset.lt")
-            logger.info(f"  Created symlink: gaff.lt -> gaff_subset.lt")
+            logger.info(f"  Created symlink: {gaff_link_name} -> gaff_subset.lt")
 
         except Exception as e:
             logger.error(f"Error in create_gaff_subset: {str(e)}")
             import traceback
             traceback.print_exc()
-            logger.warning("Falling back to full gaff.lt")
-            shutil.copy(gaff_src, str(Path(self.path_cwd) / "gaff.lt"))
+            logger.warning(f"Falling back to full {Path(gaff_src).name}")
+            shutil.copy(gaff_src, str(Path(self.path_cwd) / Path(gaff_src).name))

@@ -1,0 +1,1005 @@
+# OPLS-AA 2024 Feature Definitions for RDKit
+#
+# Atom types are based on OPLS-AA 2024 numbering from oplsaa.lt
+# See: Jorgensen et al., J. Phys. Chem. B 2024
+#
+# Format:
+#   DefineFeature @atom:NUM [SMARTS]
+#   Family PRIORITY_CLASS
+#   EndFeature
+#
+# Priority numbers: Higher = more specific pattern takes precedence
+# Class names (CT, HC, CA, etc.) are from OPLS-AA atom classes
+
+# =============================================================================
+# ALKANES (OPLS/2020 parameters, types 54-60)
+# =============================================================================
+
+# CH3 (methyl) - types 54-56 for different branching
+DefineFeature @atom:54 [$([CH3D4][C])]
+Family 0CT
+EndFeature
+DefineFeature @atom:55 [$([CH3D4][CH1])]
+Family 1CT
+EndFeature
+DefineFeature @atom:56 [$([CH3D4][CH0]([CH3])([CH3])[CH3])]
+Family 2CT
+EndFeature
+
+# CH2 (methylene) - type 57
+DefineFeature @atom:57 [$([CH2D4]([C])[C])]
+Family 3CT
+EndFeature
+
+# CH (methine) - type 58
+DefineFeature @atom:58 [$([CH1D4]([C])([C])[C])]
+Family 4CT
+EndFeature
+
+# C (quaternary) - type 59
+DefineFeature @atom:59 [$([CH0D4]([C])([C])([C])[C])]
+Family 5CT
+EndFeature
+
+# CH4 (methane) - type 138 (note: 138, not 54 range)
+DefineFeature @atom:138 [CH4D4]
+Family 6CT
+EndFeature
+
+# H on alkane - type 60
+DefineFeature @atom:60 [$([#1][CH4])]
+Family 0HC
+EndFeature
+DefineFeature @atom:60 [$([#1][CD4;!$([C][CD2,O,N][#6]);!$([C][F,Cl,Br,I])])]
+Family 1HC
+EndFeature
+
+# =============================================================================
+# ALKENES (types 141-144, 150, 178)
+# =============================================================================
+
+# R2-C= (disubstituted alkene carbon)
+DefineFeature @atom:141 [$([CH0D3]([#6])([#6])=[#6])]
+Family 0CM
+EndFeature
+
+# RH-C= (monosubstituted alkene carbon)
+DefineFeature @atom:142 [$([CH1D3]([#6])=[#6])]
+Family 1CM
+EndFeature
+
+# H2-C= (terminal alkene carbon)
+DefineFeature @atom:143 [$([CH2D3]=[#6])]
+Family 2CM
+EndFeature
+
+# H on alkene
+DefineFeature @atom:144 [$([#1][CD3])]
+Family 2HC
+EndFeature
+
+# Diene =CH-CH=
+DefineFeature @atom:150 [$([CH1](=C)-[CH1]=C)]
+Family 3CM
+EndFeature
+
+# Diene =CR-RC=
+DefineFeature @atom:178 [$([CH0](=C)-[CH0]=C)]
+Family 4CM
+EndFeature
+
+# =============================================================================
+# AROMATIC BENZENE (types 145-147)
+# =============================================================================
+
+# Benzene C
+DefineFeature @atom:145 [$([c]([c])[c])]
+Family 0CA
+EndFeature
+
+# Benzene H
+DefineFeature @atom:146 [$([#1][c]([c])[c])]
+Family 0HA
+EndFeature
+
+# Naphthalene fusion C
+DefineFeature @atom:147 [$([c](c)(c)(c))]
+Family 1CB
+EndFeature
+
+# Biphenyl C
+DefineFeature @atom:519 [$([c](c)(c)-[c](c)c)]
+Family 0C!
+EndFeature
+
+# =============================================================================
+# ALKYL BENZENE (types 61-64, 148-149, 515-516)
+# =============================================================================
+
+# CH3-benzene (toluene)
+DefineFeature @atom:61 [$([CH3][c])]
+Family 7CT
+EndFeature
+DefineFeature @atom:148 [$([CH3][c])]
+Family 8CT
+EndFeature
+
+# CH2-benzene (ethylbenzene)
+DefineFeature @atom:62 [$([CH2D4][c])]
+Family 9CT
+EndFeature
+DefineFeature @atom:149 [$([CH2D4][c])]
+Family 10CT
+EndFeature
+
+# CH-benzene (isopropylbenzene)
+DefineFeature @atom:63 [$([CH1D4][c])]
+Family 11CT
+EndFeature
+DefineFeature @atom:515 [$([CH1D4][c])]
+Family 12CT
+EndFeature
+
+# C-benzene (t-butylbenzene)
+DefineFeature @atom:64 [$([CH0D4][c])]
+Family 13CT
+EndFeature
+DefineFeature @atom:516 [$([CH0D4][c])]
+Family 14CT
+EndFeature
+
+# =============================================================================
+# HALOGENATED ALKANES
+# =============================================================================
+
+# Chloroalkanes (types 151-153)
+DefineFeature @atom:151 [$([Cl][CD4])]
+Family 0Cl
+EndFeature
+DefineFeature @atom:152 [$([CH2D4]([!Cl])[Cl])]
+Family 15CT
+EndFeature
+DefineFeature @atom:153 [$([#1][#6D4][Cl])]
+Family 3HC
+EndFeature
+
+# CHCl
+DefineFeature @atom:1052 [$([CH1D4]([!Cl])([!Cl])[Cl])]
+Family 16CT
+EndFeature
+
+# CCl
+DefineFeature @atom:1053 [$([CH0D4]([!Cl])([!Cl])([!Cl])[Cl])]
+Family 17CT
+EndFeature
+
+# Bromoalkanes
+DefineFeature @atom:722 [$([Br][CD4])]
+Family 0Br
+EndFeature
+DefineFeature @atom:1055 [$([CH2D4]([!Br])[Br])]
+Family 18CT
+EndFeature
+DefineFeature @atom:1056 [$([#1][#6D4][Br])]
+Family 4HC
+EndFeature
+DefineFeature @atom:1057 [$([CH1D4]([!Br])([!Br])[Br])]
+Family 19CT
+EndFeature
+DefineFeature @atom:1058 [$([CH0D4]([!Br])([!Br])([!Br])[Br])]
+Family 20CT
+EndFeature
+
+# Iodoalkanes
+DefineFeature @atom:1059 [$([I][CD4])]
+Family 0I
+EndFeature
+DefineFeature @atom:1060 [$([CH2D4]([!I])[I])]
+Family 21CT
+EndFeature
+DefineFeature @atom:1061 [$([#1][#6D4][I])]
+Family 5HC
+EndFeature
+DefineFeature @atom:1062 [$([CH1D4]([!I])([!I])[I])]
+Family 22CT
+EndFeature
+DefineFeature @atom:1063 [$([CH0D4]([!I])([!I])([!I])[I])]
+Family 23CT
+EndFeature
+
+# =============================================================================
+# ALCOHOLS (types 154-160, 166-176)
+# =============================================================================
+
+# O: mono alcohols
+DefineFeature @atom:154 [$([OH][#6])]
+Family 0OH
+EndFeature
+
+# H(O): mono alcohols
+DefineFeature @atom:155 [$([#1][O][#6])]
+Family 0HO
+EndFeature
+
+# H(C): methanol
+DefineFeature @atom:156 [$([#1][CH3][OH])]
+Family 6HC
+EndFeature
+
+# C: CH3 & CH2, prim. alcohols
+DefineFeature @atom:157 [$([C;H2,H3][OH])]
+Family 24CT
+EndFeature
+
+# C: CH, sec. alcohols
+DefineFeature @atom:158 [$([CH1][OH])]
+Family 25CT
+EndFeature
+
+# C: C, tert. alcohols
+DefineFeature @atom:159 [$([CH0][OH])]
+Family 26CT
+EndFeature
+
+# O: mono tert. alcohols
+DefineFeature @atom:160 [$([OH][CH0])]
+Family 1OH
+EndFeature
+
+# Phenol C(OH)
+DefineFeature @atom:166 [$([c]([OH]))]
+Family 1CA
+EndFeature
+
+# Phenol O
+DefineFeature @atom:167 [$([OH][c])]
+Family 2OH
+EndFeature
+
+# Phenol H(O)
+DefineFeature @atom:168 [$([#1][O][c])]
+Family 1HO
+EndFeature
+
+# Diols
+DefineFeature @atom:169 [$([OH][C][C][OH])]
+Family 3OH
+EndFeature
+DefineFeature @atom:170 [$([#1][O][C][C][OH])]
+Family 2HO
+EndFeature
+
+# Triols
+DefineFeature @atom:171 [$([OH][#6][#6]([OH])[#6][OH])]
+Family 4OH
+EndFeature
+DefineFeature @atom:171 [$([OH][#6]([#6][OH])[#6][OH])]
+Family 5OH
+EndFeature
+DefineFeature @atom:172 [$([#1][O][#6][#6]([OH])[#6][OH])]
+Family 3HO
+EndFeature
+DefineFeature @atom:172 [$([#1][O][#6]([#6][OH])[#6][OH])]
+Family 4HO
+EndFeature
+
+# C in diols/triols
+DefineFeature @atom:173 [$([CH2D4]([OH])[#6]([OH])[#6][OH])]
+Family 27CT
+EndFeature
+DefineFeature @atom:173 [$([CH2D4]([OH])[#6][OH])]
+Family 28CT
+EndFeature
+DefineFeature @atom:174 [$([CH1D4]([OH])[#6]([OH])[#6][OH])]
+Family 29CT
+EndFeature
+DefineFeature @atom:174 [$([CH1D4]([OH])([#6][OH])[#6][OH])]
+Family 30CT
+EndFeature
+DefineFeature @atom:174 [$([CH1D4]([OH])[#6][OH])]
+Family 31CT
+EndFeature
+DefineFeature @atom:175 [$([CH0D4]([OH])[#6]([OH])[#6][OH])]
+Family 32CT
+EndFeature
+DefineFeature @atom:175 [$([CH0D4]([OH])([#6][OH])[#6][OH])]
+Family 33CT
+EndFeature
+DefineFeature @atom:175 [$([CH0D4]([OH])[#6][OH])]
+Family 34CT
+EndFeature
+
+# H(CXOH) on diol/triol carbons
+DefineFeature @atom:176 [$([#1][CD4]([OH])[#6]([OH])[#6][OH])]
+Family 7HC
+EndFeature
+DefineFeature @atom:176 [$([#1][CD4]([OH])([#6][OH])[#6][OH])]
+Family 8HC
+EndFeature
+DefineFeature @atom:176 [$([#1][CD4]([OH])[#6][OH])]
+Family 9HC
+EndFeature
+
+# =============================================================================
+# ETHERS (types 177-186)
+# =============================================================================
+
+# Diphenyl ether
+DefineFeature @atom:177 [$([O]([c;r6])[c;r6])]
+Family 0OS
+EndFeature
+
+# Anisole O
+DefineFeature @atom:179 [$([O](c)[CD4])]
+Family 1OS
+EndFeature
+
+# Dialkyl ether O
+DefineFeature @atom:180 [$([O]([C][*;!$([#7,#8])])[C][*;!$([#7,#8])])]
+Family 2OS
+EndFeature
+
+# Ether carbons
+DefineFeature @atom:181 [$([CH3D4][O][#6][*;!$([#7,#8])])]
+Family 35CT
+EndFeature
+DefineFeature @atom:182 [$([CH2D4]([*;!$([#7,#8])])[O][#6][*;!$([#7,#8])])]
+Family 36CT
+EndFeature
+DefineFeature @atom:183 [$([CH1D4]([*;!$([#7,#8])])[O][#6][*;!$([#7,#8])])]
+Family 37CT
+EndFeature
+DefineFeature @atom:184 [$([CH0D4]([*;!$([#7,#8])])[O][#6][*;!$([#7,#8])])]
+Family 38CT
+EndFeature
+
+# Alpha H on ether
+DefineFeature @atom:185 [$([#1][#6]([*;!$([#7,#8])])[O][#6][*;!$([#7,#8])])]
+Family 10HC
+EndFeature
+DefineFeature @atom:185 [$([#1][CH3][O][#6])]
+Family 11HC
+EndFeature
+DefineFeature @atom:185 [$([#1][CH2]([#6])[O][#6])]
+Family 12HC
+EndFeature
+DefineFeature @atom:185 [$([#1][CH2]([O])[CH2][O])]
+Family 13HC
+EndFeature
+
+# HC on alcohol CH2
+DefineFeature @atom:60 [$([#1][CH2][OH])]
+Family 14HC
+EndFeature
+DefineFeature @atom:60 [$([#1][CH2]([#6][OH])[O])]
+Family 15HC
+EndFeature
+
+# Acetal ether O
+DefineFeature @atom:186 [$([O](C)[#6][O][#6])]
+Family 3OS
+EndFeature
+
+# Hemiacetal OH
+DefineFeature @atom:187 [$([OH][C][O][#6])]
+Family 6OH
+EndFeature
+DefineFeature @atom:188 [$([#1][O][C][O][#6])]
+Family 5HO
+EndFeature
+
+# Acetal carbons
+DefineFeature @atom:189 [$([CH2D4]([O][#6])[O][#6])]
+Family 0CO
+EndFeature
+DefineFeature @atom:190 [$([#1][CH2D4]([O][#6])[O][#6])]
+Family 16HC
+EndFeature
+DefineFeature @atom:191 [$([CH2D4]([OH])[O][#6])]
+Family 1CO
+EndFeature
+DefineFeature @atom:192 [$([#1][CH2D4]([OH])[O][#6])]
+Family 17HC
+EndFeature
+DefineFeature @atom:193 [$([CH1D4]([O][#6])[O][#6])]
+Family 2CO
+EndFeature
+DefineFeature @atom:194 [$([#1][CH1D4]([O][#6])[O][#6])]
+Family 18HC
+EndFeature
+DefineFeature @atom:195 [$([CH1D4]([OH])[O][#6])]
+Family 3CO
+EndFeature
+DefineFeature @atom:196 [$([#1][CH1D4]([OH])[O][#6])]
+Family 19HC
+EndFeature
+DefineFeature @atom:197 [$([CH0D4]([O][#6])[O][#6])]
+Family 4CO
+EndFeature
+DefineFeature @atom:198 [$([CH0D4]([OH])[O][#6])]
+Family 5CO
+EndFeature
+
+# Anisole C
+DefineFeature @atom:199 [$([c][O][#6])]
+Family 2CA
+EndFeature
+
+# =============================================================================
+# THIOLS AND SULFIDES (types 200-222)
+# =============================================================================
+
+# Thiol S
+DefineFeature @atom:200 [#16D2H1]
+Family 0SH
+EndFeature
+
+# H2S
+DefineFeature @atom:201 [#16D2H2]
+Family 1SH
+EndFeature
+
+# Sulfide S
+DefineFeature @atom:202 [$([#16H0]~[#6])]
+Family 0S
+EndFeature
+
+# Disulfide S
+DefineFeature @atom:203 [$([#16D2H0][#16D2H0])]
+Family 1S
+EndFeature
+
+# Thiol H
+DefineFeature @atom:204 [$([#1][SD2H1])]
+Family 0HS
+EndFeature
+
+# H2S H
+DefineFeature @atom:205 [$([#1][SD2H2])]
+Family 1HS
+EndFeature
+
+# Thiol carbons
+DefineFeature @atom:206 [$([CH2][#16H1])]
+Family 39CT
+EndFeature
+DefineFeature @atom:207 [$([CH1][#16H1])]
+Family 40CT
+EndFeature
+DefineFeature @atom:208 [$([CH0][#16H1])]
+Family 41CT
+EndFeature
+
+# Sulfide carbons
+DefineFeature @atom:209 [$([CH3][#16D2H0])]
+Family 42CT
+EndFeature
+DefineFeature @atom:210 [$([CH2][#16D2H0])]
+Family 43CT
+EndFeature
+DefineFeature @atom:211 [$([CH1][#16D2H0])]
+Family 44CT
+EndFeature
+DefineFeature @atom:212 [$([CH0][#16D2H0])]
+Family 45CT
+EndFeature
+
+# Disulfide carbons
+DefineFeature @atom:213 [$([CH3][#16D2H0][#16D2H0])]
+Family 46CT
+EndFeature
+DefineFeature @atom:214 [$([CH2][#16D2H0][#16D2H0])]
+Family 47CT
+EndFeature
+DefineFeature @atom:215 [$([CH1][#16D2H0][#16D2H0])]
+Family 48CT
+EndFeature
+DefineFeature @atom:216 [$([CH0][#16D2H0][#16D2H0])]
+Family 49CT
+EndFeature
+
+# Methanethiol C
+DefineFeature @atom:217 [$([CH3][SH1])]
+Family 50CT
+EndFeature
+
+# Benzyl alcohol C
+DefineFeature @atom:218 [$([CH2](c)[OH])]
+Family 51CT
+EndFeature
+DefineFeature @atom:219 [$([CH1](c)[OH])]
+Family 52CT
+EndFeature
+DefineFeature @atom:220 [$([CH0](c)[OH])]
+Family 53CT
+EndFeature
+
+# Benzyl alcohol ipso C
+DefineFeature @atom:221 [$([c][CH2][OH])]
+Family 3CA
+EndFeature
+
+# Thioanisole S
+DefineFeature @atom:222 [$([SD2]([c])[CH3])]
+Family 2S
+EndFeature
+
+# =============================================================================
+# AMINES (types 223-230, 287-296)
+# =============================================================================
+
+# Primary amine carbons
+DefineFeature @atom:223 [$([CH2D4][NH2])]
+Family 54CT
+EndFeature
+DefineFeature @atom:224 [$([CH1D4][NH2])]
+Family 55CT
+EndFeature
+DefineFeature @atom:225 [$([CH0D4][NH2])]
+Family 56CT
+EndFeature
+
+# Ammonium ions
+DefineFeature @atom:287 [$([ND4H3+])]
+Family 0N3
+EndFeature
+DefineFeature @atom:288 [$([ND4H0+])]
+Family 1N3
+EndFeature
+DefineFeature @atom:290 [$([#1][ND4H3+])]
+Family 0H3
+EndFeature
+
+# Ammonium carbons
+DefineFeature @atom:291 [$([CH3][ND4H3+])]
+Family 57CT
+EndFeature
+DefineFeature @atom:292 [$([CH2D4][ND4H3+])]
+Family 58CT
+EndFeature
+DefineFeature @atom:293 [$([CH1D4][ND4H3+])]
+Family 59CT
+EndFeature
+DefineFeature @atom:294 [$([CH0D4][ND4H3+])]
+Family 60CT
+EndFeature
+
+# =============================================================================
+# CHLOROALKENES (types 226-227)
+# =============================================================================
+
+DefineFeature @atom:226 [$([Cl][CD3])]
+Family 1Cl
+EndFeature
+DefineFeature @atom:227 [$([CD3][F,Cl,Br,I])]
+Family 5CM
+EndFeature
+
+# =============================================================================
+# AMIDES (types 235-246)
+# =============================================================================
+
+# Amide C=O carbon
+DefineFeature @atom:235 [$([CD3](=O)[ND3])]
+Family 0C
+EndFeature
+
+# Amide O
+DefineFeature @atom:236 [$([O]=[CD3][ND3])]
+Family 0O
+EndFeature
+
+# Primary amide N
+DefineFeature @atom:237 [$([ND3H2][CD3]=[O])]
+Family 0N
+EndFeature
+
+# Secondary amide N
+DefineFeature @atom:238 [$([ND3H1][CD3]=[O])]
+Family 1N
+EndFeature
+
+# Tertiary amide N
+DefineFeature @atom:239 [$([ND3H0][CD3]=[O])]
+Family 2N
+EndFeature
+
+# Amide H on N
+DefineFeature @atom:240 [$([#1][ND3H2][CD3]=[O])]
+Family 0H
+EndFeature
+DefineFeature @atom:241 [$([#1][ND3H1][CD3]=[O])]
+Family 1H
+EndFeature
+
+# Amide N-methyl C
+DefineFeature @atom:242 [$([CH3D4][NH1D3][CD3]=[O])]
+Family 61CT
+EndFeature
+DefineFeature @atom:243 [$([CH3D4][NH0D3][CD3]=[O])]
+Family 62CT
+EndFeature
+
+# Amide N-CH2 C
+DefineFeature @atom:244 [$([CH2D4][NH1D3][CD3]=[O])]
+Family 63CT
+EndFeature
+DefineFeature @atom:245 [$([CH2D4][NH0D3][CD3]=[O])]
+Family 64CT
+EndFeature
+
+# Amide N-CH C
+DefineFeature @atom:229 [$([CH1D4]([N][C]=[O]))]
+Family 65CT
+EndFeature
+DefineFeature @atom:246 [$([CH1D4][NH0D3][CD3]=[O])]
+Family 66CT
+EndFeature
+
+# Amide N-C (quaternary)
+DefineFeature @atom:230 [$([CH0D4]([N][C]=[O]))]
+Family 67CT
+EndFeature
+
+# =============================================================================
+# CARBOXYLIC ACIDS (types 267-270)
+# =============================================================================
+
+# Carboxylic acid C
+DefineFeature @atom:267 [$([CD3](=O)[OH])]
+Family 1C
+EndFeature
+
+# Carboxylic acid O=
+DefineFeature @atom:269 [$([O]=[CD3][OH])]
+Family 1O
+EndFeature
+
+# Carboxylic acid -OH
+DefineFeature @atom:268 [$([OH][CD3]=[O])]
+Family 7OH
+EndFeature
+
+# Carboxylic acid H
+DefineFeature @atom:270 [$([#1][O][CD3]=[O])]
+Family 6HO
+EndFeature
+
+# =============================================================================
+# CARBOXYLATE (types 271-276)
+# =============================================================================
+
+# Carboxylate C
+DefineFeature @atom:271 [$([#6](~[#8D1])~[#8D1])]
+Family 2C
+EndFeature
+
+# Carboxylate O
+DefineFeature @atom:272 [$([#8D1]~[#6]~[#8D1])]
+Family 0O2
+EndFeature
+
+# Carboxylate alpha carbons
+DefineFeature @atom:273 [$([CH3D4][#6D3](~[#8D1])~[#8D1])]
+Family 68CT
+EndFeature
+DefineFeature @atom:274 [$([CH2D4][#6D3](~[#8D1])~[#8D1])]
+Family 69CT
+EndFeature
+DefineFeature @atom:275 [$([CH1D4][#6D3](~[#8D1])~[#8D1])]
+Family 70CT
+EndFeature
+DefineFeature @atom:276 [$([CH0D4][#6D3](~[#8D1])~[#8D1])]
+Family 71CT
+EndFeature
+
+# =============================================================================
+# ALDEHYDES AND KETONES (types 277-282)
+# =============================================================================
+
+# Aldehyde C
+DefineFeature @atom:277 [$([CH1D3]=[O])]
+Family 3C
+EndFeature
+
+# Aldehyde O
+DefineFeature @atom:278 [$([O]=[CH1D3])]
+Family 2O
+EndFeature
+
+# Aldehyde H
+DefineFeature @atom:279 [$([#1][CH1D3]=[O])]
+Family 20HC
+EndFeature
+
+# Ketone C
+DefineFeature @atom:280 [$([CD3](=[O])([C])[C])]
+Family 4C
+EndFeature
+
+# Ketone O
+DefineFeature @atom:281 [$([O]=[CD3]([C])[C])]
+Family 3O
+EndFeature
+
+# Alpha H on ketone/aldehyde
+DefineFeature @atom:282 [$([#1][CD4][CD3]=[O])]
+Family 21HC
+EndFeature
+
+# =============================================================================
+# ESTERS (types 465-469)
+# =============================================================================
+
+# Ester C=O
+DefineFeature @atom:465 [$([CD3](=O)[O][C])]
+Family 5C
+EndFeature
+
+# Ester =O
+DefineFeature @atom:466 [$([O]=[CD3][O][C])]
+Family 4O
+EndFeature
+
+# Ester -O-
+DefineFeature @atom:467 [$([O]([C])[CD3]=[O])]
+Family 4OS
+EndFeature
+
+# Ester methoxy C
+DefineFeature @atom:468 [$([CH3D4][O][CD3]=[O])]
+Family 72CT
+EndFeature
+
+# Ester alkoxy H
+DefineFeature @atom:469 [$([#1][CD4][O][CD3]=[O])]
+Family 22HC
+EndFeature
+
+# Ester alkoxy carbons
+DefineFeature @atom:490 [$([CH2D4][O][CD3]=[O])]
+Family 73CT
+EndFeature
+DefineFeature @atom:491 [$([CH1D4][O][CD3]=[O])]
+Family 74CT
+EndFeature
+DefineFeature @atom:492 [$([CH0D4][O][CD3]=[O])]
+Family 75CT
+EndFeature
+
+# =============================================================================
+# NITRILES (types 753-755)
+# =============================================================================
+
+# Nitrile N
+DefineFeature @atom:753 [$([ND1]#[CD2][C])]
+Family 0NZ
+EndFeature
+
+# Nitrile C
+DefineFeature @atom:754 [$([CD2](#[ND1])[C])]
+Family 0CZ
+EndFeature
+
+# Nitrile alpha C
+DefineFeature @atom:755 [$([CH2D4][CD2]#[ND1])]
+Family 76CT
+EndFeature
+
+# =============================================================================
+# AROMATIC HALIDES
+# =============================================================================
+
+# Chlorobenzene
+DefineFeature @atom:263 [$([c][Cl])]
+Family 4CA
+EndFeature
+DefineFeature @atom:264 [$([Cl][c])]
+Family 2Cl
+EndFeature
+
+# Fluorobenzene
+DefineFeature @atom:718 [$([c]([F]))]
+Family 5CA
+EndFeature
+DefineFeature @atom:719 [$([F][c])]
+Family 0F
+EndFeature
+
+# Trifluoromethylbenzene
+DefineFeature @atom:724 [$([c][CD4]([F])([F])[F])]
+Family 6CA
+EndFeature
+DefineFeature @atom:725 [$([CD4]([F])([F])([F])[c])]
+Family 77CT
+EndFeature
+DefineFeature @atom:726 [$([F][CD4]([F])([F])[c])]
+Family 1F
+EndFeature
+
+# Bromobenzene
+DefineFeature @atom:729 [$([c][Br])]
+Family 7CA
+EndFeature
+DefineFeature @atom:730 [$([Br][c])]
+Family 1Br
+EndFeature
+
+# Iodobenzene
+DefineFeature @atom:731 [$([c][I])]
+Family 8CA
+EndFeature
+DefineFeature @atom:732 [$([I][c])]
+Family 1I
+EndFeature
+
+# =============================================================================
+# CYCLOPROPANE/CYCLOBUTANE (OPLS/2020, types 711-716)
+# =============================================================================
+
+# Cyclopropane
+DefineFeature @atom:711 [$([CH2;R]1[C;R][C;R]1)]
+Family 0CY
+EndFeature
+DefineFeature @atom:712 [$([CH1;R]1([C])[C;R][C;R]1)]
+Family 1CY
+EndFeature
+DefineFeature @atom:713 [$([CH0;R]1([C])([C])[C;R][C;R]1)]
+Family 2CY
+EndFeature
+
+# Cyclobutane
+DefineFeature @atom:714 [$([CH2;R]1[C;R][C;R][C;R]1)]
+Family 3CY
+EndFeature
+DefineFeature @atom:715 [$([CH1;R]1([C])[C;R][C;R][C;R]1)]
+Family 4CY
+EndFeature
+DefineFeature @atom:716 [$([CH0;R]1([C])([C])[C;R][C;R][C;R]1)]
+Family 5CY
+EndFeature
+
+# =============================================================================
+# IONIC SPECIES
+# =============================================================================
+
+DefineFeature @atom:400 [F-]
+Family 0F-
+EndFeature
+DefineFeature @atom:401 [Cl-]
+Family 0Cl-
+EndFeature
+DefineFeature @atom:402 [Br-]
+Family 0Br-
+EndFeature
+DefineFeature @atom:403 [I-]
+Family 0I-
+EndFeature
+DefineFeature @atom:406 [Li+]
+Family 0Li+
+EndFeature
+DefineFeature @atom:407 [Na+]
+Family 0Na+
+EndFeature
+DefineFeature @atom:408 [K+]
+Family 0K+
+EndFeature
+DefineFeature @atom:409 [Rb+]
+Family 0Rb+
+EndFeature
+DefineFeature @atom:410 [Cs+]
+Family 0Cs+
+EndFeature
+DefineFeature @atom:411 [Mg+2]
+Family 0Mg2+
+EndFeature
+DefineFeature @atom:412 [Ca+2]
+Family 0Ca2+
+EndFeature
+DefineFeature @atom:413 [Sr+2]
+Family 0Sr2+
+EndFeature
+DefineFeature @atom:414 [Ba+2]
+Family 0Ba2+
+EndFeature
+
+# =============================================================================
+# UREA (types 247-250)
+# =============================================================================
+
+DefineFeature @atom:247 [$([CD3](=O)([NH2D3])[NH2D3])]
+Family 6C
+EndFeature
+DefineFeature @atom:248 [$([O]=[CD3]([NH2D3])[NH2D3])]
+Family 5O
+EndFeature
+DefineFeature @atom:249 [$([NH2D3][CD3]([NH2D3])=[O])]
+Family 3N
+EndFeature
+DefineFeature @atom:250 [$([#1][NH2D3][CD3]([NH2D3])=[O])]
+Family 2H
+EndFeature
+
+# =============================================================================
+# IMIDES (types 251-259)
+# =============================================================================
+
+DefineFeature @atom:251 [$([ND3]([CD3]=[O])[CD3]=[O])]
+Family 4N
+EndFeature
+DefineFeature @atom:252 [$([CD3](=[O])[ND3][CD3]=[O])]
+Family 7C
+EndFeature
+DefineFeature @atom:253 [$([O]=[CD3][ND3][CD3]=[O])]
+Family 6O
+EndFeature
+DefineFeature @atom:254 [$([#1][ND3]([CD3]=[O])[CD3]=[O])]
+Family 3H
+EndFeature
+DefineFeature @atom:255 [$([#1][CD3](=[O])[ND3][CD3]=[O])]
+Family 23HC
+EndFeature
+
+# Imide carbons
+DefineFeature @atom:256 [$([CH3D4][CD3](=[O])[ND3][CD3]=[O])]
+Family 78CT
+EndFeature
+DefineFeature @atom:257 [$([CH2D4][CD3](=[O])[ND3][CD3]=[O])]
+Family 79CT
+EndFeature
+DefineFeature @atom:258 [$([CH1D4][CD3](=[O])[ND3][CD3]=[O])]
+Family 80CT
+EndFeature
+DefineFeature @atom:259 [$([CH0D4][CD3](=[O])[ND3][CD3]=[O])]
+Family 81CT
+EndFeature
+
+# =============================================================================
+# BENZONITRILE (types 260-262)
+# =============================================================================
+
+DefineFeature @atom:260 [$([c][CD2]#[ND1])]
+Family 9CA
+EndFeature
+DefineFeature @atom:261 [$([CD2](c)#[ND1])]
+Family 1CZ
+EndFeature
+DefineFeature @atom:262 [$([ND1]#[CD2][c])]
+Family 1NZ
+EndFeature
+
+# =============================================================================
+# N-PHENYLACETAMIDE (types 265-266)
+# =============================================================================
+
+DefineFeature @atom:265 [$([NH1D3](c)[CD3]=[O])]
+Family 5N
+EndFeature
+DefineFeature @atom:266 [$([c][NH1D3][CD3]=[O])]
+Family 10CA
+EndFeature
+
+# =============================================================================
+# BENZOPHENONE, BENZALDEHYDE, ACETOPHENONE (types 231-234)
+# =============================================================================
+
+DefineFeature @atom:231 [$([C]([c])([c])=[O])]
+Family 8C
+EndFeature
+DefineFeature @atom:232 [$([CH1]([c])=[O])]
+Family 9C
+EndFeature
+DefineFeature @atom:233 [$([C]([c])([CH3])=[O])]
+Family 10C
+EndFeature
+DefineFeature @atom:234 [$([C]([c])([NH2D3])=[O])]
+Family 11C
+EndFeature
+
+# =============================================================================
+# THIOANISOLE (types 222, 228)
+# =============================================================================
+
+DefineFeature @atom:228 [$([c][SD2][CH3])]
+Family 11CA
+EndFeature
