@@ -221,12 +221,12 @@ class SMARTSTyper:
         Initialize SMARTS typer.
 
         Args:
-            force_field: 'oplsaa', 'gaff', 'gaff2', or 'lopls'
+            force_field: 'oplsaa', 'gaff', 'gaff2', 'lopls', 'dreiding', or 'compass'
             verbose: Enable logging
         """
         self.force_field = force_field
         self.verbose = verbose
-        
+
         # Locate .fdefn files
         # OPLS-AA uses 2024 atom type numbering (types 54-60 for alkanes, etc.)
         module_dir = Path(__file__).parent
@@ -236,6 +236,12 @@ class SMARTSTyper:
         elif force_field == 'lopls':
             # LOPLS uses L-suffixed types from loplsaa.lt
             self.fdef_path = str(module_dir / 'extern' / 'rdlt_data' / 'lopls_lt.fdefn')
+        elif force_field == 'dreiding':
+            # DREIDING force field
+            self.fdef_path = str(module_dir / 'extern' / 'rdlt_data' / 'dreiding_lt.fdefn')
+        elif force_field == 'compass':
+            # COMPASS force field (class2)
+            self.fdef_path = str(module_dir / 'extern' / 'rdlt_data' / 'compass_lt.fdefn')
         else:  # oplsaa
             # Use OPLS-AA 2024 numbering (from oplsaa.lt / moltemplate 2.22.5)
             self.fdef_path = str(module_dir / 'extern' / 'rdlt_data' / 'opls_lt_2024.fdefn')
@@ -1253,12 +1259,26 @@ class LTWriter:
             f.write('import "gaff2.lt"    # <-- defines the GAFF2 (General Amber Force Field 2)\n')
             f.write('# NOTE: GAFF2 requires user-supplied charges (AM1-BCC or RESP recommended)\n')
             f.write(f'{class_name} inherits GAFF2 {{\n\n')
+        elif variant.force_field == 'dreiding':
+            f.write('import "dreiding.lt"    # <-- defines the DREIDING force field\n')
+            f.write('# NOTE: DREIDING requires user-supplied charges (AM1-BCC, Gasteiger, or RESP)\n')
+            f.write('# See: Mayo et al., J. Phys. Chem. 1990, 94, 8897-8909\n')
+            f.write(f'{class_name} inherits DREIDING {{\n\n')
+        elif variant.force_field == 'compass':
+            f.write('import "compass_published.lt"    # <-- defines the COMPASS force field (class2)\n')
+            f.write('# NOTE: COMPASS requires LAMMPS compiled with CLASS2 package\n')
+            f.write('# NOTE: This is an incomplete public version - some parameters may be missing\n')
+            f.write(f'{class_name} inherits COMPASS {{\n\n')
+        elif variant.force_field == 'lopls':
+            f.write('import "loplsaa.lt"    # <-- defines the L-OPLS force field (long chains)\n')
+            f.write('# L-OPLS: Sui et al., J.Chem.Theory.Comp (2012), 8(4), 1459\n')
+            f.write(f'{class_name} inherits OPLSAA {{\n\n')
         else:
             f.write('import "oplsaa.lt"    # <-- defines the OPLS-AA force field\n')
             f.write(f'{class_name} inherits OPLSAA {{\n\n')
-        
+
         f.write('# atom-id  mol-id  atom-type charge      X         Y        Z\n\n')
-    
+
     def _write_atoms_block(self, f, variant: MonomerVariant) -> None:
         """
         Write Data Atoms block with connection atoms FIRST.
@@ -1447,9 +1467,9 @@ class MonomerGenerator:
         self.verbose = verbose
         
         # Validate force field
-        if force_field not in ['oplsaa', 'gaff', 'gaff2', 'lopls']:
+        if force_field not in ['oplsaa', 'gaff', 'gaff2', 'lopls', 'dreiding', 'compass']:
             raise MonomerGeneratorError(
-                f"Unknown force field: '{force_field}'. Use 'oplsaa', 'gaff', 'gaff2', or 'lopls'"
+                f"Unknown force field: '{force_field}'. Use 'oplsaa', 'gaff', 'gaff2', 'lopls', 'dreiding', or 'compass'"
             )
         
         # Initialize components
@@ -1738,12 +1758,26 @@ class MonomerGenerator:
                 f.write('import "gaff2.lt"    # <-- defines the GAFF2 (General Amber Force Field 2)\n')
                 f.write('# NOTE: GAFF2 requires user-supplied charges (AM1-BCC or RESP recommended)\n')
                 f.write(f'{variant.base_name} inherits GAFF2 {{\n\n')
+            elif variant.force_field == 'dreiding':
+                f.write('import "dreiding.lt"    # <-- defines the DREIDING force field\n')
+                f.write('# NOTE: DREIDING requires user-supplied charges (AM1-BCC, Gasteiger, or RESP)\n')
+                f.write('# See: Mayo et al., J. Phys. Chem. 1990, 94, 8897-8909\n')
+                f.write(f'{variant.base_name} inherits DREIDING {{\n\n')
+            elif variant.force_field == 'compass':
+                f.write('import "compass_published.lt"    # <-- defines the COMPASS force field (class2)\n')
+                f.write('# NOTE: COMPASS requires LAMMPS compiled with CLASS2 package\n')
+                f.write('# NOTE: This is an incomplete public version - some parameters may be missing\n')
+                f.write(f'{variant.base_name} inherits COMPASS {{\n\n')
+            elif variant.force_field == 'lopls':
+                f.write('import "loplsaa.lt"    # <-- defines the L-OPLS force field (long chains)\n')
+                f.write('# L-OPLS: Sui et al., J.Chem.Theory.Comp (2012), 8(4), 1459\n')
+                f.write(f'{variant.base_name} inherits OPLSAA {{\n\n')
             else:
                 f.write('import "oplsaa.lt"    # <-- defines the OPLS-AA force field\n')
                 f.write(f'{variant.base_name} inherits OPLSAA {{\n\n')
-            
+
             f.write('# atom-id  mol-id  atom-type charge      X         Y        Z\n\n')
-            
+
             # Write atoms block (heavy atoms first, then hydrogens)
             f.write('  write("Data Atoms") {\n')
             

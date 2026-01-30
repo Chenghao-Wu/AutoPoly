@@ -162,6 +162,14 @@ EndFeature
 DefineFeature @atom:155 [$([#1][O][#6])]
 Family 0HO
 EndFeature
+# Alpha-C to alcohol (CH2-OH or CH3-OH)
+DefineFeature @atom:157 [$([C;H2,H3][OH])]
+Family 10CT_AlcohAlpha
+EndFeature
+# H on alpha-C to alcohol
+DefineFeature @atom:60 [$([#1][C;H2,H3][OH])]
+Family 11HC_AlcohAlpha
+EndFeature
 
 # Standard esters
 DefineFeature @atom:465 [$([CD3](=O)[O][C])]
@@ -211,4 +219,34 @@ Family 3C
 EndFeature
 DefineFeature @atom:272 [$([#8D1]~[#6]~[#8D1])]
 Family 0O2
+EndFeature
+
+# =============================================================================
+# PEO/PEG (polyethylene oxide/glycol) - OPLS-AA 2020 ether types
+# Structure: -CH2-CH2-O-CH2-CH2-O- (ethylene oxide repeat units)
+# =============================================================================
+
+# Ether oxygen in PEO chain - type 180 (dialkyl ether O)
+DefineFeature @atom:180 [$([OD2]([CH2D4])[CH2D4])]
+Family 100OS_PEO
+EndFeature
+
+# Ether O between C that connects to another O (PEO internal)
+DefineFeature @atom:180 [$([OD2]([CD4][OD2])[CD4])]
+Family 101OS_PEO2
+EndFeature
+
+# CH2 in PEO chain - type 182 (ethyl ether C)
+DefineFeature @atom:182 [$([CH2D4][OD2][#6])]
+Family 102CT_PEO
+EndFeature
+
+# Terminal CH3 next to ether O - type 181 (methyl ether)
+DefineFeature @atom:181 [$([CH3D4][OD2][#6])]
+Family 103CT_PEO_TERM
+EndFeature
+
+# H on C adjacent to ether O - type 185 (alpha H ether)
+DefineFeature @atom:185 [$([#1][CD4][OD2])]
+Family 104HC_PEO
 EndFeature

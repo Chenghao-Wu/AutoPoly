@@ -1,0 +1,270 @@
+# COMPASS Force Field Feature Definition File
+# Generated for AutoPoly rdlt.py
+# Reference: Sun, H., J. Phys. Chem. B, 1998, 102, 7338-7364
+#
+# This file contains SMARTS patterns for COMPASS atom typing.
+# COMPASS is a class2 force field (quartic bonds, cross-coupling terms).
+#
+# NOTE: This is an incomplete public version of COMPASS.
+# Parameters for some atom types (especially sp2 carbons, NH2) may be missing.
+# The commercial version includes more comprehensive coverage.
+#
+# COMPASS requires LAMMPS compiled with the CLASS2 package.
+# Charges are handled via bond increment model in the .lt file.
+
+# ============================================================================
+# Carbon Types
+# ============================================================================
+
+# c4 - Generic sp3 carbon
+DefineFeature @atom:c4 [CD4]
+Family 0c4
+EndFeature
+
+# c43 - sp3 carbon with three heavy atoms attached
+DefineFeature @atom:c43 [$([CD4;H1]([!#1])([!#1])[!#1])]
+Family 1c43
+EndFeature
+
+# c44 - sp3 carbon with four heavy atoms attached
+DefineFeature @atom:c44 [$([CD4;H0]([!#1])([!#1])([!#1])[!#1])]
+Family 2c44
+EndFeature
+
+# c41o - sp3 carbon in methanol (CH3-OH)
+DefineFeature @atom:c41o [$([CH3][OX2;H1])]
+Family 3c41o
+EndFeature
+
+# c43o - sp3 carbon in secondary alcohols
+DefineFeature @atom:c43o [$([CH1D4]([!#1])([!#1])[OX2;H1])]
+Family 4c43o
+EndFeature
+
+# c4o - Alpha carbon (next to ester/carbonyl oxygen)
+DefineFeature @atom:c4o [$([CD4][OX2][CX3]=[OX1])]
+Family 5c4o
+EndFeature
+
+# c4z - sp3 carbon bonded to azide (-N3)
+DefineFeature @atom:c4z [$([CD4][NX2]=[NX2+]=[NX1-])]
+Family 6c4z
+EndFeature
+
+# c3a - Aromatic carbon
+DefineFeature @atom:c3a [$([c])]
+Family 7c3a
+EndFeature
+
+# c3prime - Carbonyl carbon with one polar substituent
+DefineFeature @atom:c3prime [$([CX3](=[OX1])([#6,#1])[OX2,NX3])]
+Family 8c3prime
+EndFeature
+
+# c2= - Carbon in CO2 and CS2 (linear sp)
+DefineFeature @atom:c2= [$([CX2](=[OX1])=[OX1]),$(C(=[SX1])=[SX1])]
+Family 9c2eq
+EndFeature
+
+# c1o - Carbon in CO (carbon monoxide)
+DefineFeature @atom:c1o [$([CX1]#[OX1])]
+Family 10c1o
+EndFeature
+
+# ============================================================================
+# Hydrogen Types
+# ============================================================================
+
+# h1 - Nonpolar hydrogen (on C)
+DefineFeature @atom:h1 [$([#1][#6])]
+Family 11h1
+EndFeature
+
+# h1h - Hydrogen in H2
+DefineFeature @atom:h1h [$([#1][#1])]
+Family 12h1h
+EndFeature
+
+# h1o - Strongly polar hydrogen (bonded to O, F)
+DefineFeature @atom:h1o [$([#1][OX2]),$([#1][F])]
+Family 13h1o
+EndFeature
+
+# ============================================================================
+# Nitrogen Types
+# ============================================================================
+
+# n1n - Nitrogen in N2
+DefineFeature @atom:n1n [$([NX1]#[NX1])]
+Family 14n1n
+EndFeature
+
+# n1o - Nitrogen in NO
+DefineFeature @atom:n1o [$([NX2]=[OX1])]
+Family 15n1o
+EndFeature
+
+# n1z - Nitrogen, terminal atom in azide (-N3)
+DefineFeature @atom:n1z [$([NX1-]=[NX2+]=[NX2])]
+Family 16n1z
+EndFeature
+
+# n2= - Nitrogen in imine/azo
+DefineFeature @atom:n2= [$([NX2]=[#6,#7])]
+Family 17n2eq
+EndFeature
+
+# n2o - Nitrogen in NO2
+DefineFeature @atom:n2o [$([NX2](=[OX1])[OX1])]
+Family 18n2o
+EndFeature
+
+# n2t - Nitrogen, central atom in azide (-N3)
+DefineFeature @atom:n2t [$([NX2+]=[NX1-])]
+Family 19n2t
+EndFeature
+
+# n2z - Nitrogen, first atom in azide (-N3)
+DefineFeature @atom:n2z [$([NX2]=[NX2+]=[NX1-])]
+Family 20n2z
+EndFeature
+
+# n3m - sp3 nitrogen in amides without hydrogen
+DefineFeature @atom:n3m [$([NX3;H0][CX3]=[OX1])]
+Family 21n3m
+EndFeature
+
+# n3o - Nitrogen in nitro group (-NO2)
+DefineFeature @atom:n3o [$([NX3+]([OX1-])=[OX1])]
+Family 22n3o
+EndFeature
+
+# ============================================================================
+# Oxygen Types
+# ============================================================================
+
+# o1= - Oxygen in NO2, SO2, and carbonyl
+DefineFeature @atom:o1= [$([OX1]=[#6,#7,#16])]
+Family 23o1eq
+EndFeature
+
+# o1=star - Oxygen in CO2
+DefineFeature @atom:o1=star [$([OX1]=[CX2]=[OX1])]
+Family 24o1eqstar
+EndFeature
+
+# o12 - Oxygen in nitro group (-NO2)
+DefineFeature @atom:o12 [$([OX1]=[NX3+][OX1-]),$([OX1-][NX3+]=[OX1])]
+Family 25o12
+EndFeature
+
+# o1c - Oxygen in CO (carbon monoxide)
+DefineFeature @atom:o1c [$([OX1]#[CX1])]
+Family 26o1c
+EndFeature
+
+# o1n - Oxygen in NO
+DefineFeature @atom:o1n [$([OX1]=[NX2])]
+Family 27o1n
+EndFeature
+
+# o1o - Oxygen in O2
+DefineFeature @atom:o1o [$([OX1]=[OX1])]
+Family 28o1o
+EndFeature
+
+# o2 - Generic oxygen with two bonds attached
+DefineFeature @atom:o2 [$([OX2])]
+Family 29o2
+EndFeature
+
+# o2e - Ether oxygen
+DefineFeature @atom:o2e [$([OX2]([#6])[#6])]
+Family 30o2e
+EndFeature
+
+# o2h - Hydroxyl oxygen
+DefineFeature @atom:o2h [$([OX2;H1])]
+Family 31o2h
+EndFeature
+
+# o2n - Oxygen in nitrates
+DefineFeature @atom:o2n [$([OX2][NX3+]([OX1-])=[OX1])]
+Family 32o2n
+EndFeature
+
+# o2s - Ester oxygen
+DefineFeature @atom:o2s [$([OX2]([#6])[CX3]=[OX1])]
+Family 33o2s
+EndFeature
+
+# o2z - Oxygen in siloxanes and zeolites
+DefineFeature @atom:o2z [$([OX2]([Si])[Si])]
+Family 34o2z
+EndFeature
+
+# ============================================================================
+# Phosphorus Types
+# ============================================================================
+
+# p4= - Phosphorus (generic)
+DefineFeature @atom:p4= [P]
+Family 35p4eq
+EndFeature
+
+# ============================================================================
+# Sulfur Types
+# ============================================================================
+
+# s1= - Sulfur in CS2
+DefineFeature @atom:s1= [$([SX1]=[CX2]=[SX1])]
+Family 36s1eq
+EndFeature
+
+# s2= - Sulfur in SO2
+DefineFeature @atom:s2= [$([SX2](=[OX1])=[OX1])]
+Family 37s2eq
+EndFeature
+
+# ============================================================================
+# Silicon Types
+# ============================================================================
+
+# si4 - Generic silicon with four bonds attached
+DefineFeature @atom:si4 [$([SiX4])]
+Family 38si4
+EndFeature
+
+# si4c - Silicon in siloxanes (non-hydrogen attached)
+DefineFeature @atom:si4c [$([SiX4;H0])]
+Family 39si4c
+EndFeature
+
+# ============================================================================
+# Noble Gas Types
+# ============================================================================
+
+# he - Helium
+DefineFeature @atom:he [He]
+Family 40he
+EndFeature
+
+# ne - Neon
+DefineFeature @atom:ne [Ne]
+Family 41ne
+EndFeature
+
+# ar - Argon
+DefineFeature @atom:ar [Ar]
+Family 42ar
+EndFeature
+
+# kr - Krypton
+DefineFeature @atom:kr [Kr]
+Family 43kr
+EndFeature
+
+# xe - Xenon
+DefineFeature @atom:xe [Xe]
+Family 44xe
+EndFeature
