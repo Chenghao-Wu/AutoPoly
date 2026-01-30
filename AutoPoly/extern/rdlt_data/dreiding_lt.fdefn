@@ -1,0 +1,633 @@
+# DREIDING Force Field Feature Definition File
+# Generated for AutoPoly rdlt.py
+# Reference: Mayo et al., J. Phys. Chem. 1990, 94, 8897-8909
+#
+# This file contains SMARTS patterns for DREIDING atom typing.
+# DREIDING uses element-based atom types with hybridization and coordination info.
+#
+# Naming convention:
+#   Element_hybridization (e.g., C_3 for sp3 carbon, C_R for resonance/aromatic)
+#   Suffixes: _hd (H-donor), _ha (H-acceptor), _b# (bonding context), _d# (coordination)
+#
+# NOTE: DREIDING requires user-supplied charges (AM1-BCC, Gasteiger, or RESP)
+
+# ============================================================================
+# Hydrogen Types
+# ============================================================================
+
+# H - Generic hydrogen (not H-bonding)
+DefineFeature @atom:H [$([#1])]
+Family 0H
+EndFeature
+
+# H_HB - Hydrogen bond hydrogen (H bonded to N, O, F)
+DefineFeature @atom:H_HB [$([#1][N,O,F])]
+Family 1H_HB
+EndFeature
+
+# H_B - Bridging hydrogen (in B-H-B bridges)
+DefineFeature @atom:H_B [$([#1]([B])[B])]
+Family 2H_B
+EndFeature
+
+# ============================================================================
+# Carbon Types (sp3, sp2, sp, resonance)
+# ============================================================================
+
+# C_3 - sp3 carbon (generic)
+DefineFeature @atom:C_3 [CD4]
+Family 3C_3
+EndFeature
+
+# C_34 - sp3 carbon with 4 hydrogens (CH4 - methane)
+DefineFeature @atom:C_34 [$([CH4])]
+Family 4C_34
+EndFeature
+
+# C_33 - sp3 carbon with 3 hydrogens (CH3 - methyl)
+DefineFeature @atom:C_33 [$([CH3D4])]
+Family 5C_33
+EndFeature
+
+# C_32 - sp3 carbon with 2 hydrogens (CH2 - methylene)
+DefineFeature @atom:C_32 [$([CH2D4])]
+Family 6C_32
+EndFeature
+
+# C_31 - sp3 carbon with 1 hydrogen (CH - methine)
+DefineFeature @atom:C_31 [$([CH1D4])]
+Family 7C_31
+EndFeature
+
+# C_R - Aromatic/resonance carbon (in aromatic ring)
+DefineFeature @atom:C_R [$([c])]
+Family 8C_R
+EndFeature
+
+# C_R1 - Aromatic carbon with 1 hydrogen
+DefineFeature @atom:C_R1 [$([cH1])]
+Family 9C_R1
+EndFeature
+
+# C_R_b1 - Aromatic carbon in bond context 1 (fused rings)
+DefineFeature @atom:C_R_b1 [$([c]([c])([c])[c])]
+Family 10C_R_b1
+EndFeature
+
+# C_R1_b1 - Aromatic carbon with 1H in fused ring
+DefineFeature @atom:C_R1_b1 [$([cH1]([c])([c])[c])]
+Family 11C_R1_b1
+EndFeature
+
+# C_2 - sp2 carbon (double bond, not aromatic)
+DefineFeature @atom:C_2 [$([CD3]=[*])]
+Family 12C_2
+EndFeature
+
+# C_2_b1 - sp2 carbon in carbonyl (C=O)
+DefineFeature @atom:C_2_b1 [$([CD3](=[O]))]
+Family 13C_2_b1
+EndFeature
+
+# C_2_b2 - sp2 carbon double bonded to C
+DefineFeature @atom:C_2_b2 [$([CD3](=[C]))]
+Family 14C_2_b2
+EndFeature
+
+# C_1 - sp carbon (triple bond)
+DefineFeature @atom:C_1 [$([CD2]#[*])]
+Family 15C_1
+EndFeature
+
+# C_1_b1 - sp carbon in nitrile (C#N)
+DefineFeature @atom:C_1_b1 [$([CD2]#[N])]
+Family 16C_1_b1
+EndFeature
+
+# ============================================================================
+# Nitrogen Types
+# ============================================================================
+
+# N_3 - sp3 nitrogen (amine)
+DefineFeature @atom:N_3 [$([NX3;!$(N=[*]);!$(N#[*])])]
+Family 17N_3
+EndFeature
+
+# N_3_hd - sp3 nitrogen as H-donor (N-H)
+DefineFeature @atom:N_3_hd [$([NX3;H1,H2,H3;!$(N=[*])])]
+Family 18N_3_hd
+EndFeature
+
+# N_3_ha - sp3 nitrogen as H-acceptor (lone pair)
+DefineFeature @atom:N_3_ha [$([NX3;H0;!$(N=[*]);!$(N#[*])])]
+Family 19N_3_ha
+EndFeature
+
+# N_R - Aromatic nitrogen
+DefineFeature @atom:N_R [$([n])]
+Family 20N_R
+EndFeature
+
+# N_R_d1 - Aromatic nitrogen coordination 1
+DefineFeature @atom:N_R_d1 [$([nD2])]
+Family 21N_R_d1
+EndFeature
+
+# N_R_d2 - Aromatic nitrogen coordination 2
+DefineFeature @atom:N_R_d2 [$([nD3])]
+Family 22N_R_d2
+EndFeature
+
+# N_R_d2_hd - Aromatic nitrogen coordination 2, H-donor
+DefineFeature @atom:N_R_d2_hd [$([nH1])]
+Family 23N_R_d2_hd
+EndFeature
+
+# N_R_b1_d2 - Aromatic nitrogen in fused ring, coordination 2
+DefineFeature @atom:N_R_b1_d2 [$([n](c)(c)c)]
+Family 24N_R_b1_d2
+EndFeature
+
+# N_R_b1_d2_hd - Aromatic nitrogen in fused ring, coordination 2, H-donor
+DefineFeature @atom:N_R_b1_d2_hd [$([nH1](c)(c)c)]
+Family 25N_R_b1_d2_hd
+EndFeature
+
+# N_R_d1_ha - Aromatic nitrogen coordination 1, H-acceptor
+DefineFeature @atom:N_R_d1_ha [$([nD2;H0])]
+Family 26N_R_d1_ha
+EndFeature
+
+# N_R_d2_ha - Aromatic nitrogen coordination 2, H-acceptor
+DefineFeature @atom:N_R_d2_ha [$([nD3;H0])]
+Family 27N_R_d2_ha
+EndFeature
+
+# N_R_b1_d2_ha - Aromatic nitrogen fused ring, coordination 2, H-acceptor
+DefineFeature @atom:N_R_b1_d2_ha [$([nD3;H0](c)(c)c)]
+Family 28N_R_b1_d2_ha
+EndFeature
+
+# N_2 - sp2 nitrogen (imine, C=N)
+DefineFeature @atom:N_2 [$([ND2]=[*])]
+Family 29N_2
+EndFeature
+
+# N_2_d1 - sp2 nitrogen coordination 1
+DefineFeature @atom:N_2_d1 [$([ND2]=*)]
+Family 30N_2_d1
+EndFeature
+
+# N_2_d1_hd - sp2 nitrogen coordination 1, H-donor
+DefineFeature @atom:N_2_d1_hd [$([ND2;H1]=*)]
+Family 31N_2_d1_hd
+EndFeature
+
+# N_2_d1_ha - sp2 nitrogen coordination 1, H-acceptor
+DefineFeature @atom:N_2_d1_ha [$([ND2;H0]=*)]
+Family 32N_2_d1_ha
+EndFeature
+
+# N_2_b1_d1 - sp2 nitrogen in amide (N-C=O)
+DefineFeature @atom:N_2_b1_d1 [$([NX3][CX3](=[OX1]))]
+Family 33N_2_b1_d1
+EndFeature
+
+# N_2_b1_d1_ha - sp2 nitrogen in amide, H-acceptor
+DefineFeature @atom:N_2_b1_d1_ha [$([NX3;H0][CX3](=[OX1]))]
+Family 34N_2_b1_d1_ha
+EndFeature
+
+# N_2_b2_d1 - sp2 nitrogen double bonded to C
+DefineFeature @atom:N_2_b2_d1 [$([ND2]=[C])]
+Family 35N_2_b2_d1
+EndFeature
+
+# N_2_b2_d1_ha - sp2 nitrogen double bonded to C, H-acceptor
+DefineFeature @atom:N_2_b2_d1_ha [$([ND2;H0]=[C])]
+Family 36N_2_b2_d1_ha
+EndFeature
+
+# N_2_d2 - sp2 nitrogen coordination 2
+DefineFeature @atom:N_2_d2 [$([ND3]=*)]
+Family 37N_2_d2
+EndFeature
+
+# N_2_d2_hd - sp2 nitrogen coordination 2, H-donor
+DefineFeature @atom:N_2_d2_hd [$([ND3;H1]=*)]
+Family 38N_2_d2_hd
+EndFeature
+
+# N_2_d2_ha - sp2 nitrogen coordination 2, H-acceptor
+DefineFeature @atom:N_2_d2_ha [$([ND3;H0]=*)]
+Family 39N_2_d2_ha
+EndFeature
+
+# N_2_b1_d2 - sp2 nitrogen in conjugated system
+DefineFeature @atom:N_2_b1_d2 [$([ND3]=[*][*]=[*])]
+Family 40N_2_b1_d2
+EndFeature
+
+# N_2_b1_d2_hd - sp2 nitrogen conjugated, H-donor
+DefineFeature @atom:N_2_b1_d2_hd [$([ND3;H1]=[*][*]=[*])]
+Family 41N_2_b1_d2_hd
+EndFeature
+
+# N_2_b1_d2_ha - sp2 nitrogen conjugated, H-acceptor
+DefineFeature @atom:N_2_b1_d2_ha [$([ND3;H0]=[*][*]=[*])]
+Family 42N_2_b1_d2_ha
+EndFeature
+
+# N_2_b2_d2 - sp2 nitrogen in nitro-like
+DefineFeature @atom:N_2_b2_d2 [$([ND3](=[O])=[O])]
+Family 43N_2_b2_d2
+EndFeature
+
+# N_2_b2_d2_hd - sp2 nitrogen nitro-like, H-donor (unusual)
+DefineFeature @atom:N_2_b2_d2_hd [$([ND3;H1](=[O])=[O])]
+Family 44N_2_b2_d2_hd
+EndFeature
+
+# N_2_b2_d2_ha - sp2 nitrogen nitro-like, H-acceptor
+DefineFeature @atom:N_2_b2_d2_ha [$([ND3;H0](=[O])=[O])]
+Family 45N_2_b2_d2_ha
+EndFeature
+
+# N_1 - sp nitrogen (nitrile N)
+DefineFeature @atom:N_1 [$([ND1]#*)]
+Family 46N_1
+EndFeature
+
+# N_1_ha - sp nitrogen, H-acceptor
+DefineFeature @atom:N_1_ha [$([ND1]#*)]
+Family 47N_1_ha
+EndFeature
+
+# ============================================================================
+# Oxygen Types
+# ============================================================================
+
+# O_3 - sp3 oxygen (ether, alcohol)
+DefineFeature @atom:O_3 [$([OX2;!$(O=*)])]
+Family 48O_3
+EndFeature
+
+# O_3_hd - sp3 oxygen as H-donor (O-H)
+DefineFeature @atom:O_3_hd [$([OX2;H1])]
+Family 49O_3_hd
+EndFeature
+
+# O_3_ha - sp3 oxygen as H-acceptor (ether)
+DefineFeature @atom:O_3_ha [$([OX2;H0;!$(O=*)])]
+Family 50O_3_ha
+EndFeature
+
+# O_R - Aromatic oxygen (furan)
+DefineFeature @atom:O_R [$([o])]
+Family 51O_R
+EndFeature
+
+# O_R_ha - Aromatic oxygen, H-acceptor
+DefineFeature @atom:O_R_ha [$([o])]
+Family 52O_R_ha
+EndFeature
+
+# O_2 - sp2 oxygen (carbonyl C=O)
+DefineFeature @atom:O_2 [$([OX1]=[#6])]
+Family 53O_2
+EndFeature
+
+# O_2_b1 - sp2 oxygen in carbonyl
+DefineFeature @atom:O_2_b1 [$([OX1]=[CX3])]
+Family 54O_2_b1
+EndFeature
+
+# O_2_b1_hd - sp2 oxygen in carboxylic acid (C=O near O-H)
+DefineFeature @atom:O_2_b1_hd [$([OX1]=[CX3][OX2;H1])]
+Family 55O_2_b1_hd
+EndFeature
+
+# O_2_b1_ha - sp2 oxygen in carbonyl, H-acceptor
+DefineFeature @atom:O_2_b1_ha [$([OX1]=[CX3])]
+Family 56O_2_b1_ha
+EndFeature
+
+# O_2_b2 - sp2 oxygen double bonded to N (nitro)
+DefineFeature @atom:O_2_b2 [$([OX1]=[NX3])]
+Family 57O_2_b2
+EndFeature
+
+# O_2_b2_ha - sp2 oxygen double bonded to N, H-acceptor
+DefineFeature @atom:O_2_b2_ha [$([OX1]=[NX3])]
+Family 58O_2_b2_ha
+EndFeature
+
+# O_2_ha - sp2 oxygen, generic H-acceptor
+DefineFeature @atom:O_2_ha [$([OX1]=*)]
+Family 59O_2_ha
+EndFeature
+
+# O_1 - sp oxygen (C#O, carbon monoxide)
+DefineFeature @atom:O_1 [$([OX1]#*)]
+Family 60O_1
+EndFeature
+
+# O_1_ha - sp oxygen, H-acceptor
+DefineFeature @atom:O_1_ha [$([OX1]#*)]
+Family 61O_1_ha
+EndFeature
+
+# ============================================================================
+# Halogen Types
+# ============================================================================
+
+# F - Fluorine
+DefineFeature @atom:F [F]
+Family 62F
+EndFeature
+
+# F_ha - Fluorine as H-acceptor
+DefineFeature @atom:F_ha [F]
+Family 63F_ha
+EndFeature
+
+# F_hd - Fluorine in H-F (rare)
+DefineFeature @atom:F_hd [$([F][#1])]
+Family 64F_hd
+EndFeature
+
+# Cl - Chlorine
+DefineFeature @atom:Cl [Cl]
+Family 65Cl
+EndFeature
+
+# Br - Bromine
+DefineFeature @atom:Br [Br]
+Family 66Br
+EndFeature
+
+# I - Iodine
+DefineFeature @atom:I [I]
+Family 67I
+EndFeature
+
+# ============================================================================
+# Sulfur Types
+# ============================================================================
+
+# S_3 - sp3 sulfur (thiol, thioether)
+DefineFeature @atom:S_3 [$([SX2])]
+Family 68S_3
+EndFeature
+
+# ============================================================================
+# Boron Types
+# ============================================================================
+
+# B_3 - sp3 boron
+DefineFeature @atom:B_3 [$([BD4])]
+Family 69B_3
+EndFeature
+
+# B_2_d1 - sp2 boron, coordination 1
+DefineFeature @atom:B_2_d1 [$([BD2])]
+Family 70B_2_d1
+EndFeature
+
+# B_2_d2 - sp2 boron, coordination 2
+DefineFeature @atom:B_2_d2 [$([BD3])]
+Family 71B_2_d2
+EndFeature
+
+# B_2_b1_d1 - sp2 boron in borane
+DefineFeature @atom:B_2_b1_d1 [$([BD2][#1])]
+Family 72B_2_b1_d1
+EndFeature
+
+# B_2_b1_d2 - sp2 boron in borane, coordination 2
+DefineFeature @atom:B_2_b1_d2 [$([BD3][#1])]
+Family 73B_2_b1_d2
+EndFeature
+
+# B_2_b2_d1 - sp2 boron, bond context 2
+DefineFeature @atom:B_2_b2_d1 [$([BD2][B])]
+Family 74B_2_b2_d1
+EndFeature
+
+# B_2_b2_d2 - sp2 boron, bond context 2, coordination 2
+DefineFeature @atom:B_2_b2_d2 [$([BD3][B])]
+Family 75B_2_b2_d2
+EndFeature
+
+# ============================================================================
+# Silicon Types
+# ============================================================================
+
+# Si_3 - sp3 silicon
+DefineFeature @atom:Si_3 [Si]
+Family 76Si_3
+EndFeature
+
+# ============================================================================
+# Aluminum Types
+# ============================================================================
+
+# Al_3_d1 - Aluminum coordination 1
+DefineFeature @atom:Al_3_d1 [$([AlD1])]
+Family 77Al_3_d1
+EndFeature
+
+# Al_3_d2 - Aluminum coordination 2
+DefineFeature @atom:Al_3_d2 [$([AlD2,AlD3,AlD4])]
+Family 78Al_3_d2
+EndFeature
+
+# ============================================================================
+# Phosphorus Types
+# ============================================================================
+
+# P_3_d2 - Phosphorus coordination 2
+DefineFeature @atom:P_3_d2 [$([PD2])]
+Family 79P_3_d2
+EndFeature
+
+# P_3_d3 - Phosphorus coordination 3
+DefineFeature @atom:P_3_d3 [$([PD3])]
+Family 80P_3_d3
+EndFeature
+
+# P_3_d4 - Phosphorus coordination 4 (phosphate)
+DefineFeature @atom:P_3_d4 [$([PD4])]
+Family 81P_3_d4
+EndFeature
+
+# ============================================================================
+# Gallium Types
+# ============================================================================
+
+# Ga_3 - Gallium
+DefineFeature @atom:Ga_3 [Ga]
+Family 82Ga_3
+EndFeature
+
+# ============================================================================
+# Germanium Types
+# ============================================================================
+
+# Ge_3_d1 - Germanium coordination 1
+DefineFeature @atom:Ge_3_d1 [$([GeD1])]
+Family 83Ge_3_d1
+EndFeature
+
+# Ge_3_d2 - Germanium coordination 2
+DefineFeature @atom:Ge_3_d2 [$([GeD2])]
+Family 84Ge_3_d2
+EndFeature
+
+# Ge_3_d3 - Germanium coordination 3-4
+DefineFeature @atom:Ge_3_d3 [$([GeD3,GeD4])]
+Family 85Ge_3_d3
+EndFeature
+
+# ============================================================================
+# Arsenic Types
+# ============================================================================
+
+# As_3_d1 - Arsenic coordination 1
+DefineFeature @atom:As_3_d1 [$([AsD1])]
+Family 86As_3_d1
+EndFeature
+
+# As_3_d2 - Arsenic coordination 2
+DefineFeature @atom:As_3_d2 [$([AsD2])]
+Family 87As_3_d2
+EndFeature
+
+# As_3_d3 - Arsenic coordination 3
+DefineFeature @atom:As_3_d3 [$([AsD3])]
+Family 88As_3_d3
+EndFeature
+
+# As_3_d4 - Arsenic coordination 4
+DefineFeature @atom:As_3_d4 [$([AsD4])]
+Family 89As_3_d4
+EndFeature
+
+# ============================================================================
+# Selenium Types
+# ============================================================================
+
+# Se_3_d1 - Selenium coordination 1
+DefineFeature @atom:Se_3_d1 [$([SeD1])]
+Family 90Se_3_d1
+EndFeature
+
+# Se_3_d2 - Selenium coordination 2
+DefineFeature @atom:Se_3_d2 [$([SeD2])]
+Family 91Se_3_d2
+EndFeature
+
+# Se_3_d3 - Selenium coordination 3
+DefineFeature @atom:Se_3_d3 [$([SeD3])]
+Family 92Se_3_d3
+EndFeature
+
+# Se_3_d5 - Selenium coordination 4-5
+DefineFeature @atom:Se_3_d5 [$([SeD4,SeD5])]
+Family 93Se_3_d5
+EndFeature
+
+# ============================================================================
+# Indium Types
+# ============================================================================
+
+# In_3_d1 - Indium coordination 1
+DefineFeature @atom:In_3_d1 [$([InD1])]
+Family 94In_3_d1
+EndFeature
+
+# In_3_d2 - Indium coordination 2+
+DefineFeature @atom:In_3_d2 [$([InD2,InD3,InD4])]
+Family 95In_3_d2
+EndFeature
+
+# ============================================================================
+# Tin Types
+# ============================================================================
+
+# Sn_3_d2 - Tin coordination 2
+DefineFeature @atom:Sn_3_d2 [$([SnD2])]
+Family 96Sn_3_d2
+EndFeature
+
+# Sn_3_d3 - Tin coordination 3-4
+DefineFeature @atom:Sn_3_d3 [$([SnD3,SnD4])]
+Family 97Sn_3_d3
+EndFeature
+
+# ============================================================================
+# Antimony Types
+# ============================================================================
+
+# Sb_3_d2 - Antimony coordination 2
+DefineFeature @atom:Sb_3_d2 [$([SbD2])]
+Family 98Sb_3_d2
+EndFeature
+
+# Sb_3_d3 - Antimony coordination 3
+DefineFeature @atom:Sb_3_d3 [$([SbD3])]
+Family 99Sb_3_d3
+EndFeature
+
+# Sb_3_d4 - Antimony coordination 4+
+DefineFeature @atom:Sb_3_d4 [$([SbD4,SbD5])]
+Family 100Sb_3_d4
+EndFeature
+
+# ============================================================================
+# Tellurium Types
+# ============================================================================
+
+# Te_3_d1 - Tellurium coordination 1
+DefineFeature @atom:Te_3_d1 [$([TeD1])]
+Family 101Te_3_d1
+EndFeature
+
+# Te_3_d2 - Tellurium coordination 2
+DefineFeature @atom:Te_3_d2 [$([TeD2])]
+Family 102Te_3_d2
+EndFeature
+
+# Te_3_d3 - Tellurium coordination 3
+DefineFeature @atom:Te_3_d3 [$([TeD3])]
+Family 103Te_3_d3
+EndFeature
+
+# Te_3_d5 - Tellurium coordination 4-5
+DefineFeature @atom:Te_3_d5 [$([TeD4,TeD5])]
+Family 104Te_3_d5
+EndFeature
+
+# ============================================================================
+# Metal Types
+# ============================================================================
+
+# Na - Sodium
+DefineFeature @atom:Na [Na]
+Family 105Na
+EndFeature
+
+# Ca - Calcium
+DefineFeature @atom:Ca [Ca]
+Family 106Ca
+EndFeature
+
+# Fe - Iron
+DefineFeature @atom:Fe [Fe]
+Family 107Fe
+EndFeature
+
+# Zn - Zinc
+DefineFeature @atom:Zn [Zn]
+Family 108Zn
+EndFeature

@@ -13,12 +13,23 @@ import pathlib
 from ..system import logger
 
 
-def writeHeader(molname, loplsflag, gaffflag=False):
+def writeHeader(molname, loplsflag, gaffflag=False, dreidingflag=False, compassflag=False):
     if gaffflag:
         print("""import "gaff.lt"    # <-- defines the GAFF (General Amber Force Field)""")
         print("""# NOTE: GAFF requires user-supplied charges (AM1-BCC or RESP recommended)""")
         print("""# See: http://ambermd.org/antechamber/gaff.pdf""")
         print("""{0} inherits GAFF {{""".format(molname))
+    elif dreidingflag:
+        print("""import "dreiding.lt"    # <-- defines the DREIDING force field""")
+        print("""# NOTE: DREIDING requires user-supplied charges (AM1-BCC, Gasteiger, or RESP recommended)""")
+        print("""# See: Mayo et al., J. Phys. Chem. 1990, 94, 8897-8909""")
+        print("""{0} inherits DREIDING {{""".format(molname))
+    elif compassflag:
+        print("""import "compass_published.lt"    # <-- defines the COMPASS force field (class2)""")
+        print("""# NOTE: COMPASS is a class2 force field requiring LAMMPS CLASS2 package""")
+        print("""# NOTE: This is an incomplete public version - parameters may be missing""")
+        print("""# Charges are handled via bond increment model in the .lt file""")
+        print("""{0} inherits COMPASS {{""".format(molname))
     else:
         print("""import "oplsaa.lt"    # <-- defines the standard "OPLSAA" force field""")
         if loplsflag:
@@ -31,7 +42,7 @@ def writeHeader(molname, loplsflag, gaffflag=False):
         print("""{0} inherits OPLSAA {{""".format(molname))
 
 
-def writeFooter(molname, gaffflag=False):
+def writeFooter(molname, gaffflag=False, dreidingflag=False, compassflag=False):
     if gaffflag:
         print("""}} # {0}
 
@@ -49,6 +60,35 @@ def writeFooter(molname, gaffflag=False):
 #
 # After calculating charges, update the charge values in the "Data Atoms" section above.
 # Reference: http://ambermd.org/antechamber/gaff.pdf""".format(molname))
+    elif dreidingflag:
+        print("""}} # {0}
+
+# IMPORTANT: DREIDING requires atomic charges to be assigned manually!
+# All charges in this file are currently set to 0.0 as placeholders.
+# You must replace them with calculated charges using one of these methods:
+#
+# Method 1 (Recommended): AM1-BCC charges using AmberTools antechamber
+#   antechamber -i molecule.mol2 -fi mol2 -o molecule_charged.mol2 -fo mol2 -c bcc -nc 0
+#
+# Method 2: Gasteiger charges using Open Babel
+#   obabel -i mol mol.mol -o mol2 -O mol_charged.mol2 --partialcharge gasteiger
+#
+# Method 3: RESP charges (more accurate, requires Gaussian)
+#   See Amber documentation for RESP fitting procedure
+#
+# After calculating charges, update the charge values in the "Data Atoms" section above.
+# Reference: Mayo et al., J. Phys. Chem. 1990, 94, 8897-8909""".format(molname))
+    elif compassflag:
+        print("""}} # {0}
+
+# NOTE: COMPASS uses the bond increment charge model defined in the .lt file.
+# The charges in this file may be set to 0.0 as placeholders if the bond
+# increment model is not applicable for your molecule.
+#
+# COMPASS is a class2 force field that requires LAMMPS compiled with CLASS2 package.
+# This is an incomplete public version - parameters for some atom types may be missing.
+#
+# Reference: Sun, H., J. Phys. Chem. B, 1998, 102, 7338-7364""".format(molname))
     else:
         print("""}} # {0}
 
@@ -284,15 +324,16 @@ class RDlt(object):
 
         return mol
 
-    def run(self,to_file=None,name='test',fdef=str(pathlib.Path(__file__).parent.resolve())+"/rdlt_data/opls_lt.fdefn",lfdef=str(pathlib.Path(__file__).parent.resolve())+"/rdlt_data/lopls_lt.fdefn",gfdef=None,charge=True,refresh=False,loplsflag=False,gaffflag=False):
+    def run(self,to_file=None,name='test',fdef=str(pathlib.Path(__file__).parent.resolve())+"/rdlt_data/opls_lt.fdefn",lfdef=str(pathlib.Path(__file__).parent.resolve())+"/rdlt_data/lopls_lt.fdefn",gfdef=None,dfdef=None,cfdef=None,charge=True,refresh=False,loplsflag=False,gaffflag=False,dreidingflag=False,compassflag=False):
         #Build rdkit molecule from smiles and generate a conformer
         self.to_file=to_file
         self.name=pathlib.Path(to_file).stem
 
         # Validate mutual exclusivity of force fields
-        if gaffflag and loplsflag:
-            logger.error("Cannot use both GAFF and L-OPLS simultaneously. Please choose one force field.")
-            sys.exit("Error: GAFF and L-OPLS are mutually exclusive force fields.")
+        active_flags = sum([gaffflag, loplsflag, dreidingflag, compassflag])
+        if active_flags > 1:
+            logger.error("Cannot use multiple force field flags simultaneously. Please choose one force field.")
+            sys.exit("Error: Force field flags are mutually exclusive.")
 
         # Set default GAFF path if not provided
         if gaffflag and gfdef is None:
@@ -300,6 +341,20 @@ class RDlt(object):
             if not os.path.exists(gfdef):
                 logger.error(f"GAFF feature definition file not found: {gfdef}")
                 sys.exit("Error: GAFF data files not found. Please ensure GAFF support is properly installed.")
+
+        # Set default DREIDING path if not provided
+        if dreidingflag and dfdef is None:
+            dfdef = str(pathlib.Path(__file__).parent.resolve())+"/rdlt_data/dreiding_lt.fdefn"
+            if not os.path.exists(dfdef):
+                logger.error(f"DREIDING feature definition file not found: {dfdef}")
+                sys.exit("Error: DREIDING data files not found. Please ensure DREIDING support is properly installed.")
+
+        # Set default COMPASS path if not provided
+        if compassflag and cfdef is None:
+            cfdef = str(pathlib.Path(__file__).parent.resolve())+"/rdlt_data/compass_lt.fdefn"
+            if not os.path.exists(cfdef):
+                logger.error(f"COMPASS feature definition file not found: {cfdef}")
+                sys.exit("Error: COMPASS data files not found. Please ensure COMPASS support is properly installed.")
 
         original_stdout = sys.stdout
         with open(to_file, 'w') as f:
@@ -320,6 +375,10 @@ class RDlt(object):
             #Build a feature factory from the defintion file and assign all features
             if gaffflag:
                 factory = Chem.ChemicalFeatures.BuildFeatureFactory(gfdef)
+            elif dreidingflag:
+                factory = Chem.ChemicalFeatures.BuildFeatureFactory(dfdef)
+            elif compassflag:
+                factory = Chem.ChemicalFeatures.BuildFeatureFactory(cfdef)
             else:
                 factory = Chem.ChemicalFeatures.BuildFeatureFactory(fdef)
             features = factory.GetFeaturesForMol(m)
@@ -361,10 +420,10 @@ class RDlt(object):
 
 
             #basic output
-            writeHeader(self.name,loplsflag,gaffflag)
+            writeHeader(self.name,loplsflag,gaffflag,dreidingflag,compassflag)
             writeAtoms(m)
             writeBonds(m)
-            writeFooter(self.name,gaffflag)
+            writeFooter(self.name,gaffflag,dreidingflag,compassflag)
 
             if charge:
                 if gaffflag:
@@ -397,6 +456,62 @@ class RDlt(object):
                     except FileNotFoundError:
                         print("# Note: No GAFF charge dictionary found.")
                         print("# This is expected - charges must be calculated manually.\n")
+                elif dreidingflag:
+                    # DREIDING requires manual charge calculation
+                    print("\n# ========================================")
+                    print("# IMPORTANT DREIDING CHARGE NOTICE")
+                    print("# ========================================")
+                    print("# DREIDING does NOT include default charges.")
+                    print("# You must calculate charges separately using AM1-BCC, Gasteiger, or RESP.")
+                    print("#")
+                    print("# Quick start with Gasteiger charges (using Open Babel):")
+                    print('#   obabel -i mol mol.mol -o mol2 -O mol_charged.mol2 --partialcharge gasteiger')
+                    print("#")
+                    print("# Or with AM1-BCC (recommended for better accuracy):")
+                    print('#   antechamber -i mol.mol2 -fi mol2 -o mol_charged.mol2 -fo mol2 -c bcc -nc 0')
+                    print("#")
+                    print("# Reference: Mayo et al., J. Phys. Chem. 1990, 94, 8897-8909")
+                    print("# ========================================\n")
+
+                    # Try to load DREIDING charge dictionary (likely empty)
+                    try:
+                        dreiding_cdict = read_cdict(str(pathlib.Path(__file__).parent.resolve())+'/rdlt_data/dreiding_lt_dict.pkl')
+                        if not dreiding_cdict or all(v == 0.0 for v in dreiding_cdict.values()):
+                            print("# Note: DREIDING charge dictionary is empty or contains only zeros.")
+                            print("# This is expected - charges must be calculated manually.\n")
+                        else:
+                            # If charges exist, display them
+                            sum_of_charges(m, dreiding_cdict)
+                    except FileNotFoundError:
+                        print("# Note: No DREIDING charge dictionary found.")
+                        print("# This is expected - charges must be calculated manually.\n")
+                elif compassflag:
+                    # COMPASS uses bond increment model
+                    print("\n# ========================================")
+                    print("# COMPASS CHARGE NOTICE")
+                    print("# ========================================")
+                    print("# COMPASS uses a bond increment charge model.")
+                    print("# Charges may be assigned automatically by moltemplate,")
+                    print("# or you may need to calculate them manually depending on the molecule.")
+                    print("#")
+                    print("# NOTE: This is an incomplete public version of COMPASS.")
+                    print("# Parameters for some atom types may be missing.")
+                    print("#")
+                    print("# Reference: Sun, H., J. Phys. Chem. B, 1998, 102, 7338-7364")
+                    print("# ========================================\n")
+
+                    # Try to load COMPASS charge dictionary
+                    try:
+                        compass_cdict = read_cdict(str(pathlib.Path(__file__).parent.resolve())+'/rdlt_data/compass_lt_dict.pkl')
+                        if not compass_cdict or all(v == 0.0 for v in compass_cdict.values()):
+                            print("# Note: COMPASS charge dictionary is empty or contains only zeros.")
+                            print("# Charges may be handled via bond increment model in .lt file.\n")
+                        else:
+                            # If charges exist, display them
+                            sum_of_charges(m, compass_cdict)
+                    except FileNotFoundError:
+                        print("# Note: No COMPASS charge dictionary found.")
+                        print("# Charges may be handled via bond increment model in .lt file.\n")
                 else:
                     # OPLS charge handling (existing logic)
                     # Read charge dictionaries for testing

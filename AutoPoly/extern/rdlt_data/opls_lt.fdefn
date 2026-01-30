@@ -1997,3 +1997,40 @@ EndFeature
 DefineFeature @atom:795 [$([F][CH0]([F])([F])[F])]
 Family 660F
 EndFeature
+
+# ===========================================================================
+# PEO/PEG (polyethylene oxide/glycol) patterns - OPLS-AA 2020 ether types
+# Structure: -CH2-CH2-O-CH2-CH2-O- (ethylene oxide repeat units)
+# ===========================================================================
+
+# Ether oxygen in PEO chain - type 180 (dialkyl ether O)
+# Match O bonded to two carbons where at least one C is bonded to another O
+DefineFeature @atom:180 [$([OD2]([CD4][OD2])[CD4])]
+Family 661OS_PEO
+EndFeature
+
+# More general ether O for PEO-style chains (O between two CH2)
+DefineFeature @atom:180 [$([OD2]([CH2D4])[CH2D4])]
+Family 662OS_PEO2
+EndFeature
+
+# CH2 in PEO chain bonded to ether O - type 182 (ethyl ether C)
+# CH2 bonded to O on one side and another C on other side
+DefineFeature @atom:182 [$([CH2D4]([OD2][#6])[#6])]
+Family 663CT_PEO
+EndFeature
+
+# Terminal CH3 next to ether O - type 181 (methyl ether)
+DefineFeature @atom:181 [$([CH3D4][OD2][#6])]
+Family 664CT_PEO_TERM
+EndFeature
+
+# H on C adjacent to ether O - type 185 (alpha H ether)
+DefineFeature @atom:185 [$([#1][CD4][OD2][#6])]
+Family 665HC_PEO
+EndFeature
+
+# H on terminal CH3 next to ether - also type 185
+DefineFeature @atom:185 [$([#1][CH3][OD2])]
+Family 666HC_PEO_TERM
+EndFeature
