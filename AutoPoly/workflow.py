@@ -13,6 +13,8 @@ Key Features:
 - System.lt file generation
 - Polymer .lt file creation for both linear and ring topologies
 - Integration with force field management
+- Monte Carlo placement methods (grid, mc_random)
+- Self-avoiding random walk for chain growth
 
 Created on 2026-01-06
 @author: zwu
@@ -20,7 +22,7 @@ Created on 2026-01-06
 import subprocess
 from pathlib import Path
 import numpy as np
-from typing import List
+from typing import List, Optional, Dict, Any, Tuple
 from .system import logger
 from .exceptions import WorkflowError
 from .monomer_processing import read_lt_end_atoms, evaluate_offset
@@ -133,10 +135,15 @@ class WorkflowManager:
         logger.info(f"Built {len(model.sequenceSet)} chain(s) with sequence variants")
 
         # Generate polymer .lt files
+        use_mc_chain_growth = getattr(self.poly, 'use_mc_chain_growth', True)
+
         for chain_idx in range(len(model.sequenceSet)):
             if model.dop > 1:
                 logger.info(f"Creating poly_{poly_index+1}.lt")
-                self.make_poly_lt(poly_index, model.sequenceSet[chain_idx], model)
+                if use_mc_chain_growth:
+                    self.make_poly_lt_mc(poly_index, model.sequenceSet[chain_idx], model)
+                else:
+                    self.make_poly_lt(poly_index, model.sequenceSet[chain_idx], model)
                 poly_index += 1
 
         return poly_index
@@ -199,14 +206,21 @@ class WorkflowManager:
         self.poly.ff_manager.model = self.poly.model
         self.poly.ff_manager.make_force_field_lt()
 
-        # Modify alkyl dihedral coefficients if needed (skip for GAFF)
-        if self.poly.force_field == "lopls":
+        # Modify alkyl dihedral coefficients if needed
+        # Only for oplsaa - LOPLS already has optimized alkyl dihedrals built-in
+        # GAFF/GAFF2/DREIDING/COMPASS use their own dihedral parameters
+        if self.poly.force_field == "oplsaa":
             self.poly.ff_manager.FFmodify_alkyl_dihedral_oplsaa()
 
     def _generate_system_file(self) -> None:
         """Generate the system.lt file."""
-        logger.info("Creating system.lt")
-        self.make_system_lt()
+        placement_method = getattr(self.poly, 'placement_method', 'mc_random')
+        logger.info(f"Creating system.lt (placement_method={placement_method})")
+
+        if placement_method == "mc_random":
+            self.make_system_lt_mc(placement_method)
+        else:
+            self.make_system_lt()
 
     def _run_moltemplate_and_validate(self) -> None:
         """Run moltemplate and validate the output."""
@@ -356,6 +370,12 @@ class WorkflowManager:
             ff_import = 'import "gaff.lt"\n\n'
         elif self.poly.force_field == "gaff2":
             ff_import = 'import "gaff2.lt"\n\n'
+        elif self.poly.force_field == "lopls":
+            ff_import = 'import "loplsaa.lt"\n\n'
+        elif self.poly.force_field == "dreiding":
+            ff_import = 'import "dreiding.lt"\n\n'
+        elif self.poly.force_field == "compass":
+            ff_import = 'import "compass_published.lt"\n\n'
         else:
             ff_import = 'import "oplsaa.lt"\n\n'
 
@@ -485,6 +505,15 @@ class WorkflowManager:
         elif self.poly.force_field == "gaff2":
             ff_import = 'import "gaff2.lt"\n'
             ff_inherits = "GAFF2"
+        elif self.poly.force_field == "lopls":
+            ff_import = 'import "loplsaa.lt"\n'
+            ff_inherits = "OPLSAA"  # LOPLS extends OPLSAA
+        elif self.poly.force_field == "dreiding":
+            ff_import = 'import "dreiding.lt"\n'
+            ff_inherits = "DREIDING"
+        elif self.poly.force_field == "compass":
+            ff_import = 'import "compass_published.lt"\n'
+            ff_inherits = "COMPASS"
         else:
             ff_import = 'import "oplsaa.lt"\n'
             ff_inherits = "OPLSAA"
@@ -577,3 +606,368 @@ class WorkflowManager:
                 write_f.write("    }\n")
 
             write_f.write(f"\n}} # poly_{poly_index+1}\n")
+
+    def make_system_lt_mc(self, placement_method: str = "mc_random") -> None:
+        """
+        Creates the system.lt file using Monte Carlo random placement.
+
+        This method generates the main system.lt file with random positioning
+        and orientation of polymers and molecules using collision detection.
+
+        Args:
+            placement_method: Placement method ("mc_random" for Monte Carlo)
+        """
+        from .mc import (
+            CollisionDetector,
+            MolecularPlacementMC,
+            calculate_box_size,
+        )
+
+        output = Path(self.poly.path_cwd) / "system.lt"
+
+        # Determine force field import
+        ff_import = self._get_ff_import()
+
+        # Calculate box size: use the larger of density-based and chain-length-based estimates
+        total_monomers = self._count_total_monomers()
+        monomer_density = getattr(self.poly, 'mc_monomer_density', 0.05)
+        density_box = calculate_box_size(total_monomers, monomer_density)
+
+        # Account for polymer extended length to ensure chains fit inside the box
+        max_dop = max((m.dop for m in self.poly.model if hasattr(m, 'dop')), default=1)
+        offset = getattr(self.poly, 'offset', 4.0)
+        chain_length_box = max_dop**0.6 * offset * 3.0  # SAW end-to-end × safety factor
+
+        box_size = max(density_box, chain_length_box)
+        half_box = box_size / 2
+
+        box_bounds = ((-half_box, half_box), (-half_box, half_box), (-half_box, half_box))
+
+        # Initialize collision detector and placer
+        cell_size = max(5.0, box_size / 20)
+        collision_detector = CollisionDetector(box_bounds, cell_size)
+        max_attempts = getattr(self.poly, 'mc_max_attempts', 10000)
+        placer = MolecularPlacementMC(box_bounds, collision_detector, max_attempts)
+
+        with open(output, "w") as write_f:
+            write_f.write(ff_import)
+
+            # Write imports
+            polyindex = 0
+            for modelii in self.poly.model:
+                is_molecule = hasattr(modelii, '_is_molecule') and modelii._is_molecule
+
+                if is_molecule:
+                    write_f.write(f"import \"{modelii.sequenceSet[0][0]}\"\n")
+                    write_f.write("\n")
+                elif modelii.dop > 1:
+                    n_poly = len(modelii.sequenceSet)
+                    for indexi in range(n_poly):
+                        write_f.write(f"import \"poly_{polyindex+1}.lt\"\n")
+                        polyindex += 1
+                    write_f.write("\n")
+                else:
+                    if len(modelii.merSet) > 1:
+                        raise WorkflowError(
+                            f"sequenceLen = {modelii.dop}, merSet should only have one mer type!"
+                        )
+                    unique_Sequence = [i[0] for i in modelii.sequenceSet]
+                    for sequenceii in range(len(unique_Sequence)):
+                        write_f.write("import \""+unique_Sequence[sequenceii]+"\"\n")
+                    write_f.write("\n")
+
+            # Place entities using MC
+            polyindex = 0
+            index = 0
+
+            for modelii in self.poly.model:
+                is_molecule = hasattr(modelii, '_is_molecule') and modelii._is_molecule
+
+                if is_molecule:
+                    # Estimate molecule radius (simple default)
+                    mol_radius = 3.0
+                    n_instances = modelii.Count
+
+                    for moleii in range(n_instances):
+                        placement = placer.place_molecule(
+                            molecule_name=modelii.molecule_name,
+                            radius=mol_radius,
+                            instance_name=f"molecule_{index+1}"
+                        )
+                        if placement is None:
+                            logger.warning(f"Failed to place molecule {index+1}, using fallback position")
+                            # Fallback to grid position
+                            pos_x = (index % 10) * 10.0
+                            pos_y = (index // 10) * 10.0
+                            pos_z = 0.0
+                            write_f.write(f"molecule_{index+1} = new {modelii.molecule_name}")
+                            write_f.write(f".move({pos_x:.4f},{pos_y:.4f},{pos_z:.4f})\n")
+                        else:
+                            cmd = placer.generate_molecule_lt_commands([placement])[0]
+                            write_f.write(cmd + "\n")
+                        index += 1
+
+                elif modelii.dop > 1:
+                    n_poly = len(modelii.sequenceSet)
+                    # Estimate polymer radius based on DOP using random walk statistics.
+                    # For a freely-jointed chain, R_g ≈ offset * sqrt(dop / 6).
+                    # Use 2 * R_g as collision radius for inter-chain overlap avoidance.
+                    is_ring = hasattr(modelii, 'topology') and modelii.topology == "ring"
+                    if is_ring:
+                        poly_radius = self.poly.offset * np.sqrt(modelii.dop / 12) * 2.0 + 2.0
+                    else:
+                        poly_radius = self.poly.offset * np.sqrt(modelii.dop / 6) * 2.0 + 2.0
+
+                    for chain_idx in range(n_poly):
+                        placement = placer.place_polymer(
+                            poly_name=f"poly_{polyindex+1}",
+                            radius=poly_radius
+                        )
+                        if placement is None:
+                            logger.warning(f"Failed to place polymer {polyindex+1}, using fallback")
+                            pos_x = (polyindex % 10) * poly_radius * 2.5
+                            pos_y = (polyindex // 10) * poly_radius * 2.5
+                            pos_z = 0.0
+                            write_f.write(f"polymer_{polyindex+1} = new poly_{polyindex+1}")
+                            write_f.write(f".move({pos_x:.4f},{pos_y:.4f},{pos_z:.4f})\n")
+                        else:
+                            cmd = placer.generate_polymer_lt_commands([placement])[0]
+                            write_f.write(cmd + "\n")
+                        polyindex += 1
+                        index += 1
+
+                else:
+                    # Single monomers (DOP=1)
+                    for chain_idx in range(len(modelii.sequenceSet)):
+                        placement = placer.place_molecule(
+                            molecule_name=modelii.merSet[0],
+                            radius=3.0,
+                            instance_name=f"molecule_{index+1}"
+                        )
+                        if placement is None:
+                            pos_x = (index % 10) * 10.0
+                            pos_y = (index // 10) * 10.0
+                            pos_z = 0.0
+                            write_f.write(f"molecule_{index+1} = new {modelii.merSet[0]}")
+                            write_f.write(f".move({pos_x:.4f},{pos_y:.4f},{pos_z:.4f})\n")
+                        else:
+                            cmd = placer.generate_molecule_lt_commands([placement])[0]
+                            write_f.write(cmd + "\n")
+                        index += 1
+
+                write_f.write("\n")
+
+            # Write box boundaries
+            write_f.write("write_once(\"Data Boundary\") {\n")
+            write_f.write(f"   -{half_box:.4f}  {half_box:.4f}  xlo xhi\n")
+            write_f.write(f"   -{half_box:.4f}  {half_box:.4f}  ylo yhi\n")
+            write_f.write(f"   -{half_box:.4f}  {half_box:.4f}  zlo zhi\n")
+            write_f.write("}\n")
+
+        stats = placer.get_placement_stats()
+        logger.info(f"MC placement complete: {stats['polymers']} polymers, "
+                   f"{stats['molecules']} molecules placed")
+
+    def make_poly_lt_mc(
+        self,
+        poly_index: int,
+        monomer_set: list,
+        model: object,
+        collision_detector=None
+    ) -> None:
+        """
+        Creates a poly.lt file using Monte Carlo chain growth.
+
+        This method generates the polymer .lt file using self-avoiding random
+        walk for monomer placement, providing more realistic chain conformations.
+
+        Args:
+            poly_index: The index of the polymer
+            monomer_set: The list of monomers in the polymer
+            model: The polymer model object
+            collision_detector: Optional shared CollisionDetector
+        """
+        from .mc import CollisionDetector, ChainGrowthMC, calculate_box_size
+
+        output = Path(self.poly.path_cwd) / f"poly_{poly_index+1}.lt"
+
+        # Get force field settings
+        ff_import, ff_inherits = self._get_ff_import_and_inherits()
+
+        # Compute box bounds (needed for collision detector init and retries)
+        n_monomers = len(monomer_set)
+        estimated_chain_length = n_monomers**0.6 * 4.0
+        box_size = max(estimated_chain_length * 3.0,
+                      calculate_box_size(n_monomers, monomer_density=0.05))
+        half_box = box_size / 2
+        box_bounds = ((-half_box, half_box), (-half_box, half_box), (-half_box, half_box))
+
+        # Initialize collision detector if not provided
+        if collision_detector is None:
+            collision_detector = CollisionDetector(box_bounds, cell_size=5.0)
+
+        max_attempts = getattr(self.poly, 'mc_max_attempts', 1000)
+        bond_angle_min = getattr(self.poly, 'mc_bond_angle_min', 50.0)
+        bond_angle_max = getattr(self.poly, 'mc_bond_angle_max', 90.0)
+        exclude_neighbors = getattr(self.poly, 'mc_intrachain_exclude_neighbors', 2)
+        chain_mc = ChainGrowthMC(
+            collision_detector,
+            max_attempts,
+            bond_angle_min=bond_angle_min,
+            bond_angle_max=bond_angle_max,
+            intrachain_exclude_neighbors=exclude_neighbors
+        )
+
+        # Build list of .lt file paths
+        monomer_bank = Path(self.poly.path_cwd)
+        lt_files = []
+        for monomer in monomer_set:
+            monomer_name = monomer[:-3] if monomer.endswith('.lt') else monomer
+            lt_files.append(str(monomer_bank / f"{monomer_name}.lt"))
+
+        is_ring = hasattr(model, 'topology') and model.topology == "ring"
+
+        with open(output, "w") as write_f:
+            write_f.write(ff_import)
+
+            # Import unique monomers
+            unique_monomers = list(dict.fromkeys(monomer_set))
+            for monomer in unique_monomers:
+                base_name = monomer[:-3] if monomer.endswith('.lt') else monomer
+                write_f.write(f"import \"{base_name}.lt\"\n")
+
+            write_f.write("\n")
+            write_f.write(f"poly_{poly_index+1} inherits {ff_inherits} {{\n\n")
+            write_f.write("    create_var {$mol}\n\n")
+
+            if is_ring:
+                # Ring topology: use circular placement
+                self._write_ring_polymer_mc(write_f, monomer_set, chain_mc, lt_files)
+            else:
+                # Linear topology: use chain growth MC with retries.
+                # Each retry resets the collision detector so stale monomer
+                # registrations from a failed attempt don't block the next one.
+                max_chain_retries = 5
+                placed = False
+                for retry in range(max_chain_retries):
+                    if retry > 0:
+                        # Fresh collision detector for each retry
+                        collision_detector = CollisionDetector(box_bounds, cell_size=5.0)
+                        chain_mc = ChainGrowthMC(
+                            collision_detector,
+                            max_attempts,
+                            bond_angle_min=bond_angle_min,
+                            bond_angle_max=bond_angle_max,
+                            intrachain_exclude_neighbors=exclude_neighbors
+                        )
+                    try:
+                        placements = chain_mc.grow_chain(lt_files, chain_id=poly_index)
+                        commands = chain_mc.generate_lt_commands(placements)
+                        for cmd in commands:
+                            write_f.write(cmd + "\n")
+                        placed = True
+                        break
+                    except RuntimeError as e:
+                        logger.warning(
+                            f"MC chain growth attempt {retry+1}/{max_chain_retries} "
+                            f"failed for poly_{poly_index+1}: {e}"
+                        )
+                if not placed:
+                    logger.warning("All MC retries exhausted, falling back to deterministic placement")
+                    self._write_linear_polymer_deterministic(write_f, monomer_set)
+
+            # Write bonds
+            write_f.write("\n    write('Data Bond List') {\n")
+            if is_ring:
+                n_monomers = len(monomer_set)
+                for i in range(n_monomers):
+                    next_i = (i + 1) % n_monomers
+                    monomer_name_1 = monomer_set[i][:-3] if monomer_set[i].endswith('.lt') else monomer_set[i]
+                    monomer_name_2 = monomer_set[next_i][:-3] if monomer_set[next_i].endswith('.lt') else monomer_set[next_i]
+                    merltfile_path_1 = monomer_bank / f"{monomer_name_1}.lt"
+                    _, second_atom = read_lt_end_atoms(merltfile_path_1)
+                    merltfile_path_2 = monomer_bank / f"{monomer_name_2}.lt"
+                    first_atom, _ = read_lt_end_atoms(merltfile_path_2)
+                    write_f.write(f"      $bond:b{i+1}  $atom:monomer[{i}]/{second_atom}  $atom:monomer[{next_i}]/{first_atom}\n")
+            else:
+                for indexii in range(len(monomer_set)-1):
+                    monomer_name_1 = monomer_set[indexii][:-3] if monomer_set[indexii].endswith('.lt') else monomer_set[indexii]
+                    monomer_name_2 = monomer_set[indexii+1][:-3] if monomer_set[indexii+1].endswith('.lt') else monomer_set[indexii+1]
+                    merltfile_path_1 = monomer_bank / f"{monomer_name_1}.lt"
+                    _, second_atom = read_lt_end_atoms(merltfile_path_1)
+                    merltfile_path_2 = monomer_bank / f"{monomer_name_2}.lt"
+                    first_atom, _ = read_lt_end_atoms(merltfile_path_2)
+                    write_f.write(f"      $bond:b{indexii+1}  $atom:monomer[{indexii}]/{second_atom}  $atom:monomer[{indexii+1}]/{first_atom}\n")
+            write_f.write("    }\n")
+
+            write_f.write(f"\n}} # poly_{poly_index+1}\n")
+
+    def _write_ring_polymer_mc(
+        self,
+        write_f,
+        monomer_set: list,
+        chain_mc,
+        lt_files: list
+    ) -> None:
+        """Write ring polymer using MC with circular constraints."""
+        n_monomers = len(monomer_set)
+        radius = self.poly.offset * n_monomers / (2 * np.pi)
+
+        for i in range(n_monomers):
+            angle = 2 * np.pi * i / n_monomers
+            x = radius * np.cos(angle)
+            y = radius * np.sin(angle)
+            rotation_angle = (angle * 180 / np.pi) + 90
+
+            monomer_name = monomer_set[i][:-3] if monomer_set[i].endswith('.lt') else monomer_set[i]
+
+            write_f.write(f"    monomer[{i}] = new {monomer_name}")
+            write_f.write(f".rot({rotation_angle:.4f},0,0,1)")
+            write_f.write(f".move({x:.4f},{y:.4f},0)\n")
+
+    def _write_linear_polymer_deterministic(self, write_f, monomer_set: list) -> None:
+        """Fallback deterministic placement for linear polymers."""
+        offset_cum = 0
+        for indexii in range(len(monomer_set)):
+            monomer_name = monomer_set[indexii][:-3] if monomer_set[indexii].endswith('.lt') else monomer_set[indexii]
+            write_f.write(f"    monomer[{indexii}] = new {monomer_name}")
+            if indexii > 0:
+                write_f.write(f".rot({self.poly.rotate*(indexii%2)},1,0,0).move({offset_cum:.4f},0,0)")
+            write_f.write("\n")
+            self.poly.evaluate_offset(f"{monomer_name}.lt")
+            offset_cum += self.poly.offset
+
+    def _get_ff_import(self) -> str:
+        """Get force field import statement."""
+        ff_map = {
+            "gaff": 'import "gaff.lt"\n\n',
+            "gaff2": 'import "gaff2.lt"\n\n',
+            "lopls": 'import "loplsaa.lt"\n\n',
+            "dreiding": 'import "dreiding.lt"\n\n',
+            "compass": 'import "compass_published.lt"\n\n',
+        }
+        return ff_map.get(self.poly.force_field, 'import "oplsaa.lt"\n\n')
+
+    def _get_ff_import_and_inherits(self) -> Tuple[str, str]:
+        """Get force field import and inheritance statements."""
+        ff_map = {
+            "gaff": ('import "gaff.lt"\n', "GAFF"),
+            "gaff2": ('import "gaff2.lt"\n', "GAFF2"),
+            "lopls": ('import "loplsaa.lt"\n', "OPLSAA"),
+            "dreiding": ('import "dreiding.lt"\n', "DREIDING"),
+            "compass": ('import "compass_published.lt"\n', "COMPASS"),
+        }
+        return ff_map.get(self.poly.force_field, ('import "oplsaa.lt"\n', "OPLSAA"))
+
+    def _count_total_monomers(self) -> int:
+        """Count total monomers across all models."""
+        total = 0
+        for modelii in self.poly.model:
+            is_molecule = hasattr(modelii, '_is_molecule') and modelii._is_molecule
+            if is_molecule:
+                total += modelii.Count
+            elif modelii.dop > 1:
+                total += len(modelii.sequenceSet) * modelii.dop
+            else:
+                total += len(modelii.sequenceSet)
+        return max(total, 1)

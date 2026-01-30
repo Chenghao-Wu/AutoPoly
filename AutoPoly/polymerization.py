@@ -52,12 +52,12 @@ from .workflow import WorkflowManager
 class Polymerization:
     """
     Core polymerization class for generating polymer structures using Moltemplate.
-    
+
     This class manages the complete workflow for creating polymer structures
     from monomer templates and generating LAMMPS input files for molecular
     dynamics simulations. It handles file management, force field parameters,
     and integration with external tools like Moltemplate.
-    
+
     Attributes:
         name (str): Name of the polymerization project
         system (object): System object containing path information
@@ -73,10 +73,29 @@ class Polymerization:
         packingL_spacing (float): Packing length spacing
         moltemplate_box_size (float): Box size for Moltemplate
         FFmodify_alkylDihedral (np.array): Modified dihedral parameters
+        placement_method (str): Method for placing polymers ("grid" or "mc_random")
+        use_mc_chain_growth (bool): Use MC self-avoiding random walk for chain growth
+        mc_max_attempts (int): Maximum placement attempts for MC methods
+        mc_monomer_density (float): Target monomer density for MC box sizing
+        mc_bond_angle_min (float): Minimum bond angle in degrees for MC chain growth
+        mc_bond_angle_max (float): Maximum bond angle in degrees for MC chain growth
     """
     
-    def __init__(self, name: str = None, system: object = None, model: list = None,
-                 run: bool = True, force_field: str = "oplsaa") -> None:
+    def __init__(
+        self,
+        name: str = None,
+        system: object = None,
+        model: list = None,
+        run: bool = True,
+        force_field: str = "oplsaa",
+        placement_method: str = "mc_random",
+        use_mc_chain_growth: bool = True,
+        mc_max_attempts: int = 10000,
+        mc_monomer_density: float = 0.085,
+        mc_bond_angle_min: float = 50.0,
+        mc_bond_angle_max: float = 90.0,
+        mc_intrachain_exclude_neighbors: int = 2
+    ) -> None:
         """
         Initialize the Polymerization class.
 
@@ -87,12 +106,33 @@ class Polymerization:
             run (bool, optional): Flag to run the process immediately. Defaults to True.
             force_field (str, optional): Force field to use. Options: "oplsaa", "gaff", "gaff2", "lopls".
                                         Defaults to "oplsaa".
+            placement_method (str, optional): Method for placing polymers/molecules in the box.
+                                             Options: "grid" (deterministic), "mc_random" (Monte Carlo).
+                                             Defaults to "mc_random".
+            use_mc_chain_growth (bool, optional): Use Monte Carlo self-avoiding random walk for
+                                                  chain growth within polymers. Defaults to True.
+            mc_max_attempts (int, optional): Maximum placement attempts for MC methods.
+                                            Defaults to 10000.
+            mc_monomer_density (float, optional): Target monomer density (monomers/A^3) for
+                                                  MC box sizing. Defaults to 0.085.
+            mc_bond_angle_min (float, optional): Minimum deflection angle in degrees for MC chain growth.
+                                                 Deflection = 180° - bond angle (e.g., tetrahedral: 180° - 109.5° = 70.5°).
+                                                 Defaults to 50.0.
+            mc_bond_angle_max (float, optional): Maximum deflection angle in degrees for MC chain growth.
+                                                 Defaults to 90.0.
+            mc_intrachain_exclude_neighbors (int, optional): Number of neighbors to exclude from
+                                                             intra-chain collision detection.
+                                                             0 = maximum collision checking,
+                                                             2 = recommended, avoids false positives
+                                                                 from bonded geometry (default),
+                                                             Higher values = more permissive.
+                                                             Defaults to 2.
 
         Raises:
             SystemExit: If required directories or files are not found
         """
         # Validate force_field parameter
-        valid_force_fields = ["oplsaa", "gaff", "gaff2", "lopls"]
+        valid_force_fields = ["oplsaa", "gaff", "gaff2", "lopls", "dreiding", "compass"]
         if force_field not in valid_force_fields:
             raise ValidationError(
                 f"Invalid force_field '{force_field}'. Must be one of: {valid_force_fields}"
@@ -118,6 +158,10 @@ class Polymerization:
             self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "gaff2.lt")
         elif force_field == "lopls":
             self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "loplsaa.lt")
+        elif force_field == "dreiding":
+            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "dreiding.lt")
+        elif force_field == "compass":
+            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "compass_published.lt")
         else:  # oplsaa
             self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "oplsaa.lt")
 
@@ -128,6 +172,15 @@ class Polymerization:
         self.offset = 4.0
         self.packingL_spacing = 5.0
         self.moltemplate_box_size = 400.0
+
+        # Monte Carlo placement configuration
+        self.placement_method = placement_method
+        self.use_mc_chain_growth = use_mc_chain_growth
+        self.mc_max_attempts = mc_max_attempts
+        self.mc_monomer_density = mc_monomer_density
+        self.mc_bond_angle_min = mc_bond_angle_min
+        self.mc_bond_angle_max = mc_bond_angle_max
+        self.mc_intrachain_exclude_neighbors = mc_intrachain_exclude_neighbors
 
         # Modified alkyl dihedral parameters (Kj/mol -> kcal/mol conversion)
         self.FFmodify_alkylDihedral = np.array([0.6446926386, -0.2143420172, 0.1782194073, 0.0])
