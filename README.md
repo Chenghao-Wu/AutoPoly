@@ -11,6 +11,7 @@ AutoPoly generates polymer structures and prepares them for molecular dynamics s
 - **Complement SMILES** - Unique format for precise positional control
 - **Small Molecules** - Built-in support for solvents and additives
 - **Ring & Linear** - Both topologies supported
+- **SAW Placement** - Monte Carlo self-avoiding walk for realistic initial configurations
 - **Automatic Setup** - Generates complete LAMMPS input files
 
 Note: The current atom typing systems (for all force fields) relies on SMARTS pattern which is built mannuly. The correct SMARTS pattern can be built via a data-driven method as BESMARTS. We are currently exploring this for better atom typing system.
@@ -180,6 +181,31 @@ polymer = Polymer(
     topology="ring"              # Specify ring
 )
 ```
+
+### Monte Carlo Placement with Self-Avoiding Walk
+
+AutoPoly uses a Monte Carlo (MC) self-avoiding walk (SAW) algorithm to generate realistic initial polymer configurations. Instead of placing chains on a grid, the SAW method grows each chain monomer-by-monomer with collision detection, producing coiled conformations that better approximate equilibrium structures.
+
+```python
+Polymerization(
+    name="polymer_mc",
+    system=system,
+    model=[polymer],
+    force_field="oplsaa",
+    placement_method="mc_random",       # Monte Carlo placement (default)
+    use_mc_chain_growth=True,           # SAW chain growth (default)
+    mc_max_attempts=10000,              # Max placement attempts
+    mc_monomer_density=0.085,           # Target density (monomers/Å³)
+    mc_bond_angle_min=50.0,             # Min deflection angle (degrees)
+    mc_bond_angle_max=90.0              # Max deflection angle (degrees)
+)
+```
+
+**Placement methods:**
+- `"mc_random"` (default) — Monte Carlo with SAW chain growth
+- `"grid"` — Deterministic grid placement
+
+Box sizing uses SAW scaling (`N^0.6 × bond_length`) rather than fully-extended chain length, producing compact, realistic simulation boxes.
 
 ### Other Examples
 
