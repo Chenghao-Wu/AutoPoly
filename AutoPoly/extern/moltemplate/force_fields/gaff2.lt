@@ -540,6 +540,23 @@ GAFF2 {
     bond_coeff @bond:ca-ne harmonic 320.1 1.4080   # SOURCE1_SOURCE5 276 0.0093
     bond_coeff @bond:ca-nf harmonic 320.1 1.4080   # SOURCE1_SOURCE5 276 0.0093
     bond_coeff @bond:ca-nh harmonic 347.1 1.3860   # SOURCE1_SOURCE5 2785 0.0134
+    bond_coeff @bond:ca-nu harmonic 347.1 1.3860   # SOURCE1_SOURCE5 2785 0.0134
+    bond_coeff @bond:c-nu harmonic 263.8 1.4620   # Same as c-n (aliphatic C to aromatic N) - approximated
+    bond_coeff @bond:c1-nu harmonic 409.0 1.3420   # Same as c1-nh (sp C to aromatic N) - approximated
+    bond_coeff @bond:c2-nu harmonic 345.4 1.3870   # Same as c2-nh (sp² C to aromatic N) - approximated
+    bond_coeff @bond:c3-nu harmonic 261.8 1.4640   # Same as c3-nh (sp³ C to aromatic N) - approximated
+    bond_coeff @bond:cc-nu harmonic 363.5 1.3730   # Same as cc-nh (conjugated sp² C to aromatic N) - approximated
+    bond_coeff @bond:cx-nu harmonic 262.9 1.4630   # Same as cx-nh (triangle sp³ C to aromatic N) - approximated
+    bond_coeff @bond:cy-nu harmonic 262.9 1.4630   # Same as cy-nh (square sp³ C to aromatic N) - approximated
+    bond_coeff @bond:ca-nv harmonic 347.1 1.3860   # Same as ca-nh - approximated
+    bond_coeff @bond:c-nv harmonic 263.8 1.4620   # Same as c-n - approximated
+    bond_coeff @bond:c1-nv harmonic 409.0 1.3420   # Same as c1-nh - approximated
+    bond_coeff @bond:c2-nv harmonic 345.4 1.3870   # Same as c2-nh - approximated
+    bond_coeff @bond:c3-nv harmonic 261.8 1.4640   # Same as c3-nh - approximated
+    bond_coeff @bond:cc-nv harmonic 363.5 1.3730   # Same as cc-nh - approximated
+    bond_coeff @bond:cx-nv harmonic 291.2 1.4340   # Same as cx-nh - approximated
+    bond_coeff @bond:cy-nv harmonic 279.0 1.4460   # Same as cy-nh - approximated
+    bond_coeff @bond:hn-nv harmonic 529.5 1.0120   # Same as hn-nh - approximated
     bond_coeff @bond:ca-no harmonic 257.4 1.4690   # SOURCE1_SOURCE5 454 0.0049
     bond_coeff @bond:ca-o harmonic 606.5 1.2360   # SOURCE4_SOURCE5 17 0.0088
     bond_coeff @bond:ca-oh harmonic 365.6 1.3640   # SOURCE1_SOURCE5 3637 0.0062
@@ -809,6 +826,7 @@ GAFF2 {
     bond_coeff @bond:hn-n4 harmonic 482.9 1.0300   # SOURCE3_SOURCE5 756 0.0122
     bond_coeff @bond:hn-na harmonic 535.1 1.0100   # SOURCE3_SOURCE5 1755 0.0019
     bond_coeff @bond:hn-nh harmonic 529.5 1.0120   # SOURCE3_SOURCE5 7230 0.0022
+    bond_coeff @bond:hn-nu harmonic 529.5 1.0120   # Approximated from hn-nh (aromatic amine N-H)
     bond_coeff @bond:hn-no harmonic 501.1 1.0230   # SOURCE3 1
     bond_coeff @bond:ho-o harmonic 540.3 0.9810   # SOURCE3 1
     bond_coeff @bond:ho-oh harmonic 563.5 0.9730   # SOURCE3_SOURCE5 21237 0.0034
@@ -1478,6 +1496,23 @@ GAFF2 {
     @bond:ca-ne @atom:ca @atom:ne
     @bond:ca-nf @atom:ca @atom:nf
     @bond:ca-nh @atom:ca @atom:nh
+    @bond:ca-nu @atom:ca @atom:nu
+    @bond:c-nu @atom:c @atom:nu
+    @bond:c1-nu @atom:c1 @atom:nu
+    @bond:c2-nu @atom:c2 @atom:nu
+    @bond:c3-nu @atom:c3 @atom:nu
+    @bond:cc-nu @atom:cc @atom:nu
+    @bond:cx-nu @atom:cx @atom:nu
+    @bond:cy-nu @atom:cy @atom:nu
+    @bond:ca-nv @atom:ca @atom:nv
+    @bond:c-nv @atom:c @atom:nv
+    @bond:c1-nv @atom:c1 @atom:nv
+    @bond:c2-nv @atom:c2 @atom:nv
+    @bond:c3-nv @atom:c3 @atom:nv
+    @bond:cc-nv @atom:cc @atom:nv
+    @bond:cx-nv @atom:cx @atom:nv
+    @bond:cy-nv @atom:cy @atom:nv
+    @bond:hn-nv @atom:hn @atom:nv
     @bond:ca-no @atom:ca @atom:no
     @bond:ca-o @atom:ca @atom:o
     @bond:ca-oh @atom:ca @atom:oh
@@ -1747,6 +1782,7 @@ GAFF2 {
     @bond:hn-n4 @atom:hn @atom:n4
     @bond:hn-na @atom:hn @atom:na
     @bond:hn-nh @atom:hn @atom:nh
+    @bond:hn-nu @atom:hn @atom:nu
     @bond:hn-no @atom:hn @atom:no
     @bond:ho-o @atom:ho @atom:o
     @bond:ho-oh @atom:ho @atom:oh
@@ -5023,6 +5059,14 @@ GAFF2 {
     angle_coeff @angle:nd-n-p2 harmonic 102.8 117.21   # CORR 2
     angle_coeff @angle:nd-n-pd harmonic 102.5 117.21   # CORR 2
     angle_coeff @angle:nh-n-nh harmonic 106.3 115.18   # SOURCE3 1
+    angle_coeff @angle:c3-nu-ca harmonic 65.2 119.98   # Same as c3-nh-ca (SOURCE3_SOURCE5 1640 2.1716) - approximated
+    angle_coeff @angle:c3-nu-c3 harmonic 65.1 114.51   # Same as c3-nh-c3 (SOURCE4_SOURCE5 1386 2.1206) - approximated
+    angle_coeff @angle:c3-nu-hn harmonic 46.4 115.99   # Same as c3-nh-hn (SOURCE3_SOURCE5 1206 1.7716) - approximated
+    angle_coeff @angle:ca-nu-ca harmonic 65.2 127.46   # Same as ca-nh-ca (SOURCE3 2 0.0002) - approximated
+    angle_coeff @angle:c3-nv-ca harmonic 65.2 119.98   # Same as c3-nh-ca - approximated
+    angle_coeff @angle:c3-nv-c3 harmonic 65.1 114.51   # Same as c3-nh-c3 - approximated
+    angle_coeff @angle:c3-nv-hn harmonic 46.4 115.99   # Same as c3-nh-hn - approximated
+    angle_coeff @angle:ca-nv-ca harmonic 65.2 127.46   # Same as ca-nh-ca - approximated
     angle_coeff @angle:n-n-n harmonic 106.4 114.62   # SOURCE3 1
     angle_coeff @angle:no-n-no harmonic 105.4 108.66   # SOURCE3 1
     angle_coeff @angle:br-no-o harmonic 72.5 113.19   # SOURCE3 2
@@ -10326,6 +10370,14 @@ GAFF2 {
     @angle:sh-nh-sh @atom:sh @atom:nh @atom:sh
     @angle:s-nh-s @atom:s @atom:nh @atom:s
     @angle:ss-nh-ss @atom:ss @atom:nh @atom:ss
+    @angle:c3-nu-ca @atom:c3 @atom:nu @atom:ca
+    @angle:c3-nu-c3 @atom:c3 @atom:nu @atom:c3
+    @angle:c3-nu-hn @atom:c3 @atom:nu @atom:hn
+    @angle:ca-nu-ca @atom:ca @atom:nu @atom:ca
+    @angle:c3-nv-ca @atom:c3 @atom:nv @atom:ca
+    @angle:c3-nv-c3 @atom:c3 @atom:nv @atom:c3
+    @angle:c3-nv-hn @atom:c3 @atom:nv @atom:hn
+    @angle:ca-nv-ca @atom:ca @atom:nv @atom:ca
     @angle:i-n-i @atom:i @atom:n @atom:i
     @angle:n2-n-n2 @atom:n2 @atom:n @atom:n2
     @angle:n3-n-n3 @atom:n3 @atom:n @atom:n3
@@ -13038,6 +13090,55 @@ GAFF2 {
     dihedral_coeff @dihedral:X-c3-n4-X fourier 1 0.15555555555555556 3 0.0     # JCC,7,(1986),230
     dihedral_coeff @dihedral:X-c3-na-X fourier 1 0.0 2 0.0     # JCC,7,(1986),230
     dihedral_coeff @dihedral:X-c3-nh-X fourier 1 0.0 2 0.0     # JCC,7,(1986),230
+    # Wildcard dihedrals for nu (aromatic amine nitrogen with one hydrogen) - approximated from nh
+    dihedral_coeff @dihedral:X-c1-nu-X fourier 1 0.0 2 180.0     # Same as X-c1-nh-X
+    dihedral_coeff @dihedral:X-c2-nu-X fourier 1 0.675 2 180.0   # Same as X-c2-nh-X
+    dihedral_coeff @dihedral:X-c3-nu-X fourier 1 0.0 2 0.0       # Same as X-c3-nh-X
+    dihedral_coeff @dihedral:X-ca-nu-X fourier 1 1.05 2 180.0     # Same as X-ca-nh-X
+    dihedral_coeff @dihedral:X-cc-nu-X fourier 1 1.05 2 180.0     # Same as X-cc-nh-X
+    dihedral_coeff @dihedral:X-cd-nu-X fourier 1 1.05 2 180.0     # Same as X-cd-nh-X
+    dihedral_coeff @dihedral:X-n-nu-X fourier 1 1.1 2 0.0         # Same as X-n-nh-X
+    dihedral_coeff @dihedral:X-n1-nu-X fourier 1 0.0 2 180.0       # Same as X-n1-nh-X
+    dihedral_coeff @dihedral:X-n2-nu-X fourier 1 2.8 2 180.0       # Same as X-n2-nh-X
+    dihedral_coeff @dihedral:X-ne-nu-X fourier 1 2.8 2 180.0       # Same as X-ne-nh-X
+    dihedral_coeff @dihedral:X-nf-nu-X fourier 1 2.8 2 180.0       # Same as X-nf-nh-X
+    dihedral_coeff @dihedral:X-n3-nu-X fourier 1 1.9 2 0.0         # Same as X-n3-nh-X
+    dihedral_coeff @dihedral:X-n4-nu-X fourier 1 0.18333333333333335 3 0.0  # Same as X-n4-nh-X
+    dihedral_coeff @dihedral:X-na-nu-X fourier 1 1.2 2 0.0         # Same as X-na-nh-X
+    dihedral_coeff @dihedral:X-nh-nu-X fourier 1 1.8 3 180.0       # Same as X-nh-nh-X
+    # Wildcard dihedrals for nv (aromatic amine nitrogen with two hydrogens) - approximated from nh
+    dihedral_coeff @dihedral:X-c1-nv-X fourier 1 0.0 2 180.0       # Same as X-c1-nh-X
+    dihedral_coeff @dihedral:X-c2-nv-X fourier 1 0.675 2 180.0     # Same as X-c2-nh-X
+    dihedral_coeff @dihedral:X-c3-nv-X fourier 1 0.0 2 0.0         # Same as X-c3-nh-X
+    dihedral_coeff @dihedral:X-ca-nv-X fourier 1 1.05 2 180.0       # Same as X-ca-nh-X
+    dihedral_coeff @dihedral:X-cc-nv-X fourier 1 1.05 2 180.0       # Same as X-cc-nh-X
+    dihedral_coeff @dihedral:X-cd-nv-X fourier 1 1.05 2 180.0       # Same as X-cd-nh-X
+    dihedral_coeff @dihedral:X-n-nv-X fourier 1 1.1 2 0.0           # Same as X-n-nh-X
+    dihedral_coeff @dihedral:X-n1-nv-X fourier 1 0.0 2 180.0         # Same as X-n1-nh-X
+    dihedral_coeff @dihedral:X-n2-nv-X fourier 1 2.8 2 180.0         # Same as X-n2-nh-X
+    dihedral_coeff @dihedral:X-ne-nv-X fourier 1 2.8 2 180.0         # Same as X-ne-nh-X
+    dihedral_coeff @dihedral:X-nf-nv-X fourier 1 2.8 2 180.0         # Same as X-nf-nh-X
+    dihedral_coeff @dihedral:X-n3-nv-X fourier 1 1.9 2 0.0           # Same as X-n3-nh-X
+    dihedral_coeff @dihedral:X-n4-nv-X fourier 1 0.18333333333333335 3 0.0  # Same as X-n4-nh-X
+    dihedral_coeff @dihedral:X-na-nv-X fourier 1 1.2 2 0.0           # Same as X-na-nh-X
+    dihedral_coeff @dihedral:X-nh-nv-X fourier 1 1.8 3 180.0         # Same as X-nh-nh-X
+    dihedral_coeff @dihedral:X-nv-no-X fourier 1 2.55 2 180.0        # Same as X-nh-no-X
+    dihedral_coeff @dihedral:X-nv-oh-X fourier 1 1.5 2 0.0           # Same as X-nh-oh-X
+    dihedral_coeff @dihedral:X-nv-os-X fourier 1 1.5 1 0.0           # Same as X-nh-os-X
+    dihedral_coeff @dihedral:X-nv-p2-X fourier 1 1.4 2 180.0         # Same as X-nh-p2-X
+    dihedral_coeff @dihedral:X-nv-pe-X fourier 1 1.4 2 180.0         # Same as X-nh-pe-X
+    dihedral_coeff @dihedral:X-nv-pf-X fourier 1 1.4 2 180.0         # Same as X-nh-pf-X
+    dihedral_coeff @dihedral:X-nv-p3-X fourier 1 2.35 2 0.0          # Same as X-nh-p3-X
+    dihedral_coeff @dihedral:X-nv-p4-X fourier 1 1.175 3 0.0         # Same as X-nh-p4-X
+    dihedral_coeff @dihedral:X-nv-px-X fourier 1 1.175 3 0.0         # Same as X-nh-px-X
+    dihedral_coeff @dihedral:X-nv-p5-X fourier 1 0.7999999999999999 2 0.0  # Same as X-nh-p5-X
+    dihedral_coeff @dihedral:X-nv-py-X fourier 1 0.7999999999999999 2 0.0  # Same as X-nh-py-X
+    dihedral_coeff @dihedral:X-nv-sh-X fourier 1 1.6 2 0.0           # Same as X-nh-sh-X
+    dihedral_coeff @dihedral:X-nv-ss-X fourier 1 2.1 2 0.0           # Same as X-nh-ss-X
+    dihedral_coeff @dihedral:X-nv-s4-X fourier 2 0.75 2 0.0 0.1 3 180.0  # Same as X-nh-s4-X
+    dihedral_coeff @dihedral:X-nv-sx-X fourier 2 0.75 2 0.0 0.1 3 180.0  # Same as X-nh-sx-X
+    dihedral_coeff @dihedral:X-nv-s6-X fourier 1 0.09999999999999999 2 180.0  # Same as X-nh-s6-X
+    dihedral_coeff @dihedral:X-nv-sy-X fourier 1 0.09999999999999999 2 180.0  # Same as X-nh-sy-X
     dihedral_coeff @dihedral:X-c3-no-X fourier 1 0.0 2 0.0     # JCC,7,(1986),230
     dihedral_coeff @dihedral:X-c3-oh-X fourier 1 0.16666666666666666 3 0.0     # JCC,7,(1986),230
     dihedral_coeff @dihedral:X-c3-os-X fourier 1 0.3833333333333333 3 0.0     # JCC,7,(1986),230
@@ -13822,6 +13923,31 @@ GAFF2 {
     dihedral_coeff @dihedral:c3-n3-c3-c3 fourier 2 0.58 3 0.0 0.28 2 180.0     # m14 GA AUE=0.4298 RMSE=0.5205 TorType=3
     dihedral_coeff @dihedral:c3-n-cs-c3 fourier 2 2.0 2 180.0 2.31 1 0.0     # set2_7 GA AUE=0.7571 RMSE=0.9582 TorType=3
     dihedral_coeff @dihedral:c3-nu-ca-ca fourier 1 0.55 2 180.0     # c67 SS AUE=0.5825 RMSE=0.8345 TorType=3
+    # Specific dihedrals for nu (aromatic amine nitrogen with one hydrogen) - approximated from nh
+    dihedral_coeff @dihedral:c2-nu-ca-ca fourier 1 0.55 2 180.0     # Same as c2-nh-ca-ca
+    dihedral_coeff @dihedral:c3-nu-ca-c3 fourier 1 0.733 2 180.0     # Same as c3-nh-ca-c3 (if exists)
+    dihedral_coeff @dihedral:c3-nu-ca-nu fourier 1 1.2 2 0.0       # Same as c3-nh-ca-nh (if exists)
+    dihedral_coeff @dihedral:c3-nu-c3-ca fourier 1 0.733 2 180.0    # Same as c3-nh-c3-ca (if exists)
+    dihedral_coeff @dihedral:c3-nu-c3-c3 fourier 1 0.733 2 180.0    # Same as c3-nh-c3-c3 (if exists)
+    dihedral_coeff @dihedral:ca-nu-ca-ca fourier 1 0.733 2 180.0     # Same as ca-nh-ca-ca (if exists)
+    dihedral_coeff @dihedral:hn-nu-ca-ca fourier 1 0.802 2 0.0      # Same as hn-nh-ca-ca (if exists)
+    dihedral_coeff @dihedral:hn-nu-ca-c3 fourier 1 0.332 2 0.0      # Same as hn-nh-ca-c3 (if exists)
+    dihedral_coeff @dihedral:hn-nu-c3-ca fourier 1 0.332 2 0.0      # Same as hn-nh-c3-ca (if exists)
+    dihedral_coeff @dihedral:c1-nu-ca-ca fourier 1 0.55 2 180.0     # Approximated from c2-nu-ca-ca
+    dihedral_coeff @dihedral:c2-nu-ca-c3 fourier 1 0.55 2 180.0     # Approximated from c2-nu-ca-ca
+    dihedral_coeff @dihedral:c3-nv-ca-ca fourier 1 0.733 2 180.0     # Same as c3-nh-ca-ca - approximated
+    # Specific dihedrals for nv (aromatic amine nitrogen with two hydrogens) - approximated from nh
+    dihedral_coeff @dihedral:c2-nv-ca-ca fourier 1 0.55 2 180.0     # Same as c2-nh-ca-ca
+    dihedral_coeff @dihedral:c3-nv-ca-c3 fourier 1 0.733 2 180.0     # Same as c3-nh-ca-c3
+    dihedral_coeff @dihedral:c3-nv-ca-nv fourier 1 1.2 2 0.0       # Same as c3-nh-ca-nh
+    dihedral_coeff @dihedral:c3-nv-c3-ca fourier 1 0.733 2 180.0    # Same as c3-nh-c3-ca
+    dihedral_coeff @dihedral:c3-nv-c3-c3 fourier 1 0.733 2 180.0    # Same as c3-nh-c3-c3
+    dihedral_coeff @dihedral:ca-nv-ca-ca fourier 1 0.733 2 180.0     # Same as ca-nh-ca-ca
+    dihedral_coeff @dihedral:hn-nv-ca-ca fourier 1 0.802 2 0.0      # Same as hn-nh-ca-ca
+    dihedral_coeff @dihedral:hn-nv-ca-c3 fourier 1 0.332 2 0.0      # Same as hn-nh-ca-c3
+    dihedral_coeff @dihedral:hn-nv-c3-ca fourier 1 0.332 2 0.0      # Same as hn-nh-c3-ca
+    dihedral_coeff @dihedral:c1-nv-ca-ca fourier 1 0.55 2 180.0     # Approximated from c2-nv-ca-ca
+    dihedral_coeff @dihedral:c2-nv-ca-c3 fourier 1 0.55 2 180.0     # Approximated from c2-nv-ca-ca
     dihedral_coeff @dihedral:c3-nh-ca-ca fourier 1 0.733 2 180.0     # c64 SS AUE=0.6264 RMSE=0.7797 TorType=3
     dihedral_coeff @dihedral:c3-os-cs-c3 fourier 3 0.12 1 0.0 3.47 2 180.0 0.73 3 0.0     # set2_13 GA AUE=0.2180 RMSE=0.2948 TorType=3
     dihedral_coeff @dihedral:c3-p3-c-c3 fourier 1 1.538 2 180.0     # c15 SS AUE=0.3737 RMSE=0.4391 TorType=3
@@ -14027,6 +14153,55 @@ GAFF2 {
     @dihedral:X-c3-n4-X @atom:* @atom:c3 @atom:n4 @atom:*
     @dihedral:X-c3-na-X @atom:* @atom:c3 @atom:na @atom:*
     @dihedral:X-c3-nh-X @atom:* @atom:c3 @atom:nh @atom:*
+    # Wildcard dihedral type definitions for nu (aromatic amine nitrogen with one hydrogen)
+    @dihedral:X-c1-nu-X @atom:* @atom:c1 @atom:nu @atom:*
+    @dihedral:X-c2-nu-X @atom:* @atom:c2 @atom:nu @atom:*
+    @dihedral:X-c3-nu-X @atom:* @atom:c3 @atom:nu @atom:*
+    @dihedral:X-ca-nu-X @atom:* @atom:ca @atom:nu @atom:*
+    @dihedral:X-cc-nu-X @atom:* @atom:cc @atom:nu @atom:*
+    @dihedral:X-cd-nu-X @atom:* @atom:cd @atom:nu @atom:*
+    @dihedral:X-n-nu-X @atom:* @atom:n @atom:nu @atom:*
+    @dihedral:X-n1-nu-X @atom:* @atom:n1 @atom:nu @atom:*
+    @dihedral:X-n2-nu-X @atom:* @atom:n2 @atom:nu @atom:*
+    @dihedral:X-ne-nu-X @atom:* @atom:ne @atom:nu @atom:*
+    @dihedral:X-nf-nu-X @atom:* @atom:nf @atom:nu @atom:*
+    @dihedral:X-n3-nu-X @atom:* @atom:n3 @atom:nu @atom:*
+    @dihedral:X-n4-nu-X @atom:* @atom:n4 @atom:nu @atom:*
+    @dihedral:X-na-nu-X @atom:* @atom:na @atom:nu @atom:*
+    @dihedral:X-nh-nu-X @atom:* @atom:nh @atom:nu @atom:*
+    # Wildcard dihedral type definitions for nv (aromatic amine nitrogen with two hydrogens)
+    @dihedral:X-c1-nv-X @atom:* @atom:c1 @atom:nv @atom:*
+    @dihedral:X-c2-nv-X @atom:* @atom:c2 @atom:nv @atom:*
+    @dihedral:X-c3-nv-X @atom:* @atom:c3 @atom:nv @atom:*
+    @dihedral:X-ca-nv-X @atom:* @atom:ca @atom:nv @atom:*
+    @dihedral:X-cc-nv-X @atom:* @atom:cc @atom:nv @atom:*
+    @dihedral:X-cd-nv-X @atom:* @atom:cd @atom:nv @atom:*
+    @dihedral:X-n-nv-X @atom:* @atom:n @atom:nv @atom:*
+    @dihedral:X-n1-nv-X @atom:* @atom:n1 @atom:nv @atom:*
+    @dihedral:X-n2-nv-X @atom:* @atom:n2 @atom:nv @atom:*
+    @dihedral:X-ne-nv-X @atom:* @atom:ne @atom:nv @atom:*
+    @dihedral:X-nf-nv-X @atom:* @atom:nf @atom:nv @atom:*
+    @dihedral:X-n3-nv-X @atom:* @atom:n3 @atom:nv @atom:*
+    @dihedral:X-n4-nv-X @atom:* @atom:n4 @atom:nv @atom:*
+    @dihedral:X-na-nv-X @atom:* @atom:na @atom:nv @atom:*
+    @dihedral:X-nh-nv-X @atom:* @atom:nh @atom:nv @atom:*
+    @dihedral:X-nv-no-X @atom:* @atom:nv @atom:no @atom:*
+    @dihedral:X-nv-oh-X @atom:* @atom:nv @atom:oh @atom:*
+    @dihedral:X-nv-os-X @atom:* @atom:nv @atom:os @atom:*
+    @dihedral:X-nv-p2-X @atom:* @atom:nv @atom:p2 @atom:*
+    @dihedral:X-nv-pe-X @atom:* @atom:nv @atom:pe @atom:*
+    @dihedral:X-nv-pf-X @atom:* @atom:nv @atom:pf @atom:*
+    @dihedral:X-nv-p3-X @atom:* @atom:nv @atom:p3 @atom:*
+    @dihedral:X-nv-p4-X @atom:* @atom:nv @atom:p4 @atom:*
+    @dihedral:X-nv-px-X @atom:* @atom:nv @atom:px @atom:*
+    @dihedral:X-nv-p5-X @atom:* @atom:nv @atom:p5 @atom:*
+    @dihedral:X-nv-py-X @atom:* @atom:nv @atom:py @atom:*
+    @dihedral:X-nv-sh-X @atom:* @atom:nv @atom:sh @atom:*
+    @dihedral:X-nv-ss-X @atom:* @atom:nv @atom:ss @atom:*
+    @dihedral:X-nv-s4-X @atom:* @atom:nv @atom:s4 @atom:*
+    @dihedral:X-nv-sx-X @atom:* @atom:nv @atom:sx @atom:*
+    @dihedral:X-nv-s6-X @atom:* @atom:nv @atom:s6 @atom:*
+    @dihedral:X-nv-sy-X @atom:* @atom:nv @atom:sy @atom:*
     @dihedral:X-c3-no-X @atom:* @atom:c3 @atom:no @atom:*
     @dihedral:X-c3-oh-X @atom:* @atom:c3 @atom:oh @atom:*
     @dihedral:X-c3-os-X @atom:* @atom:c3 @atom:os @atom:*
@@ -14811,6 +14986,31 @@ GAFF2 {
     @dihedral:c3-n3-c3-c3 @atom:c3 @atom:n3 @atom:c3 @atom:c3
     @dihedral:c3-n-cs-c3 @atom:c3 @atom:n @atom:cs @atom:c3
     @dihedral:c3-nu-ca-ca @atom:c3 @atom:nu @atom:ca @atom:ca
+    # Specific dihedral type definitions for nu (aromatic amine nitrogen with one hydrogen)
+    @dihedral:c2-nu-ca-ca @atom:c2 @atom:nu @atom:ca @atom:ca
+    @dihedral:c3-nu-ca-c3 @atom:c3 @atom:nu @atom:ca @atom:c3
+    @dihedral:c3-nu-ca-nu @atom:c3 @atom:nu @atom:ca @atom:nu
+    @dihedral:c3-nu-c3-ca @atom:c3 @atom:nu @atom:c3 @atom:ca
+    @dihedral:c3-nu-c3-c3 @atom:c3 @atom:nu @atom:c3 @atom:c3
+    @dihedral:ca-nu-ca-ca @atom:ca @atom:nu @atom:ca @atom:ca
+    @dihedral:hn-nu-ca-ca @atom:hn @atom:nu @atom:ca @atom:ca
+    @dihedral:hn-nu-ca-c3 @atom:hn @atom:nu @atom:ca @atom:c3
+    @dihedral:hn-nu-c3-ca @atom:hn @atom:nu @atom:c3 @atom:ca
+    @dihedral:c1-nu-ca-ca @atom:c1 @atom:nu @atom:ca @atom:ca
+    @dihedral:c2-nu-ca-c3 @atom:c2 @atom:nu @atom:ca @atom:c3
+    @dihedral:c3-nv-ca-ca @atom:c3 @atom:nv @atom:ca @atom:ca
+    # Specific dihedral type definitions for nv (aromatic amine nitrogen with two hydrogens)
+    @dihedral:c2-nv-ca-ca @atom:c2 @atom:nv @atom:ca @atom:ca
+    @dihedral:c3-nv-ca-c3 @atom:c3 @atom:nv @atom:ca @atom:c3
+    @dihedral:c3-nv-ca-nv @atom:c3 @atom:nv @atom:ca @atom:nv
+    @dihedral:c3-nv-c3-ca @atom:c3 @atom:nv @atom:c3 @atom:ca
+    @dihedral:c3-nv-c3-c3 @atom:c3 @atom:nv @atom:c3 @atom:c3
+    @dihedral:ca-nv-ca-ca @atom:ca @atom:nv @atom:ca @atom:ca
+    @dihedral:hn-nv-ca-ca @atom:hn @atom:nv @atom:ca @atom:ca
+    @dihedral:hn-nv-ca-c3 @atom:hn @atom:nv @atom:ca @atom:c3
+    @dihedral:hn-nv-c3-ca @atom:hn @atom:nv @atom:c3 @atom:ca
+    @dihedral:c1-nv-ca-ca @atom:c1 @atom:nv @atom:ca @atom:ca
+    @dihedral:c2-nv-ca-c3 @atom:c2 @atom:nv @atom:ca @atom:c3
     @dihedral:c3-nh-ca-ca @atom:c3 @atom:nh @atom:ca @atom:ca
     @dihedral:c3-os-cs-c3 @atom:c3 @atom:os @atom:cs @atom:c3
     @dihedral:c3-p3-c-c3 @atom:c3 @atom:p3 @atom:c @atom:c3
