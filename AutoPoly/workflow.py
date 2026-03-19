@@ -638,7 +638,26 @@ class WorkflowManager:
         offset = getattr(self.poly, 'offset', 4.0)
         chain_length_box = max_dop**0.6 * offset * 3.0  # SAW end-to-end × safety factor
 
-        box_size = max(density_box, chain_length_box)
+        # Chain-packing estimate — ensure box is large enough for non-overlapping placement
+        total_collision_volume = 0.0
+        for modelii in self.poly.model:
+            is_molecule = hasattr(modelii, '_is_molecule') and modelii._is_molecule
+            if is_molecule:
+                total_collision_volume += modelii.Count * (4.0 / 3.0) * np.pi * 3.0**3
+            elif modelii.dop > 1:
+                n_poly = len(modelii.sequenceSet)
+                is_ring = hasattr(modelii, 'topology') and modelii.topology == "ring"
+                if is_ring:
+                    r = offset * np.sqrt(modelii.dop / 12) * 2.0 + 2.0
+                else:
+                    r = offset * np.sqrt(modelii.dop / 6) * 2.0 + 2.0
+                total_collision_volume += n_poly * (4.0 / 3.0) * np.pi * r**3
+            else:
+                total_collision_volume += len(modelii.sequenceSet) * (4.0 / 3.0) * np.pi * 3.0**3
+
+        packing_box = (total_collision_volume / 0.3) ** (1.0 / 3.0) if total_collision_volume > 0 else 0.0
+
+        box_size = max(density_box, chain_length_box, packing_box)
         half_box = box_size / 2
 
         box_bounds = ((-half_box, half_box), (-half_box, half_box), (-half_box, half_box))
@@ -696,10 +715,14 @@ class WorkflowManager:
                         )
                         if placement is None:
                             logger.warning(f"Failed to place molecule {index+1}, using fallback position")
-                            # Fallback to grid position
-                            pos_x = (index % 10) * 10.0
-                            pos_y = (index // 10) * 10.0
-                            pos_z = 0.0
+                            spacing = mol_radius * 2.5
+                            grid_per_dim = max(1, int((2 * half_box - 2 * mol_radius) / spacing))
+                            ix = index % grid_per_dim
+                            iy = (index // grid_per_dim) % grid_per_dim
+                            iz = (index // (grid_per_dim * grid_per_dim)) % grid_per_dim
+                            pos_x = -half_box + mol_radius + ix * spacing
+                            pos_y = -half_box + mol_radius + iy * spacing
+                            pos_z = -half_box + mol_radius + iz * spacing
                             write_f.write(f"molecule_{index+1} = new {modelii.molecule_name}")
                             write_f.write(f".move({pos_x:.4f},{pos_y:.4f},{pos_z:.4f})\n")
                         else:
@@ -725,9 +748,14 @@ class WorkflowManager:
                         )
                         if placement is None:
                             logger.warning(f"Failed to place polymer {polyindex+1}, using fallback")
-                            pos_x = (polyindex % 10) * poly_radius * 2.5
-                            pos_y = (polyindex // 10) * poly_radius * 2.5
-                            pos_z = 0.0
+                            spacing = poly_radius * 2.5
+                            grid_per_dim = max(1, int((2 * half_box - 2 * poly_radius) / spacing))
+                            ix = polyindex % grid_per_dim
+                            iy = (polyindex // grid_per_dim) % grid_per_dim
+                            iz = (polyindex // (grid_per_dim * grid_per_dim)) % grid_per_dim
+                            pos_x = -half_box + poly_radius + ix * spacing
+                            pos_y = -half_box + poly_radius + iy * spacing
+                            pos_z = -half_box + poly_radius + iz * spacing
                             write_f.write(f"polymer_{polyindex+1} = new poly_{polyindex+1}")
                             write_f.write(f".move({pos_x:.4f},{pos_y:.4f},{pos_z:.4f})\n")
                         else:
@@ -745,9 +773,14 @@ class WorkflowManager:
                             instance_name=f"molecule_{index+1}"
                         )
                         if placement is None:
-                            pos_x = (index % 10) * 10.0
-                            pos_y = (index // 10) * 10.0
-                            pos_z = 0.0
+                            spacing = 3.0 * 2.5
+                            grid_per_dim = max(1, int((2 * half_box - 2 * 3.0) / spacing))
+                            ix = index % grid_per_dim
+                            iy = (index // grid_per_dim) % grid_per_dim
+                            iz = (index // (grid_per_dim * grid_per_dim)) % grid_per_dim
+                            pos_x = -half_box + 3.0 + ix * spacing
+                            pos_y = -half_box + 3.0 + iy * spacing
+                            pos_z = -half_box + 3.0 + iz * spacing
                             write_f.write(f"molecule_{index+1} = new {modelii.merSet[0]}")
                             write_f.write(f".move({pos_x:.4f},{pos_y:.4f},{pos_z:.4f})\n")
                         else:
