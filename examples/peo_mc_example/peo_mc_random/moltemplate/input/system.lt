@@ -1,0 +1,19 @@
+import "oplsaa.lt"
+
+import "poly_1.lt"
+import "poly_2.lt"
+import "poly_3.lt"
+import "poly_4.lt"
+import "poly_5.lt"
+
+polymer_1 = new poly_1.rot(166.2336,-0.3029,-0.0356,-0.9523).move(-9.5868,18.3848,9.6250)
+polymer_2 = new poly_2.rot(97.0153,-0.8554,-0.4773,-0.2013).move(12.3222,-9.1273,16.0991)
+polymer_3 = new poly_3.rot(76.2918,-0.8906,0.2844,0.3550).move(-5.5736,-18.9060,-14.1471)
+polymer_4 = new poly_4.rot(136.7204,0.5653,0.7061,-0.4265).move(18.8261,8.2149,-14.4757)
+polymer_5 = new poly_5.rot(137.6191,0.9635,0.1321,0.2329).move(-19.4565,-19.3243,16.5934)
+
+write_once("Data Boundary") {
+   -36.2051  36.2051  xlo xhi
+   -36.2051  36.2051  ylo yhi
+   -36.2051  36.2051  zlo zhi
+}

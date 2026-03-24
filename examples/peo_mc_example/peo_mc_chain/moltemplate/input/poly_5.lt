@@ -1,0 +1,54 @@
+import "oplsaa.lt"
+import "monomer_0_0le_T1.lt"
+import "monomer_0_1i.lt"
+import "monomer_0_1i_T1.lt"
+import "monomer_0_19re.lt"
+
+poly_5 inherits OPLSAA {
+
+    create_var {$mol}
+
+    monomer[0] = new monomer_0_0le_T1.rot(171.6854,0.4112,0.8332,-0.3698).move(-0.6011,0.0234,-0.1871)
+    monomer[1] = new monomer_0_1i.rot(89.1345,0.0000,0.6601,0.7511).move(-1.3390,1.6304,-1.4500)
+    monomer[2] = new monomer_0_1i_T1.rot(140.1347,0.0000,0.3885,0.9215).move(-2.2209,3.2028,-2.5155)
+    monomer[3] = new monomer_0_1i_T1.rot(133.5353,0.0000,0.3169,-0.9485).move(-3.9277,3.0892,-3.0766)
+    monomer[4] = new monomer_0_1i_T1.rot(158.2579,0.0000,0.2252,0.9743).move(-5.8236,2.7063,-3.4436)
+    monomer[5] = new monomer_0_1i.rot(115.3235,0.0000,-0.9502,0.3117).move(-7.4135,3.4595,-2.5347)
+    monomer[6] = new monomer_0_1i.rot(69.5630,0.0000,-0.9881,-0.1538).move(-7.5056,3.6207,-0.4430)
+    monomer[7] = new monomer_0_1i.rot(86.1951,0.0000,-0.1584,-0.9874).move(-7.0186,2.2972,0.8275)
+    monomer[8] = new monomer_0_1i.rot(38.6984,0.0000,-0.9960,0.0898).move(-6.0261,1.2084,1.7426)
+    monomer[9] = new monomer_0_1i.rot(82.3453,0.0000,-0.3613,-0.9324).move(-4.9553,0.1911,2.8921)
+    monomer[10] = new monomer_0_1i.rot(127.3305,0.0000,0.8623,-0.5064).move(-5.5099,-1.3639,2.5082)
+    monomer[11] = new monomer_0_1i_T1.rot(118.6415,0.0000,-0.0503,-0.9987).move(-6.7824,-2.8631,1.7563)
+    monomer[12] = new monomer_0_1i.rot(36.7823,0.0000,-0.1238,-0.9923).move(-6.4055,-4.5868,1.8950)
+    monomer[13] = new monomer_0_1i_T1.rot(50.1241,0.0000,0.9909,-0.1344).move(-4.7154,-5.4040,1.0906)
+    monomer[14] = new monomer_0_1i_T1.rot(90.4996,0.0000,0.6017,-0.7987).move(-3.9743,-6.4610,-0.5058)
+    monomer[15] = new monomer_0_1i_T1.rot(76.9558,0.0000,0.8659,0.5002).move(-3.7200,-6.8260,-2.1996)
+    monomer[16] = new monomer_0_1i_T1.rot(120.9639,0.0000,0.9806,-0.1959).move(-4.0584,-6.4518,-4.1737)
+    monomer[17] = new monomer_0_1i_T1.rot(85.5860,0.0000,0.8998,0.4364).move(-4.5712,-6.1388,-6.2107)
+    monomer[18] = new monomer_0_1i.rot(94.1977,0.0000,0.7608,-0.6489).move(-4.5668,-6.3874,-8.1514)
+    monomer[19] = new monomer_0_19re.rot(25.3240,0.0000,0.7641,-0.6451).move(-3.3600,-7.5405,-9.5081)
+
+    write('Data Bond List') {
+      $bond:b1  $atom:monomer[0]/O2  $atom:monomer[1]/C1
+      $bond:b2  $atom:monomer[1]/O2  $atom:monomer[2]/C1
+      $bond:b3  $atom:monomer[2]/O2  $atom:monomer[3]/C1
+      $bond:b4  $atom:monomer[3]/O2  $atom:monomer[4]/C1
+      $bond:b5  $atom:monomer[4]/O2  $atom:monomer[5]/C1
+      $bond:b6  $atom:monomer[5]/O2  $atom:monomer[6]/C1
+      $bond:b7  $atom:monomer[6]/O2  $atom:monomer[7]/C1
+      $bond:b8  $atom:monomer[7]/O2  $atom:monomer[8]/C1
+      $bond:b9  $atom:monomer[8]/O2  $atom:monomer[9]/C1
+      $bond:b10  $atom:monomer[9]/O2  $atom:monomer[10]/C1
+      $bond:b11  $atom:monomer[10]/O2  $atom:monomer[11]/C1
+      $bond:b12  $atom:monomer[11]/O2  $atom:monomer[12]/C1
+      $bond:b13  $atom:monomer[12]/O2  $atom:monomer[13]/C1
+      $bond:b14  $atom:monomer[13]/O2  $atom:monomer[14]/C1
+      $bond:b15  $atom:monomer[14]/O2  $atom:monomer[15]/C1
+      $bond:b16  $atom:monomer[15]/O2  $atom:monomer[16]/C1
+      $bond:b17  $atom:monomer[16]/O2  $atom:monomer[17]/C1
+      $bond:b18  $atom:monomer[17]/O2  $atom:monomer[18]/C1
+      $bond:b19  $atom:monomer[18]/O2  $atom:monomer[19]/C1
+    }
+
+} # poly_5

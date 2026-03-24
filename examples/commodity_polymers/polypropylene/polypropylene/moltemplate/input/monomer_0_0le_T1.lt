@@ -1,0 +1,35 @@
+import "oplsaa.lt"    # <-- defines the OPLS-AA force field
+monomer_0_0le_T1 inherits OPLSAA {
+
+# atom-id  mol-id  atom-type charge      X         Y        Z
+
+  write("Data Atoms") {
+	$atom:C1 $mol:... @atom:80 -0.1800    -0.742   -0.000   0.000
+	$atom:C2 $mol:... @atom:82 -0.0600    0.742   0.000   -0.000
+	$atom:C3 $mol:... @atom:80 -0.1800    1.388   -0.424   1.258
+	$atom:H4 $mol:... @atom:85 0.0600    -1.219   -0.948   0.325
+	$atom:H5 $mol:... @atom:85 0.0600    -1.121   0.773   0.716
+	$atom:H6 $mol:... @atom:85 0.0600    -1.079   0.291   -1.017
+	$atom:H7 $mol:... @atom:85 0.0600    1.231   -0.292   -0.930
+	$atom:H8 $mol:... @atom:85 0.0600    2.311   0.202   1.400
+	$atom:H9 $mol:... @atom:85 0.0600    1.704   -1.499   1.290
+	$atom:H10 $mol:... @atom:85 0.0600    0.684   -0.259   2.096
+  }
+
+  write('Data Bond List') {
+	$bond:C1C2	$atom:C1	$atom:C2
+	$bond:C2C3	$atom:C2	$atom:C3
+	$bond:C1H4	$atom:C1	$atom:H4
+	$bond:C1H5	$atom:C1	$atom:H5
+	$bond:C1H6	$atom:C1	$atom:H6
+	$bond:C2H7	$atom:C2	$atom:H7
+	$bond:C3H8	$atom:C3	$atom:H8
+	$bond:C3H9	$atom:C3	$atom:H9
+	$bond:C3H10	$atom:C3	$atom:H10
+  }
+}  # monomer_0_0le_T1
+
+# Note: You don't need to supply the partial partial charges of the atoms.
+#       If you like, just fill the fourth column with zeros ("0.000").
+#       Moltemplate and LAMMPS will automatically assign the charge later
+
