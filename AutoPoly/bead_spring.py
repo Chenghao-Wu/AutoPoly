@@ -1487,6 +1487,11 @@ class BeadSpringPolymer:
     stiffness, and both harmonic and FENE bond styles.
     """
 
+    VALID_TOPOLOGIES = ["linear", "ring"]
+    VALID_BOND_STYLES = ["harmonic", "fene"]
+    VALID_PAIR_STYLES = ["lj", "wca"]
+    VALID_GENERATION_METHODS = ["geometric", "saw", "mc"]
+
     def __init__(
         self,
         name: str,
@@ -1557,14 +1562,14 @@ class BeadSpringPolymer:
             the balance of FENE (attractive, wants r→0) + WCA (repulsive, prevents r<~1.0).
             LAMMPS FENE syntax: bond_coeff * K R0 epsilon sigma
         """
-        if topology not in ["linear", "ring"]:
-            raise ValueError("Topology must be 'linear' or 'ring'")
-        if bond_style not in ["harmonic", "fene"]:
-            raise ValueError("Bond style must be 'harmonic' or 'fene'")
-        if generation_method not in ["geometric", "saw", "mc"]:
-            raise ValueError("Generation method must be 'geometric', 'saw', or 'mc'")
-        if pair_style not in ["lj", "wca"]:
-            raise ValueError("Pair style must be 'lj' or 'wca'")
+        if topology not in self.VALID_TOPOLOGIES:
+            raise ValueError(f"Topology must be one of: {self.VALID_TOPOLOGIES}")
+        if bond_style not in self.VALID_BOND_STYLES:
+            raise ValueError(f"Bond style must be one of: {self.VALID_BOND_STYLES}")
+        if generation_method not in self.VALID_GENERATION_METHODS:
+            raise ValueError(f"Generation method must be one of: {self.VALID_GENERATION_METHODS}")
+        if pair_style not in self.VALID_PAIR_STYLES:
+            raise ValueError(f"Pair style must be one of: {self.VALID_PAIR_STYLES}")
         if not bead_types:
             raise ValueError("At least one bead type is required")
 

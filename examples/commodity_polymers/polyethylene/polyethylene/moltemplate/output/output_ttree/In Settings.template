@@ -1,0 +1,19 @@
+    pair_coeff @/atom:OPLSAA/80 @/atom:OPLSAA/80 lj/cut/coul/long 0.066 3.5
+    pair_coeff @/atom:OPLSAA/81 @/atom:OPLSAA/81 lj/cut/coul/long 0.066 3.5
+    pair_coeff @/atom:OPLSAA/85 @/atom:OPLSAA/85 lj/cut/coul/long 0.03 2.5
+    bond_coeff @/bond:OPLSAA/80-80 harmonic 268.0 1.529
+    bond_coeff @/bond:OPLSAA/80-81 harmonic 268.0 1.529
+    bond_coeff @/bond:OPLSAA/81-80 harmonic 268.0 1.529
+    bond_coeff @/bond:OPLSAA/81-81 harmonic 268.0 1.529
+    bond_coeff @/bond:OPLSAA/80-85 harmonic 340.0 1.09
+    bond_coeff @/bond:OPLSAA/81-85 harmonic 340.0 1.09
+    angle_coeff @/angle:OPLSAA/85-80-85 harmonic 33.0 107.8
+    angle_coeff @/angle:OPLSAA/85-81-85 harmonic 33.0 107.8
+    angle_coeff @/angle:OPLSAA/80-80-85 harmonic 37.5 110.7
+    angle_coeff @/angle:OPLSAA/80-81-85 harmonic 37.5 110.7
+    angle_coeff @/angle:OPLSAA/81-80-85 harmonic 37.5 110.7
+    angle_coeff @/angle:OPLSAA/81-81-85 harmonic 37.5 110.7
+    dihedral_coeff @/dihedral:OPLSAA/85-80-80-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @/dihedral:OPLSAA/85-80-81-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @/dihedral:OPLSAA/85-81-80-85 opls 0.0 0.0 0.3 0.0
+    dihedral_coeff @/dihedral:OPLSAA/85-81-81-85 opls 0.0 0.0 0.3 0.0

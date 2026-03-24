@@ -1,0 +1,9 @@
+@/bond:OPLSAA/CT_CT @/atom:OPLSAA/*_bCT*_a*_d*_i* @/atom:OPLSAA/*_bCT*_a*_d*_i*
+@/bond:OPLSAA/CT_HC @/atom:OPLSAA/*_bCT*_a*_d*_i* @/atom:OPLSAA/*_bHC*_a*_d*_i*
+@/bond:OPLSAA/CT_OH @/atom:OPLSAA/*_bCT*_a*_d*_i* @/atom:OPLSAA/*_bOH*_a*_d*_i*
+@/bond:OPLSAA/CT_OS @/atom:OPLSAA/*_bCT*_a*_d*_i* @/atom:OPLSAA/*_bOS*_a*_d*_i*
+@/bond:OPLSAA/HC_HC @/atom:OPLSAA/*_bHC*_a*_d*_i* @/atom:OPLSAA/*_bHC*_a*_d*_i*
+@/bond:OPLSAA/HO_OH @/atom:OPLSAA/*_bHO*_a*_d*_i* @/atom:OPLSAA/*_bOH*_a*_d*_i*
+@/bond:OPLSAA/HO_OS @/atom:OPLSAA/*_bHO*_a*_d*_i* @/atom:OPLSAA/*_bOS*_a*_d*_i*
+@/bond:OPLSAA/OS_OH @/atom:OPLSAA/*_bOS*_a*_d*_i* @/atom:OPLSAA/*_bOH*_a*_d*_i*
+@/bond:OPLSAA/OS_OS @/atom:OPLSAA/*_bOS*_a*_d*_i* @/atom:OPLSAA/*_bOS*_a*_d*_i*

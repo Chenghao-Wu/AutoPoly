@@ -34,3 +34,70 @@ LOG = {
 MAX_DOP = 10000  # Maximum degree of polymerization
 MAX_SEQUENCE_LENGTH = 10000  # Maximum sequence length
 MAX_UNIQUE_MONOMERS = 100  # Maximum unique monomer types
+
+# Metadata for agent API discovery
+FORCE_FIELD_DESCRIPTIONS = {
+    "oplsaa": "OPLS-AA. Best for organic molecules and proteins.",
+    "lopls": "L-OPLS. Better for long alkyl chains.",
+    "gaff": "General AMBER Force Field. Broad organic coverage.",
+    "gaff2": "GAFF2. Updated GAFF with improved parameters.",
+    "dreiding": "DREIDING. Generic, element-based. Good for unusual chemistry.",
+    "compass": "COMPASS. Optimized for condensed-phase properties.",
+}
+
+TOPOLOGY_DESCRIPTIONS = {
+    "linear": "Linear chain. Distinct first/last monomers.",
+    "ring": "Ring (cyclic). All monomers are middle-type, chain closes on itself.",
+}
+
+TACTICITY_DESCRIPTIONS = {
+    "atactic": "Random stereochemistry at each chiral center.",
+    "isotactic": "Same stereochemistry at all chiral centers.",
+    "syndiotactic": "Alternating stereochemistry at chiral centers.",
+}
+
+EXAMPLE_CONFIGS = {
+    "polyethylene_10mer": {
+        "type": "atomistic",
+        "name": "pe_system",
+        "force_field": "oplsaa",
+        "polymers": [{
+            "chain_num": 2,
+            "sequence": ["CC[*]"] + ["[*]CC[*]"] * 8 + ["[*]CC"],
+            "topology": "linear",
+            "tacticity": "atactic",
+        }],
+    },
+    "diblock_copolymer": {
+        "type": "atomistic",
+        "name": "diblock",
+        "force_field": "gaff2",
+        "polymers": [{
+            "chain_num": 5,
+            "sequence": ["CC[*]"] + ["[*]CC[*]"] * 4
+                        + ["[*]C(=O)O[*]"] * 4 + ["[*]C(=O)O"],
+            "topology": "linear",
+        }],
+    },
+    "bead_spring_melt": {
+        "type": "bead_spring",
+        "name": "melt",
+        "n_chains": 100,
+        "bead_types": [{"name": "A"}],
+        "sequence": [["A", 50]],
+        "bond_style": "fene",
+        "pair_style": "wca",
+        "density": 0.85,
+    },
+    "ring_polymer": {
+        "type": "bead_spring",
+        "name": "ring",
+        "n_chains": 50,
+        "bead_types": [{"name": "A"}],
+        "sequence": [["A", 30]],
+        "topology": "ring",
+        "bond_style": "fene",
+        "pair_style": "wca",
+        "generation_method": "saw",
+    },
+}

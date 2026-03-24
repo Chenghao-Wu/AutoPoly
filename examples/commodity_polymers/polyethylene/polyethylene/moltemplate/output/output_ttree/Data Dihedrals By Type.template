@@ -1,0 +1,4 @@
+    @/dihedral:OPLSAA/85-80-80-85 @/atom:OPLSAA/85 @/atom:OPLSAA/80 @/atom:OPLSAA/80 @/atom:OPLSAA/85
+    @/dihedral:OPLSAA/85-80-81-85 @/atom:OPLSAA/85 @/atom:OPLSAA/80 @/atom:OPLSAA/81 @/atom:OPLSAA/85
+    @/dihedral:OPLSAA/85-81-80-85 @/atom:OPLSAA/85 @/atom:OPLSAA/81 @/atom:OPLSAA/80 @/atom:OPLSAA/85
+    @/dihedral:OPLSAA/85-81-81-85 @/atom:OPLSAA/85 @/atom:OPLSAA/81 @/atom:OPLSAA/81 @/atom:OPLSAA/85

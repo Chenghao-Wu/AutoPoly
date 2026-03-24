@@ -80,7 +80,9 @@ class Polymerization:
         mc_bond_angle_min (float): Minimum bond angle in degrees for MC chain growth
         mc_bond_angle_max (float): Maximum bond angle in degrees for MC chain growth
     """
-    
+
+    VALID_FORCE_FIELDS = ["oplsaa", "gaff", "gaff2", "lopls", "dreiding", "compass"]
+
     def __init__(
         self,
         name: str = None,
@@ -132,10 +134,9 @@ class Polymerization:
             SystemExit: If required directories or files are not found
         """
         # Validate force_field parameter
-        valid_force_fields = ["oplsaa", "gaff", "gaff2", "lopls", "dreiding", "compass"]
-        if force_field not in valid_force_fields:
+        if force_field not in self.VALID_FORCE_FIELDS:
             raise ValidationError(
-                f"Invalid force_field '{force_field}'. Must be one of: {valid_force_fields}"
+                f"Invalid force_field '{force_field}'. Must be one of: {self.VALID_FORCE_FIELDS}"
             )
 
         self.name = name

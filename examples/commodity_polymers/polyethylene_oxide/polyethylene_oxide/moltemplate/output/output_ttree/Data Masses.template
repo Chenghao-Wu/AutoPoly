@@ -1,0 +1,8 @@
+    @/atom:OPLSAA/80 12.011 #CT "Alkane CH3-" 6 partial charge=-0.18
+    @/atom:OPLSAA/85 1.008 #HC "Alkane H-C" 1 partial charge=0.06
+    @/atom:OPLSAA/96 15.999 #OH "Alcohol -OH" 8 partial charge=-0.683
+    @/atom:OPLSAA/97 1.008 #HO "Alcohol -OH" 1 partial charge=0.418
+    @/atom:OPLSAA/99 12.011 #CT "Alcohol CH3OH & RCH2OH" 6 partial charge=0.145
+    @/atom:OPLSAA/122 15.999 #OS "Dialkyl Ether -O-" 8 partial charge=-0.4
+    @/atom:OPLSAA/124 12.011 #CT "Ethyl Ether -CH2OR" 6 partial charge=0.14
+    @/atom:OPLSAA/127 1.008 #HC "Alkyl Ether H-COR" 1 partial charge=0.03

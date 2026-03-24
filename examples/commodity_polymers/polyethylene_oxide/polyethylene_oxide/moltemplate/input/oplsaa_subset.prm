@@ -1,0 +1,343 @@
+
+      ##############################
+      ##                          ##
+      ##  Force Field Definition  ##
+      ##                          ##
+      ##############################
+
+
+forcefield              OPLS-AA
+
+vdwindex                TYPE
+vdwtype                 LENNARD-JONES
+radiusrule              GEOMETRIC
+radiustype              SIGMA
+radiussize              DIAMETER
+epsilonrule             GEOMETRIC
+torsionunit             0.5
+imptorunit              0.5
+vdw-14-scale            2.0
+chg-14-scale            2.0
+electric                332.06
+dielectric              1.0
+
+
+      #############################
+      ##                         ##
+      ##  Literature References  ##
+      ##                         ##
+      #############################
+
+
+The parameters supplied with TINKER are from "OPLS All-Atom Parameters
+for Organic Molecules, Ions, Peptides & Nucleic Acids, July 2008" as
+provided by W. L. Jorgensen, Yale University during June 2009. These
+parameters are taken from those distributed with BOSS Version 4.8.
+
+Note that "atom type" numbers and not "atom class" numbers are used
+to index van der Waals parameters, see the "vdwindex" keyword above
+
+The atom types with (UA) in the description are "united atom" values,
+ie, OPLS-UA, where any nonpolar hydrogen atoms are combined onto their
+attached atoms. All other parameters are "all-atom", OPLS-AA, including
+explicit hydrogen atoms.
+
+
+      #############################
+      ##                         ##
+      ##  Atom Type Definitions  ##
+      ##                         ##
+      #############################
+
+
+atom         80   13    CT    "Alkane CH3-"                  6    12.011    4
+atom         85   46    HC    "Alkane H-C"                   1     1.008    1
+atom         96    5    OH    "Alcohol -OH"                  8    15.999    2
+atom         97    7    HO    "Alcohol -OH"                  1     1.008    1
+atom         99   13    CT    "Alcohol CH3OH & RCH2OH"       6    12.011    4
+atom        122   20    OS    "Dialkyl Ether -O-"            8    15.999    2
+atom        124   13    CT    "Ethyl Ether -CH2OR"           6    12.011    4
+atom        127   46    HC    "Alkyl Ether H-COR"            1     1.008    1
+
+
+      ################################
+      ##                            ##
+      ##  Van der Waals Parameters  ##
+      ##                            ##
+      ################################
+
+
+vdw          80               3.5000     0.0660
+vdw          85               2.5000     0.0300
+vdw          96               3.1200     0.1700
+vdw          97               0.0000     0.0000
+vdw          99               3.5000     0.0660
+vdw         122               2.9000     0.1400
+vdw         124               3.5000     0.0660
+vdw         127               2.5000     0.0300
+
+
+      ##################################
+      ##                              ##
+      ##  Bond Stretching Parameters  ##
+      ##                              ##
+      ##################################
+
+
+bond          5    7          553.00     0.9450
+bond          5   13          320.00     1.4100
+bond         13   13          268.00     1.5290
+bond         13   20          320.00     1.4100
+bond         13   46          340.00     1.0900
+
+
+      ################################
+      ##                            ##
+      ##  Angle Bending Parameters  ##
+      ##                            ##
+      ################################
+
+
+angle         7    5   13      55.00     108.50
+angle         5   13   13      50.00     109.50
+angle        13   13   20      50.00     109.50
+angle        46   13   46      33.00     107.80
+angle         5   13   46      35.00     109.50
+angle        20   13   46      35.00     109.50
+angle        13   13   46      37.50     110.70
+
+
+      ################################
+      ##                            ##
+      ##   Urey-Bradley Parameters  ##
+      ##                            ##
+      ################################
+
+
+ureybrad     35   34   35      38.25     1.5537
+
+
+      #####################################
+      ##                                 ##
+      ##  Improper Torsional Parameters  ##
+      ##                                 ##
+      #####################################
+
+
+
+
+      ############################
+      ##                        ##
+      ##  Torsional Parameters  ##
+      ##                        ##
+      ############################
+
+
+    ###################################################################
+    ##                                                               ##
+    ##  Alternative Torsional Parameter Values for Use with OPLS-AA  ##
+    ##                                                               ##
+    ##  For some torsions, OPLS-AA has multiple possible parameter   ##
+    ##  values; the list below shows functional groups for which     ##
+    ##  these alternate (commented) values should be preferred; the  ##
+    ##  values are in the same order as in the full parameter list   ##
+    ##                                                               ##
+    ##    4    3    3   36      generic (default)                    ##
+    ##    4    3    3   36      dicarbonyls                          ##
+    ##   36    3    3   36      hydrocarbon (default)                ##
+    ##   36    3    3   36      dicarbonyls                          ##
+    ##   13    3    5    7      carboxylic acid (default)            ##
+    ##   13    3    5    7      1,2-diacid monoanion                 ##
+    ##    4    3   13   13      peptide (default)                    ##
+    ##    4    3   13   13      propanamide                          ##
+    ##    4    3   13   13      carboxylic acid                      ##
+    ##    4    3   13   13      dicarboxylic acid                    ##
+    ##    4    3   13   13      aldyhyde, ketone, acyl halide        ##
+    ##    4    3   13   13      1,2-diacid monoanion                 ##
+    ##    5    3   13   13      carboxylic acid (default)            ##
+    ##    5    3   13   13      dicarboxylic acid                    ##
+    ##   35    3   13   13      peptide psi' (default)               ##
+    ##   35    3   13   13      propanamide                          ##
+    ##   35    3   13   13      beta-3-peptide, last psi             ##
+    ##    4    3   29   13      esters (default)                     ##
+    ##    4    3   29   13      benzoic esters                       ##
+    ##    7    5   13   13      alcohols (default)                   ##
+    ##    7    5   13   13      trifluoroethanol                     ##
+    ##    7    5   13   13      hexopyranoses                        ##
+    ##    7    5   13   36      alcohols (default)                   ##
+    ##    7    5   13   36      axial cyclohexanol                   ##
+    ##    7    5   13   36      trifluoroethanol                     ##
+    ##    0   13   13   13      alcohols, ethers (default)           ##
+    ##    0   13   13   13      hexopyranoses                        ##
+    ##    3   13   13    3      dicarboxylic acid (default)          ##
+    ##    3   13   13    3      1,2-diacid monoanion                 ##
+    ##    3   13   13   13      butanamide (default)                 ##
+    ##    3   13   13   13      carboxylate ion                      ##
+    ##    3   13   13   13      aldyhyde, ketone, acyl halide        ##
+    ##    3   13   13   36      all carbonyls (default)              ##
+    ##    3   13   13   36      dicarboxylic acid                    ##
+    ##    3   13   13   36      aldehyde, ketone, acyl halide        ##
+    ##    5   13   13    5      diols only (default)                 ##
+    ##    5   13   13    5      triols only                          ##
+    ##    5   13   13    5      hexopyranoses                        ##
+    ##   13   13   13   13      hydrocarbon (default)                ##
+    ##   13   13   13   13      perfluoroalkane                      ##
+    ##   13   13   13   35      peptide chi-1 (default)              ##
+    ##   13   13   13   35      N-propylformamide                    ##
+    ##   36   13   13   69      generic (default)                    ##
+    ##   36   13   13   69      sulfone                              ##
+    ##   13   13   33   13      amine (default)                      ##
+    ##   13   13   33   13      exocyclic amine                      ##
+    ##   13   13   33   13      exocyclic 1,4-diamine                ##
+    ##   13   13   33   34      amine (default)                      ##
+    ##   13   13   33   34      azetidine, 4-ring                    ##
+    ##   13   13   33   34      pyrrolidine, 5-ring                  ##
+    ##   13   13   33   34      cyclic amine                         ##
+    ##   13   13   33   34      cyclic 1,4-diamine                   ##
+    ##   13   13   35    3      peptide phi' (default)               ##
+    ##   13   13   35    3      N-ethylformamide                     ##
+    ##   13   13   35    3      beta-3-peptide, first theta tors     ##
+    ##   13   13   35   13      proline, CD-N-CA-CB (default)        ##
+    ##   13   13   35   13      proline, CG-CD-N-CA                  ##
+    ##   36   13   35    3      peptide phi'' (default)              ##
+    ##   36   13   35    3      N-methylformamide                    ##
+    ##   13   13   47    0      imidazole, indole, purine (default)  ##
+    ##   13   13   47    0      nucleoside chi                       ##
+    ##   13   13   47   52      nucleoside (default)                 ##
+    ##   13   13   47   52      imidazole, indole, purine            ##
+    ##   29   13   47    0      imidazole, indole, purine (default)  ##
+    ##   29   13   47    0      nucleoside chi                       ##
+    ##   29   13   95   52      nucleoside (default)                 ##
+    ##   29   13   95   52      imidazole, indole, purine            ##
+    ##   13   13   97   13      generic (default)                    ##
+    ##   13   13   97   13      generic                              ##
+    ##   17   15   38    0      aromatic thiol (default)             ##
+    ##   17   15   38    0      aromatic thiol, N-C-S-H              ##
+    ##   13   29   54   42      phosphonates (default)               ##
+    ##   13   29   54   42      dimethyl phosphate                   ##
+    ##   34   35   72   16      diaryl amine (default)               ##
+    ##   34   35   72   16      aniline-like                         ##
+    ##   34   35   72   29      diaryl amine (default)               ##
+    ##   34   35   72   29      aniline-like                         ##
+    ##   13   40   40   37      diene (default)                      ##
+    ##   13   40   40   37      2-methyl-1,3-butadiene               ##
+    ##    0   46   72    0      generic (default)                    ##
+    ##    0   46   72    0      generic                              ##
+    ##    0   47   72    0      generic (default)                    ##
+    ##    0   47   72    0      generic                              ##
+    ##    0   47   74    0      generic (default)                    ##
+    ##    0   47   74    0      generic                              ##
+    ##    0   47   74    0      generic                              ##
+    ##    0   51   72    0      generic (default)                    ##
+    ##    0   51   72    0      HA-CR-NB-?? or N?-CR-NB-??           ##
+    ##    0   72   77    0      generic (default)                    ##
+    ##    0   72   77    0      biphenyl-like, N-C-C-C               ##
+    ##                                                               ##
+    ###################################################################
+
+
+#torsion      4    3    3   36      0.000 0.0 1   0.200 180.0 2   0.000 0.0 3
+#torsion     36    3    3   36      0.800 0.0 1   0.000 180.0 2   0.000 0.0 3
+#torsion     13    3    5    7      3.200 0.0 1   4.900 180.0 2   0.000 0.0 3
+#torsion      4    3   13   13      0.000 0.0 1   1.166 180.0 2   0.000 0.0 3
+#torsion      4    3   13   13      0.000 0.0 1   0.546 180.0 2   0.000 0.0 3
+#torsion      4    3   13   13     -0.750 0.0 1  -0.550 180.0 2  -0.250 0.0 3
+#torsion      4    3   13   13     -0.277 0.0 1   1.228 180.0 2  -0.694 0.0 3
+#torsion      4    3   13   13     -1.000 0.0 1  -1.900 180.0 2  -0.900 0.0 3
+#torsion      5    3   13   13      1.000 0.0 1   0.546 180.0 2   0.450 0.0 3
+#torsion     35    3   13   13      3.250 0.0 1  -0.402 180.0 2  -0.136 0.0 3
+#torsion     35    3   13   13      3.260 0.0 1   0.440 180.0 2   0.600 0.0 3
+#torsion      4    3   29   13      0.000 0.0 1   5.000 180.0 2   0.000 0.0 3
+torsion       7    5   13   13     -0.356 0.0 1  -0.174 180.0 2   0.492 0.0 3
+#torsion      7    5   13   13      4.478 0.0 1  -2.175 180.0 2   0.000 0.0 3
+#torsion      7    5   13   13      2.674 0.0 1  -2.883 180.0 2   1.026 0.0 3
+torsion       7    5   13   46      0.000 0.0 1   0.000 180.0 2   0.352 0.0 3
+#torsion      7    5   13   36     -2.589 0.0 1  -1.123 180.0 2   0.270 0.0 3
+#torsion      7    5   13   36      0.000 0.0 1   0.000 180.0 2   0.476 0.0 3
+#torsion      0   13   13   13     -1.336 0.0 1   0.000 180.0 2   0.000 0.0 3
+#torsion      3   13   13    3      0.800 0.0 1   0.000 180.0 2   0.900 0.0 3
+#torsion      3   13   13   13     -3.185 0.0 1  -0.825 180.0 2   0.493 0.0 3
+#torsion      3   13   13   13     -1.697 0.0 1  -0.456 180.0 2   0.585 0.0 3
+#torsion      3   13   13   36      0.000 0.0 1   0.000 180.0 2   0.074 0.0 3
+#torsion      3   13   13   36      0.000 0.0 1   0.000 180.0 2  -0.076 0.0 3
+#torsion      5   13   13    5     12.234 0.0 1   0.000 180.0 2   0.000 0.0 3
+#torsion      5   13   13    5      9.066 0.0 1   0.000 180.0 2   0.000 0.0 3
+torsion       5   13   13   46      0.000 0.0 1   0.000 180.0 2   0.468 0.0 3
+#torsion   13   13   13   13  6.622 0. 1 0.948 180. 2 -1.388 0. 3 -2.118 180. 4
+#torsion     13   13   13   35      1.964 0.0 1   0.000 180.0 2   0.659 0.0 3
+torsion      20   13   13   46      0.000 0.0 1   0.000 180.0 2   0.468 0.0 3
+torsion      46   13   13   46      0.000 0.0 1   0.000 180.0 2   0.300 0.0 3
+#torsion     36   13   13   69      0.000 0.0 1   0.000 180.0 2   0.350 0.0 3
+#torsion     13   13   33   13      1.536 0.0 1  -0.128 180.0 2   0.695 0.0 3
+#torsion     13   13   33   13      1.464 0.0 1  -0.128 180.0 2   0.695 0.0 3
+#torsion     13   13   33   34      0.000 0.0 1   4.000 180.0 2   0.000 0.0 3
+#torsion     13   13   33   34      0.200 0.0 1  -0.417 180.0 2   0.418 0.0 3
+#torsion     13   13   33   34      0.819 0.0 1  -0.417 180.0 2   0.418 0.0 3
+#torsion     13   13   33   34      1.522 0.0 1  -0.417 180.0 2   0.418 0.0 3
+#torsion     13   13   35    3     -1.396 0.0 1  -0.427 180.0 2   0.000 0.0 3
+#torsion     13   13   35    3      1.130 0.0 1  -1.420 180.0 2   0.440 0.0 3
+#torsion     13   13   35   13      2.859 0.0 1   2.058 180.0 2 -11.266 0.0 3
+#torsion     36   13   35    3      0.000 0.0 1   0.000 180.0 2  -0.139 0.0 3
+#torsion     13   13   47    0      0.000 0.0 1  -0.576 180.0 2   0.000 0.0 3
+#torsion     13   13   47   52     -1.000 0.0 1  -0.350 180.0 2   0.000 0.0 3
+#torsion     29   13   47    0      0.000 0.0 1  -1.876 180.0 2   0.000 0.0 3
+#torsion     29   13   95   52     -1.500 0.0 1  -1.500 180.0 2   0.000 0.0 3
+#torsion     13   13   97   13      2.859 0.0 1   2.058 180.0 2 -11.266 0.0 3
+#torsion     17   15   38    0     -3.000 0.0 1   0.000 180.0 2   0.000 0.0 3
+#torsion     13   29   54   42      0.900 0.0 1  -2.930 180.0 2   2.640 0.0 3
+#torsion     34   35   72   16      0.000 0.0 1   2.030 180.0 2   0.000 0.0 3
+#torsion     34   35   72   29      0.000 0.0 1   2.030 180.0 2   0.000 0.0 3
+#torsion     13   40   40   37      0.900 0.0 1   0.230 180.0 2  -0.505 0.0 3
+#torsion      0   46   72    0      0.000 0.0 1  10.000 180.0 2   0.000 0.0 3
+#torsion      0   47   72    0      0.000 0.0 1  10.000 180.0 2   0.000 0.0 3
+#torsion      0   47   74    0      0.000 0.0 1   5.000 180.0 2   0.000 0.0 3
+#torsion      0   47   74    0      0.000 0.0 1   3.000 180.0 2   0.000 0.0 3
+#torsion      0   51   72    0      0.000 0.0 1  10.000 180.0 2   0.000 0.0 3
+#torsion      0   72   77    0      0.000 0.0 1   2.170 180.0 2   0.000 0.0 3
+
+
+    ################################################################
+    ##                                                            ##
+    ##  Additional Torsional Parameter Values Used with OPLS-AA   ##
+    ##                                                            ##
+    ##  The torsions listed below were added to official OPLS-AA  ##
+    ##  to complete the set needed for proteins; the values were  ##
+    ##  obtained by analogy from the closest OPLS-AA torsions;    ##
+    ##  most of the added values are for HIP or N-terminal AAs;   ##
+    ##                                                            ##
+    ################################################################
+
+
+
+
+    ################################################################
+    ##                                                            ##
+    ##  Additional Torsional Parameter Values Used with OPLS-AA   ##
+    ##                                                            ##
+    ##  The torsions listed below were added to official OPLS-AA  ##
+    ##  to complete the values needed for selected organics       ##
+    ##                                                            ##
+    ################################################################
+
+
+
+
+      ########################################
+      ##                                    ##
+      ##  Atomic Partial Charge Parameters  ##
+      ##                                    ##
+      ########################################
+
+
+charge       80              -0.1800
+charge       85               0.0600
+charge       96              -0.6830
+charge       97               0.4180
+charge       99               0.1450
+charge      122              -0.4000
+charge      124               0.1400
+charge      127               0.0300
+
+
+      ########################################
+      ##                                    ##
