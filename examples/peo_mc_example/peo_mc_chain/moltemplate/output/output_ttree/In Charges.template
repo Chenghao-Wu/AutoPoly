@@ -1,0 +1,8 @@
+set type @/atom:OPLSAA/54_bCT_aCT_dCT_iCT   charge     -0.180 # C  - CT   | n-CH3 all-atom C: alkanes
+set type @/atom:OPLSAA/60_bHC_aHC_dHC_iHC   charge      0.060 # H  - HC   | H all-atom H: alkanes
+set type @/atom:OPLSAA/154_bOH_aOH_dOH_iOH  charge     -0.683 # O  - OH   | all-atom O: mono alcohols
+set type @/atom:OPLSAA/155_bHO_aHO_dHO_iHO  charge      0.418 # H  - HO   | all-atom H(O): mono alcohols
+set type @/atom:OPLSAA/157_bCT_aCT_dCT_iCT  charge      0.145 # C  - CT   | all-atom C: CH3 & CH2, prim. alcohols
+set type @/atom:OPLSAA/180_bOS_aOS_dOS_iOS  charge     -0.400 # O  - OS   | O: dialkyl ether OPLS/2020
+set type @/atom:OPLSAA/182_bCT_aCT_dCT_iCT  charge      0.140 # C  - CT   | C(H2OR): ethyl ether
+set type @/atom:OPLSAA/185_bHC_aHC_dHC_iHC  charge      0.030 # H  - HC   | H(COR): alpha H ether OPLS/2020 see 794

@@ -1,0 +1,28 @@
+# LAMMPS input script for bead-spring polymer
+
+units           lj
+atom_style      molecular
+boundary        p p p
+
+read_data       polymer.data
+
+pair_style      lj/cut 2.8
+pair_coeff      1 1 1.0000 1.0000
+pair_coeff      1 2 1.0954 1.0500
+pair_coeff      2 2 1.2000 1.1000
+
+bond_style      fene
+bond_coeff      1 30.0 1.5000 1.0000 1.0000
+special_bonds   fene
+
+neighbor        0.3 bin
+neigh_modify    every 1 delay 0 check yes
+
+minimize        1.0e-4 1.0e-6 1000 10000
+reset_timestep  0
+
+timestep        0.005
+fix             1 all nvt temp 1.0 1.0 0.5
+dump            1 all custom 1000 dump.lammpstrj id type x y z
+thermo          1000
+run             100000

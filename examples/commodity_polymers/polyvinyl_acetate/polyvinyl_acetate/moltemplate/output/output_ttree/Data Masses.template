@@ -1,0 +1,9 @@
+    @/atom:OPLSAA/80 12.011 #CT "Alkane CH3-" 6 partial charge=-0.18
+    @/atom:OPLSAA/81 12.011 #CT "Alkane -CH2-" 6 partial charge=-0.12
+    @/atom:OPLSAA/85 1.008 #HC "Alkane H-C" 1 partial charge=0.06
+    @/atom:OPLSAA/406 12.011 #C "Ester -COOR" 6 partial charge=0.51
+    @/atom:OPLSAA/407 15.999 #O "Ester C=O" 8 partial charge=-0.43
+    @/atom:OPLSAA/408 15.999 #OS "Ester CO-O-R" 8 partial charge=-0.33
+    @/atom:OPLSAA/410 1.008 #HC "Ester -OCH<" 1 partial charge=0.03
+    @/atom:OPLSAA/431 12.011 #CT "Et Ester -OCH2R" 6 partial charge=0.19
+    @/atom:OPLSAA/432 12.011 #CT "i-Pr Ester -OCHR2" 6 partial charge=0.22

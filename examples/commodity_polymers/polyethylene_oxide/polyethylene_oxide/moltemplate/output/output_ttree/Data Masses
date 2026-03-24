@@ -1,0 +1,8 @@
+    1 12.011 #CT "Alkane CH3-" 6 partial charge=-0.18
+    2 1.008 #HC "Alkane H-C" 1 partial charge=0.06
+    3 15.999 #OH "Alcohol -OH" 8 partial charge=-0.683
+    4 1.008 #HO "Alcohol -OH" 1 partial charge=0.418
+    5 12.011 #CT "Alcohol CH3OH & RCH2OH" 6 partial charge=0.145
+    6 15.999 #OS "Dialkyl Ether -O-" 8 partial charge=-0.4
+    7 12.011 #CT "Ethyl Ether -CH2OR" 6 partial charge=0.14
+    8 1.008 #HC "Alkyl Ether H-COR" 1 partial charge=0.03

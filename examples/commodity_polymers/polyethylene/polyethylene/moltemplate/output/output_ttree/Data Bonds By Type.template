@@ -1,0 +1,6 @@
+    @/bond:OPLSAA/80-80 @/atom:OPLSAA/80 @/atom:OPLSAA/80
+    @/bond:OPLSAA/80-81 @/atom:OPLSAA/80 @/atom:OPLSAA/81
+    @/bond:OPLSAA/81-80 @/atom:OPLSAA/81 @/atom:OPLSAA/80
+    @/bond:OPLSAA/81-81 @/atom:OPLSAA/81 @/atom:OPLSAA/81
+    @/bond:OPLSAA/80-85 @/atom:OPLSAA/80 @/atom:OPLSAA/85
+    @/bond:OPLSAA/81-85 @/atom:OPLSAA/81 @/atom:OPLSAA/85

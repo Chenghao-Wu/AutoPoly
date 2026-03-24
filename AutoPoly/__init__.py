@@ -40,6 +40,7 @@ __all__ = [
     "SAWConfig",
     "MonomerGenerator",
     "mc",
+    "agent",
     "__version__",
     "__author__",
 ]
@@ -47,6 +48,7 @@ __all__ = [
 # Always available imports (no rdkit dependency)
 from .system import System
 from .bead_spring import BeadSpringPolymer, BeadType, AngleType, MCConfig, SAWConfig
+from . import agent
 
 # Optional imports that require rdkit
 try:
