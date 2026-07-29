@@ -3,12 +3,15 @@
 
 Polymers: PE, PP, PS, PVC, PVAc, PMMA, PAN, PB, PI, PEO
 Force field: OPLS-AA
+
+Requires: pip install -e .  (from the AutoPoly repo root)
 """
 
-import sys
 import argparse
-from pathlib import Path
+import sys
 from typing import Dict, List
+
+from AutoPoly import System, Polymer, Polymerization
 
 # Complement SMILES for each polymer (first/middle/last variants)
 POLYMER_CONFIGS: Dict[str, Dict] = {
@@ -85,23 +88,6 @@ POLYMER_CONFIGS: Dict[str, Dict] = {
 }
 
 FORCE_FIELD = "oplsaa"
-
-
-def setup_imports():
-    """Add AutoPoly to Python path and import modules."""
-    project_root = Path(__file__).parent.parent
-    sys.path.insert(0, str(project_root))
-
-    try:
-        from AutoPoly import System, Polymer, Polymerization
-        return System, Polymer, Polymerization
-    except ImportError as e:
-        print(f"Error importing AutoPoly: {e}")
-        print("Install with: pip install -e /path/to/AutoPoly")
-        sys.exit(1)
-
-
-System, Polymer, Polymerization = setup_imports()
 
 
 def generate_single_polymer(polymer_id: str, config: Dict, base_output_dir: str = "commodity_polymers"):

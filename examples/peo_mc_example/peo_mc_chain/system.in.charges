@@ -1,8 +1,0 @@
-set type 1   charge     -0.180 # C  - CT   | n-CH3 all-atom C: alkanes
-set type 2   charge      0.060 # H  - HC   | H all-atom H: alkanes
-set type 3  charge     -0.683 # O  - OH   | all-atom O: mono alcohols
-set type 4  charge      0.418 # H  - HO   | all-atom H(O): mono alcohols
-set type 5  charge      0.145 # C  - CT   | all-atom C: CH3 & CH2, prim. alcohols
-set type 6  charge     -0.400 # O  - OS   | O: dialkyl ether OPLS/2020
-set type 7  charge      0.140 # C  - CT   | C(H2OR): ethyl ether
-set type 8  charge      0.030 # H  - HC   | H(COR): alpha H ether OPLS/2020 see 794

@@ -24,7 +24,7 @@ from AutoPoly import System, Polymer, Polymerization
 system = System(out="pmma_gasteiger")
 
 # Define PMMA polymer with complement SMILES format
-# SMILES: First="CC(C)(C(=O)OC)[*]", Middle="[*]CC([*])(C)C(=O)OC", Last="[*]CC(C)(C(=O)OC))"
+# SMILES: First="CC(C)(C(=O)OC)[*]", Middle="[*]CC([*])(C)C(=O)OC", Last="[*]CC(C)(C(=O)OC)"
 # - [*] marks connection points for polymerization
 # - Atactic (random stereochemistry)
 PMMA_FIRST = "CC(C)(C(=O)OC)[*]"
@@ -53,4 +53,4 @@ print("✓ Gasteiger charges were calculated automatically")
 print(f"✓ Output files in: {system.out}")
 print()
 print("To verify non-zero charges:")
-print(f"  grep -A 30 'Data Atoms' {system.out}/output_ttree/system.in.charges | head -35")
+print(f"  head -30 {system.out}/pmma_gasteiger/system.in.charges")

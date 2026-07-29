@@ -14,13 +14,9 @@ Configuration:
 - Monomer: Ethylene oxide (-CH2-CH2-O-)
 - Chain length: 10 monomers
 - Number of chains: 10
+
+Requires: pip install -e .  (from the AutoPoly repo root)
 """
-
-import sys
-from pathlib import Path
-
-# Add parent to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from AutoPoly import System, Polymer, Polymerization
 

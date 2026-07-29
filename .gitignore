@@ -17,3 +17,5 @@ __pycache__/
 .DS_Store
 *.log
 *.backup
+# AutoPoly example outputs (regenerate by running examples/*.py)
+examples/*/

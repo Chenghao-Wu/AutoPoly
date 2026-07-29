@@ -19,16 +19,8 @@ Output files (for each example):
 - polymer.data: LAMMPS data file
 - in.polymer: LAMMPS input script
 
-Created on 2026-01-29
-@author: zwu
+Requires: pip install -e .  (from the AutoPoly repo root)
 """
-
-import sys
-from pathlib import Path
-
-# Add project root to path for imports
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
 
 from AutoPoly import System, BeadSpringPolymer, BeadType, AngleType, MCConfig, SAWConfig
 
@@ -241,9 +233,9 @@ def example_4_equilibrated_melt():
     polymer = BeadSpringPolymer(
         name="melt",
         system=system,
-        n_chains=50,                # Reduced for demonstration
+        n_chains=50,
         bead_types=[bead_A],
-        sequence=[("A", 100)],       # 20-bead chains
+        sequence=[("A", 100)],       # 100-bead chains
         topology="linear",
         bond_style="harmonic",
         bond_length=1.0,
@@ -342,11 +334,13 @@ def main():
     print("# Bead-Spring Coarse-Grained Polymer Examples")
     print("#"*60)
 
-    # Run each example
+    # Run each example.
+    # Example 4 (MC equilibration) is opt-in: it is much slower than the
+    # others. Uncomment the call below to run it.
     example_1_homopolymer()
     example_2_diblock_fene()
     example_3_ring_with_angles()
-    #example_4_equilibrated_melt()
+    # example_4_equilibrated_melt()
     example_5_saw_generation()
 
     print("\n" + "="*60)
@@ -356,8 +350,8 @@ def main():
     print("  - bead_spring_homopolymer/")
     print("  - bead_spring_diblock/")
     print("  - bead_spring_ring/")
-    print("  - bead_spring_melt/")
     print("  - bead_spring_saw/")
+    print("  (example 4 would also create bead_spring_melt/)")
     print("\nTo run a LAMMPS simulation:")
     print("  cd <output_dir>/<name>")
     print("  lmp -in in.polymer")
