@@ -1,7 +1,0 @@
-numpy>=1.8.0
-rdkit>=2022.09.1
-
-[dev]
-pytest>=7.0.0
-pytest-cov>=4.0.0
-pytest-mock>=3.10.0
