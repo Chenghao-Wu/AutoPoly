@@ -215,26 +215,45 @@ def generate_sequence_variants_for_polymerization(
 
         variants = generator.from_smiles(smiles_list)
 
-        # Extract unique variants by variant_type
+        # Extract unique variants by (variant_type, smiles) so that chemically
+        # distinct monomers sharing a variant_type (e.g. two different
+        # 'middle' monomers in a block copolymer) each get their own .lt file.
+        # (Previously keyed by variant_type alone, which silently dropped
+        # every middle monomer after the first.)
         unique_variants = {}
         for variant in variants:
-            vtype = variant.variant_type
-            if vtype not in unique_variants:
-                unique_variants[vtype] = variant
+            key = (variant.variant_type, variant.smiles)
+            if key not in unique_variants:
+                unique_variants[key] = variant
 
         # For ring topology, use middle variants for all positions
-        if topology == "ring":
-            if 'middle' in unique_variants:
-                unique_variants = {'ring': unique_variants['middle']}
-            elif 'first' in unique_variants:
-                unique_variants = {'ring': unique_variants['first']}
+        if topology == 'ring':
+            ring_variants = {}
+            for (vtype, smi), variant in unique_variants.items():
+                if vtype == 'middle':
+                    ring_variants[('ring', smi)] = variant
+            if not ring_variants:
+                for (vtype, smi), variant in unique_variants.items():
+                    if vtype == 'first':
+                        ring_variants[('ring', smi)] = variant
+            if ring_variants:
+                unique_variants = ring_variants
 
-        logger.info(f"Extracted {len(unique_variants)} unique variant types: {list(unique_variants.keys())}")
+        logger.info(f"Extracted {len(unique_variants)} unique variants: {list(unique_variants.keys())}")
 
         lt_files = generator.write_lt_files(list(unique_variants.values()), generate_t1=True)
         logger.info(f"Generated {len(lt_files)} .lt files for {base_name}")
 
-        variant_name_mapping = _build_variant_mapping(unique_variants, base_name)
+        variant_name_mapping, file_lookup = _build_variant_mapping(unique_variants, base_name)
+
+        # Per-position lookup so the workflow can map every chain position to
+        # the .lt file of its own chemistry, not just of its variant_type.
+        by_position = []
+        for variant in variants:
+            vt = 'ring' if topology == 'ring' else variant.variant_type
+            by_position.append(file_lookup[(vt, variant.smiles)])
+        variant_name_mapping["_by_position"] = by_position
+
         generated_cache[cache_key] = variant_name_mapping
 
         logger.info(f"Generated sequence variants for '{base_name}' from {len(smiles_list)} complement SMILES")
@@ -247,21 +266,25 @@ def generate_sequence_variants_for_polymerization(
         ) from e
 
 
-def _build_variant_mapping(unique_variants: dict, base_name: str) -> Dict[str, str]:
+def _build_variant_mapping(unique_variants: dict, base_name: str) -> Tuple[Dict[str, str], dict]:
     """
     Build mapping from variant types to .lt filenames.
 
     Args:
-        unique_variants: Dictionary of variant_type -> variant objects
+        unique_variants: Dictionary of (variant_type, smiles) -> variant objects
         base_name: Base name for the files
 
     Returns:
-        Dictionary mapping variant_type keys to filenames
+        Tuple of
+          - mapping from variant_type keys to filenames (legacy, first
+            variant of each type wins) for backward compatibility,
+          - lookup of (variant_type, smiles) -> (filename, filename_t1)
+            covering every unique chemistry.
     """
     variant_name_mapping = {}
+    file_lookup = {}
 
-    for variant in unique_variants.values():
-        vtype = variant.variant_type
+    for (vtype, smi), variant in unique_variants.items():
         pos = variant.position
 
         # Determine filename suffix based on variant_type
@@ -277,11 +300,15 @@ def _build_variant_mapping(unique_variants: dict, base_name: str) -> Dict[str, s
         filename = f"{base_name}_{pos}{suffix}.lt"
         filename_t1 = f"{base_name}_{pos}{suffix}_T1.lt"
 
-        variant_name_mapping[vtype] = filename
-        variant_name_mapping[f"{vtype}_standard"] = filename
-        variant_name_mapping[f"{vtype}_T1"] = filename_t1
+        file_lookup[(vtype, smi)] = (filename, filename_t1)
 
-    return variant_name_mapping
+        # Legacy keys: first variant of each type wins (backward compatible)
+        if vtype not in variant_name_mapping:
+            variant_name_mapping[vtype] = filename
+            variant_name_mapping[f"{vtype}_standard"] = filename
+            variant_name_mapping[f"{vtype}_T1"] = filename_t1
+
+    return variant_name_mapping, file_lookup
 
 
 def n_monomer_atoms(merltfile: str, path_cwd: str) -> int:

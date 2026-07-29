@@ -458,7 +458,8 @@ class ChainGrowthMC:
         max_attempts: int = 1000,
         bond_angle_min: float = 95.0,
         bond_angle_max: float = 150.0,
-        intrachain_exclude_neighbors: int = 2
+        intrachain_exclude_neighbors: int = 2,
+        junction_bond_length: float = 1.54
     ):
         """
         Initialize the chain growth Monte Carlo sampler.
@@ -474,12 +475,19 @@ class ChainGrowthMC:
                                          2 = exclude i-2, i-1, i, i+1, i+2 (default, recommended)
                                          3 = exclude i-3 through i+3
                                          Higher values allow tighter packing but must maintain zero self-intersections.
+            junction_bond_length: Equilibrium bond length (Angstrom) of the
+                                         inter-monomer bond formed at each junction.
+                                         The incoming monomer's left connection is
+                                         placed this far beyond the previous right
+                                         connection (previously it was placed exactly
+                                         ON it, giving zero-length junction bonds).
         """
         self.collision_detector = collision_detector
         self.max_attempts = max_attempts
         self.bond_angle_min = bond_angle_min
         self.bond_angle_max = bond_angle_max
         self.intrachain_exclude_neighbors = intrachain_exclude_neighbors
+        self.junction_bond_length = junction_bond_length
         self.templates: Dict[str, MonomerTemplate] = {}
 
     def load_monomer_template(self, lt_file: str) -> MonomerTemplate:
@@ -808,8 +816,13 @@ class ChainGrowthMC:
             incoming_dir = self._apply_bond_angle_bend(prev_bond_dir, bond_angle, dihedral)
 
             # 4. Align monomer (dihedral=0 since already applied in incoming_dir)
+            #    The left connection is placed one equilibrium bond length
+            #    BEYOND the previous right connection, along the growth
+            #    direction — otherwise the junction atoms coincide exactly
+            #    and the inter-monomer bond written into the .lt has zero length.
+            junction_target = target_pos + self.junction_bond_length * incoming_dir
             R, translation = self.align_monomer_to_connection(
-                template, target_pos, incoming_dir, 0.0
+                template, junction_target, incoming_dir, 0.0
             )
 
             # Transform all coordinates

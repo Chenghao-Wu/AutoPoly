@@ -164,11 +164,21 @@ class WorkflowManager:
             topology: Polymer topology
             dop: Degree of polymerization
         """
+        by_position = variant_mapping.get("_by_position")
         for chain_idx, chain_smiles in enumerate(model.sequenceSet):
             monomer_names = []
             for pos_idx, smiles in enumerate(chain_smiles):
-                variant_type = self._determine_variant_type(topology, pos_idx, dop)
                 has_t1 = "_T1" in smiles
+
+                # Preferred path: exact per-position file mapping (handles
+                # multiple chemically distinct monomers of the same variant
+                # type, e.g. block copolymers with two 'middle' monomers).
+                if by_position is not None:
+                    fname, fname_t1 = by_position[pos_idx]
+                    monomer_names.append(fname_t1 if has_t1 else fname)
+                    continue
+
+                variant_type = self._determine_variant_type(topology, pos_idx, dop)
                 mapping_key = f"{variant_type}_T1" if has_t1 else variant_type
 
                 if mapping_key not in variant_mapping:
@@ -906,7 +916,16 @@ class WorkflowManager:
                             f"failed for poly_{poly_index+1}: {e}"
                         )
                 if not placed:
-                    logger.warning("All MC retries exhausted, falling back to deterministic placement")
+                    logger.warning(
+                        "=" * 70 + "\n"
+                        "WARNING: MC chain growth failed for poly_%d after %d attempts.\n"
+                        "Falling back to DETERMINISTIC placement. The resulting chain\n"
+                        "coordinates are a crude linear/grid arrangement that may contain\n"
+                        "atomic clashes — inspect the output system.data before running MD,\n"
+                        "or increase the box size / mc_max_attempts and regenerate.\n"
+                        + "=" * 70,
+                        poly_index + 1, max_chain_retries,
+                    )
                     self._write_linear_polymer_deterministic(write_f, monomer_set)
 
             # Write bonds

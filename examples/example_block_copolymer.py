@@ -25,13 +25,13 @@ system = System(out="aba_triblock")
 # This creates a block copolymer structure
 # Complement SMILES: first position has 1 wildcard (right), middle have 2, last has 1 (left)
 sequence = [
-    "CC[*]",         # Position 0: Ethylene - First (1 wildcard right)
-    "[*]CC[*]",      # Position 1: Ethylene - Middle (2 wildcards)
-    "[*]C=C[*]",     # Position 2: Styrene - Middle (2 wildcards)
-    "[*]C=C[*]",     # Position 3: Styrene - Middle (2 wildcards)
-    "[*]C=C[*]",     # Position 4: Styrene - Middle (2 wildcards)
-    "[*]CC[*]",      # Position 5: Ethylene - Middle (2 wildcards)
-    "[*]CC"          # Position 6: Ethylene - Last (1 wildcard left)
+    "CC[*]",                # Position 0: Ethylene - First (1 wildcard right)
+    "[*]CC[*]",             # Position 1: Ethylene - Middle (2 wildcards)
+    "[*]CC(c1ccccc1)[*]",   # Position 2: Styrene - Middle (2 wildcards)
+    "[*]CC(c1ccccc1)[*]",   # Position 3: Styrene - Middle (2 wildcards)
+    "[*]CC(c1ccccc1)[*]",   # Position 4: Styrene - Middle (2 wildcards)
+    "[*]CC[*]",             # Position 5: Ethylene - Middle (2 wildcards)
+    "[*]CC"                 # Position 6: Ethylene - Last (1 wildcard left)
 ]
 
 # Create polymer with explicit sequence
@@ -56,11 +56,19 @@ print(f"\nComplete chain info:")
 for key, value in info.items():
     print(f"  {key}: {value}")
 
-# Note: Polymerization would be done here if needed
-# polyz = Polymerization(
-#     name="aba_triblock",
-#     system=system,
-#     model=[poly],
-#     force_field="oplsaa",
-#     run=True
-# )
+# Run the polymerization — this generates the LAMMPS input files
+# (monomer templates -> chain growth -> moltemplate -> system.data)
+polyz = Polymerization(
+    name="aba_triblock",
+    system=system,
+    model=[poly],
+    force_field="oplsaa",
+    run=True
+)
+
+print(f"\nLAMMPS input files written to: aba_triblock/aba_triblock/")
+print(f"  system.data          topology + coordinates (read_data)")
+print(f"  system.in.init       units / atom / bond styles")
+print(f"  system.in.settings   force-field parameters")
+print(f"\nQuick check: each chain should have 74 atoms (C32H42) with")
+print(f"3 phenyl rings from the styrene middle units.")
