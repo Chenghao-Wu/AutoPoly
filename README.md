@@ -14,14 +14,14 @@ AutoPoly generates polymer structures and prepares them for molecular dynamics s
 - **SAW Placement** - Monte Carlo self-avoiding walk for realistic initial configurations
 - **Automatic Setup** - Generates complete LAMMPS input files
 
-Note: The current atom typing systems (for all force fields) relies on SMARTS pattern which is built mannuly. The correct SMARTS pattern can be built via a data-driven method as BESMARTS. We are currently exploring this for better atom typing system.
+Note: The current atom typing system (for all force fields) relies on manually built SMARTS patterns. A data-driven approach such as BESMARTS could generate more robust SMARTS patterns, and we are exploring this for a better atom typing system.
 
 ## Quick Start
 
 ### Installation
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/WuGroup-XJTLU/AutoPoly.git
 cd AutoPoly
 pip install -e .
 ```
@@ -207,13 +207,19 @@ Polymerization(
 
 Box sizing uses SAW scaling (`N^0.6 × bond_length`) rather than fully-extended chain length, producing compact, realistic simulation boxes.
 
-### Other Examples
+### More Examples
 
-- **Bead-spring models** - Coarse-grained simulations
-- **Multiple polymers** - Blends and mixtures
-- **Custom tacticity** - Isotactic, syndiotactic, atactic
+The [examples directory](examples/) contains 12 runnable scripts covering:
 
-[See all examples →](examples/)
+- **Beginner tutorial** — PMMA step by step ([example_pmma_linear.py](examples/example_pmma_linear.py))
+- **Condensation polymers** — PLA with GAFF ([example_pla_condensation.py](examples/example_pla_condensation.py))
+- **Polymer solutions** — PEO in explicit water ([example_peo_solution.py](examples/example_peo_solution.py))
+- **Batch generation** — 10 commodity polymers ([example_commodity_polymers_10.py](examples/example_commodity_polymers_10.py))
+- **Force field comparison** — all 6 force fields on PEO ([example_peo_all_forcefields.py](examples/example_peo_all_forcefields.py))
+- **Placement methods** — grid vs MC random vs MC chain growth ([example_peo_mc_placement.py](examples/example_peo_mc_placement.py))
+- **Bead-spring models** — coarse-grained homo/block/ring polymers ([example_bead_spring.py](examples/example_bead_spring.py))
+
+[See the full list with descriptions →](examples/README.md)
 
 ## API Quick Reference
 
@@ -291,7 +297,7 @@ Quick guide:
 - **Exploratory/generic** → DREIDING
 - **Commercial polymers** → COMPASS
 
-**Note:** GAFF/GAFF2 require explicit charge calculation (not automatic).
+**Note:** Gasteiger charges are assigned automatically for GAFF/GAFF2. For production runs, replace them with AM1-BCC or RESP charges in `system.in.charges`.
 
 [Detailed comparison →](docs/FORCE_FIELDS.md)
 
@@ -300,9 +306,8 @@ Quick guide:
 ### Common Issues
 
 **API errors:**
-- `TypeError: 'ChainNum'` → Use `chain_num` (v1.0+ uses snake_case)
+- `TypeError: 'ChainNum'` → Use `chain_num` (v1.0 uses snake_case)
 - `TypeError: 'DOP'` → Removed, DOP = `len(sequence)` automatically
-- [Migration guide →](MIGRATION.md)
 
 **Sequence errors:**
 - `ValidationError: sequence cannot be empty` → Provide at least one monomer
@@ -319,28 +324,30 @@ Quick guide:
 
 ## Output Structure
 
+Each run writes into `<System out>/<Polymerization name>/`:
+
 ```
-project_name/
-├── moltemplate/           # Intermediate files
+my_polymer/polyethylene/
+├── moltemplate/           # Intermediate files (.lt inputs, moltemplate output)
 ├── system.data            # LAMMPS data file (topology & coordinates)
-├── system.in              # LAMMPS input script
-└── system.in.settings     # Force field parameters
+├── system.in.init         # Units, atom/bond/angle styles
+├── system.in.settings     # Force field parameters
+└── system.in.charges      # Atomic charges
 ```
 
-Run with LAMMPS:
+Run with LAMMPS by including the pieces from your own input script:
 ```bash
-lmp -in system.in
+lmp -in your_run.in   # with: include system.in.init / system.in.settings
 ```
 
 ## More Information
 
 **Documentation:**
 - 📖 [Complete API Reference](docs/API.md) - All classes and methods
-- 🔄 [v1.0 Migration Guide](MIGRATION.md) - Upgrading from v0.x
 - 🧬 [Complement SMILES Guide](docs/COMPLEMENT_SMILES.md) - Deep dive on SMILES format
 - ⚙️ [Force Field Guide](docs/FORCE_FIELDS.md) - Detailed comparison of all 6 force fields
 - 🐛 [Troubleshooting](docs/TROUBLESHOOTING.md) - Solutions to common issues
-- 📝 [Examples Directory](examples/) - Working examples
+- 📝 [Examples Directory](examples/) - 12 working examples
 
 **Quick links:**
 - [Installation details](docs/TROUBLESHOOTING.md#installation-issues)
@@ -352,18 +359,13 @@ lmp -in system.in
 If you use AutoPoly in your research, please cite:
 
 ```bibtex
-@software{autopoly2024,
+@software{autopoly,
   title={AutoPoly: Automated Polymer Generation for Molecular Simulation},
   author={Wu, Zhenghao},
-  year={2024},
-  url={https://github.com/your-repo/autopoly}
+  url={https://github.com/WuGroup-XJTLU/AutoPoly}
 }
 ```
 
 ## License
 
 MIT License - see [license.md](license.md) for details.
-
----
-
-**Note for v0.x users:** Version 1.0 has breaking API changes (snake_case, explicit sequences). See [MIGRATION.md](MIGRATION.md) for upgrade guide.
