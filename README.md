@@ -54,6 +54,65 @@ Polymerization(
 
 **Output:** Ready-to-run LAMMPS files in `my_polymer/` directory!
 
+## The Three-Stage Pipeline
+
+Under the hood, `Polymerization` composes three independent stages, each
+usable on its own:
+
+```
+models ──▶ GeometryBuilder ──▶ geometry/geometry.json   (FF-agnostic)
+                                   │  + force_field
+                                   ▼
+                              UnitTyper ──▶ build/<ff>/  (typed .lt + units.json)
+                                   │
+                                   ▼
+              BoxPacker + packing strategies ──▶ moltemplate/ ──▶ system.data
+```
+
+1. **GeometryBuilder** — builds chain graphs, conformers, and per-chain
+   placements with *no force field involved*. The result is a single
+   inspectable `geometry.json`.
+2. **UnitTyper** — assigns atom types/charges on the full chain graph and
+   joins them onto the stored geometry via atom-map numbers. The same
+   geometry can be typed under multiple force fields (`build/oplsaa/`,
+   `build/gaff2/`, ...) without rebuilding chains.
+3. **BoxPacker** — packs the typed units into the simulation box with a
+   pluggable placement strategy (`mc_random`, `grid`, or your own), then
+   runs moltemplate.
+
+Stage-level usage (see `examples/example_three_stage_pipeline.py`):
+
+```python
+from AutoPoly import (System, Polymer, GeometryBuilder, GeometryConfig,
+                      UnitTyper, BoxPacker)
+
+system = System(out="peo_run")
+polymer = Polymer(chain_num=5, sequence=["CCO[*]"] + ["[*]CCO[*]"] * 8 + ["[*]CCO"])
+
+# Build geometry ONCE
+geom = GeometryBuilder(system, "peo", GeometryConfig(rng_seed=42)).build([polymer])
+
+# Type it under as many force fields as you like
+UnitTyper(geom.dir, "oplsaa").type()          # build/oplsaa/
+UnitTyper(geom.dir, "gaff2").type()           # build/gaff2/ — same geometry
+
+# Pack the typed units into a box and run moltemplate
+BoxPacker(system, "peo", strategy="mc_random", rng_seed=42).pack("peo_run/peo/build/gaff2")
+```
+
+Custom packing strategies can be registered at runtime:
+
+```python
+from AutoPoly import PlacementStrategy, register_strategy
+
+class MyStrategy(PlacementStrategy):
+    name = "my_strategy"
+    def place(self, ctx):   # ctx.units: UnitLibrary manifest
+        ...                 # return PlacementResult(records, box_bounds)
+
+register_strategy("my_strategy", MyStrategy)
+```
+
 ## Core Concepts
 
 ### The 3-Step Workflow
@@ -329,7 +388,9 @@ Each run writes into `<System out>/<Polymerization name>/`:
 
 ```
 my_polymer/polyethylene/
-├── moltemplate/           # Intermediate files (.lt inputs, moltemplate output)
+├── geometry/              # Stage 1: geometry.json (FF-agnostic coordinates)
+├── build/oplsaa/          # Stage 2: typed .lt files + units.json manifest
+├── moltemplate/           # Stage 3: intermediate files (.lt inputs, moltemplate output)
 ├── system.data            # LAMMPS data file (topology & coordinates)
 ├── system.in.init         # Units, atom/bond/angle styles
 ├── system.in.settings     # Force field parameters

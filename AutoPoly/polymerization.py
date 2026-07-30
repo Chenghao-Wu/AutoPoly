@@ -29,16 +29,12 @@ Dependencies:
 Created on Fri Dec 21 12:19:08 2018
 @author: zwu
 """
-import os
 from pathlib import Path
-import subprocess
-import shutil
-import re
 import numpy as np
 from typing import List, Optional, Dict, Any, Set, Tuple
 from .system import logger
 from .exceptions import ValidationError
-from .monomer_generator import MonomerGenerator
+from .conf import FORCE_FIELD_REGISTRY
 from .file_management import (
     create_working_directory,
     get_rid_of_lj_cut_coul_long,
@@ -153,18 +149,10 @@ class Polymerization:
 
         # Set force field parameter path based on force_field type
         # All force fields now use .lt files from moltemplate/force_fields/
-        if force_field == "gaff":
-            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "gaff.lt")
-        elif force_field == "gaff2":
-            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "gaff2.lt")
-        elif force_field == "lopls":
-            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "loplsaa.lt")
-        elif force_field == "dreiding":
-            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "dreiding.lt")
-        elif force_field == "compass":
-            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "compass_published.lt")
-        else:  # oplsaa
-            self.path_oplsaaprm = str(Path(self.path_master) / "moltemplate" / "force_fields" / "oplsaa.lt")
+        self.path_oplsaaprm = str(
+            Path(self.path_master) / "moltemplate" / "force_fields"
+            / FORCE_FIELD_REGISTRY[force_field]["lt_file"]
+        )
 
         logger.info(f"\n'you are now using parameter set of {self.path_oplsaaprm}\n")
         self.model = model

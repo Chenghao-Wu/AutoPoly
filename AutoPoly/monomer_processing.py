@@ -13,11 +13,163 @@ Created on 2026-01-06
 import re
 import numpy as np
 from pathlib import Path
-from typing import Tuple, List, Dict, Optional
+from typing import Tuple, List, Dict, Optional, Set, Any, Callable, Iterator
 
 from .system import logger
 from .monomer_generator import MonomerGenerator
 from .exceptions import GenerationError
+
+
+# =============================================================================
+# Shared moltemplate .lt parsing helpers
+#
+# These consolidate the Data Atoms / Data Bond List block parsing that was
+# previously re-implemented in gaff_analysis.py, force_field.py, and here.
+# =============================================================================
+
+_LT_SECTION_MARKERS = {
+    'atoms': ('write("Data Atoms")', "write('Data Atoms')"),
+    'bonds': ('write("Data Bond List")', "write('Data Bond List')"),
+}
+
+
+def iter_lt_section(filepath, section: str) -> Iterator[str]:
+    """
+    Yield lines inside a named block of a moltemplate .lt file.
+
+    Args:
+        filepath: Path to the .lt file
+        section: 'atoms' (Data Atoms) or 'bonds' (Data Bond List)
+
+    Yields:
+        Raw lines inside the block (header and closing brace excluded)
+    """
+    markers = _LT_SECTION_MARKERS[section]
+    in_section = False
+    with open(filepath, 'r') as f:
+        for line in f:
+            if not in_section:
+                if any(marker in line for marker in markers):
+                    in_section = True
+                continue
+            if '}' in line and not line.strip().startswith('#'):
+                break
+            yield line
+
+
+def extract_atom_id_type_map(filepath, atom_type_parser: Callable[[str], Any] = str) -> Dict[str, Any]:
+    """
+    Parse the Data Atoms block into an atom_id -> atom_type mapping.
+
+    Args:
+        filepath: Path to the .lt file
+        atom_type_parser: Callable converting the raw type string (e.g. 'c3'
+            or '54') to the desired type. Parsers raising ValueError cause the
+            atom to be skipped.
+
+    Returns:
+        Dict mapping atom_id (e.g. 'C1') to parsed atom type
+    """
+    atom_types = {}
+    for line in iter_lt_section(filepath, 'atoms'):
+        if '$atom:' not in line or '@atom:' not in line:
+            continue
+        atom_id = None
+        atom_type = None
+        for part in line.split():
+            if part.startswith('$atom:'):
+                atom_id = part.split(':')[1]
+            elif part.startswith('@atom:'):
+                try:
+                    atom_type = atom_type_parser(part.split(':')[1])
+                except ValueError:
+                    atom_type = None
+        if atom_id and atom_type is not None:
+            atom_types[atom_id] = atom_type
+    return atom_types
+
+
+def extract_atom_types_from_lt(filepath, atom_type_parser: Callable[[str], Any] = str) -> Set[Any]:
+    """
+    Extract the set of @atom: types used in a .lt file's Data Atoms block.
+
+    Args:
+        filepath: Path to the .lt file
+        atom_type_parser: Callable converting the raw type string
+
+    Returns:
+        Set of parsed atom types
+    """
+    types = set()
+    for line in iter_lt_section(filepath, 'atoms'):
+        if '@atom:' not in line:
+            continue
+        for part in line.split():
+            if part.startswith('@atom:'):
+                try:
+                    types.add(atom_type_parser(part.split(':')[1]))
+                except ValueError:
+                    continue
+    return types
+
+
+def parse_bond_graph(filepath, atom_type_parser: Callable[[str], Any] = str) -> Dict[str, Tuple[Any, List[str]]]:
+    """
+    Build a bond connectivity graph from a monomer .lt file.
+
+    Args:
+        filepath: Path to the .lt file
+        atom_type_parser: Callable converting the raw type string
+
+    Returns:
+        Dict mapping atom_id -> (atom_type, [neighbor_atom_ids])
+    """
+    graph = {atom_id: (atom_type, [])
+             for atom_id, atom_type in extract_atom_id_type_map(filepath, atom_type_parser).items()}
+
+    for line in iter_lt_section(filepath, 'bonds'):
+        if '$bond:' not in line:
+            continue
+        bonded_atoms = [part.split(':')[1] for part in line.split()
+                        if part.startswith('$atom:')]
+        if len(bonded_atoms) >= 2:
+            atom1, atom2 = bonded_atoms[0], bonded_atoms[1]
+            if atom1 in graph and atom2 in graph:
+                graph[atom1][1].append(atom2)
+                graph[atom2][1].append(atom1)
+
+    return graph
+
+
+def collect_monomer_files(model, path_cwd, on_missing: str = 'skip') -> List[str]:
+    """
+    Collect monomer .lt file paths referenced by the models' sequenceSets.
+
+    Args:
+        model: List of model objects with sequenceSet attributes
+        path_cwd: Directory containing the monomer .lt files
+        on_missing: 'skip' to ignore missing files, 'error' to raise
+
+    Returns:
+        List of paths (strings) to existing monomer .lt files
+
+    Raises:
+        GenerationError: If on_missing='error' and a file does not exist
+    """
+    monomer_bank = Path(path_cwd)
+    monomer_files = []
+    for modelii in model:
+        for monomerSet in modelii.sequenceSet:
+            for merltfile in monomerSet:
+                merltfile_path = monomer_bank / merltfile
+                if merltfile_path.is_file():
+                    monomer_files.append(str(merltfile_path))
+                elif on_missing == 'error':
+                    raise GenerationError(
+                        f"Monomer ({merltfile}) does NOT exist. "
+                        f"Please check the following path to the file\n{merltfile_path}"
+                    )
+    return monomer_files
 
 
 def _create_generator(base_name: str, force_field: str, output_dir: str) -> MonomerGenerator:

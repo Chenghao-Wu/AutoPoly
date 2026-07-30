@@ -13,6 +13,13 @@ Main Components:
 - BeadSpringPolymer: Simplified bead-spring polymer model generator
 - mc: Monte Carlo placement module for chain growth and molecular placement
 
+Three-Stage Pipeline (Geometry -> Typing -> Packing):
+- GeometryBuilder: Stage 1, force-field-agnostic coordinates -> geometry.json
+- UnitTyper: Stage 2, force-field assignment -> build/<ff>/ + units.json
+- BoxPacker: Stage 3, box packing + moltemplate -> system.data
+- UnitLibrary: units.json manifest contract between stages 2 and 3
+- PlacementStrategy / register_strategy: pluggable packing strategies
+
 External Dependencies:
 - Moltemplate: For generating LAMMPS data files from molecular templates
 - LAMMPS: Molecular dynamics simulation engine
@@ -39,6 +46,15 @@ __all__ = [
     "MCConfig",
     "SAWConfig",
     "MonomerGenerator",
+    "GeometryBuilder",
+    "GeometryConfig",
+    "UnitTyper",
+    "BoxPacker",
+    "UnitLibrary",
+    "UnitSpec",
+    "PlacementStrategy",
+    "register_strategy",
+    "get_strategy",
     "mc",
     "agent",
     "__version__",
@@ -56,6 +72,11 @@ try:
     from .polymerization import Polymerization
     from .molecule import Molecule
     from .monomer_generator import MonomerGenerator
+    from .geometry import GeometryBuilder, GeometryConfig
+    from .typing import UnitTyper
+    from .packer import BoxPacker
+    from .units import UnitLibrary, UnitSpec
+    from .packing import PlacementStrategy, register_strategy, get_strategy
     from . import mc
 except ImportError as e:
     import warnings

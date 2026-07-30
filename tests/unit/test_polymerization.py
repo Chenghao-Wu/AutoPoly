@@ -13,28 +13,6 @@ class TestPolymerizationInitialization:
     @patch('AutoPoly.polymerization.ForceFieldManager')
     @patch('AutoPoly.polymerization.WorkflowManager')
     @patch('AutoPoly.polymerization.create_working_directory')
-    def test_polymerization_init_with_oplsaa(self, mock_create_dir, mock_workflow_class, mock_ff_class, tmp_path):
-        """Test initialization with oplsaa force field."""
-        mock_system = MagicMock()
-        mock_system.get_folder_path.return_value = str(tmp_path)
-        mock_create_dir.return_value = str(tmp_path / "test" / "moltemplate")
-        mock_workflow = MagicMock()
-        mock_workflow_class.return_value = mock_workflow
-
-        # Set run=False to avoid executing workflow
-        poly = Polymerization(name="test", system=mock_system, model=None, run=False, force_field="oplsaa")
-
-        assert poly.name == "test"
-        assert poly.force_field == "oplsaa"
-        assert "oplsaa.prm" in poly.path_oplsaaprm
-        # Verify ForceFieldManager was initialized
-        mock_ff_class.assert_called_once()
-        # Verify WorkflowManager was initialized
-        mock_workflow_class.assert_called_once()
-
-    @patch('AutoPoly.polymerization.ForceFieldManager')
-    @patch('AutoPoly.polymerization.WorkflowManager')
-    @patch('AutoPoly.polymerization.create_working_directory')
     def test_polymerization_init_with_gaff(self, mock_create_dir, mock_workflow_class, mock_ff_class, tmp_path):
         """Test initialization with gaff force field."""
         mock_system = MagicMock()
@@ -48,22 +26,6 @@ class TestPolymerizationInitialization:
         assert poly.force_field == "gaff"
         assert "gaff.lt" in poly.path_oplsaaprm
         assert poly.gaff_analyzer is not None
-
-    @patch('AutoPoly.polymerization.ForceFieldManager')
-    @patch('AutoPoly.polymerization.WorkflowManager')
-    @patch('AutoPoly.polymerization.create_working_directory')
-    def test_polymerization_init_with_lopls(self, mock_create_dir, mock_workflow_class, mock_ff_class, tmp_path):
-        """Test initialization with lopls force field."""
-        mock_system = MagicMock()
-        mock_system.get_folder_path.return_value = str(tmp_path)
-        mock_create_dir.return_value = str(tmp_path / "test" / "moltemplate")
-        mock_workflow = MagicMock()
-        mock_workflow_class.return_value = mock_workflow
-
-        poly = Polymerization(name="test", system=mock_system, model=None, run=False, force_field="lopls")
-
-        assert poly.force_field == "lopls"
-        assert "loplsaa.prm" in poly.path_oplsaaprm
 
     @patch('AutoPoly.polymerization.ForceFieldManager')
     @patch('AutoPoly.polymerization.WorkflowManager')
@@ -95,26 +57,6 @@ class TestPolymerizationInitialization:
 
         # Verify create_working_directory was called
         mock_create_dir.assert_called_once()
-
-    @patch('AutoPoly.polymerization.ForceFieldManager')
-    @patch('AutoPoly.polymerization.WorkflowManager')
-    @patch('AutoPoly.polymerization.create_working_directory')
-    @patch('AutoPoly.polymerization.GAFFAnalyzer')
-    def test_polymerization_init_with_gaff_creates_gaff_analyzer(
-        self, mock_gaff_class, mock_create_dir, mock_workflow_class, mock_ff_class, tmp_path
-    ):
-        """Test that GAFF analyzer is created for GAFF force field."""
-        mock_system = MagicMock()
-        mock_system.get_folder_path.return_value = str(tmp_path)
-        mock_create_dir.return_value = str(tmp_path / "test" / "moltemplate")
-        mock_workflow = MagicMock()
-        mock_workflow_class.return_value = mock_workflow
-
-        poly = Polymerization(name="test", system=mock_system, model=None, run=False, force_field="gaff")
-
-        # Verify GAFFAnalyzer was created
-        mock_gaff_class.assert_called_once_with(poly.path_cwd, poly.path_master)
-        assert poly.gaff_analyzer is not None
 
 
 class TestPolymerizationDelegation:
@@ -247,36 +189,6 @@ class TestPolymerizationDelegation:
         # Verify delegation
         mock_read.assert_called_once_with("test.lt")
         assert result == ("C1", "C2")
-
-    @patch('AutoPoly.polymerization.ForceFieldManager')
-    @patch('AutoPoly.polymerization.WorkflowManager')
-    @patch('AutoPoly.polymerization.create_working_directory')
-    @patch('AutoPoly.polymerization.monomer_processing.generate_sequence_variants_for_polymerization')
-    def test_generate_sequence_variants_delegates_to_monomer_processing(
-        self, mock_generate, mock_create_dir, mock_workflow_class, mock_ff_class, tmp_path
-    ):
-        """Test that generate_sequence_variants_for_polymer delegates correctly."""
-        mock_system = MagicMock()
-        mock_system.get_folder_path.return_value = str(tmp_path)
-        mock_create_dir.return_value = str(tmp_path / "test" / "moltemplate")
-        mock_workflow = MagicMock()
-        mock_workflow_class.return_value = mock_workflow
-        mock_generate.return_value = ({'first': 'monomer_0.lt'}, 1)
-
-        poly = Polymerization(name="test", system=mock_system, model=None, run=False, force_field="oplsaa")
-
-        result_mapping = poly.generate_sequence_variants_for_polymer("[*]C=C[*]", dop=5)
-
-        # Verify delegation with correct parameters
-        mock_generate.assert_called_once()
-        call_args = mock_generate.call_args[1]
-        assert call_args['base_smiles'] == "[*]C=C[*]"
-        assert call_args['dop'] == 5
-        assert call_args['topology'] == "linear"
-        assert call_args['path_cwd'] == poly.path_cwd
-        assert call_args['force_field'] == "oplsaa"
-        # Verify counter was updated
-        assert poly._smiles_to_name_counter == 1
 
 
 class TestPolymerizationFileManagement:

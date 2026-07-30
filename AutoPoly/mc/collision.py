@@ -38,7 +38,7 @@ class MonomerSphere:
     def __post_init__(self):
         """Ensure center is a numpy array."""
         if not isinstance(self.center, np.ndarray):
-            self.center = np.ndarray(self.center, dtype=np.float64)
+            self.center = np.array(self.center, dtype=np.float64)
 
 
 class CollisionDetector:

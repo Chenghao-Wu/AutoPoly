@@ -52,7 +52,11 @@ def setup_logger(to_file: bool = None) -> logging.Logger:
     
     logger = logging.getLogger(__name__)
     logger.setLevel(LOG['ROOT_LEVEL'])
-    
+
+    # Idempotent: reuse existing handlers if the logger was already set up.
+    # Repeated setup_logger() calls would otherwise stack duplicate handlers.
+    existing = {type(h) for h in logger.handlers}
+
     # Create formatter with timestamp
     formatter = logging.Formatter(
         '%(asctime)s - %(levelname)s - %(message)s',
@@ -60,9 +64,9 @@ def setup_logger(to_file: bool = None) -> logging.Logger:
     )
 
     # Add file handler if requested
-    if to_file:
+    if to_file and logging.FileHandler not in existing:
         file_handler = logging.FileHandler(
-            os.path.join(OUT_PATH, 'analysis_log.log'), 
+            os.path.join(OUT_PATH, 'analysis_log.log'),
             mode='w'
         )
         file_handler.setLevel(LOG['FILE_LEVEL'])
@@ -70,9 +74,10 @@ def setup_logger(to_file: bool = None) -> logging.Logger:
         logger.addHandler(file_handler)
 
     # Add console handler
-    stream_handler = logging.StreamHandler()
-    stream_handler.setLevel(LOG['CONSOLE_LEVEL'])
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
-    
+    if logging.StreamHandler not in existing:
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(LOG['CONSOLE_LEVEL'])
+        stream_handler.setFormatter(formatter)
+        logger.addHandler(stream_handler)
+
     return logger

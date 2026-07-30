@@ -30,11 +30,16 @@ Dependencies:
 Created on 2025-01-06
 @author: AutoPy Development Team
 """
-import sys
 import shutil
 from pathlib import Path
 from typing import Set, Dict, List, Tuple, Optional
 from .system import logger
+from .exceptions import GenerationError
+from .monomer_processing import (
+    collect_monomer_files,
+    extract_atom_types_from_lt,
+    parse_bond_graph,
+)
 
 
 class GAFFAnalyzer:
@@ -63,7 +68,7 @@ class GAFFAnalyzer:
         self.path_master = path_master
         self.force_field = force_field
 
-    def extract_atom_types(self, model) -> Set[str]:
+    def extract_atom_types(self, model=None, monomer_files: Optional[List[str]] = None) -> Set[str]:
         """Extract unique GAFF atom types used in monomer files.
 
         Parses monomer .lt files to find atom type references (e.g., @atom:c3, @atom:ce)
@@ -71,58 +76,24 @@ class GAFFAnalyzer:
 
         Args:
             model: Model object containing sequence information with monomer file names
+            monomer_files: Explicit list of monomer .lt file paths (takes
+                precedence over model-derived paths)
 
         Returns:
             Set[str]: Set of atom type names (e.g., {'c3', 'ce', 'hc', 'o'})
         """
         atom_types = set()
 
-        for modelii in model:
-            for monomerii in range(len(modelii.sequenceSet)):
-                monomerSet = modelii.sequenceSet[monomerii]
-
-                for vecii in range(len(monomerSet)):
-                    # Determine monomer bank path based on force field
-                    MonomerBank = Path(self.path_cwd)
-
-                    merltfile_Path = MonomerBank / monomerSet[vecii]
-
-                    if merltfile_Path.is_file():
-                        mono = str(merltfile_Path)
-                        read_switch = False
-
-                        try:
-                            with open(mono) as f:
-                                while True:
-                                    line = f.readline()
-
-                                    if line.strip() == 'write("Data Atoms") {':
-                                        read_switch = True
-                                        continue
-                                    elif line.strip() == "}":
-                                        read_switch = False
-                                        break
-
-                                    if read_switch:
-                                        stringvector = line.split()
-
-                                        if len(stringvector) >= 3:
-                                            # Extract atom type from @atom:c3 format
-                                            atom_type_full = stringvector[2]
-                                            if atom_type_full.startswith("@atom:"):
-                                                # Strip @atom: prefix to get type name
-                                                atom_type = atom_type_full.split(":")[1]
-                                                atom_types.add(atom_type)
-
-                                    if not line:
-                                        break
-                        except Exception as e:
-                            logger.warning(f"Error reading monomer file {mono}: {str(e)}")
-                            continue
-                    else:
-                        logger.error(' '.join(["Monomer (" + monomerSet[vecii] + ") does NOT exist. \n",
-                                               "Please check the following path to the file\n" + str(merltfile_Path) + "\n"]))
-                        sys.exit()
+        if monomer_files is None:
+            monomer_files = collect_monomer_files(model, self.path_cwd, on_missing='error')
+        for filepath in monomer_files:
+            try:
+                atom_types.update(extract_atom_types_from_lt(filepath))
+            except GenerationError:
+                raise
+            except Exception as e:
+                logger.warning(f"Error reading monomer file {filepath}: {str(e)}")
+                continue
 
         return atom_types
 
@@ -553,9 +524,6 @@ class GAFFAnalyzer:
         Parses the 'Data Bond List' sections to find which atom type pairs
         are actually bonded in the monomers.
 
-        First builds an atom ID -> atom type mapping from 'Data Atoms' section,
-        then extracts bonds and looks up the types.
-
         Args:
             monomer_files: List of paths to monomer .lt files
 
@@ -567,64 +535,13 @@ class GAFFAnalyzer:
 
         for filepath in monomer_files:
             try:
-                # First, build atom ID -> atom type mapping
-                atom_types_map = {}
-                in_atoms_section = False
-                with open(filepath, 'r') as f:
-                    for line in f:
-                        if 'write("Data Atoms")' in line or 'write(\'Data Atoms\')' in line:
-                            in_atoms_section = True
-                            continue
-                        elif in_atoms_section and '}' in line and not line.strip().startswith('#'):
-                            break
-
-                        if in_atoms_section and '$atom:' in line and '@atom:' in line:
-                            parts = line.split()
-                            atom_id = None
-                            atom_type = None
-                            for part in parts:
-                                if part.startswith('$atom:'):
-                                    atom_id = part.split(':')[1]
-                                elif part.startswith('@atom:'):
-                                    atom_type = part.split(':')[1]
-                            if atom_id and atom_type:
-                                atom_types_map[atom_id] = atom_type
-
-                # Now extract bonds using the atom type mapping
-                in_bond_section = False
-                with open(filepath, 'r') as f:
-                    for line in f:
-                        # Look for bond list section
-                        if 'write(\'Data Bond List\')' in line or 'write("Data Bond List")' in line:
-                            in_bond_section = True
-                            continue
-
-                        # End of section
-                        if in_bond_section:
-                            if '}' in line and not line.strip().startswith('#'):
-                                break
-
-                            # Extract bonded atom IDs
-                            if '$bond:' in line and '$atom:' in line:
-                                parts = line.split()
-                                atom_ids = []
-                                for part in parts:
-                                    # Only extract $atom:, not $bond:
-                                    if part.startswith('$atom:'):
-                                        # Extract atom ID (after colon)
-                                        atom_id = part.split(':')[1]
-                                        atom_ids.append(atom_id)
-
-                                # Look up atom types and create bond type
-                                if len(atom_ids) >= 2:
-                                    atom1_type = atom_types_map.get(atom_ids[0])
-                                    atom2_type = atom_types_map.get(atom_ids[1])
-
-                                    if atom1_type and atom2_type:
-                                        # Normalize alphabetically for consistency
-                                        bond_type = '-'.join(sorted([atom1_type, atom2_type]))
-                                        used_bonds.add(bond_type)
-
+                graph = parse_bond_graph(filepath)
+                for atom_id, (atom_type, neighbors) in graph.items():
+                    for neighbor_id in neighbors:
+                        neighbor_type = graph[neighbor_id][0]
+                        # Normalize alphabetically for consistency
+                        bond_type = '-'.join(sorted([atom_type, neighbor_type]))
+                        used_bonds.add(bond_type)
             except Exception as e:
                 logger.warning(f"  Warning: Could not parse bonds from {filepath}: {e}")
                 continue
@@ -640,63 +557,11 @@ class GAFFAnalyzer:
         Returns:
             Dictionary mapping atom_id -> (atom_type, [neighbor_atom_ids])
         """
-        graph = {}
-        atom_types = {}  # atom_id -> atom_type
-
         try:
-            with open(filepath, 'r') as f:
-                in_atoms_section = False
-                in_bond_section = False
-
-                for line in f:
-                    # Parse Data Atoms section
-                    if 'write("Data Atoms")' in line or 'write(\'Data Atoms\')' in line:
-                        in_atoms_section = True
-                        continue
-                    elif in_atoms_section and '}' in line and not line.strip().startswith('#'):
-                        in_atoms_section = False
-
-                    if in_atoms_section and '$atom:' in line and '@atom:' in line:
-                        parts = line.split()
-                        atom_id = None
-                        atom_type = None
-                        for part in parts:
-                            if part.startswith('$atom:'):
-                                atom_id = part.split(':')[1]
-                            elif part.startswith('@atom:'):
-                                atom_type = part.split(':')[1]
-                        if atom_id and atom_type:
-                            atom_types[atom_id] = atom_type
-                            graph[atom_id] = (atom_type, [])
-
-                    # Parse Data Bond List section
-                    if 'write(\'Data Bond List\')' in line or 'write("Data Bond List")' in line:
-                        in_bond_section = True
-                        continue
-                    elif in_bond_section and '}' in line and not line.strip().startswith('#'):
-                        in_bond_section = False
-
-                    if in_bond_section and '$bond:' in line:
-                        parts = line.split()
-                        bonded_atoms = []
-                        for part in parts:
-                            # Only extract $atom:, not $bond:
-                            if part.startswith('$atom:'):
-                                # Extract atom ID (after colon)
-                                atom_id = part.split(':')[1]
-                                bonded_atoms.append(atom_id)
-
-                        # Add edges to graph (bidirectional)
-                        if len(bonded_atoms) >= 2:
-                            atom1, atom2 = bonded_atoms[0], bonded_atoms[1]
-                            if atom1 in graph and atom2 in graph:
-                                graph[atom1][1].append(atom2)
-                                graph[atom2][1].append(atom1)
-
+            return parse_bond_graph(filepath)
         except Exception as e:
             logger.warning(f"  Warning: Could not build bond graph from {filepath}: {e}")
-
-        return graph
+            return {}
 
     def _infer_angles_from_graph(self, bond_graph: Dict) -> Set[str]:
         """Infer angle types from bond connectivity graph.
@@ -898,7 +763,21 @@ class GAFFAnalyzer:
         is_valid = len(errors) == 0
         return is_valid, errors
 
-    def create_gaff_subset(self, model) -> None:
+    @staticmethod
+    def _write_section_lines(f, lines: List[str]) -> None:
+        """Write filtered section lines, skipping embedded headers/closing
+        braces/section-marker comments from the parsed source file."""
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith('}'):
+                continue
+            if stripped.startswith('write_once('):
+                continue
+            if stripped.startswith('#') and ('once' in stripped or 'end of' in stripped.lower()):
+                continue
+            f.write(f"{line}")
+
+    def create_gaff_subset(self, model=None, monomer_files: Optional[List[str]] = None) -> None:
         """Create a subset of GAFF parameters based on the models.
 
         This method analyzes the topology used in the monomer files and
@@ -917,6 +796,8 @@ class GAFFAnalyzer:
 
         Args:
             model: Model object containing sequence information with monomer file names
+            monomer_files: Explicit list of monomer .lt file paths (takes
+                precedence over model-derived paths)
         """
         try:
             # Determine source file based on force field
@@ -928,26 +809,17 @@ class GAFFAnalyzer:
 
             # Check if source file exists
             if not Path(gaff_src).exists():
-                logger.error(f"GAFF force field file not found: {gaff_src}")
-                logger.error(f"Please ensure {Path(gaff_src).name} is installed in moltemplate/")
-                sys.exit(1)
+                raise GenerationError(
+                    f"GAFF force field file not found: {gaff_src}. "
+                    f"Please ensure {Path(gaff_src).name} is installed in moltemplate/"
+                )
 
             logger.info("Creating GAFF parameter subset...")
 
             # Step 1: Collect monomer file paths
             logger.info("  Collecting monomer files...")
-            monomer_files = []
-            for modelii in model:
-                for monomerii in range(len(modelii.sequenceSet)):
-                    monomerSet = modelii.sequenceSet[monomerii]
-
-                    for vecii in range(len(monomerSet)):
-                        # Determine monomer bank path based on force field
-                        MonomerBank = Path(self.path_cwd)
-                        merltfile_Path = MonomerBank / monomerSet[vecii]
-
-                        if merltfile_Path.is_file():
-                            monomer_files.append(str(merltfile_Path))
+            if monomer_files is None:
+                monomer_files = collect_monomer_files(model, self.path_cwd)
 
             if not monomer_files:
                 logger.warning("  No monomer files found!")
@@ -959,7 +831,7 @@ class GAFFAnalyzer:
 
             # Step 2: Extract atom types (still needed for masses and pair coeffs)
             logger.info("  Extracting atom types from monomers...")
-            atom_types = self.extract_atom_types(model)
+            atom_types = self.extract_atom_types(model, monomer_files=monomer_files)
             logger.info(f"  Found {len(atom_types)} unique atom types: {sorted(atom_types)}")
 
             if not atom_types:
@@ -1083,149 +955,62 @@ class GAFFAnalyzer:
 
                 # Masses
                 f.write("  write_once(\"Data Masses\") {\n")
-                for line in filtered_masses:
-                    # Skip section headers, closing braces, and comments that are section markers
-                    stripped = line.strip()
-                    # Skip lines that are closing braces (with or without comments)
-                    if stripped.startswith('}'):
-                        continue
-                    # Skip section headers
-                    if stripped.startswith('write_once('):
-                        continue
-                    # Skip comment lines that reference "once" or "end"
-                    if stripped.startswith('#') and ('once' in stripped or 'end of' in stripped.lower()):
-                        continue
-                    f.write(f"{line}")
+                self._write_section_lines(f, filtered_masses)
                 f.write("  } # (end of masses)\n\n")
 
                 # Pair coeffs
                 f.write("  write_once(\"In Settings\") {\n")
-                for line in filtered_pairs:
-                    # Skip section headers, closing braces, and comments that are section markers
-                    stripped = line.strip()
-                    # Skip lines that are closing braces (with or without comments)
-                    if stripped.startswith('}'):
-                        continue
-                    # Skip section headers
-                    if stripped.startswith('write_once('):
-                        continue
-                    # Skip comment lines that reference "once" or "end"
-                    if stripped.startswith('#') and ('once' in stripped or 'end of' in stripped.lower()):
-                        continue
-                    f.write(f"{line}")
+                self._write_section_lines(f, filtered_pairs)
                 f.write("  } # (end of pair_coeffs)\n\n")
 
                 # Bond definitions and coeffs
                 if filtered_bond_defs:
                     f.write("  write_once(\"Data Bonds By Type\") {\n")
-                    for line in filtered_bond_defs:
-                        # Skip section headers, closing braces, and comments that are section markers
-                        stripped = line.strip()
-                        if not (stripped.startswith('write_once(') or
-                                stripped == '}' or
-                                stripped.startswith('#end of') or
-                                (stripped.startswith('#') and 'once' in stripped)):
-                            f.write(f"{line}")
+                    self._write_section_lines(f, filtered_bond_defs)
                     f.write("  } # (end of bonds by type)\n\n")
 
                 if filtered_bond_coeffs:
                     f.write("  write_once(\"In Settings\") {\n")
-                    for line in filtered_bond_coeffs:
-                        # Skip section headers, closing braces, and comments that are section markers
-                        stripped = line.strip()
-                        if not (stripped.startswith('write_once(') or
-                                stripped == '}' or
-                                stripped.startswith('#end of') or
-                                (stripped.startswith('#') and 'once' in stripped)):
-                            f.write(f"{line}")
+                    self._write_section_lines(f, filtered_bond_coeffs)
                     f.write("  } # (end of bond_coeffs)\n\n")
 
                 # Angle definitions and coeffs
                 if filtered_angle_defs:
                     f.write("  write_once(\"Data Angles By Type\") {\n")
-                    for line in filtered_angle_defs:
-                        # Skip section headers, closing braces, and comments that are section markers
-                        stripped = line.strip()
-                        if not (stripped.startswith('write_once(') or
-                                stripped == '}' or
-                                stripped.startswith('#end of') or
-                                (stripped.startswith('#') and 'once' in stripped)):
-                            f.write(f"{line}")
+                    self._write_section_lines(f, filtered_angle_defs)
                     f.write("  } # (end of angles by type)\n\n")
 
                 if filtered_angle_coeffs:
                     f.write("  write_once(\"In Settings\") {\n")
-                    for line in filtered_angle_coeffs:
-                        # Skip section headers, closing braces, and comments that are section markers
-                        stripped = line.strip()
-                        if not (stripped.startswith('write_once(') or
-                                stripped == '}' or
-                                stripped.startswith('#end of') or
-                                (stripped.startswith('#') and 'once' in stripped)):
-                            f.write(f"{line}")
+                    self._write_section_lines(f, filtered_angle_coeffs)
                     f.write("  } # (end of angle_coeffs)\n\n")
 
                 # Dihedral definitions and coeffs
                 if filtered_dihedral_defs:
                     f.write("  write_once(\"Data Dihedrals By Type\") {\n")
-                    for line in filtered_dihedral_defs:
-                        # Skip section headers, closing braces, and comments that are section markers
-                        stripped = line.strip()
-                        if not (stripped.startswith('write_once(') or
-                                stripped == '}' or
-                                stripped.startswith('#end of') or
-                                (stripped.startswith('#') and 'once' in stripped)):
-                            f.write(f"{line}")
+                    self._write_section_lines(f, filtered_dihedral_defs)
                     f.write("  } # (end of Dihedrals by type)\n\n")
 
                 if filtered_dihedral_coeffs:
                     f.write("  write_once(\"In Settings\") {\n")
-                    for line in filtered_dihedral_coeffs:
-                        # Skip section headers, closing braces, and comments that are section markers
-                        stripped = line.strip()
-                        if not (stripped.startswith('write_once(') or
-                                stripped == '}' or
-                                stripped.startswith('#end of') or
-                                (stripped.startswith('#') and 'once' in stripped)):
-                            f.write(f"{line}")
+                    self._write_section_lines(f, filtered_dihedral_coeffs)
                     f.write("  } # (end of dihedral_coeffs)\n\n")
 
                 # Improper definitions and coeffs
                 if filtered_improper_defs:
                     f.write("  write_once(\"Data Impropers By Type (gaff_imp.py)\") {\n")
-                    for line in filtered_improper_defs:
-                        # Skip section headers, closing braces, and comments that are section markers
-                        stripped = line.strip()
-                        if not (stripped.startswith('write_once(') or
-                                stripped == '}' or
-                                stripped.startswith('#end of') or
-                                (stripped.startswith('#') and 'once' in stripped)):
-                            f.write(f"{line}")
+                    self._write_section_lines(f, filtered_improper_defs)
                     f.write("  } # (end of impropers by type)\n\n")
 
                 if filtered_improper_coeffs:
                     f.write("  write_once(\"In Settings\") {\n")
-                    for line in filtered_improper_coeffs:
-                        # Skip section headers, closing braces, and comments that are section markers
-                        stripped = line.strip()
-                        if not (stripped.startswith('write_once(') or
-                                stripped == '}' or
-                                stripped.startswith('#end of') or
-                                (stripped.startswith('#') and 'once' in stripped)):
-                            f.write(f"{line}")
+                    self._write_section_lines(f, filtered_improper_coeffs)
                     f.write("  } # (end of improp_coeffs)\n\n")
 
                 # Init section (unchanged)
                 if sections['init']:
                     f.write("  write_once(\"In Init\") {\n")
-                    for line in sections['init']:
-                        # Skip section headers, closing braces, and comments that are section markers
-                        stripped = line.strip()
-                        if not (stripped.startswith('write_once(') or
-                                stripped == '}' or
-                                stripped.startswith('#end of') or
-                                (stripped.startswith('#') and 'once' in stripped)):
-                            f.write(f"{line}")
+                    self._write_section_lines(f, sections['init'])
                     f.write("  } #end of init parameters\n\n")
 
                 ff_name = "GAFF2" if self.force_field == "gaff2" else "GAFF"

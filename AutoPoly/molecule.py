@@ -117,7 +117,7 @@ class Molecule:
         # This mirrors Polymer's sequenceSet structure where:
         # - Polymer: sequenceSet[chain_idx][position_idx]
         # - Molecule: sequenceSet[molecule_idx][0] (always position 0)
-        for i in range(self.Count):
+        for _ in range(self.Count):
             self.sequenceSet.append([self.molecule_name])
             self.sequenceName.append([self.molecule_name])
 

@@ -8,7 +8,6 @@ polymerization workflow, including directory creation, file movement,
 and settings file modification.
 """
 
-import os
 from pathlib import Path
 import shutil
 from .system import logger
@@ -42,7 +41,14 @@ def create_working_directory(system, name):
 
     # Check if base directory exists
     if polymer_path.exists():
-        response = input(f"{polymer_path} folder exists, delete and make new?(y/n) ")
+        try:
+            response = input(f"{polymer_path} folder exists, delete and make new?(y/n) ")
+        except EOFError:
+            # Never block headless/agent runs (stdin closed or not a TTY)
+            raise WorkflowError(
+                f"Directory exists: {polymer_path}. "
+                "Please remove the existing folder or choose a different name."
+            ) from None
         if response.lower() == 'y':
             logger.info(f"removing {polymer_path}")
             shutil.rmtree(polymer_path)

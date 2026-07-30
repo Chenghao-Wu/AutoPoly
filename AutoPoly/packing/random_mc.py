@@ -1,0 +1,189 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Monte Carlo random packing strategy.
+
+Polymers and molecules are placed at random positions/orientations with
+collision detection (MolecularPlacementMC). The box is auto-sized as the
+maximum of three estimates:
+
+- density-based: total monomers at the target monomer density
+- chain-length: longest chain's SAW end-to-end distance x safety factor
+- packing-volume: sum of unit collision volumes at 30% packing fraction
+
+If an instance cannot be placed after mc_max_attempts tries, it falls back
+to a deterministic grid position with a warning (same policy as the legacy
+workflow).
+
+Extracted from the former WorkflowManager.make_system_lt_mc (workflow.py).
+
+Created on 2026-07-30
+@author: zwu
+"""
+import numpy as np
+
+from ..system import logger
+from ..units import UNIT_KIND_POLYMER
+from ..mc import CollisionDetector, MolecularPlacementMC, calculate_box_size
+from .base import (
+    PackingContext,
+    PlacementRecord,
+    PlacementResult,
+    PlacementStrategy,
+    bounds_size,
+    symmetric_bounds,
+)
+
+PACKING_FRACTION = 0.3
+CHAIN_LENGTH_SAFETY_FACTOR = 3.0
+GRID_FALLBACK_FACTOR = 2.5
+
+
+def compute_auto_box_size(ctx: PackingContext) -> float:
+    """
+    Auto-size the simulation box as max(density, chain-length, packing-volume).
+
+    Args:
+        ctx: Packing context with the unit manifest.
+
+    Returns:
+        Cubic box side length in Angstrom.
+    """
+    units = ctx.units
+
+    # Density-based estimate
+    density_box = calculate_box_size(
+        units.total_particle_count(), ctx.monomer_density
+    )
+
+    # Chain-length estimate: ensure the longest chain fits inside the box.
+    # For a SAW, end-to-end ~ n^0.6 * bond length; apply a safety factor.
+    max_dop = units.max_chain_length()
+    chain_length_box = max_dop**0.6 * ctx.offset * CHAIN_LENGTH_SAFETY_FACTOR
+
+    # Packing-volume estimate: enough room for non-overlapping placement
+    total_collision_volume = sum(
+        unit.count * (4.0 / 3.0) * np.pi * unit.radius**3
+        for unit in units.units
+    )
+    packing_box = (
+        (total_collision_volume / PACKING_FRACTION) ** (1.0 / 3.0)
+        if total_collision_volume > 0 else 0.0
+    )
+
+    return max(density_box, chain_length_box, packing_box)
+
+
+class RandomMCStrategy(PlacementStrategy):
+    """Monte Carlo random placement with collision detection."""
+
+    name = "mc_random"
+
+    def place(self, ctx: PackingContext) -> PlacementResult:
+        if ctx.rng_seed is not None:
+            np.random.seed(ctx.rng_seed)
+
+        box_size = ctx.box.requested_box_size or compute_auto_box_size(ctx)
+        box_bounds = symmetric_bounds(box_size)
+        half_box = box_size / 2.0
+
+        cell_size = max(5.0, box_size / 20)
+        collision_detector = CollisionDetector(box_bounds, cell_size)
+        placer = MolecularPlacementMC(
+            box_bounds, collision_detector, ctx.mc_max_attempts
+        )
+
+        records = []
+        polymer_index = 0
+        molecule_index = 0
+
+        for unit in ctx.units.units:
+            if unit.kind == UNIT_KIND_POLYMER:
+                polymer_index += 1
+                record = self._place_polymer(
+                    placer, unit, polymer_index, half_box
+                )
+                records.append(record)
+            else:
+                for _ in range(unit.count):
+                    molecule_index += 1
+                    record = self._place_molecule(
+                        placer, unit, molecule_index, half_box
+                    )
+                    records.append(record)
+
+        stats = placer.get_placement_stats()
+        logger.info(
+            f"MC placement complete: {stats['polymers']} polymers, "
+            f"{stats['molecules']} molecules placed, "
+            f"box size {bounds_size(box_bounds):.2f} A"
+        )
+        return PlacementResult(records=records, box_bounds=box_bounds)
+
+    def _place_polymer(
+        self, placer, unit, polymer_index: int, half_box: float
+    ) -> PlacementRecord:
+        """Place one polymer chain; grid fallback on failure."""
+        instance_name = f"polymer_{polymer_index}"
+        placement = placer.place_polymer(
+            poly_name=unit.class_name, radius=unit.radius
+        )
+        if placement is not None:
+            command = placer.generate_polymer_lt_commands([placement])[0]
+            return PlacementRecord(unit.id, instance_name, command)
+
+        logger.warning(
+            f"Failed to place polymer {polymer_index} ({unit.id}), "
+            "using fallback grid position"
+        )
+        command = self._fallback_command(
+            instance_name, unit.class_name, unit.radius,
+            polymer_index - 1, half_box
+        )
+        return PlacementRecord(unit.id, instance_name, command)
+
+    def _place_molecule(
+        self, placer, unit, molecule_index: int, half_box: float
+    ) -> PlacementRecord:
+        """Place one molecule instance; grid fallback on failure."""
+        instance_name = f"molecule_{molecule_index}"
+        placement = placer.place_molecule(
+            molecule_name=unit.class_name,
+            radius=unit.radius,
+            instance_name=instance_name,
+        )
+        if placement is not None:
+            command = placer.generate_molecule_lt_commands([placement])[0]
+            return PlacementRecord(unit.id, instance_name, command)
+
+        logger.warning(
+            f"Failed to place molecule {molecule_index} ({unit.id}), "
+            "using fallback grid position"
+        )
+        command = self._fallback_command(
+            instance_name, unit.class_name, unit.radius,
+            molecule_index - 1, half_box
+        )
+        return PlacementRecord(unit.id, instance_name, command)
+
+    @staticmethod
+    def _fallback_command(
+        instance_name: str,
+        class_name: str,
+        radius: float,
+        index: int,
+        half_box: float,
+    ) -> str:
+        """Deterministic 3D grid position used when MC placement fails."""
+        spacing = radius * GRID_FALLBACK_FACTOR
+        grid_per_dim = max(1, int((2 * half_box - 2 * radius) / spacing))
+        ix = index % grid_per_dim
+        iy = (index // grid_per_dim) % grid_per_dim
+        iz = (index // (grid_per_dim * grid_per_dim)) % grid_per_dim
+        pos_x = -half_box + radius + ix * spacing
+        pos_y = -half_box + radius + iy * spacing
+        pos_z = -half_box + radius + iz * spacing
+        return (
+            f"{instance_name} = new {class_name}"
+            f".move({pos_x:.4f},{pos_y:.4f},{pos_z:.4f})"
+        )

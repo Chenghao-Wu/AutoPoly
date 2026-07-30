@@ -1885,8 +1885,6 @@ class BeadSpringPolymer:
                         (iz - n_per_dim / 2 + 0.5) * spacing
                     ])
 
-                    theta = np.random.uniform(0, np.pi)
-                    phi = np.random.uniform(0, 2 * np.pi)
                     R = _random_rotation_matrix(np.pi)
 
                     for pos in chain_pos:

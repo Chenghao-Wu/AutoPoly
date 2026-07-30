@@ -6,7 +6,6 @@ from unittest.mock import MagicMock, patch
 from AutoPoly.monomer_processing import (
     generate_monomer_from_psmiles,
     generate_molecule_from_smiles,
-    generate_sequence_variants_for_polymerization,
     n_monomer_atoms,
     read_lt_end_atoms,
     extract_element_from_atom,
@@ -198,94 +197,6 @@ class TestGenerateMoleculeFromSmiles:
         # Generator should only be called once (cache hit)
         assert mock_generator.from_single_molecule.call_count == 1
         assert result_filename1 == result_filename2
-
-
-class TestGenerateSequenceVariants:
-    """Test sequence variant generation."""
-
-    @patch('AutoPoly.monomer_processing.MonomerGenerator')
-    def test_generate_sequence_variants_creates_generator(self, mock_generator_class, tmp_path):
-        """Test MonomerGenerator creation for sequence variants."""
-        mock_generator = MagicMock()
-        mock_generator_class.return_value = mock_generator
-        mock_generator.from_smiles.return_value = []
-        mock_generator.write_lt_files.return_value = []
-
-        cache = {}
-        result_mapping, result_counter = generate_sequence_variants_for_polymerization(
-            base_smiles="[*]C=C[*]",
-            dop=5,
-            topology="linear",
-            path_cwd=str(tmp_path),
-            force_field="oplsaa",
-            generated_cache=cache,
-            counter=0
-        )
-
-        # Verify generator creation
-        mock_generator_class.assert_called_once()
-        call_kwargs = mock_generator_class.call_args[1]
-        assert call_kwargs['base_name'] == 'monomer_0'
-        assert call_kwargs['force_field'] == 'oplsaa'
-
-    @patch('AutoPoly.monomer_processing.MonomerGenerator')
-    def test_generate_sequence_variants_uses_max_dop(self, mock_generator_class, tmp_path):
-        """Test that at least 3 monomers are used for variant generation."""
-        mock_generator = MagicMock()
-        mock_generator_class.return_value = mock_generator
-        mock_generator.from_smiles.return_value = []
-        mock_generator.write_lt_files.return_value = []
-
-        cache = {}
-        # With DOP=2, should still use n_monomers=3
-        generate_sequence_variants_for_polymerization(
-            base_smiles="[*]C=C[*]",
-            dop=2,
-            topology="linear",
-            path_cwd=str(tmp_path),
-            force_field="oplsaa",
-            generated_cache=cache,
-            counter=0
-        )
-
-        # Verify from_smiles was called with n_monomers=3 (max of 3 and dop)
-        mock_generator.from_smiles.assert_called_once()
-        call_args = mock_generator.from_smiles.call_args[1]
-        assert call_args['n_monomers'] == 3
-
-    @patch('AutoPoly.monomer_processing.MonomerGenerator')
-    def test_generate_sequence_variants_caches_result(self, mock_generator_class, tmp_path):
-        """Test that sequence variants are cached."""
-        mock_generator = MagicMock()
-        mock_generator_class.return_value = mock_generator
-        mock_generator.from_smiles.return_value = []
-        mock_generator.write_lt_files.return_value = []
-
-        cache = {}
-        # First call
-        result_mapping1, counter1 = generate_sequence_variants_for_polymerization(
-            base_smiles="[*]C=C[*]",
-            dop=5,
-            topology="linear",
-            path_cwd=str(tmp_path),
-            force_field="oplsaa",
-            generated_cache=cache,
-            counter=0
-        )
-
-        # Second call with same parameters
-        result_mapping2, counter2 = generate_sequence_variants_for_polymerization(
-            base_smiles="[*]C=C[*]",
-            dop=5,
-            topology="linear",
-            path_cwd=str(tmp_path),
-            force_field="oplsaa",
-            generated_cache=cache,
-            counter=1
-        )
-
-        # Generator should only be called once
-        assert mock_generator.from_smiles.call_count == 1
 
 
 class TestNMonomerAtoms:

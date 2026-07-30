@@ -45,6 +45,44 @@ FORCE_FIELD_DESCRIPTIONS = {
     "compass": "COMPASS. Optimized for condensed-phase properties.",
 }
 
+# Central registry of per-force-field file/class mappings.
+# Single source of truth for the lt parameter file, moltemplate class to
+# inherit, and the RDlt .fdefn SMARTS file used for atom typing.
+FORCE_FIELD_REGISTRY = {
+    "oplsaa": {
+        "lt_file": "oplsaa.lt",
+        "inherits": "OPLSAA",
+        "fdefn": "opls_lt_2024.fdefn",  # OPLS-AA 2024 numbering (moltemplate 2.22.5)
+    },
+    "lopls": {
+        "lt_file": "loplsaa.lt",
+        "inherits": "OPLSAA",  # LOPLS extends OPLSAA
+        "fdefn": "lopls_lt.fdefn",
+    },
+    "gaff": {
+        "lt_file": "gaff.lt",
+        "inherits": "GAFF",
+        "fdefn": "gaff_lt.fdefn",
+    },
+    "gaff2": {
+        "lt_file": "gaff2.lt",
+        "inherits": "GAFF2",
+        "fdefn": "gaff_lt.fdefn",
+    },
+    "dreiding": {
+        "lt_file": "dreiding.lt",
+        "inherits": "DREIDING",
+        "fdefn": "dreiding_lt.fdefn",
+    },
+    "compass": {
+        "lt_file": "compass_published.lt",
+        "inherits": "COMPASS",
+        "fdefn": "compass_lt.fdefn",
+    },
+}
+
+VALID_FORCE_FIELDS = list(FORCE_FIELD_REGISTRY.keys())
+
 TOPOLOGY_DESCRIPTIONS = {
     "linear": "Linear chain. Distinct first/last monomers.",
     "ring": "Ring (cyclic). All monomers are middle-type, chain closes on itself.",

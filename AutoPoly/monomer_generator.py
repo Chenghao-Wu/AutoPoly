@@ -40,6 +40,17 @@ INTER_BOND_MAP_START = 100  # Starting map number for inter-monomer bond markers
 CHARGE_MAP_START = 10000   # Starting map number for Gasteiger charge tracking (avoid conflicts)
 CAP_H_MAP_START = 20000    # Starting map number for cap H atoms (chain ends)
 TERMINAL_DUMMY_ISOTOPE = 99  # Isotope to mark terminal dummy atoms (chain ends)
+GEOM_MAP_PROP = "geom_map"  # Atom property holding the chain-level map number
+
+# Force field -> RDlt .fdefn SMARTS file (located in extern/rdlt_data/)
+FORCE_FIELD_FDEFN = {
+    'oplsaa': 'opls_lt_2024.fdefn',  # OPLS-AA 2024 numbering (moltemplate 2.22.5)
+    'lopls': 'lopls_lt.fdefn',
+    'gaff': 'gaff_lt.fdefn',
+    'gaff2': 'gaff_lt.fdefn',
+    'dreiding': 'dreiding_lt.fdefn',
+    'compass': 'compass_lt.fdefn',
+}
 
 # =============================================================================
 # Exceptions
@@ -227,24 +238,10 @@ class SMARTSTyper:
         self.force_field = force_field
         self.verbose = verbose
 
-        # Locate .fdefn files
-        # OPLS-AA uses 2024 atom type numbering (types 54-60 for alkanes, etc.)
+        # Locate .fdefn file for this force field
         module_dir = Path(__file__).parent
-
-        if force_field in ('gaff', 'gaff2'):
-            self.fdef_path = str(module_dir / 'extern' / 'rdlt_data' / 'gaff_lt.fdefn')
-        elif force_field == 'lopls':
-            # LOPLS uses L-suffixed types from loplsaa.lt
-            self.fdef_path = str(module_dir / 'extern' / 'rdlt_data' / 'lopls_lt.fdefn')
-        elif force_field == 'dreiding':
-            # DREIDING force field
-            self.fdef_path = str(module_dir / 'extern' / 'rdlt_data' / 'dreiding_lt.fdefn')
-        elif force_field == 'compass':
-            # COMPASS force field (class2)
-            self.fdef_path = str(module_dir / 'extern' / 'rdlt_data' / 'compass_lt.fdefn')
-        else:  # oplsaa
-            # Use OPLS-AA 2024 numbering (from oplsaa.lt / moltemplate 2.22.5)
-            self.fdef_path = str(module_dir / 'extern' / 'rdlt_data' / 'opls_lt_2024.fdefn')
+        fdef_name = FORCE_FIELD_FDEFN.get(force_field, FORCE_FIELD_FDEFN['oplsaa'])
+        self.fdef_path = str(module_dir / 'extern' / 'rdlt_data' / fdef_name)
         
         # Load charge dictionary
         self.charge_dict = self._load_charges()
@@ -280,7 +277,6 @@ class SMARTSTyper:
         Returns:
             Priority number (higher = more specific), or 0 if not extractable
         """
-        import re
         # Extract leading digits from family string
         match = re.match(r'^(\d+)', family_str)
         if match:
@@ -717,6 +713,17 @@ class ChainSplitter:
         # Get fragments as separate molecules
         fragments = Chem.GetMolFrags(fragmented, asMols=True, sanitizeFrags=False)
 
+        # Stash chain-level atom map numbers in an atom property so they
+        # survive the connection-atom renumbering in _process_fragment (which
+        # overwrites map numbers with LEFT/RIGHT_CONN_MAP). GeometryBuilder
+        # relies on the 'geom_map' property to join force-field types from the
+        # full typed chain back onto individual variant atoms.
+        for frag in fragments:
+            for atom in frag.GetAtoms():
+                map_num = atom.GetAtomMapNum()
+                if map_num > 0:
+                    atom.SetIntProp(GEOM_MAP_PROP, map_num)
+
         # Restore Gasteiger charges to fragments
         if gasteiger_charges_by_map_num:
             restored_count = 0
@@ -1112,6 +1119,121 @@ class BackboneAligner:
 
 
 # =============================================================================
+# LT atom ordering (shared by LTWriter and GeometryBuilder)
+# =============================================================================
+
+def compute_lt_atom_order(
+    mol: Chem.Mol,
+    variant_type: str,
+    conn_left: int,
+    conn_right: int
+) -> List[int]:
+    """
+    Compute the Data Atoms output order for a monomer .lt file.
+
+    Connection atoms come FIRST so that AutoPoly's read_lt_end_atoms() can
+    identify the polymerization connection points from the first two atoms:
+    - 'first':  [placeholder heavy atom, conn_right] (left end is terminal)
+    - 'last':   [conn_left, ...] (right end is terminal)
+    - 'middle' / 'ring': [conn_left, conn_right, ...]
+    - 'single' / 'molecule': no connection atoms promoted
+    Remaining atoms follow: heavy atoms first, then hydrogens.
+
+    Args:
+        mol: RDKit Mol of the variant
+        variant_type: 'first', 'middle', 'last', 'single', 'ring', or 'molecule'
+        conn_left: Index of the left connection atom
+        conn_right: Index of the right connection atom
+
+    Returns:
+        List of atom indices in output order
+    """
+    if variant_type == 'first':
+        # First monomer: need placeholder for left (terminal), conn_right second
+        first_heavy = None
+        for i in range(mol.GetNumAtoms()):
+            atom = mol.GetAtomWithIdx(i)
+            if atom.GetAtomicNum() > 1 and i != conn_right:
+                first_heavy = i
+                break
+        if first_heavy is not None:
+            atom_order = [first_heavy, conn_right]
+        else:
+            atom_order = [conn_right]
+    elif variant_type == 'last':
+        # Last monomer: only LEFT side is a connection point
+        atom_order = [conn_left]
+    elif variant_type in ('single', 'molecule'):
+        # No real connections
+        atom_order = []
+    else:
+        # Middle/ring: both sides are connection points
+        atom_order = [conn_left]
+        if conn_right != conn_left:
+            atom_order.append(conn_right)
+
+    # Add remaining atoms (heavy atoms first, then hydrogens)
+    conn_set = set(atom_order)
+    heavy_atoms = []
+    h_atoms = []
+    for i in range(mol.GetNumAtoms()):
+        if i not in conn_set:
+            atom = mol.GetAtomWithIdx(i)
+            if atom.GetAtomicNum() == 1:  # Hydrogen
+                h_atoms.append(i)
+            else:
+                heavy_atoms.append(i)
+    atom_order.extend(heavy_atoms)
+    atom_order.extend(h_atoms)
+
+    return atom_order
+
+
+# =============================================================================
+# LT header/footer writers (shared by LTWriter and single-molecule writer)
+# =============================================================================
+
+def write_lt_header(f, class_name: str, force_field: str) -> None:
+    """Write .lt file header: force field import, notes, and class declaration."""
+    if force_field == 'gaff':
+        f.write('import "gaff.lt"    # <-- defines the GAFF (General Amber Force Field)\n')
+        f.write('# NOTE: GAFF requires user-supplied charges (AM1-BCC or RESP recommended)\n')
+        f.write('# See: http://ambermd.org/antechamber/gaff.pdf\n')
+        f.write(f'{class_name} inherits GAFF {{\n\n')
+    elif force_field == 'gaff2':
+        f.write('import "gaff2.lt"    # <-- defines the GAFF2 (General Amber Force Field 2)\n')
+        f.write('# NOTE: GAFF2 requires user-supplied charges (AM1-BCC or RESP recommended)\n')
+        f.write(f'{class_name} inherits GAFF2 {{\n\n')
+    elif force_field == 'dreiding':
+        f.write('import "dreiding.lt"    # <-- defines the DREIDING force field\n')
+        f.write('# NOTE: DREIDING requires user-supplied charges (AM1-BCC, Gasteiger, or RESP)\n')
+        f.write('# See: Mayo et al., J. Phys. Chem. 1990, 94, 8897-8909\n')
+        f.write(f'{class_name} inherits DREIDING {{\n\n')
+    elif force_field == 'compass':
+        f.write('import "compass_published.lt"    # <-- defines the COMPASS force field (class2)\n')
+        f.write('# NOTE: COMPASS requires LAMMPS compiled with CLASS2 package\n')
+        f.write('# NOTE: This is an incomplete public version - some parameters may be missing\n')
+        f.write(f'{class_name} inherits COMPASS {{\n\n')
+    elif force_field == 'lopls':
+        f.write('import "loplsaa.lt"    # <-- defines the L-OPLS force field (long chains)\n')
+        f.write('# L-OPLS: Sui et al., J.Chem.Theory.Comp (2012), 8(4), 1459\n')
+        f.write(f'{class_name} inherits OPLSAA {{\n\n')
+    else:
+        f.write('import "oplsaa.lt"    # <-- defines the OPLS-AA force field\n')
+        f.write(f'{class_name} inherits OPLSAA {{\n\n')
+
+    f.write('# atom-id  mol-id  atom-type charge      X         Y        Z\n\n')
+
+
+def write_lt_footer(f, class_name: str) -> None:
+    """Write .lt file footer."""
+    f.write(f'}}  # {class_name}\n\n')
+    f.write("# Note: You don't need to supply the partial partial charges of the atoms.\n")
+    f.write("#       If you like, just fill the fourth column with zeros (\"0.000\").\n")
+    f.write("#       Moltemplate and LAMMPS will automatically assign the charge later\n\n")
+
+
+# =============================================================================
 # LTWriter - AutoPoly-compatible format
 # =============================================================================
 
@@ -1249,35 +1371,7 @@ class LTWriter:
         class_name = f"{variant.base_name}_{variant.position}{suffix}"
         if variant.is_t1:
             class_name += "_T1"
-        
-        if variant.force_field == 'gaff':
-            f.write('import "gaff.lt"    # <-- defines the GAFF (General Amber Force Field)\n')
-            f.write('# NOTE: GAFF requires user-supplied charges (AM1-BCC or RESP recommended)\n')
-            f.write('# See: http://ambermd.org/antechamber/gaff.pdf\n')
-            f.write(f'{class_name} inherits GAFF {{\n\n')
-        elif variant.force_field == 'gaff2':
-            f.write('import "gaff2.lt"    # <-- defines the GAFF2 (General Amber Force Field 2)\n')
-            f.write('# NOTE: GAFF2 requires user-supplied charges (AM1-BCC or RESP recommended)\n')
-            f.write(f'{class_name} inherits GAFF2 {{\n\n')
-        elif variant.force_field == 'dreiding':
-            f.write('import "dreiding.lt"    # <-- defines the DREIDING force field\n')
-            f.write('# NOTE: DREIDING requires user-supplied charges (AM1-BCC, Gasteiger, or RESP)\n')
-            f.write('# See: Mayo et al., J. Phys. Chem. 1990, 94, 8897-8909\n')
-            f.write(f'{class_name} inherits DREIDING {{\n\n')
-        elif variant.force_field == 'compass':
-            f.write('import "compass_published.lt"    # <-- defines the COMPASS force field (class2)\n')
-            f.write('# NOTE: COMPASS requires LAMMPS compiled with CLASS2 package\n')
-            f.write('# NOTE: This is an incomplete public version - some parameters may be missing\n')
-            f.write(f'{class_name} inherits COMPASS {{\n\n')
-        elif variant.force_field == 'lopls':
-            f.write('import "loplsaa.lt"    # <-- defines the L-OPLS force field (long chains)\n')
-            f.write('# L-OPLS: Sui et al., J.Chem.Theory.Comp (2012), 8(4), 1459\n')
-            f.write(f'{class_name} inherits OPLSAA {{\n\n')
-        else:
-            f.write('import "oplsaa.lt"    # <-- defines the OPLS-AA force field\n')
-            f.write(f'{class_name} inherits OPLSAA {{\n\n')
-
-        f.write('# atom-id  mol-id  atom-type charge      X         Y        Z\n\n')
+        write_lt_header(f, class_name, variant.force_field)
 
     def _write_atoms_block(self, f, variant: MonomerVariant) -> None:
         """
@@ -1289,54 +1383,17 @@ class LTWriter:
         For first/last monomers, only ONE side is a real connection point.
         """
         f.write('  write("Data Atoms") {\n')
-        
+
         mol = variant.mol
         atom_ids = variant.atom_ids
         conn_left, conn_right = variant.connection_atoms
-        
-        # Build atom order with connection atoms first (based on variant type)
-        # Convention: first atom = left side, second atom = right side
-        # make_poly_lt uses first_atom as left connection, second_atom as right connection
-        if variant.variant_type == 'first':
-            # First monomer: need placeholder for left (terminal), conn_right second
-            # Find a heavy atom that is NOT conn_right to be first (the terminal/left side)
-            first_heavy = None
-            for i in range(mol.GetNumAtoms()):
-                atom = mol.GetAtomWithIdx(i)
-                if atom.GetAtomicNum() > 1 and i != conn_right:  # Non-hydrogen, not conn_right
-                    first_heavy = i
-                    break
-            if first_heavy is not None:
-                atom_order = [first_heavy, conn_right]
-            else:
-                atom_order = [conn_right]
-        elif variant.variant_type == 'last':
-            # Last monomer: only LEFT side is a connection point
-            # make_poly_lt uses first_atom as left connection, so conn_left must be first
-            atom_order = [conn_left]
-        elif variant.variant_type == 'single':
-            # Single monomer: no real connections
-            atom_order = []
-        else:
-            # Middle: both sides are connection points
-            atom_order = [conn_left]
-            if conn_right != conn_left:
-                atom_order.append(conn_right)
-        
-        # Add remaining atoms (heavy atoms first, then hydrogens)
-        conn_set = set(atom_order)
-        heavy_atoms = []
-        h_atoms = []
-        for i in range(mol.GetNumAtoms()):
-            if i not in conn_set:
-                atom = mol.GetAtomWithIdx(i)
-                if atom.GetAtomicNum() == 1:  # Hydrogen
-                    h_atoms.append(i)
-                else:
-                    heavy_atoms.append(i)
-        atom_order.extend(heavy_atoms)
-        atom_order.extend(h_atoms)
-        
+
+        # Connection atoms FIRST (shared with GeometryBuilder so geometry.json
+        # atom order always matches the typed .lt output order).
+        atom_order = compute_lt_atom_order(
+            mol, variant.variant_type, conn_left, conn_right
+        )
+
         # Regenerate atom IDs based on output order
         output_atom_ids = {}
         for seq_num, atom_idx in enumerate(atom_order, 1):
@@ -1419,10 +1476,7 @@ class LTWriter:
         class_name = f"{variant.base_name}_{variant.position}{suffix}"
         if variant.is_t1:
             class_name += "_T1"
-        f.write(f'}}  # {class_name}\n\n')
-        f.write("# Note: You don't need to supply the partial partial charges of the atoms.\n")
-        f.write("#       If you like, just fill the fourth column with zeros (\"0.000\").\n")
-        f.write("#       Moltemplate and LAMMPS will automatically assign the charge later\n\n")
+        write_lt_footer(f, class_name)
 
 
 # =============================================================================
@@ -1749,34 +1803,7 @@ class MonomerGenerator:
         
         with open(filepath, 'w') as f:
             # Write header
-            if variant.force_field == 'gaff':
-                f.write('import "gaff.lt"    # <-- defines the GAFF (General Amber Force Field)\n')
-                f.write('# NOTE: GAFF requires user-supplied charges (AM1-BCC or RESP recommended)\n')
-                f.write('# See: http://ambermd.org/antechamber/gaff.pdf\n')
-                f.write(f'{variant.base_name} inherits GAFF {{\n\n')
-            elif variant.force_field == 'gaff2':
-                f.write('import "gaff2.lt"    # <-- defines the GAFF2 (General Amber Force Field 2)\n')
-                f.write('# NOTE: GAFF2 requires user-supplied charges (AM1-BCC or RESP recommended)\n')
-                f.write(f'{variant.base_name} inherits GAFF2 {{\n\n')
-            elif variant.force_field == 'dreiding':
-                f.write('import "dreiding.lt"    # <-- defines the DREIDING force field\n')
-                f.write('# NOTE: DREIDING requires user-supplied charges (AM1-BCC, Gasteiger, or RESP)\n')
-                f.write('# See: Mayo et al., J. Phys. Chem. 1990, 94, 8897-8909\n')
-                f.write(f'{variant.base_name} inherits DREIDING {{\n\n')
-            elif variant.force_field == 'compass':
-                f.write('import "compass_published.lt"    # <-- defines the COMPASS force field (class2)\n')
-                f.write('# NOTE: COMPASS requires LAMMPS compiled with CLASS2 package\n')
-                f.write('# NOTE: This is an incomplete public version - some parameters may be missing\n')
-                f.write(f'{variant.base_name} inherits COMPASS {{\n\n')
-            elif variant.force_field == 'lopls':
-                f.write('import "loplsaa.lt"    # <-- defines the L-OPLS force field (long chains)\n')
-                f.write('# L-OPLS: Sui et al., J.Chem.Theory.Comp (2012), 8(4), 1459\n')
-                f.write(f'{variant.base_name} inherits OPLSAA {{\n\n')
-            else:
-                f.write('import "oplsaa.lt"    # <-- defines the OPLS-AA force field\n')
-                f.write(f'{variant.base_name} inherits OPLSAA {{\n\n')
-
-            f.write('# atom-id  mol-id  atom-type charge      X         Y        Z\n\n')
+            write_lt_header(f, variant.base_name, variant.force_field)
 
             # Write atoms block (heavy atoms first, then hydrogens)
             f.write('  write("Data Atoms") {\n')
@@ -1837,10 +1864,7 @@ class MonomerGenerator:
             f.write('  }\n')
             
             # Write footer
-            f.write(f'}}  # {variant.base_name}\n\n')
-            f.write("# Note: You don't need to supply the partial partial charges of the atoms.\n")
-            f.write("#       If you like, just fill the fourth column with zeros (\"0.000\").\n")
-            f.write("#       Moltemplate and LAMMPS will automatically assign the charge later\n\n")
+            write_lt_footer(f, variant.base_name)
 
 
 # =============================================================================
@@ -1970,14 +1994,13 @@ if __name__ == '__main__':
     print("Monomer Generator for AutoPoly")
     print("=" * 50)
     
-    # Example: Polyethylene
+    # Example: Polyethylene (3-monomer chain)
     try:
         files = generate_monomers(
-            smiles="[*]CC[*]",
+            smiles_list=['CC[*]', '[*]CC[*]', '[*]CC'],
             base_name="PE",
             force_field="gaff",
             output_dir="./test_monomers",
-            n_monomers=3,
             verbose=True
         )
         print(f"\nGenerated files: {files}")

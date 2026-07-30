@@ -176,8 +176,8 @@ def parse_lt_file(lt_file: str) -> MonomerTemplate:
     monomer_type = _determine_monomer_type(monomer_name)
 
     # Connection points are first two atoms
-    left_conn_coords = atoms[0].coords if monomer_type != "first" else atoms[0].coords
-    right_conn_coords = atoms[1].coords if monomer_type != "last" else atoms[1].coords
+    left_conn_coords = atoms[0].coords
+    right_conn_coords = atoms[1].coords
 
     left_conn_id = atoms[0].atom_id
     right_conn_id = atoms[1].atom_id
@@ -688,10 +688,42 @@ class ChainGrowthMC:
         if start_position is None:
             start_position = np.zeros(3)
 
+        templates = [self.load_monomer_template(f) for f in monomer_lt_files]
+        return self.grow_chain_from_templates(
+            templates, chain_id=chain_id, start_position=start_position
+        )
+
+    def grow_chain_from_templates(
+        self,
+        templates: List[MonomerTemplate],
+        chain_id: int = 0,
+        start_position: Optional[np.ndarray] = None
+    ) -> List[MonomerPlacement]:
+        """
+        Build a polymer chain from pre-built monomer templates.
+
+        Same algorithm as grow_chain(), but takes MonomerTemplate objects
+        directly instead of parsing them from .lt files. This lets the
+        force-field-agnostic geometry stage grow chains before any typed
+        .lt file exists.
+
+        Args:
+            templates: MonomerTemplate for each monomer in sequence
+            chain_id: Unique identifier for this chain
+            start_position: Starting position (default: origin)
+
+        Returns:
+            List of MonomerPlacement objects for each placed monomer
+
+        Raises:
+            RuntimeError: If chain growth fails after max_attempts
+        """
+        if start_position is None:
+            start_position = np.zeros(3)
+
         placements = []
 
-        for i, lt_file in enumerate(monomer_lt_files):
-            template = self.load_monomer_template(lt_file)
+        for i, template in enumerate(templates):
             monomer_radius = self._estimate_monomer_radius(template)
 
             placement = None
