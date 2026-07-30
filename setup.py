@@ -36,5 +36,11 @@ setup(
             'agent': [
                 'langchain-core>=0.3.0',
             ],
+            'docs': [
+                'mkdocs>=1.6.0',
+                'mkdocs-material>=9.5.0',
+                'mkdocstrings[python]>=0.26.0',
+                'pymdown-extensions>=10.0',
+            ],
         },
 )

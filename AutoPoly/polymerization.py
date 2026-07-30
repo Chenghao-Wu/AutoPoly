@@ -254,7 +254,7 @@ class Polymerization:
         """
         return monomer_processing.n_monomer_atoms(merltfile, self.path_cwd)
 
-    def extract_element_from_atom(self, atom_string: str):
+    def extract_element_from_atom(self, atom_string: str) -> Optional[str]:
         """
         Extract element name from atom identifier string.
 
@@ -262,12 +262,11 @@ class Polymerization:
             atom_string (str): Atom identifier like "$atom:C1", "$atom:H16", etc.
 
         Returns:
-            str: Element name (e.g., "C", "H", "Si", "Fe")
-            None: If no match found
+            str or None: Element name (e.g., "C", "H", "Si", "Fe"), or None if no match is found.
         """
         return monomer_processing.extract_element_from_atom(atom_string)
 
-    def read_lt_end_atoms(self, lt_file: str):
+    def read_lt_end_atoms(self, lt_file: str) -> tuple:
         """
         Read the first and second atoms from a .lt file.
 
@@ -275,12 +274,11 @@ class Polymerization:
             lt_file (str): Path to the .lt file
 
         Returns:
-            tuple: (first_atom, second_atom) where each atom is a string with
-                   element name and position (e.g., "C1", "H2")
+            tuple: (first_atom, second_atom) as strings with element name and position (e.g., "C1", "H2").
         """
         return monomer_processing.read_lt_end_atoms(lt_file)
 
-    def generate_monomer_from_psmiles(self, psmiles: str):
+    def generate_monomer_from_psmiles(self, psmiles: str) -> tuple:
         """
         Generate monomer from pSMILES/SMILES string.
 
@@ -291,9 +289,8 @@ class Polymerization:
             psmiles (str): pSMILES or SMILES string
 
         Returns:
-            tuple: (base_name, updated_counter) where:
-                - base_name: Generated monomer base name
-                - updated_counter: Incremented counter value
+            tuple: (base_name, updated_counter) — the generated monomer base name
+                and the incremented counter value.
         """
         base_name, counter = monomer_processing.generate_monomer_from_psmiles(
             psmiles,
@@ -348,7 +345,7 @@ class Polymerization:
         self._smiles_to_name_counter = counter
         return variant_mapping
 
-    def generate_molecule_from_smiles(self, smiles: str, molecule_name: str):
+    def generate_molecule_from_smiles(self, smiles: str, molecule_name: str) -> tuple:
         """
         Generate molecule from SMILES string.
 
@@ -360,9 +357,8 @@ class Polymerization:
             molecule_name (str): Name for the molecule (e.g., "water", "ethanol", "benzene")
 
         Returns:
-            tuple: (filename, updated_counter) where:
-                - filename: Generated molecule .lt filename
-                - updated_counter: Incremented counter value
+            tuple: (filename, updated_counter) — the generated molecule .lt filename
+                and the incremented counter value.
         """
         filename, counter = monomer_processing.generate_molecule_from_smiles(
             smiles,

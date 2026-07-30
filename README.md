@@ -2,6 +2,7 @@
 
 ![Python](https://img.shields.io/badge/python-3.7+-blue.svg)
 ![LAMMPS](https://img.shields.io/badge/LAMMPS-compatible-orange.svg)
+[![Docs](https://img.shields.io/badge/docs-mkdocs--material-blue)](https://wugroup-xjtlu.github.io/AutoPoly/)
 
 AutoPoly generates polymer structures and prepares them for molecular dynamics simulations with LAMMPS. Build everything from simple homopolymers to complex block copolymers with explicit sequence control.
 
@@ -90,7 +91,7 @@ sequence = [
 
 **Why it matters:** Standard SMILES can't distinguish first/middle/last positions. Complement SMILES gives you control over every monomer.
 
-[Deep dive: Complement SMILES Guide →](docs/COMPLEMENT_SMILES.md)
+[Deep dive: Complement SMILES Guide →](https://wugroup-xjtlu.github.io/AutoPoly/guides/complement-smiles/)
 
 ### Polymer vs Molecule
 
@@ -245,7 +246,7 @@ Polymer(
 **Key points:**
 - DOP is automatic from `len(sequence)`
 - Use complement SMILES: first=`"CC[*]"`, middle=`"[*]CC[*]"`, last=`"[*]CC"`
-- [Complete API →](docs/API.md#polymer)
+- [Complete API →](https://wugroup-xjtlu.github.io/AutoPoly/reference/polymer/)
 
 ### Molecule
 
@@ -259,7 +260,7 @@ Molecule(
 
 **Key point:** Use regular SMILES without `[*]` wildcards.
 
-[Complete API →](docs/API.md#molecule)
+[Complete API →](https://wugroup-xjtlu.github.io/AutoPoly/reference/molecule/)
 
 ### Polymerization
 
@@ -283,9 +284,9 @@ Polymerization(
 | DREIDING | `"dreiding"` | Generic, metals, inorganics |
 | COMPASS | `"compass"` | Commercial polymers |
 
-[Force field selection guide →](docs/FORCE_FIELDS.md)
+[Force field selection guide →](https://wugroup-xjtlu.github.io/AutoPoly/guides/force-fields/)
 
-[Complete API →](docs/API.md)
+[Complete API →](https://wugroup-xjtlu.github.io/AutoPoly/reference/)
 
 ## Force Field Selection
 
@@ -299,7 +300,7 @@ Quick guide:
 
 **Note:** Gasteiger charges are assigned automatically for GAFF/GAFF2. For production runs, replace them with AM1-BCC or RESP charges in `system.in.charges`.
 
-[Detailed comparison →](docs/FORCE_FIELDS.md)
+[Detailed comparison →](https://wugroup-xjtlu.github.io/AutoPoly/guides/force-fields/)
 
 ## Troubleshooting
 
@@ -320,7 +321,7 @@ Quick guide:
 **Moltemplate:**
 - `Moltemplate not found` → Install: `pip install moltemplate`
 
-[Full troubleshooting guide →](docs/TROUBLESHOOTING.md)
+[Full troubleshooting guide →](https://wugroup-xjtlu.github.io/AutoPoly/guides/troubleshooting/)
 
 ## Output Structure
 
@@ -343,16 +344,16 @@ lmp -in your_run.in   # with: include system.in.init / system.in.settings
 ## More Information
 
 **Documentation:**
-- 📖 [Complete API Reference](docs/API.md) - All classes and methods
-- 🧬 [Complement SMILES Guide](docs/COMPLEMENT_SMILES.md) - Deep dive on SMILES format
-- ⚙️ [Force Field Guide](docs/FORCE_FIELDS.md) - Detailed comparison of all 6 force fields
-- 🐛 [Troubleshooting](docs/TROUBLESHOOTING.md) - Solutions to common issues
+- 📖 [Complete API Reference](https://wugroup-xjtlu.github.io/AutoPoly/reference/) - All classes and methods
+- 🧬 [Complement SMILES Guide](https://wugroup-xjtlu.github.io/AutoPoly/guides/complement-smiles/) - Deep dive on SMILES format
+- ⚙️ [Force Field Guide](https://wugroup-xjtlu.github.io/AutoPoly/guides/force-fields/) - Detailed comparison of all 6 force fields
+- 🐛 [Troubleshooting](https://wugroup-xjtlu.github.io/AutoPoly/guides/troubleshooting/) - Solutions to common issues
 - 📝 [Examples Directory](examples/) - 12 working examples
 
 **Quick links:**
-- [Installation details](docs/TROUBLESHOOTING.md#installation-issues)
-- [Ring vs linear polymers](docs/COMPLEMENT_SMILES.md#ring-vs-linear-polymers)
-- [Common monomer SMILES](docs/COMPLEMENT_SMILES.md#common-monomers-reference)
+- [Installation details](https://wugroup-xjtlu.github.io/AutoPoly/guides/troubleshooting/#installation-issues)
+- [Ring vs linear polymers](https://wugroup-xjtlu.github.io/AutoPoly/guides/complement-smiles/#ring-vs-linear-polymers)
+- [Common monomer SMILES](https://wugroup-xjtlu.github.io/AutoPoly/guides/complement-smiles/#common-monomers-reference)
 
 ## Citation
 

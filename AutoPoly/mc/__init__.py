@@ -17,7 +17,7 @@ Main Classes:
 - ChainGrowthMC: Self-avoiding random walk for building polymer chains
 - MolecularPlacementMC: Random placement of polymers/molecules in simulation box
 
-Example Usage:
+Examples:
     >>> from AutoPoly.mc import CollisionDetector, ChainGrowthMC, MolecularPlacementMC
     >>> from AutoPoly.mc import calculate_box_size
     >>>

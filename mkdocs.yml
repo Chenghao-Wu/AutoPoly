@@ -1,0 +1,109 @@
+site_name: AutoPoly
+site_description: Automated Polymer Generation and Simulation Package
+site_author: Zhenghao Wu
+site_url: https://wugroup-xjtlu.github.io/AutoPoly/
+repo_url: https://github.com/WuGroup-XJTLU/AutoPoly
+repo_name: WuGroup-XJTLU/AutoPoly
+edit_uri: edit/v1.0/docs/
+copyright: Copyright &copy; 2026 Zhenghao Wu
+
+theme:
+  name: material
+  language: en
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - toc.follow
+    - content.code.copy
+    - content.action.edit
+    - search.highlight
+    - search.suggest
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_root_heading: true
+            show_source: true
+            show_signature_annotations: true
+            members_order: source
+            filters: ["!^_"]
+            summary: true
+
+markdown_extensions:
+  - admonition
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.snippets:
+      base_path:
+        - .
+      check_paths: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: getting-started/installation.md
+      - Quickstart: getting-started/quickstart.md
+  - User Guide:
+      - The 3-Step Workflow: guides/workflow.md
+      - Complement SMILES: guides/complement-smiles.md
+      - Polymers vs Molecules: guides/polymers-vs-molecules.md
+      - Force Fields: guides/force-fields.md
+      - "MC Placement & Chain Growth": guides/mc-placement.md
+      - Bead-Spring (Coarse-Grained): guides/bead-spring.md
+      - "Agent API & CLI": guides/agent.md
+      - Output Files: guides/output-files.md
+      - Troubleshooting: guides/troubleshooting.md
+  - Tutorials:
+      - Overview: tutorials/index.md
+      - "First Polymer: PMMA": tutorials/pmma-linear.md
+      - Block Copolymer (PE-PS-PE): tutorials/block-copolymer.md
+      - Condensation Polymer (PLA): tutorials/pla-condensation.md
+      - Polymer Solution (PEO + water): tutorials/peo-solution.md
+      - Small Molecules & Mixtures: tutorials/molecules.md
+      - Force Field Comparison: tutorials/force-field-comparison.md
+      - MC Placement Methods: tutorials/mc-placement.md
+      - Bead-Spring Models: tutorials/bead-spring.md
+  - Reference:
+      - Overview: reference/index.md
+      - System: reference/system.md
+      - Polymer: reference/polymer.md
+      - Molecule: reference/molecule.md
+      - Polymerization: reference/polymerization.md
+      - Bead-Spring: reference/bead-spring.md
+      - MonomerGenerator: reference/monomer-generator.md
+      - mc (Monte Carlo): reference/mc.md
+      - agent: reference/agent.md
+      - tools (LangChain): reference/tools.md
+      - CLI: reference/cli.md
+      - exceptions: reference/exceptions.md

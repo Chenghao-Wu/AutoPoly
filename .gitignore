@@ -19,3 +19,6 @@ __pycache__/
 *.backup
 # AutoPoly example outputs (regenerate by running examples/*.py)
 examples/*/
+
+# MkDocs build output
+site/
