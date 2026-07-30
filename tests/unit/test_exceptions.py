@@ -7,7 +7,7 @@ error handling and testing.
 
 import pytest
 from AutoPoly import Polymer
-from AutoPoly.exceptions import ValidationError, AutoPolyError
+from AutoPoly.core.exceptions import ValidationError, AutoPolyError
 
 
 class TestExceptions:
@@ -16,7 +16,7 @@ class TestExceptions:
     def test_zero_chain_num_raises_validation_error(self):
         """Test that zero chain_num raises ValidationError."""
         with pytest.raises(ValidationError, match="chain_num must be greater than 0"):
-            Polymer(chain_num=0, sequence=["[*]CC[*]"])
+            Polymer(chain_num=0, sequence=["CC[*]", "[*]CC"])
 
     def test_invalid_topology_raises_value_error(self):
         """Test that invalid topology raises ValueError."""

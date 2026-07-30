@@ -10,7 +10,7 @@ from rdkit.Chem import AllChem
 
 import pathlib
 
-from ..system import logger
+from ..core.system import logger
 
 
 def writeHeader(molname, loplsflag, gaffflag=False, dreidingflag=False, compassflag=False):

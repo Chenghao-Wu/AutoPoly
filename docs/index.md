@@ -13,12 +13,12 @@ AutoPoly generates polymer structures and prepares them for molecular dynamics s
 - **Ring & Linear** — both topologies supported
 - **SAW Placement** — Monte Carlo self-avoiding walk for realistic initial configurations
 - **Coarse-Grained Models** — bead-spring polymers written directly as LAMMPS data files
-- **Agent API & CLI** — config-driven JSON interface with LangChain tool wrappers
+- **Three-Stage Pipeline** — geometry → typing → packing as independently usable stages
 
 ## Your First Polymer in 3 Steps
 
 ```python
-from AutoPoly import System, Polymer, Polymerization
+from AutoPoly import System, Polymer, generate
 
 # Step 1: Create system
 system = System(out="my_polymer")
@@ -32,12 +32,7 @@ polymer = Polymer(
 )
 
 # Step 3: Generate LAMMPS files
-Polymerization(
-    name="polyethylene",
-    system=system,
-    model=[polymer],
-    force_field="oplsaa"
-)
+generate(system, "polyethylene", [polymer], force_field="oplsaa")
 ```
 
 **Output:** ready-to-run LAMMPS files (`system.data`, `system.in.init`, `system.in.settings`, `system.in.charges`) in `my_polymer/polyethylene/`.

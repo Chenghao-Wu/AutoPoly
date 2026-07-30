@@ -1,3 +1,3 @@
 # Bead-Spring
 
-::: AutoPoly.bead_spring
+::: AutoPoly.models.bead_spring

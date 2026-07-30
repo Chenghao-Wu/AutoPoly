@@ -6,14 +6,14 @@ from pathlib import Path
 import pytest
 from rdkit import Chem
 
-from AutoPoly.exceptions import ValidationError
-from AutoPoly.geometry import GeometryBuilder, GeometryConfig
-from AutoPoly.molecule import Molecule
-from AutoPoly.monomer_generator import SMARTSTyper
-from AutoPoly.polymer import Polymer
-from AutoPoly.system import System
-from AutoPoly.typing import UnitTyper
-from AutoPoly.units import UnitLibrary
+from AutoPoly.core.exceptions import ValidationError
+from AutoPoly.pipeline.geometry import GeometryBuilder, GeometryConfig
+from AutoPoly.models.molecule import Molecule
+from AutoPoly.monomers.monomer_generator import SMARTSTyper
+from AutoPoly.models.polymer import Polymer
+from AutoPoly.core.system import System
+from AutoPoly.pipeline.typing import UnitTyper
+from AutoPoly.pipeline.units import UnitLibrary
 
 PE_SEQUENCE = ["CC[*]", "[*]CC[*]", "[*]CC"]
 

@@ -18,7 +18,7 @@ Configuration:
 Requires: pip install -e .  (from the AutoPoly repo root)
 """
 
-from AutoPoly import System, Polymer, Polymerization
+from AutoPoly import System, Polymer, generate
 
 # Force fields to test
 FORCE_FIELDS = ["oplsaa", "gaff", "gaff2", "lopls", "dreiding", "compass"]
@@ -73,13 +73,12 @@ def test_force_field(force_field, output_base="peo_test"):
             tacticity=PEO_CONFIG["tacticity"]
         )
 
-        # Run polymerization
-        poly = Polymerization(
-            name=f"peo_{force_field}",
-            system=system,
-            model=[polymer],
+        # Run generation
+        generate(
+            system,
+            f"peo_{force_field}",
+            [polymer],
             force_field=force_field,
-            run=True
         )
 
         print(f"SUCCESS: {force_field} completed")

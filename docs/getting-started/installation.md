@@ -23,26 +23,17 @@ pip install -e .
 | Extra | Install | Provides |
 |---|---|---|
 | `dev` | `pip install -e ".[dev]"` | Test suite: pytest, pytest-cov, pytest-mock |
-| `agent` | `pip install -e ".[agent]"` | LangChain tool wrappers for the [agent API](../guides/agent.md) |
 | `docs` | `pip install -e ".[docs]"` | Build this documentation site locally with `mkdocs serve` |
 
 ## Verify the installation
 
 ```python
 import AutoPoly
-print(AutoPoly.__version__)   # 1.0.0
+print(AutoPoly.__version__)   # 2.0.0
 
-from AutoPoly import System, Polymer, Polymerization
+from AutoPoly import System, Polymer, generate
 print("All components available")
 ```
-
-You can also check the command-line interface:
-
-```bash
-autopoly info
-```
-
-This prints a JSON summary of force fields, topologies, limits, and example configs.
 
 ## Building the documentation locally
 

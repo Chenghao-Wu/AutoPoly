@@ -3,9 +3,9 @@
 import numpy as np
 import pytest
 
-from AutoPoly.exceptions import ValidationError
-from AutoPoly.geometry import GeometryBuilder, GeometryConfig
-from AutoPoly.packer import BoxPacker
+from AutoPoly.core.exceptions import ValidationError
+from AutoPoly.pipeline.geometry import GeometryBuilder, GeometryConfig
+from AutoPoly.pipeline.packer import BoxPacker
 from AutoPoly.packing import (
     PlacementStrategy,
     PackingContext,
@@ -15,10 +15,10 @@ from AutoPoly.packing import (
 )
 from AutoPoly.packing.base import BoxSpec
 from AutoPoly.packing.random_mc import compute_auto_box_size
-from AutoPoly.polymer import Polymer
-from AutoPoly.system import System
-from AutoPoly.typing import UnitTyper
-from AutoPoly.units import UnitLibrary, UnitSpec
+from AutoPoly.models.polymer import Polymer
+from AutoPoly.core.system import System
+from AutoPoly.pipeline.typing import UnitTyper
+from AutoPoly.pipeline.units import UnitLibrary, UnitSpec
 
 PE_SEQUENCE = ["CC[*]", "[*]CC[*]", "[*]CC"]
 

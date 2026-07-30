@@ -129,7 +129,7 @@ pip install -e /path/to/AutoPoly
 
 ### RDKit-related import warnings
 
-`System`, `BeadSpringPolymer`, and the agent API work without RDKit, but `Polymer`, `Molecule`, `Polymerization`, and `MonomerGenerator` require it. Install RDKit (`pip install rdkit` or `conda install -c conda-forge rdkit`) for full functionality.
+`System` and `BeadSpringPolymer` work without RDKit, but `Polymer`, `Molecule`, `generate`, and `MonomerGenerator` require it. Install RDKit (`pip install rdkit` or `conda install -c conda-forge rdkit`) for full functionality.
 
 ## Performance Issues
 
@@ -137,7 +137,7 @@ pip install -e /path/to/AutoPoly
 
 - **Start small** — 2–5 chains, DOP 10–20 — then scale up
 - **Use bead-spring** for very large systems: `BeadSpringPolymer` bypasses moltemplate entirely (see the [Bead-Spring guide](bead-spring.md))
-- **Tune MC placement** — lower `mc_monomer_density` or raise `mc_max_attempts` if placement retries dominate (see [MC Placement](mc-placement.md))
+- **Tune MC placement** — lower `monomer_density` or raise `mc_max_attempts` if placement retries dominate (see [MC Placement](mc-placement.md))
 
 ### Memory errors
 

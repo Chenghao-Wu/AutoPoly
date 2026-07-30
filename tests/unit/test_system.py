@@ -3,7 +3,7 @@
 import pytest
 import shutil
 from pathlib import Path
-from AutoPoly.system import System
+from AutoPoly.core.system import System
 
 
 class TestSystemInitialization:

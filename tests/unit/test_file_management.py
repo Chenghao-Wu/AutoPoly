@@ -3,10 +3,10 @@
 import pytest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
-from AutoPoly.file_management import create_working_directory
-from AutoPoly.file_management import get_rid_of_lj_cut_coul_long
-from AutoPoly.file_management import mv_files
-from AutoPoly.exceptions import WorkflowError
+from AutoPoly.core.file_management import create_working_directory
+from AutoPoly.core.file_management import get_rid_of_lj_cut_coul_long
+from AutoPoly.core.file_management import mv_files
+from AutoPoly.core.exceptions import WorkflowError
 
 
 class TestCreateWorkingDirectory:
@@ -148,9 +148,9 @@ class TestMoveFiles:
 
         mv_files(str(work_dir))
 
-        # Should create output/ and input/ subdirectories in parent
-        output_dir = tmp_path / "simulation" / "output"
-        input_dir = tmp_path / "simulation" / "input"
+        # Should create output/ and input/ subdirectories in the working dir
+        output_dir = work_dir / "output"
+        input_dir = work_dir / "input"
         assert output_dir.exists()
         assert input_dir.exists()
         assert output_dir.is_dir()
@@ -188,7 +188,7 @@ class TestMoveFiles:
         mv_files(str(work_dir))
 
         # Verify .in* files in output/
-        final_output = tmp_path / "simulation" / "output"
+        final_output = work_dir / "output"
         assert (final_output / "system.in").exists()
         assert (final_output / "system.init").exists()
         assert (final_output / "output_ttree").exists()
@@ -206,7 +206,7 @@ class TestMoveFiles:
         mv_files(str(work_dir))
 
         # Verify .lt and .prm files in input/
-        input_dir = tmp_path / "simulation" / "input"
+        input_dir = work_dir / "input"
         assert (input_dir / "PE.lt").exists()
         assert (input_dir / "PS.lt").exists()
         assert (input_dir / "oplsaa.prm").exists()
@@ -227,8 +227,8 @@ class TestMoveFiles:
         mv_files(str(work_dir))
 
         # Verify directories are still created
-        output_dir = tmp_path / "simulation" / "output"
-        input_dir = tmp_path / "simulation" / "input"
+        output_dir = work_dir / "output"
+        input_dir = work_dir / "input"
         assert output_dir.exists()
         assert input_dir.exists()
 
@@ -244,7 +244,7 @@ class TestMoveFiles:
         mv_files(str(work_dir))
 
         # Verify system.data is copied to parent and also moved to output
-        output_dir = tmp_path / "simulation" / "output"
+        output_dir = work_dir / "output"
         parent_dir = tmp_path / "simulation"
         assert (output_dir / "system.data").exists()
         assert (parent_dir / "system.data").exists()  # Copied first, then moved

@@ -5,15 +5,15 @@ import json
 import numpy as np
 import pytest
 
-from AutoPoly.exceptions import GenerationError, ValidationError
-from AutoPoly.geometry import (
+from AutoPoly.core.exceptions import GenerationError, ValidationError
+from AutoPoly.pipeline.geometry import (
     GEOMETRY_FILENAME,
     GeometryBuilder,
     GeometryConfig,
 )
-from AutoPoly.molecule import Molecule
-from AutoPoly.polymer import Polymer
-from AutoPoly.system import System
+from AutoPoly.models.molecule import Molecule
+from AutoPoly.models.polymer import Polymer
+from AutoPoly.core.system import System
 
 PE_SEQUENCE = ["CC[*]", "[*]CC[*]", "[*]CC"]
 ABA_SEQUENCE = [
@@ -72,7 +72,7 @@ class TestLinearGeometry:
 
     def test_variant_map_numbers_are_chain_atoms(self, tmp_path):
         """Every variant atom map number must exist in the chain graph."""
-        from AutoPoly.typing import mol_from_mapped_smiles
+        from AutoPoly.pipeline.typing import mol_from_mapped_smiles
 
         system = System(out=str(tmp_path / "out"))
         poly = Polymer(chain_num=1, sequence=ABA_SEQUENCE, tacticity="atactic")

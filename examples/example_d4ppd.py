@@ -10,7 +10,7 @@ with a larger, drug-like organic molecule and the GAFF2 force field
 Requires: pip install -e .  (from the AutoPoly repo root)
 """
 
-from AutoPoly import System, Molecule, Polymerization
+from AutoPoly import System, Molecule, generate
 
 # D4PPD: a diaryl-p-phenylenediamine antioxidant
 D4PPD_SMILES = "CC(C)Nc1c(C)cc(Nc2ccc(C)cc2)cc1"
@@ -23,12 +23,7 @@ d4ppd = Molecule(
     Name="d4ppd",
 )
 
-Polymerization(
-    name="d4ppd",
-    system=system,
-    model=[d4ppd],
-    force_field="gaff2",  # GAFF2 (extended atom types, e.g. nq)
-)
+generate(system, "d4ppd", [d4ppd], force_field="gaff2")  # GAFF2 (extended atom types, e.g. nq)
 
 print("D4PPD system created successfully!")
 print("Output directory: d4ppd/d4ppd/")

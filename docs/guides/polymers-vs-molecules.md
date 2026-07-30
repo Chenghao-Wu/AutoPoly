@@ -49,10 +49,10 @@ Note the capitalized parameter names (`Count`, `Smiles`, `Name`) — `Molecule` 
 
 ## Mixed systems
 
-Pass both classes together in the `model` list to build polymer solutions, melts with additives, or multi-solvent mixtures:
+Pass both classes together in the `models` list to build polymer solutions, melts with additives, or multi-solvent mixtures:
 
 ```python
-from AutoPoly import System, Polymer, Molecule, Polymerization
+from AutoPoly import System, Polymer, Molecule, generate
 
 system = System(out="solution")
 
@@ -62,10 +62,10 @@ polymer = Polymer(
 )
 water = Molecule(Count=200, Smiles="O", Name="water")
 
-Polymerization(
-    name="peo_solution",
-    system=system,
-    model=[polymer, water],     # polymers and molecules mix freely
+generate(
+    system,
+    "peo_solution",
+    [polymer, water],     # polymers and molecules mix freely
     force_field="gaff",
 )
 ```

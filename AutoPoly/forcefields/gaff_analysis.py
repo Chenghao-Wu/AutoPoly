@@ -33,9 +33,9 @@ Created on 2025-01-06
 import shutil
 from pathlib import Path
 from typing import Set, Dict, List, Tuple, Optional
-from .system import logger
-from .exceptions import GenerationError
-from .monomer_processing import (
+from ..core.system import logger
+from ..core.exceptions import GenerationError
+from ..monomers.monomer_processing import (
     collect_monomer_files,
     extract_atom_types_from_lt,
     parse_bond_graph,

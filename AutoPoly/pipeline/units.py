@@ -23,7 +23,7 @@ from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-from .exceptions import ValidationError
+from ..core.exceptions import ValidationError
 
 FORMAT_VERSION = 1
 MANIFEST_FILENAME = "units.json"

@@ -26,17 +26,17 @@ from typing import Any, Dict, List, Optional, Union
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
-from .system import logger
-from .conf import FORCE_FIELD_REGISTRY
-from .exceptions import ValidationError
+from ..core.system import logger
+from ..core.conf import FORCE_FIELD_REGISTRY
+from ..core.exceptions import ValidationError
 from .geometry import GEOMETRY_DIRNAME, GeometryBuilder
-from .monomer_generator import (
+from ..monomers.monomer_generator import (
     AtomTypingError,
     SMARTSTyper,
     write_lt_footer,
     write_lt_header,
 )
-from .monomer_processing import read_lt_end_atoms
+from ..monomers.monomer_processing import read_lt_end_atoms
 from .units import UnitLibrary, UnitSpec
 
 BUILD_DIRNAME = "build"

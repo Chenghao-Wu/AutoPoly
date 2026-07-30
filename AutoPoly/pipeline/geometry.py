@@ -34,16 +34,16 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 from rdkit import Chem
 
-from .system import logger
-from .exceptions import GenerationError
-from .mc import (
+from ..core.system import logger
+from ..core.exceptions import GenerationError
+from ..mc import (
     AtomData,
     CollisionDetector,
     ChainGrowthMC,
     MonomerTemplate,
     calculate_box_size,
 )
-from .monomer_generator import (
+from ..monomers.monomer_generator import (
     GEOM_MAP_PROP,
     BackboneAligner,
     ChainBuilder,
@@ -216,7 +216,7 @@ class GeometryBuilder:
     @staticmethod
     def load(geometry_dir: str) -> Dict[str, Any]:
         """Load a geometry.json artifact and check its format version."""
-        from .exceptions import ValidationError
+        from ..core.exceptions import ValidationError
 
         path = Path(geometry_dir) / GEOMETRY_FILENAME
         if not path.is_file():
@@ -331,7 +331,7 @@ class GeometryBuilder:
         per-atom map numbers) gets a conformer; atom map numbers are stashed
         in the geom_map property for the stage-2 type join.
         """
-        from .monomer_generator import MonomerVariant
+        from ..monomers.monomer_generator import MonomerVariant
 
         mol = self._conformer_gen.generate_conformer(Chem.Mol(chain_mol))
         for atom in mol.GetAtoms():

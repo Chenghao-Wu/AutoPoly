@@ -1,7 +1,7 @@
 """Tests for the Molecule class."""
 
 import pytest
-from AutoPoly.molecule import Molecule
+from AutoPoly.models.molecule import Molecule
 
 
 class TestMoleculeInitialization:

@@ -18,7 +18,7 @@ Key concepts:
   - OPLS-AA is the recommended force field for vinyl polymers.
 
 Workflow:
-  System -> Polymer -> Polymerization -> moltemplate -> LAMMPS files
+  System -> Polymer -> generate -> moltemplate -> LAMMPS files
 
 Output (pmma_tutorial/pmma/):
   system.data          topology + coordinates (LAMMPS read_data)
@@ -29,7 +29,7 @@ Output (pmma_tutorial/pmma/):
 Requires: pip install -e .  (from the AutoPoly repo root)
 """
 
-from AutoPoly import System, Polymer, Polymerization
+from AutoPoly import System, Polymer, generate
 
 # ---------------------------------------------------------------------------
 # Step 1: Complement SMILES for methyl methacrylate (vinyl addition, C-C backbone)
@@ -69,14 +69,14 @@ for key, value in info.items():
     print(f"  {key}: {value}")
 
 # ---------------------------------------------------------------------------
-# Step 4: Run the polymerization pipeline.
+# Step 4: Run the generation pipeline.
 # This generates monomer .lt templates, grows the chains, invokes
 # moltemplate, and writes the LAMMPS input files.
 # ---------------------------------------------------------------------------
-Polymerization(
-    name="pmma",
-    system=system,
-    model=[pmma],
+generate(
+    system,
+    "pmma",
+    [pmma],
     force_field="oplsaa",   # recommended for vinyl polymers
 )
 

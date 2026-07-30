@@ -18,7 +18,7 @@ After this implementation:
 - System is ready for simulation
 """
 
-from AutoPoly import System, Polymer, Polymerization
+from AutoPoly import System, Polymer, generate
 
 # Create system
 system = System(out="pmma_gasteiger")
@@ -39,16 +39,16 @@ polymer = Polymer(
     tacticity="atactic"  # Random stereochemistry
 )
 
-# Run polymerization with GAFF
+# Run generation with GAFF
 # Gasteiger charges are calculated automatically!
-polymerization = Polymerization(
-    name="pmma_gasteiger",
-    system=system,
-    model=[polymer],
+generate(
+    system,
+    "pmma_gasteiger",
+    [polymer],
     force_field="gaff"  # GAFF force field - no special configuration needed
 )
 
-print("✓ PMMA polymerization with GAFF complete!")
+print("✓ PMMA generation with GAFF complete!")
 print("✓ Gasteiger charges were calculated automatically")
 print(f"✓ Output files in: {system.out}")
 print()

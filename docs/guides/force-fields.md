@@ -1,6 +1,6 @@
 # Force Fields
 
-AutoPoly supports six force fields. Pass one as the `force_field` string to `Polymerization`:
+AutoPoly supports six force fields. Pass one as the `force_field` string to `generate`:
 
 | Force Field | Value | Best For | Limitations |
 |------------|-------|----------|-------------|
@@ -74,14 +74,14 @@ System type?
 
 ### Don't mix force fields across components
 
-One `Polymerization` call uses one force field for everything in `model`. That is the correct behavior — never combine, say, an OPLS-AA polymer with a GAFF solvent in one box without validated combination rules:
+One `generate` call uses one force field for everything in `models`. That is the correct behavior — never combine, say, an OPLS-AA polymer with a GAFF solvent in one box without validated combination rules:
 
 ```python
 # GOOD: one force field covers all components
-Polymerization(
-    name="compatible_system",
-    system=system,
-    model=[polymer, solvent],
+generate(
+    system,
+    "compatible_system",
+    [polymer, solvent],
     force_field="gaff",
 )
 ```
@@ -104,4 +104,4 @@ DREIDING's generic parameters are for exploration. Generate and equilibrate the 
 
 - [Force Field Comparison tutorial](../tutorials/force-field-comparison.md) — the same polymer built with all six
 - [Gasteiger charges example](../tutorials/index.md) — automatic charge assignment with GAFF
-- [Polymerization API](../reference/polymerization.md) — the `force_field` parameter
+- [generate API](../reference/generate.md) — the `force_field` parameter

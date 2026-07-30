@@ -1,3 +1,3 @@
 # MonomerGenerator
 
-::: AutoPoly.monomer_generator
+::: AutoPoly.monomers.monomer_generator

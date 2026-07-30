@@ -25,7 +25,7 @@ are well validated. Gasteiger charges are assigned automatically.
 Requires: pip install -e .  (from the AutoPoly repo root)
 """
 
-from AutoPoly import System, Polymer, Polymerization
+from AutoPoly import System, Polymer, generate
 
 PLA_FIRST = "OC(C)C(=O)[*]"
 PLA_MIDDLE = "[*]OC(C)C(=O)[*]"
@@ -43,10 +43,10 @@ pla = Polymer(
     tacticity="atactic",
 )
 
-Polymerization(
-    name="pla",
-    system=system,
-    model=[pla],
+generate(
+    system,
+    "pla",
+    [pla],
     force_field="gaff",  # well-validated ester parameters
 )
 

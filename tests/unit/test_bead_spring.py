@@ -7,7 +7,7 @@ import numpy as np
 from pathlib import Path
 from unittest.mock import MagicMock
 
-from AutoPoly.bead_spring import (
+from AutoPoly.models.bead_spring import (
     BeadSpringPolymer, BeadType, AngleType, MCConfig, SAWConfig,
     calculate_box_size, compute_lj_energy, compute_bond_energy,
     compute_total_energy, metropolis_accept,

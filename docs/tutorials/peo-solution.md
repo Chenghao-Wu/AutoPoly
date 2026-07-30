@@ -4,7 +4,7 @@ This tutorial mixes the `Polymer` and `Molecule` classes in one system: poly(eth
 
 You will learn:
 
-- How to pass polymers **and** molecules together in `Polymerization(model=[...])`
+- How to pass polymers **and** molecules together in `generate(system, name, [...])`
 - The two SMILES conventions side by side: wildcards for the polymer, plain SMILES for the solvent
 - Why GAFF is a convenient single force field for mixed organic systems
 

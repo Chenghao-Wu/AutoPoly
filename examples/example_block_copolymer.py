@@ -15,7 +15,7 @@ Created on 2026-01-13
 @author: zwu
 """
 
-from AutoPoly import System, Polymer, Polymerization
+from AutoPoly import System, Polymer, generate
 
 # Create system
 system = System(out="aba_triblock")
@@ -56,15 +56,9 @@ print(f"\nComplete chain info:")
 for key, value in info.items():
     print(f"  {key}: {value}")
 
-# Run the polymerization — this generates the LAMMPS input files
+# Run the generation — this creates the LAMMPS input files
 # (monomer templates -> chain growth -> moltemplate -> system.data)
-polyz = Polymerization(
-    name="aba_triblock",
-    system=system,
-    model=[poly],
-    force_field="oplsaa",
-    run=True
-)
+generate(system, "aba_triblock", [poly], force_field="oplsaa")
 
 print(f"\nLAMMPS input files written to: aba_triblock/aba_triblock/")
 print(f"  system.data          topology + coordinates (read_data)")

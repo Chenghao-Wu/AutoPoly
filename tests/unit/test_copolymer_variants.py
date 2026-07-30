@@ -15,7 +15,7 @@ bonds.
 import numpy as np
 import pytest
 
-from AutoPoly import monomer_processing
+from AutoPoly.monomers import monomer_processing
 from AutoPoly.mc import CollisionDetector, ChainGrowthMC
 
 # ABA triblock: two chemically distinct middle monomers (PE and PS)

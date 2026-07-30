@@ -33,11 +33,11 @@ import subprocess
 import shutil
 import numpy as np
 from typing import List, Optional, Set, Dict, Tuple
-from .system import logger
+from ..core.system import logger
 from .gaff_analysis import GAFFAnalyzer
-from .conf import FORCE_FIELD_REGISTRY
-from .exceptions import GenerationError, WorkflowError
-from .monomer_processing import (
+from ..core.conf import FORCE_FIELD_REGISTRY
+from ..core.exceptions import GenerationError, WorkflowError
+from ..monomers.monomer_processing import (
     collect_monomer_files,
     extract_atom_types_from_lt,
     parse_bond_graph,

@@ -27,12 +27,12 @@ from typing import Optional, Union
 
 import numpy as np
 
-from .system import logger
-from .conf import FORCE_FIELD_REGISTRY
-from .exceptions import WorkflowError
-from .file_management import get_rid_of_lj_cut_coul_long, mv_files
-from .force_field import ForceFieldManager
-from .packing import (
+from ..core.system import logger
+from ..core.conf import FORCE_FIELD_REGISTRY
+from ..core.exceptions import WorkflowError
+from ..core.file_management import get_rid_of_lj_cut_coul_long, mv_files
+from ..forcefields.force_field import ForceFieldManager
+from ..packing import (
     BoxSpec,
     PackingContext,
     PlacementResult,
@@ -92,7 +92,7 @@ class BoxPacker:
         self.rng_seed = rng_seed
         self.run_moltemplate = run_moltemplate
 
-        self.path_master = str(Path(__file__).parent.resolve() / "extern/")
+        self.path_master = str(Path(__file__).parent.parent.resolve() / "extern/")
         self.path_moltemplatesrc = str(
             Path(self.path_master) / "moltemplate" / "scripts/"
         )

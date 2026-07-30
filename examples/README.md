@@ -31,6 +31,12 @@ Output directories are git-ignored — just re-run a script to regenerate them.
 | `example_peo_all_forcefields.py` | PEO | all 6 | Force field comparison (oplsaa, lopls, gaff, gaff2, dreiding, compass) |
 | `example_peo_mc_placement.py` | PEO | OPLS-AA | Placement methods: grid vs MC random vs MC chain growth |
 
+### Pipeline API
+
+| Script | Demonstrates |
+|---|---|
+| `example_three_stage_pipeline.py` | Stage-level API: `GeometryBuilder` → `UnitTyper` → `BoxPacker`; one geometry typed under multiple force fields |
+
 ### Molecules and mixtures
 
 | Script | System | Force field | Demonstrates |

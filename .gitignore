@@ -22,3 +22,9 @@ examples/*/
 
 # MkDocs build output
 site/
+
+# Test/coverage artifacts
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/

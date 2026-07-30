@@ -2,14 +2,19 @@
 
 import pytest
 from pathlib import Path
-from AutoPoly.system import System
-from AutoPoly.polymer import Polymer
-from AutoPoly.molecule import Molecule
+from AutoPoly.core.system import System
+from AutoPoly.models.polymer import Polymer
+from AutoPoly.models.molecule import Molecule
 
 
 @pytest.mark.integration
 class TestFullWorkflow:
     """Test complete polymer generation workflow."""
+
+    @staticmethod
+    def _pe_sequence(n):
+        """Valid n-monomer PE pSMILES sequence (first=1 wildcard, middle=2, last=1)."""
+        return ["CC[*]"] + ["[*]CC[*]"] * (n - 2) + ["[*]CC"]
 
     def test_pe_linear_polymer_workflow_structure(self, tmp_path):
         """Test PE linear polymer generation structure."""
@@ -18,7 +23,7 @@ class TestFullWorkflow:
         system = System(out=str(output_dir))
 
         # Create polymer
-        poly = Polymer(chain_num=1, sequence=["PE"] * 5, tacticity="isotactic")
+        poly = Polymer(chain_num=1, sequence=self._pe_sequence(5), tacticity="isotactic")
         poly.set_Sequence()
 
         # Verify polymer structure
@@ -32,7 +37,9 @@ class TestFullWorkflow:
         output_dir = tmp_path / "ps_test"
         system = System(out=str(output_dir))
 
-        poly = Polymer(chain_num=1, sequence=["PS"] * 3, tacticity="atactic")
+        poly = Polymer(chain_num=1, sequence=[
+            "CC(c1ccccc1)[*]", "[*]CC(c1ccccc1)[*]", "[*]CC(c1ccccc1)"
+        ], tacticity="atactic")
         poly.set_Sequence()
 
         # Verify chirality is assigned (random but deterministic)
@@ -57,21 +64,21 @@ class TestFullWorkflow:
         output_dir = tmp_path / "copolymer_test"
         system = System(out=str(output_dir))
 
-        poly = Polymer(chain_num=1, sequence=["PE", "PS", "PE", "PS"])
+        poly = Polymer(chain_num=1, sequence=["CC[*]", "[*]C=C[*]", "[*]CC[*]", "[*]C=C"])
         poly.set_Sequence()
 
         # Verify copolymer structure
         assert len(poly.sequenceSet[0]) == 4
         mer_set = poly.get_mer_set()
-        assert "PE" in mer_set
-        assert "PS" in mer_set
+        assert "[*]C=C[*]" in mer_set
+        assert "CC[*]" in mer_set
 
     def test_ring_polymer_workflow(self, tmp_path):
         """Test ring polymer topology."""
         output_dir = tmp_path / "ring_test"
         system = System(out=str(output_dir))
 
-        poly = Polymer(chain_num=1, sequence=["PE"] * 5, topology="ring")
+        poly = Polymer(chain_num=1, sequence=self._pe_sequence(5), topology="ring")
         poly.set_Sequence()
 
         # Verify ring topology
@@ -83,7 +90,7 @@ class TestFullWorkflow:
         output_dir = tmp_path / "multi_chain_test"
         system = System(out=str(output_dir))
 
-        poly = Polymer(chain_num=3, sequence=["PE"] * 4, tacticity="isotactic")
+        poly = Polymer(chain_num=3, sequence=self._pe_sequence(4), tacticity="isotactic")
         poly.set_Sequence()
 
         # Verify multiple chains
@@ -96,7 +103,7 @@ class TestFullWorkflow:
         output_dir = tmp_path / "syndiotactic_test"
         system = System(out=str(output_dir))
 
-        poly = Polymer(chain_num=1, sequence=["PE"] * 6, tacticity="syndiotactic")
+        poly = Polymer(chain_num=1, sequence=self._pe_sequence(6), tacticity="syndiotactic")
         poly.set_Sequence()
 
         # Verify alternating chirality

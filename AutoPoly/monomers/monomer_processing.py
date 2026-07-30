@@ -15,9 +15,9 @@ import numpy as np
 from pathlib import Path
 from typing import Tuple, List, Dict, Optional, Set, Any, Callable, Iterator
 
-from .system import logger
+from ..core.system import logger
 from .monomer_generator import MonomerGenerator
-from .exceptions import GenerationError
+from ..core.exceptions import GenerationError
 
 
 # =============================================================================

@@ -3,7 +3,7 @@
 import pytest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
-from AutoPoly.monomer_processing import (
+from AutoPoly.monomers.monomer_processing import (
     generate_monomer_from_psmiles,
     generate_molecule_from_smiles,
     n_monomer_atoms,
@@ -16,7 +16,7 @@ from AutoPoly.monomer_processing import (
 class TestGenerateMonomerFromPsmiles:
     """Test monomer generation from pSMILES."""
 
-    @patch('AutoPoly.monomer_processing.MonomerGenerator')
+    @patch('AutoPoly.monomers.monomer_processing.MonomerGenerator')
     def test_generate_monomer_from_psmiles_creates_generator(self, mock_generator_class, tmp_path):
         """Test that MonomerGenerator is called with correct parameters."""
         mock_generator = MagicMock()
@@ -41,7 +41,7 @@ class TestGenerateMonomerFromPsmiles:
         assert call_kwargs['output_dir'] == str(tmp_path)
         assert call_kwargs['verbose'] is False
 
-    @patch('AutoPoly.monomer_processing.MonomerGenerator')
+    @patch('AutoPoly.monomers.monomer_processing.MonomerGenerator')
     def test_generate_monomer_from_psmiles_calls_generation_methods(self, mock_generator_class, tmp_path):
         """Test that from_smiles and write_lt_files are called."""
         mock_generator = MagicMock()
@@ -62,7 +62,7 @@ class TestGenerateMonomerFromPsmiles:
         mock_generator.from_smiles.assert_called_once_with(smiles="[*]C=C[*]", n_monomers=3)
         mock_generator.write_lt_files.assert_called_once_with([], generate_t1=True)
 
-    @patch('AutoPoly.monomer_processing.MonomerGenerator')
+    @patch('AutoPoly.monomers.monomer_processing.MonomerGenerator')
     def test_generate_monomer_from_psmiles_caches_result(self, mock_generator_class, tmp_path):
         """Test that second call uses cache."""
         mock_generator = MagicMock()
@@ -93,7 +93,7 @@ class TestGenerateMonomerFromPsmiles:
         assert mock_generator.from_smiles.call_count == 1
         assert result_name1 == result_name2
 
-    @patch('AutoPoly.monomer_processing.MonomerGenerator')
+    @patch('AutoPoly.monomers.monomer_processing.MonomerGenerator')
     def test_generate_monomer_from_psmiles_increments_counter(self, mock_generator_class, tmp_path):
         """Test that counter is incremented correctly."""
         mock_generator = MagicMock()
@@ -118,7 +118,7 @@ class TestGenerateMonomerFromPsmiles:
 class TestGenerateMoleculeFromSmiles:
     """Test molecule generation from SMILES."""
 
-    @patch('AutoPoly.monomer_processing.MonomerGenerator')
+    @patch('AutoPoly.monomers.monomer_processing.MonomerGenerator')
     def test_generate_molecule_from_smiles_creates_generator(self, mock_generator_class, tmp_path):
         """Test that MonomerGenerator is called with correct parameters."""
         mock_generator = MagicMock()
@@ -143,7 +143,7 @@ class TestGenerateMoleculeFromSmiles:
         assert call_kwargs['force_field'] == 'oplsaa'
         assert call_kwargs['output_dir'] == str(tmp_path)
 
-    @patch('AutoPoly.monomer_processing.MonomerGenerator')
+    @patch('AutoPoly.monomers.monomer_processing.MonomerGenerator')
     def test_generate_molecule_from_smiles_calls_single_molecule(self, mock_generator_class, tmp_path):
         """Test that from_single_molecule is called."""
         mock_generator = MagicMock()
@@ -165,7 +165,7 @@ class TestGenerateMoleculeFromSmiles:
         mock_generator.from_single_molecule.assert_called_once_with(smiles="CCO", molecule_name="ethanol")
         mock_generator.write_single_molecule.assert_called_once_with(mock_variant, generate_t1=False)
 
-    @patch('AutoPoly.monomer_processing.MonomerGenerator')
+    @patch('AutoPoly.monomers.monomer_processing.MonomerGenerator')
     def test_generate_molecule_from_smiles_caches_result(self, mock_generator_class, tmp_path):
         """Test that molecule generation is cached."""
         mock_generator = MagicMock()
@@ -233,7 +233,7 @@ class TestNMonomerAtoms:
 
     def test_n_monomer_atoms_missing_file_raises_system_exit(self, tmp_path):
         """Test that missing file raises GenerationError."""
-        from AutoPoly.exceptions import GenerationError
+        from AutoPoly.core.exceptions import GenerationError
         with pytest.raises(GenerationError, match="Monomer file not found"):
             n_monomer_atoms("nonexistent.lt", str(tmp_path))
 

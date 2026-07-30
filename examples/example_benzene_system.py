@@ -11,7 +11,7 @@ GAFF is recommended for small organic molecules with aromatic rings.
 Requires: pip install -e .  (from the AutoPoly repo root)
 """
 
-from AutoPoly import System, Molecule, Polymerization
+from AutoPoly import System, Molecule, generate
 
 system = System(out="benzene_system_100")
 
@@ -21,12 +21,7 @@ benzene = Molecule(
     Name="benzene",
 )
 
-Polymerization(
-    name="benzene_100",
-    system=system,
-    model=[benzene],
-    force_field="gaff",
-)
+generate(system, "benzene_100", [benzene], force_field="gaff")
 
 print("Benzene system created successfully!")
 print("Output directory: benzene_system_100/benzene_100/")

@@ -18,8 +18,8 @@ Created on 2026-07-30
 """
 import numpy as np
 
-from ..system import logger
-from ..units import UNIT_KIND_POLYMER
+from ..core.system import logger
+from ..pipeline.units import UNIT_KIND_POLYMER
 from .base import (
     BoxSpec,
     PackingContext,

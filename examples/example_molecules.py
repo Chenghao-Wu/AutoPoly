@@ -29,7 +29,7 @@ Requires: pip install -e .  (from the AutoPoly repo root)
 
 import argparse
 
-from AutoPoly import System, Molecule, Polymer, Polymerization
+from AutoPoly import System, Molecule, Polymer, generate
 
 FORCE_FIELD = "gaff"  # GAFF recommended for small molecules
 
@@ -49,12 +49,7 @@ def example_single_molecule():
 
     water = Molecule(Count=100, Smiles="O", Name="water")
 
-    Polymerization(
-        name="water_box",
-        system=system,
-        model=[water],
-        force_field=FORCE_FIELD,
-    )
+    generate(system, "water_box", [water], force_field=FORCE_FIELD)
 
     print("\nExample 1 completed: water_box/water_box/")
 
@@ -70,10 +65,10 @@ def example_molecule_mixture():
     water = Molecule(Count=100, Smiles="O", Name="water")
     ethanol = Molecule(Count=20, Smiles="CCO", Name="ethanol")
 
-    Polymerization(
-        name="water_ethanol",
-        system=system,
-        model=[water, ethanol],  # multiple components in one system
+    generate(
+        system,
+        "water_ethanol",
+        [water, ethanol],  # multiple components in one system
         force_field=FORCE_FIELD,
     )
 
@@ -96,10 +91,10 @@ def example_polymer_molecule_mixture():
 
     water = Molecule(Count=100, Smiles="O", Name="water")
 
-    Polymerization(
-        name="pe_water",
-        system=system,
-        model=[pe, water],  # Polymer and Molecule mix freely
+    generate(
+        system,
+        "pe_water",
+        [pe, water],  # Polymer and Molecule mix freely
         force_field=FORCE_FIELD,
     )
 

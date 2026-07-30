@@ -14,7 +14,7 @@ The logging system includes:
 - Centralized configuration through the conf module
 
 Usage:
-    from .logger import setup_logger
+    from AutoPoly.core.logger import setup_logger
     logger = setup_logger()
     logger.info("Your message here")
 """

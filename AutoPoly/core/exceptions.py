@@ -38,7 +38,7 @@ class ValidationError(AutoPolyError):
     - Invalid SMILES strings
 
     Example:
-        >>> from AutoPoly.exceptions import ValidationError
+        >>> from AutoPoly.core.exceptions import ValidationError
         >>> try:
         ...     Polymer(ChainNum=0, Sequence=["[*]CC[*]"])
         ... except ValidationError as e:
@@ -59,7 +59,7 @@ class GenerationError(AutoPolyError):
     - Moltemplate file generation errors
 
     Example:
-        >>> from AutoPoly.exceptions import GenerationError
+        >>> from AutoPoly.core.exceptions import GenerationError
         >>> try:
         ...     generate_monomer_from_smiles("invalid_smiles")
         ... except GenerationError as e:
@@ -80,9 +80,9 @@ class WorkflowError(AutoPolyError):
     - External tool integration errors
 
     Example:
-        >>> from AutoPoly.exceptions import WorkflowError
+        >>> from AutoPoly.core.exceptions import WorkflowError
         >>> try:
-        ...     Polymerization(..., run=True)
+        ...     generate(system, name, models, force_field="oplsaa")
         ... except WorkflowError as e:
         ...     print(f"Workflow failed: {e}")
     """

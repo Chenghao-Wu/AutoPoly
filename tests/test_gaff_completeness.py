@@ -13,7 +13,7 @@ from collections import defaultdict
 
 # File paths relative to project root
 GAFF_LT_FDEFN = pathlib.Path(__file__).parent.parent / "AutoPoly/extern/rdlt_data/gaff_lt.fdefn"
-GAFF_LT = pathlib.Path(__file__).parent.parent / "AutoPoly/extern/moltemplate/gaff.lt"
+GAFF_LT = pathlib.Path(__file__).parent.parent / "AutoPoly/extern/moltemplate/force_fields/gaff.lt"
 GAFF_TOMOLTEMPLATE = pathlib.Path(__file__).parent.parent / "AutoPoly/extern/rdlt_data/gaff_tomoltemplate.txt"
 
 

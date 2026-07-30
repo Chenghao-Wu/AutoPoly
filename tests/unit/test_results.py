@@ -2,7 +2,7 @@
 """Tests for AutoPoly result types."""
 import json
 
-from AutoPoly.results import GenerationResult, Result, ValidationResult
+from AutoPoly.core.results import GenerationResult, Result, ValidationResult
 
 
 class TestResult:

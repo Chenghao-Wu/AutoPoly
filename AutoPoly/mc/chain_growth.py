@@ -269,6 +269,11 @@ def _determine_monomer_type(monomer_name: str) -> str:
     """
     name_lower = monomer_name.lower()
 
+    # Strip tacticity marker so it can't shadow the position suffix
+    # (e.g. "monomer_0_49re_T1" must still match the "re" right-end rule)
+    if name_lower.endswith("_t1"):
+        name_lower = name_lower[:-3]
+
     if "le" in name_lower and ("0le" in name_lower or "_le" in name_lower or name_lower.endswith("le")):
         return "first"
     elif "re" in name_lower and ("_re" in name_lower or name_lower.endswith("re")):

@@ -17,7 +17,7 @@ Created on 2025
 """
 from typing import List, Dict, Union
 
-from .system import logger
+from ..core.system import logger
 
 
 class Molecule:
@@ -35,7 +35,7 @@ class Molecule:
         sequenceSet (list): List of molecule identifiers for each molecule instance
         sequenceName (list): List of molecule names for each molecule instance
         merSet (list): Single-element list containing the molecule name
-        DOP (int): Always 1 for molecules (for compatibility with Polymerization)
+        DOP (int): Always 1 for molecules (for pipeline compatibility)
         _is_molecule (bool): Type detection flag (always True for Molecule class)
 
     Example:
@@ -87,7 +87,7 @@ class Molecule:
                 "Use Polymer class for pSMILES with wildcards."
             )
 
-        # Initialize attributes for Polymerization workflow compatibility
+        # Initialize attributes for pipeline compatibility
         self.DOP = 1  # Always 1 for molecules
         self._is_molecule = True  # Type detection flag
 
@@ -103,10 +103,10 @@ class Molecule:
 
     def _set_molecule_structure(self) -> None:
         """
-        Set up the molecule structure for compatibility with Polymerization workflow.
+        Set up the molecule structure for compatibility with the pipeline.
 
         This method creates sequenceSet and sequenceName lists that mirror the
-        Polymer class structure, allowing the WorkflowManager to handle molecules
+        Polymer class structure, allowing the GeometryBuilder to handle molecules
         and polymers seamlessly.
         """
         # Set merSet (unique set of molecules)

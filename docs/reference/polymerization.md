@@ -1,3 +1,0 @@
-# Polymerization
-
-::: AutoPoly.polymerization

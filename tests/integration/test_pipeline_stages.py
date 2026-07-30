@@ -20,9 +20,9 @@ import numpy as np
 import pytest
 
 from AutoPoly import System, Polymer, Molecule
-from AutoPoly.geometry import GeometryBuilder, GeometryConfig
-from AutoPoly.packer import BoxPacker
-from AutoPoly.typing import UnitTyper
+from AutoPoly.pipeline.geometry import GeometryBuilder, GeometryConfig
+from AutoPoly.pipeline.packer import BoxPacker
+from AutoPoly.pipeline.typing import UnitTyper
 
 PE_SEQUENCE = ["CC[*]", "[*]CC[*]", "[*]CC"]
 

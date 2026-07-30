@@ -8,8 +8,8 @@ Three ways to fill the simulation box, compared on the same system (PEO, 5 chain
 
 You will learn:
 
-- The `placement_method` and `use_mc_chain_growth` switches
-- The `mc_*` tuning parameters (attempts, density, bond angles)
+- The `strategy` switch and the `GeometryConfig` chain-growth options
+- The MC tuning parameters (attempts, density, bond angles)
 - Why SAW-grown coils equilibrate faster than grid-placed extended chains
 
 ## The script

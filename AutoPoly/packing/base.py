@@ -15,7 +15,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import ClassVar, List, Optional, Tuple
 
-from ..units import UnitLibrary
+from ..pipeline.units import UnitLibrary
 
 # ((xmin, xmax), (ymin, ymax), (zmin, zmax))
 BoxBounds = Tuple[Tuple[float, float], Tuple[float, float], Tuple[float, float]]

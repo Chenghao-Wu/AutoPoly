@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = '1.0.0'
+VERSION = '2.0.0'
 DESCRIPTION = 'AutoPoly'
 LONG_DESCRIPTION = 'Build your LAMMPS data file'
 
@@ -22,19 +22,11 @@ setup(
         # needs to be installed along with your package. Eg: 'caer'
 
         keywords=['python', 'molecular dynamics'],
-        entry_points={
-            'console_scripts': [
-                'autopoly=AutoPoly.cli:main',
-            ],
-        },
         extras_require={
             'dev': [
                 'pytest>=7.0.0',
                 'pytest-cov>=4.0.0',
                 'pytest-mock>=3.10.0',
-            ],
-            'agent': [
-                'langchain-core>=0.3.0',
             ],
             'docs': [
                 'mkdocs>=1.6.0',

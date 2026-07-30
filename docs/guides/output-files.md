@@ -1,6 +1,6 @@
 # Output Files
 
-Every `Polymerization` run writes into `<System out>/<Polymerization name>/`:
+Every `generate` run writes into `<System out>/<name>/`:
 
 ```
 my_polymer/polyethylene/

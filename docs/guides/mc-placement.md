@@ -4,7 +4,7 @@ AutoPoly builds the initial configuration of your simulation box with Monte Carl
 
 ## Placement methods
 
-Choose with `placement_method`:
+Choose with the `strategy` parameter of `generate`:
 
 | Value | Behavior |
 |---|---|
@@ -12,17 +12,21 @@ Choose with `placement_method`:
 | `"grid"` | Deterministic grid placement — extended chains on a lattice; simple, but far from equilibrium |
 
 ```python
-Polymerization(
-    name="polymer_mc",
-    system=system,
-    model=[polymer],
+from AutoPoly import generate, GeometryConfig
+
+generate(
+    system,
+    "polymer_mc",
+    [polymer],
     force_field="oplsaa",
-    placement_method="mc_random",     # Monte Carlo placement (default)
-    use_mc_chain_growth=True,         # SAW chain growth (default)
-    mc_max_attempts=10000,            # max placement attempts
-    mc_monomer_density=0.085,         # target density (monomers / Å³)
-    mc_bond_angle_min=50.0,           # min deflection angle (degrees)
-    mc_bond_angle_max=90.0,           # max deflection angle (degrees)
+    strategy="mc_random",                 # Monte Carlo placement (default)
+    mc_max_attempts=10000,                # max placement attempts
+    monomer_density=0.085,                # target density (monomers / Å³)
+    geometry_config=GeometryConfig(
+        use_mc_chain_growth=True,         # SAW chain growth (default)
+        mc_bond_angle_min=50.0,           # min deflection angle (degrees)
+        mc_bond_angle_max=90.0,           # max deflection angle (degrees)
+    ),
 )
 ```
 
@@ -33,20 +37,20 @@ Polymerization(
 3. A cell-linked-list **collision detector** rejects placements that overlap existing atoms — both other chains and, with `mc_intrachain_exclude_neighbors` (default 2), the growing chain itself beyond its bonded neighbors.
 4. If no valid position is found within `mc_max_attempts`, growth backtracks and retries.
 
-Set `use_mc_chain_growth=False` to place whole chains rigidly instead of growing them.
+Set `use_mc_chain_growth=False` in the `GeometryConfig` to place whole chains rigidly instead of growing them.
 
 ## Box sizing
 
-Boxes are sized from SAW scaling — `N^0.6 × bond_length` for a chain of `N` monomers — combined with the target `mc_monomer_density`, rather than the fully extended chain length. This produces compact, realistic boxes at low initial density, leaving room for overlap-free placement before NPT compression.
+Boxes are sized from SAW scaling — `N^0.6 × bond_length` for a chain of `N` monomers — combined with the target `monomer_density`, rather than the fully extended chain length. This produces compact, realistic boxes at low initial density, leaving room for overlap-free placement before NPT compression.
 
 ## Tuning guide
 
 | Symptom | Knob |
 |---|---|
-| Placement fails / "max attempts exceeded" | Lower `mc_monomer_density` (looser box), raise `mc_max_attempts` |
-| Chains too extended or too knotted | Adjust `mc_bond_angle_min/max` toward your chemistry's real bond angles |
-| False-positive collisions along a chain | Raise `mc_intrachain_exclude_neighbors` (2 is recommended) |
-| Want reproducible grid layout | `placement_method="grid"` |
+| Placement fails / "max attempts exceeded" | Lower `monomer_density` (looser box), raise `mc_max_attempts` |
+| Chains too extended or too knotted | Adjust `mc_bond_angle_min/max` in `GeometryConfig` toward your chemistry's real bond angles |
+| False-positive collisions along a chain | Raise `mc_intrachain_exclude_neighbors` in `GeometryConfig` (2 is recommended) |
+| Want reproducible grid layout | `strategy="grid"` |
 
 ## The mc module
 
@@ -55,4 +59,4 @@ The placement engine is a standalone subpackage — see the [mc API reference](.
 ## See also
 
 - [MC Placement tutorial](../tutorials/mc-placement.md) — grid vs MC random vs chain growth, side by side
-- [Polymerization API](../reference/polymerization.md) — all `mc_*` parameters
+- [generate API](../reference/generate.md) — the `strategy` and density parameters; `GeometryConfig` for the chain-growth knobs

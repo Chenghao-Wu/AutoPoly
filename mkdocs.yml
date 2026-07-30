@@ -81,7 +81,6 @@ nav:
       - Force Fields: guides/force-fields.md
       - "MC Placement & Chain Growth": guides/mc-placement.md
       - Bead-Spring (Coarse-Grained): guides/bead-spring.md
-      - "Agent API & CLI": guides/agent.md
       - Output Files: guides/output-files.md
       - Troubleshooting: guides/troubleshooting.md
   - Tutorials:
@@ -99,11 +98,8 @@ nav:
       - System: reference/system.md
       - Polymer: reference/polymer.md
       - Molecule: reference/molecule.md
-      - Polymerization: reference/polymerization.md
+      - generate: reference/generate.md
       - Bead-Spring: reference/bead-spring.md
       - MonomerGenerator: reference/monomer-generator.md
       - mc (Monte Carlo): reference/mc.md
-      - agent: reference/agent.md
-      - tools (LangChain): reference/tools.md
-      - CLI: reference/cli.md
       - exceptions: reference/exceptions.md

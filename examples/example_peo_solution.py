@@ -10,7 +10,7 @@ battery electrolytes).
 
   - Polymer: complement SMILES with [*] wildcards, chain_num + sequence
   - Molecule: regular SMILES, Count
-  - Both are passed together as Polymerization(model=[polymer, solvent])
+  - Both are passed together as generate(system, name, [polymer, solvent])
 
 Force field: GAFF covers both components; Gasteiger charges are assigned
 automatically. For production runs consider AM1-BCC/RESP charges and a
@@ -19,7 +19,7 @@ water-specific model if quantitative aqueous properties matter.
 Requires: pip install -e .  (from the AutoPoly repo root)
 """
 
-from AutoPoly import System, Molecule, Polymer, Polymerization
+from AutoPoly import System, Molecule, Polymer, generate
 
 # Complement SMILES for PEO (methyl-terminated, matching the other examples)
 PEO_FIRST = "CCO[*]"
@@ -44,10 +44,10 @@ water = Molecule(
     Name="water",
 )
 
-Polymerization(
-    name="peo_water",
-    system=system,
-    model=[peo, water],   # polymer + solvent in one box
+generate(
+    system,
+    "peo_water",
+    [peo, water],   # polymer + solvent in one box
     force_field="gaff",
 )
 

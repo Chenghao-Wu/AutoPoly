@@ -1,3 +1,3 @@
 # Molecule
 
-::: AutoPoly.molecule
+::: AutoPoly.models.molecule

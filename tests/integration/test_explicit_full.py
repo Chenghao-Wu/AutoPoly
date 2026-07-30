@@ -9,7 +9,7 @@ import pytest
 import os
 import tempfile
 from pathlib import Path
-from AutoPoly import System, Polymer, Polymerization
+from AutoPoly import System, Polymer
 
 
 class TestExplicitFullWorkflow:
@@ -20,15 +20,15 @@ class TestExplicitFullWorkflow:
         with tempfile.TemporaryDirectory() as tmp_dir:
             system = System(out=str(Path(tmp_dir) / "block_copolymer"))
 
-            # ABA triblock
+            # ABA triblock (first = 1 wildcard, middle = 2, last = 1)
             sequence = [
-                "[*]CC[*]",  # Position 0
-                "[*]CC[*]",  # Position 1
+                "CC[*]",      # Position 0 (first)
+                "[*]CC[*]",   # Position 1
                 "[*]C=C[*]",  # Position 2
                 "[*]C=C[*]",  # Position 3
                 "[*]C=C[*]",  # Position 4
-                "[*]CC[*]",  # Position 5
-                "[*]CC[*]"   # Position 6
+                "[*]CC[*]",   # Position 5
+                "[*]CC"       # Position 6 (last)
             ]
 
             poly = Polymer(
@@ -41,8 +41,8 @@ class TestExplicitFullWorkflow:
             # Verify polymer was created correctly
             assert poly.dop == 7
             assert poly.chain_num == 5
-            assert len(poly.sequence_set) == 5
-            assert len(poly.sequence_set[0]) == 7
+            assert len(poly.sequenceSet) == 5
+            assert len(poly.sequenceSet[0]) == 7
 
     def test_multi_monomer_workflow(self):
         """Test workflow with multiple unique monomer types."""
@@ -50,10 +50,10 @@ class TestExplicitFullWorkflow:
             system = System(out=str(Path(tmp_dir) / "multi_monomer"))
 
             sequence = [
-                "[*]CC[*]",              # Ethylene
-                "[*]C=C[*]",             # Styrene
+                "CC[*]",                # Ethylene (first)
+                "[*]C=C[*]",            # Styrene
                 "[*]CC([*])C(=O)OC",    # MMA
-                "[*]CC(C)(C)[*]",       # Isobutylene
+                "[*]CC(C)(C)",          # Isobutylene (last)
             ]
 
             poly = Polymer(
@@ -74,7 +74,7 @@ class TestExplicitFullWorkflow:
 
             poly = Polymer(
                 chain_num=2,
-                sequence=["[*]CC[*]", "[*]C=C[*]", "[*]CC[*]"],
+                sequence=["CC[*]", "[*]C=C[*]", "[*]CC"],
                 topology="ring",
                 tacticity="isotactic"
             )
@@ -90,7 +90,7 @@ class TestExplicitFullWorkflow:
             system = System(out=str(Path(tmp_dir) / "uniform_long"))
 
             # Create a sequence of 50 identical monomers
-            sequence = ["[*]CC[*]"] * 50
+            sequence = ["CC[*]"] + ["[*]CC[*]"] * 48 + ["[*]CC"]
 
             poly = Polymer(
                 chain_num=5,
@@ -101,7 +101,8 @@ class TestExplicitFullWorkflow:
 
             # Verify polymer was created correctly
             assert poly.dop == 50
-            assert len(poly.mer_set) == 1  # Only one unique monomer
+            # One monomer chemistry; first/middle/last are distinct pSMILES strings
+            assert len(poly.mer_set) == 3
             assert poly.chain_num == 5
 
     def test_arbitrary_sequence(self):
@@ -111,12 +112,12 @@ class TestExplicitFullWorkflow:
 
             # Arbitrary sequence with no clear pattern
             sequence = [
-                "[*]CC[*]",              # Ethylene
-                "[*]C=C[*]",             # Styrene
+                "CC[*]",                # Ethylene (first)
+                "[*]C=C[*]",            # Styrene
                 "[*]CC([*])C(=O)OC",    # MMA
-                "[*]CC[*]",              # Ethylene again
+                "[*]CC[*]",             # Ethylene again
                 "[*]CC(C)(C)[*]",       # Isobutylene
-                "[*]C=C[*]",             # Styrene again
+                "[*]C=C",               # Styrene again (last)
             ]
 
             poly = Polymer(
@@ -127,8 +128,8 @@ class TestExplicitFullWorkflow:
 
             # Verify the exact sequence is preserved
             assert poly.dop == 6
-            assert len(poly.sequence_set) == 2
-            assert len(poly.sequence_set[0]) == 6
+            assert len(poly.sequenceSet) == 2
+            assert len(poly.sequenceSet[0]) == 6
 
     def test_single_monomer_sequence(self):
         """Test edge case: sequence with single monomer."""
@@ -137,7 +138,7 @@ class TestExplicitFullWorkflow:
 
             poly = Polymer(
                 chain_num=10,
-                sequence=["[*]CC[*]"],
+                sequence=["CC"],
                 topology="linear",
                 tacticity="syndiotactic"
             )
@@ -153,9 +154,12 @@ class TestExplicitFullWorkflow:
             system = System(out=str(Path(tmp_dir) / "all_different"))
 
             # Sequence where each monomer is unique
-            sequence = [
-                f"[*]C([*])({i})C" for i in range(10)
-            ]
+            sequence = (
+                ["CC[*]"]
+                + [f"[*]C({sub})[*]" for sub in
+                   ["F", "Cl", "Br", "I", "C", "CC", "CCC", "CCCC"]]
+                + ["[*]CC"]
+            )
 
             poly = Polymer(
                 chain_num=1,

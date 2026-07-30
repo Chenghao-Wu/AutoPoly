@@ -354,7 +354,7 @@ class CollisionDetector:
         Returns:
             True if the sphere is completely within bounds, False otherwise
         """
-        return (
+        return bool(
             center[0] - radius >= self._xmin and center[0] + radius <= self._xmax and
             center[1] - radius >= self._ymin and center[1] + radius <= self._ymax and
             center[2] - radius >= self._zmin and center[2] + radius <= self._zmax

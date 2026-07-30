@@ -6,7 +6,7 @@ You will learn:
 
 - How the **first / middle / last** wildcard variants define a chain
 - How `MonomerGenerator` turns them into moltemplate `.lt` templates (including mirror-tacticity `_T1` variants)
-- The full **System → Polymer → Polymerization** sequence
+- The full **System → Polymer → generate** sequence
 - Where the LAMMPS output files land
 
 The PMMA repeat unit needs all three complement SMILES variants:

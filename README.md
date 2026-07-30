@@ -30,7 +30,7 @@ pip install -e .
 ### Your First Polymer (3 Steps)
 
 ```python
-from AutoPoly import System, Polymer, Polymerization
+from AutoPoly import System, Polymer, generate
 
 # Step 1: Create system
 system = System(out="my_polymer")
@@ -44,19 +44,14 @@ polymer = Polymer(
 )
 
 # Step 3: Generate LAMMPS files
-Polymerization(
-    name="polyethylene",
-    system=system,
-    model=[polymer],
-    force_field="oplsaa"
-)
+generate(system, "polyethylene", [polymer], force_field="oplsaa")
 ```
 
 **Output:** Ready-to-run LAMMPS files in `my_polymer/` directory!
 
 ## The Three-Stage Pipeline
 
-Under the hood, `Polymerization` composes three independent stages, each
+Under the hood, `generate` composes three independent stages, each
 usable on its own:
 
 ```
@@ -118,12 +113,12 @@ register_strategy("my_strategy", MyStrategy)
 ### The 3-Step Workflow
 
 ```
-System → Polymer/Molecule → Polymerization → LAMMPS Files
+System → Polymer/Molecule → generate → LAMMPS Files
 ```
 
 1. **System** - Defines output directory
 2. **Polymer/Molecule** - Defines what to build
-3. **Polymerization** - Generates files with chosen force field
+3. **generate** - Generates files with chosen force field
 
 ### Complement SMILES (Unique to AutoPoly)
 
@@ -203,12 +198,7 @@ ethanol = Molecule(
 )
 
 # Generate system
-Polymerization(
-    name="solvent_mixture",
-    system=system,
-    model=[water, ethanol],
-    force_field="gaff"
-)
+generate(system, "solvent_mixture", [water, ethanol], force_field="gaff")
 ```
 
 [Full example: examples/example_molecules.py →](examples/example_molecules.py)
@@ -223,12 +213,7 @@ polymer = Polymer(
 )
 water = Molecule(Count=100, Smiles="O", Name="water")
 
-Polymerization(
-    name="polymer_solution",
-    system=system,
-    model=[polymer, water],
-    force_field="gaff"
-)
+generate(system, "polymer_solution", [polymer, water], force_field="gaff")
 ```
 
 ### Ring Polymer
@@ -247,21 +232,25 @@ polymer = Polymer(
 AutoPoly uses a Monte Carlo (MC) self-avoiding walk (SAW) algorithm to generate realistic initial polymer configurations. Instead of placing chains on a grid, the SAW method grows each chain monomer-by-monomer with collision detection, producing coiled conformations that better approximate equilibrium structures.
 
 ```python
-Polymerization(
-    name="polymer_mc",
-    system=system,
-    model=[polymer],
+from AutoPoly import generate, GeometryConfig
+
+generate(
+    system,
+    "polymer_mc",
+    [polymer],
     force_field="oplsaa",
-    placement_method="mc_random",       # Monte Carlo placement (default)
-    use_mc_chain_growth=True,           # SAW chain growth (default)
-    mc_max_attempts=10000,              # Max placement attempts
-    mc_monomer_density=0.085,           # Target density (monomers/Å³)
-    mc_bond_angle_min=50.0,             # Min deflection angle (degrees)
-    mc_bond_angle_max=90.0              # Max deflection angle (degrees)
+    strategy="mc_random",                 # Monte Carlo placement (default)
+    mc_max_attempts=10000,                # Max placement attempts
+    monomer_density=0.085,                # Target density (monomers/Å³)
+    geometry_config=GeometryConfig(
+        use_mc_chain_growth=True,         # SAW chain growth (default)
+        mc_bond_angle_min=50.0,           # Min deflection angle (degrees)
+        mc_bond_angle_max=90.0,           # Max deflection angle (degrees)
+    ),
 )
 ```
 
-**Placement methods:**
+**Placement strategies:**
 - `"mc_random"` (default) — Monte Carlo with SAW chain growth
 - `"grid"` — Deterministic grid placement
 
@@ -321,13 +310,13 @@ Molecule(
 
 [Complete API →](https://wugroup-xjtlu.github.io/AutoPoly/reference/molecule/)
 
-### Polymerization
+### generate
 
 ```python
-Polymerization(
-    name="project",
-    system=system,
-    model=[polymer1, polymer2, molecule1],  # Mix polymers and molecules
+generate(
+    system,
+    "project",
+    [polymer1, polymer2, molecule1],  # Mix polymers and molecules
     force_field="oplsaa"  # See force fields below
 )
 ```
@@ -384,7 +373,7 @@ Quick guide:
 
 ## Output Structure
 
-Each run writes into `<System out>/<Polymerization name>/`:
+Each run writes into `<System out>/<name>/`:
 
 ```
 my_polymer/polyethylene/

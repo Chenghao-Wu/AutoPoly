@@ -6,8 +6,8 @@ user inputs to prevent injection attacks and ensure data integrity.
 """
 
 import pytest
-from AutoPoly.validation import validate_smiles, validate_smiles_list
-from AutoPoly.exceptions import ValidationError
+from AutoPoly.core.validation import validate_smiles, validate_smiles_list
+from AutoPoly.core.exceptions import ValidationError
 
 
 class TestSMILESValidation:

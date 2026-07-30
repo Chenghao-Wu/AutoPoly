@@ -1,3 +1,3 @@
 # Polymer
 
-::: AutoPoly.polymer
+::: AutoPoly.models.polymer

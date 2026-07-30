@@ -7,12 +7,12 @@ This page walks through the complete AutoPoly workflow on the simplest possible 
 Every AutoPoly script follows the same shape:
 
 ```
-System  →  Polymer / Molecule  →  Polymerization  →  LAMMPS files
+System  →  Polymer / Molecule  →  generate  →  LAMMPS files
 ```
 
 1. **System** — decides *where* output goes
 2. **Polymer / Molecule** — defines *what* to build
-3. **Polymerization** — generates the files with a chosen force field
+3. **generate** — generates the files with a chosen force field
 
 ## Step by step
 
@@ -50,12 +50,12 @@ The degree of polymerization is implicit: `DOP = len(sequence)` (here 1 + 48 + 1
 ### 3. Generate the LAMMPS files
 
 ```python
-from AutoPoly import Polymerization
+from AutoPoly import generate
 
-Polymerization(
-    name="polyethylene",
-    system=system,
-    model=[polymer],
+generate(
+    system,
+    "polyethylene",
+    [polymer],
     force_field="oplsaa"
 )
 ```

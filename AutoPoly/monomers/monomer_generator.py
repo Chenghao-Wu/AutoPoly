@@ -239,7 +239,7 @@ class SMARTSTyper:
         self.verbose = verbose
 
         # Locate .fdefn file for this force field
-        module_dir = Path(__file__).parent
+        module_dir = Path(__file__).parent.parent
         fdef_name = FORCE_FIELD_FDEFN.get(force_field, FORCE_FIELD_FDEFN['oplsaa'])
         self.fdef_path = str(module_dir / 'extern' / 'rdlt_data' / fdef_name)
         

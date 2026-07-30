@@ -18,8 +18,8 @@ from typing import List, Dict, Optional, Union, Tuple
 import math
 import numpy as np
 
-from .logger import setup_logger
-from .mc.collision import CollisionDetector
+from ..core.logger import setup_logger
+from ..mc.collision import CollisionDetector
 
 logger = setup_logger()
 

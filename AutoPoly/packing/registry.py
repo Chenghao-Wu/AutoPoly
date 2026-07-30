@@ -19,7 +19,7 @@ Created on 2026-07-30
 """
 from typing import Dict, List, Type
 
-from ..exceptions import ValidationError
+from ..core.exceptions import ValidationError
 from .base import PlacementStrategy
 
 #: Names reserved for future built-in strategies (grafting, confinement).

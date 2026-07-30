@@ -19,7 +19,7 @@ Configuration:
 Requires: pip install -e .  (from the AutoPoly repo root)
 """
 
-from AutoPoly import System, Polymer, Polymerization
+from AutoPoly import System, Polymer, GeometryConfig, generate
 
 # PEO configuration
 PEO_CONFIG = {
@@ -35,7 +35,7 @@ PEO_CONFIG = {
 # MC configuration
 MC_CONFIG = {
     "mc_max_attempts": 10000,
-    "mc_monomer_density": 0.03  # Low density for easy placement
+    "monomer_density": 0.03  # Low density for easy placement
 }
 
 
@@ -65,13 +65,12 @@ def test_grid_placement(system, polymer):
     print("\n[1/3] Testing grid placement...")
 
     try:
-        poly = Polymerization(
-            name="peo_grid",
-            system=system,
-            model=[polymer],
+        generate(
+            system,
+            "peo_grid",
+            [polymer],
             force_field="oplsaa",
-            placement_method="grid",  # Default
-            run=True
+            strategy="grid",
         )
         print("  SUCCESS: peo_grid completed")
         return True
@@ -93,15 +92,14 @@ def test_mc_random_placement(system, polymer):
     print("\n[2/3] Testing MC random placement...")
 
     try:
-        poly = Polymerization(
-            name="peo_mc_random",
-            system=system,
-            model=[polymer],
+        generate(
+            system,
+            "peo_mc_random",
+            [polymer],
             force_field="oplsaa",
-            placement_method="mc_random",
+            strategy="mc_random",
             mc_max_attempts=MC_CONFIG["mc_max_attempts"],
-            mc_monomer_density=MC_CONFIG["mc_monomer_density"],
-            run=True
+            monomer_density=MC_CONFIG["monomer_density"],
         )
         print("  SUCCESS: peo_mc_random completed")
         return True
@@ -124,16 +122,15 @@ def test_mc_chain_growth(system, polymer):
     print("\n[3/3] Testing MC chain growth...")
 
     try:
-        poly = Polymerization(
-            name="peo_mc_chain",
-            system=system,
-            model=[polymer],
+        generate(
+            system,
+            "peo_mc_chain",
+            [polymer],
             force_field="oplsaa",
-            placement_method="mc_random",
-            use_mc_chain_growth=True,
+            strategy="mc_random",
+            geometry_config=GeometryConfig(use_mc_chain_growth=True),
             mc_max_attempts=MC_CONFIG["mc_max_attempts"],
-            mc_monomer_density=MC_CONFIG["mc_monomer_density"],
-            run=True
+            monomer_density=MC_CONFIG["monomer_density"],
         )
         print("  SUCCESS: peo_mc_chain completed")
         return True
@@ -156,7 +153,7 @@ def main():
     print(f"  - Tacticity: {PEO_CONFIG['tacticity']}")
     print(f"\nMC Settings:")
     print(f"  - Max attempts: {MC_CONFIG['mc_max_attempts']}")
-    print(f"  - Monomer density: {MC_CONFIG['mc_monomer_density']} monomers/A^3")
+    print(f"  - Monomer density: {MC_CONFIG['monomer_density']} monomers/A^3")
 
     # Build sequence
     sequence = build_sequence(PEO_CONFIG)

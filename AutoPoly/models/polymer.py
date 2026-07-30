@@ -18,10 +18,10 @@ Created on Fri Dec 21 12:19:08 2018
 import random
 from typing import List, Optional, Union
 
-from .system import logger
-from .exceptions import ValidationError
-from .conf import MAX_DOP, MAX_SEQUENCE_LENGTH, MAX_UNIQUE_MONOMERS
-from .validation import validate_smiles
+from ..core.system import logger
+from ..core.exceptions import ValidationError
+from ..core.conf import MAX_DOP, MAX_SEQUENCE_LENGTH, MAX_UNIQUE_MONOMERS
+from ..core.validation import validate_smiles
 
 
 class Polymer:

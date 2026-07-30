@@ -1,3 +1,3 @@
 # System
 
-::: AutoPoly.system
+::: AutoPoly.core.system

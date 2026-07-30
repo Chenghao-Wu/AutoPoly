@@ -1,11 +1,11 @@
-"""Tests for the units.json manifest contract (AutoPoly.units)."""
+"""Tests for the units.json manifest contract (AutoPoly.pipeline.units)."""
 
 import json
 
 import pytest
 
-from AutoPoly.exceptions import ValidationError
-from AutoPoly.units import (
+from AutoPoly.core.exceptions import ValidationError
+from AutoPoly.pipeline.units import (
     FORMAT_VERSION,
     MANIFEST_FILENAME,
     UnitLibrary,

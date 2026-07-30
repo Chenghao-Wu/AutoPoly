@@ -11,7 +11,7 @@ import argparse
 import sys
 from typing import Dict, List
 
-from AutoPoly import System, Polymer, Polymerization
+from AutoPoly import System, Polymer, generate
 
 # Complement SMILES for each polymer (first/middle/last variants)
 POLYMER_CONFIGS: Dict[str, Dict] = {
@@ -114,9 +114,9 @@ def generate_single_polymer(polymer_id: str, config: Dict, base_output_dir: str 
         )
 
         force_field = config.get("force_field", FORCE_FIELD)
-        print(f"Running polymerization ({force_field.upper()})...")
+        print(f"Running generation ({force_field.upper()})...")
 
-        Polymerization(name=polymer_id, system=system, model=[polymer], force_field=force_field, run=True)
+        generate(system, polymer_id, [polymer], force_field=force_field)
         print(f"✓ {polymer_id} completed")
         return True
 

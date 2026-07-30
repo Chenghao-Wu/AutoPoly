@@ -3,7 +3,7 @@
 """
 End-to-end regression tests for copolymer chemistry and junction geometry.
 
-These run the COMPLETE Polymerization workflow and validate the generated
+These run the COMPLETE generation pipeline and validate the generated
 system.data, because the two v1.0 workflow bugs were invisible at the API
 level (Polymer metadata looked correct while the output was wrong):
 
@@ -18,7 +18,7 @@ import numpy as np
 import pytest
 from collections import defaultdict
 
-from AutoPoly import System, Polymer, Polymerization
+from AutoPoly import System, Polymer, generate
 
 # PE2 - PS3 - PE2 triblock (corrected styrene complement SMILES)
 ABA_SEQUENCE = [
@@ -105,8 +105,7 @@ class TestCopolymerEndToEnd:
         to silently replace the styrene middles with ethylene."""
         system = System(out=str(tmp_path / "aba"))
         poly = Polymer(chain_num=2, sequence=ABA_SEQUENCE, tacticity="atactic")
-        Polymerization(name="aba", system=system, model=[poly],
-                       force_field="oplsaa")
+        generate(system, "aba", [poly], force_field="oplsaa")
 
         masses, atoms, bonds = _parse_data_file(tmp_path / "aba" / "aba" / "system.data")
         comps, adj = _chains(atoms, bonds)
@@ -136,8 +135,7 @@ class TestCopolymerEndToEnd:
         Bug B used to silently build linear polyethylene instead."""
         system = System(out=str(tmp_path / "pe_pp"))
         poly = Polymer(chain_num=2, sequence=PE_PP_SEQUENCE)
-        Polymerization(name="pe_pp", system=system, model=[poly],
-                       force_field="oplsaa")
+        generate(system, "pe_pp", [poly], force_field="oplsaa")
 
         masses, atoms, bonds = _parse_data_file(tmp_path / "pe_pp" / "pe_pp" / "system.data")
         comps, adj = _chains(atoms, bonds)
