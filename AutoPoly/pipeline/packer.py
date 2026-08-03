@@ -62,19 +62,29 @@ class BoxPacker:
         monomer_density: float = 0.085,
         rng_seed: Optional[int] = None,
         run_moltemplate: bool = True,
+        substrate: Optional[object] = None,
+        subtract: Optional[list] = None,
+        box_dims: Optional[tuple] = None,
     ) -> None:
         """
         Args:
             system: System object providing get_folder_path().
             name: Project name; output goes to <out>/<name>/moltemplate/.
             strategy: Registered packing strategy name ("mc_random", "grid",
-                      or a user-registered strategy).
+                      "on_substrate", or a user-registered strategy).
             box_size: Explicit cubic box side (Angstrom); None = auto-size.
             mc_max_attempts: Max random placement attempts per instance.
             monomer_density: Target monomer density (monomers/A^3) for box sizing.
             rng_seed: Optional seed for reproducible stochastic strategies.
             run_moltemplate: Run moltemplate + post-processing (False = stop
                              after writing system.lt; useful for testing).
+            substrate: Optional SubstrateSpec (required by the
+                       "on_substrate" strategy).
+            subtract: Optional list of CarveRegion specs (whole-instance
+                      removal; supported by "mc_random" and "on_substrate").
+            box_dims: Optional per-axis box sides (lx, ly, lz) in Angstrom;
+                      any element may be None (auto-sized). Overrides
+                      box_size per axis where given.
 
         Raises:
             ValidationError: If the strategy name is not registered.
@@ -91,6 +101,9 @@ class BoxPacker:
         self.monomer_density = monomer_density
         self.rng_seed = rng_seed
         self.run_moltemplate = run_moltemplate
+        self.substrate = substrate
+        self.subtract = subtract
+        self.box_dims = box_dims
 
         self.path_master = str(Path(__file__).parent.parent.resolve() / "extern/")
         self.path_moltemplatesrc = str(
@@ -183,6 +196,15 @@ class BoxPacker:
             if src.is_file():
                 shutil.copy2(src, self.moltemplate_dir / unit.lt_file)
 
+        # External substrate slab: user-supplied .lt, imported as-is
+        if self.substrate is not None and self.substrate.is_external:
+            src = Path(self.substrate.lt_file)
+            if not src.is_file():
+                raise WorkflowError(
+                    f"External substrate lt_file not found: {src}"
+                )
+            shutil.copy2(src, self.moltemplate_dir / src.name)
+
     # ------------------------------------------------------------------
     # Step 2: force-field files
     # ------------------------------------------------------------------
@@ -219,11 +241,16 @@ class BoxPacker:
         offset = float(units.build_config.get("offset", 4.0))
         ctx = PackingContext(
             units=units,
-            box=BoxSpec(requested_box_size=self.box_size),
+            box=BoxSpec(
+                requested_box_size=self.box_size,
+                box_dims=self.box_dims or (None, None, None),
+            ),
             mc_max_attempts=self.mc_max_attempts,
             rng_seed=self.rng_seed,
             offset=offset,
             monomer_density=self.monomer_density,
+            substrate=self.substrate,
+            subtract=self.subtract,
         )
         logger.info(f"Placing units with strategy '{self.strategy_name}'")
         return self.strategy.place(ctx)
@@ -245,6 +272,12 @@ class BoxPacker:
                     continue
                 seen.add(unit.lt_file)
                 f.write(f'import "{unit.lt_file}"\n')
+
+            # External substrate slab (already copied into this directory)
+            if self.substrate is not None and self.substrate.is_external:
+                slab_lt = Path(self.substrate.lt_file).name
+                if slab_lt not in seen:
+                    f.write(f'import "{slab_lt}"\n')
             f.write("\n")
 
             for record in result.records:

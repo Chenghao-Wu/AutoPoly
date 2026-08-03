@@ -30,6 +30,7 @@ Output directories are git-ignored — just re-run a script to regenerate them.
 | `example_commodity_polymers_10.py` | PE, PP, PS, PVC, PVAc, PMMA, PAN, PB, PI, PEO | OPLS-AA | Batch generation of 10 polymers, CLI selection |
 | `example_peo_all_forcefields.py` | PEO | all 6 | Force field comparison (oplsaa, lopls, gaff, gaff2, dreiding, compass) |
 | `example_peo_mc_placement.py` | PEO | OPLS-AA | Placement methods: grid vs MC random vs MC chain growth |
+| `example_film_on_substrate.py` | PE film on ethanol slab | GAFF | **Surfaces:** physical substrate (`SubstrateSpec`), `box_dims`, carve subtract (`Cylinder`) |
 
 ### Pipeline API
 

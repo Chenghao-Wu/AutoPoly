@@ -158,12 +158,17 @@ class GeometryBuilder:
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
-    def build(self, models: List[object]) -> GeometryResult:
+    def build(self, models: List[object],
+              substrate_models: Optional[List[object]] = None) -> GeometryResult:
         """
         Build geometry for all models and write geometry.json.
 
         Args:
-            models: List of Polymer and/or Molecule model objects.
+            models: List of Polymer and/or Molecule model objects (film).
+            substrate_models: Optional list of models forming a physical
+                substrate slab. Processed identically to film models, but
+                their chains/molecules are tagged role="substrate" so the
+                packing stage can place them into the slab region.
 
         Returns:
             GeometryResult with the geometry directory and data dict.
@@ -179,10 +184,15 @@ class GeometryBuilder:
         chains: List[Dict[str, Any]] = []
         molecules: List[Dict[str, Any]] = []
 
+        partitioned = (
+            [(m, "film") for m in models]
+            + [(m, "substrate") for m in (substrate_models or [])]
+        )
+
         poly_model_idx = 0
-        for model in models:
+        for model, role in partitioned:
             if is_molecule_model(model):
-                molecules.append(self._build_molecule_entry(model))
+                molecules.append(self._build_molecule_entry(model, role))
             else:
                 model_id = f"model_{poly_model_idx}"
                 base_name = f"monomer_{poly_model_idx}"
@@ -190,6 +200,7 @@ class GeometryBuilder:
                 self._build_polymer_entries(
                     model, model_id, base_name,
                     chain_graphs, variants, chains,
+                    role=role,
                 )
 
         data = {
@@ -242,6 +253,7 @@ class GeometryBuilder:
         chain_graphs: Dict[str, Any],
         variants: Dict[str, Any],
         chains: List[Dict[str, Any]],
+        role: str = "film",
     ) -> None:
         """Build chain graph, variants, and per-chain placements for a Polymer."""
         topology = getattr(model, "topology", "linear")
@@ -321,6 +333,7 @@ class GeometryBuilder:
                 "placements": placements,
                 "n_monomers": len(position_names),
                 "radius": self._chain_radius(topology, dop),
+                "role": role,
             })
 
     def _single_variant(self, chain_mol: Chem.Mol, base_name: str):
@@ -650,7 +663,8 @@ class GeometryBuilder:
     # ------------------------------------------------------------------
     # Molecule processing
     # ------------------------------------------------------------------
-    def _build_molecule_entry(self, model: object) -> Dict[str, Any]:
+    def _build_molecule_entry(self, model: object,
+                              role: str = "film") -> Dict[str, Any]:
         """Embed a small molecule conformer and serialize it (no typing)."""
         smiles = model.Smiles
         mol = Chem.MolFromSmiles(smiles)
@@ -704,6 +718,7 @@ class GeometryBuilder:
             "count": model.Count,
             "atoms": atoms,
             "bonds": bonds,
+            "role": role,
         }
 
     # ------------------------------------------------------------------

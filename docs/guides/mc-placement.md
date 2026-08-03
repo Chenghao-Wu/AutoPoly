@@ -10,6 +10,7 @@ Choose with the `strategy` parameter of `generate`:
 |---|---|
 | `"mc_random"` (default) | Monte Carlo placement with SAW chain growth — realistic coiled conformations |
 | `"grid"` | Deterministic grid placement — extended chains on a lattice; simple, but far from equilibrium |
+| `"on_substrate"` | Film on a physical substrate slab — auto-selected when `substrate=` is passed; see [Substrates & Films](substrates.md) |
 
 ```python
 from AutoPoly import generate, GeometryConfig
@@ -58,5 +59,6 @@ The placement engine is a standalone subpackage — see the [mc API reference](.
 
 ## See also
 
+- [Substrates & Films](substrates.md) — film-on-slab systems, rectangular `box_dims`, carve subtract
 - [MC Placement tutorial](../tutorials/mc-placement.md) — grid vs MC random vs chain growth, side by side
 - [generate API](../reference/generate.md) — the `strategy` and density parameters; `GeometryConfig` for the chain-growth knobs

@@ -11,6 +11,7 @@ AutoPoly generates polymer structures and prepares them for molecular dynamics s
 - **Block Copolymers** - Explicit sequence control for any block arrangement
 - **Complement SMILES** - Unique format for precise positional control
 - **Small Molecules** - Built-in support for solvents and additives
+- **Substrates & Films** - Polymer films on physical slabs, with lithography-style carve subtract
 - **Ring & Linear** - Both topologies supported
 - **SAW Placement** - Monte Carlo self-avoiding walk for realistic initial configurations
 - **Automatic Setup** - Generates complete LAMMPS input files
@@ -253,14 +254,70 @@ generate(
 **Placement strategies:**
 - `"mc_random"` (default) — Monte Carlo with SAW chain growth
 - `"grid"` — Deterministic grid placement
+- `"on_substrate"` — Film on a physical substrate slab (auto-selected when `substrate=` is given)
 
 Box sizing uses SAW scaling (`N^0.6 × bond_length`) rather than fully-extended chain length, producing compact, realistic simulation boxes.
 
+### Film on a Substrate
+
+Pass a `SubstrateSpec` to build a polymer/molecule **film on top of a physical
+slab** (fully periodic, two-interface slab model). The slab can be built
+in-pipeline from a `Molecule`/`Polymer` (ordered `"grid"` or amorphous `"mc"`
+packing), or imported as a pre-built external surface:
+
+```python
+from AutoPoly import System, Polymer, Molecule, generate
+from AutoPoly.packing import SubstrateSpec, CutAbove, Cylinder
+
+film = Polymer(chain_num=10, sequence=["CC[*]"] + ["[*]CC[*]"] * 18 + ["[*]CC"])
+
+substrate = SubstrateSpec(
+    model=Molecule(Count=64, Smiles="CCO", Name="etoh_sub"),
+    thickness=10.0,   # slab z-extent (Å)
+    packing="grid",   # ordered slab; "mc" = amorphous
+    gap=3.0,          # empty space between slab top and film (Å)
+)
+
+generate(
+    system, "pe_film", [film],
+    force_field="gaff",
+    substrate=substrate,              # auto-selects strategy="on_substrate"
+    box_dims=(50.0, 50.0, 50.0),      # (lx, ly, lz); any entry may be None = auto
+)
+```
+
+For a crystalline surface built elsewhere, point at its moltemplate class
+instead: `SubstrateSpec(lt_file="au111.lt", class_name="Au111", thickness=12.0)`.
+
+**Subtract (carve):** remove whole instances after placement — chains and
+molecules are removed intact, so **no covalent bonds are ever cut**:
+
+```python
+generate(
+    system, "pe_film_patterned", [film],
+    substrate=substrate,
+    box_dims=(50.0, 50.0, 50.0),
+    subtract=[
+        Cylinder(axis="z", center=(0, 0), radius=8.0),  # hole through the film
+        # CutAbove(z=25.0),                             # trim film to a thickness
+        # CutAbove(z=-10.0, apply_to="substrate"),      # carve the slab instead
+    ],
+)
+```
+
+Regions (`CutAbove`, `CutBelow`, `Cylinder`, `BoxRegion`) apply to the film by
+default (`apply_to="substrate"` or `"all"` to target the slab); subtract also
+works with plain `mc_random` melts — carve a `Cylinder` through a melt box and
+you have a nanopore.
+
+[Full example: examples/example_film_on_substrate.py →](examples/example_film_on_substrate.py) · [Guide: Substrates & Films →](https://wugroup-xjtlu.github.io/AutoPoly/guides/substrates/)
+
 ### More Examples
 
-The [examples directory](examples/) contains 12 runnable scripts covering:
+The [examples directory](examples/) contains 13 runnable scripts covering:
 
 - **Beginner tutorial** — PMMA step by step ([example_pmma_linear.py](examples/example_pmma_linear.py))
+- **Film on substrate** — PE film on a slab + carve subtract ([example_film_on_substrate.py](examples/example_film_on_substrate.py))
 - **Condensation polymers** — PLA with GAFF ([example_pla_condensation.py](examples/example_pla_condensation.py))
 - **Polymer solutions** — PEO in explicit water ([example_peo_solution.py](examples/example_peo_solution.py))
 - **Batch generation** — 10 commodity polymers ([example_commodity_polymers_10.py](examples/example_commodity_polymers_10.py))

@@ -306,19 +306,21 @@ class UnitTyper:
 
         Returns:
             (units, dop1_counts): polymer UnitSpec list, and a dict of
-            variant name -> chain count for DOP=1 chains.
+            (variant name, role) -> chain count for DOP=1 chains.
         """
         entry = FORCE_FIELD_REGISTRY[self.force_field]
         units: List[UnitSpec] = []
-        dop1_counts: Dict[str, int] = {}
+        dop1_counts: Dict[tuple, int] = {}
 
         poly_index = 0
         for chain in self.geometry["chains"]:
+            role = chain.get("role", "film")
             placements = chain["placements"]
             n = len(placements)
             if n <= 1:
                 variant_name = placements[0]["variant"]
-                dop1_counts[variant_name] = dop1_counts.get(variant_name, 0) + 1
+                key = (variant_name, role)
+                dop1_counts[key] = dop1_counts.get(key, 0) + 1
                 continue
 
             poly_index += 1
@@ -342,6 +344,7 @@ class UnitTyper:
                 n_monomers=chain["n_monomers"],
                 radius=chain["radius"],
                 anchors=anchors,
+                role=role,
                 monomer_files=monomer_files,
             ))
 
@@ -472,22 +475,24 @@ class UnitTyper:
                 count=entry["count"],
                 radius=DEFAULT_MOLECULE_RADIUS,
                 anchors={},
+                role=entry.get("role", "film"),
                 monomer_files=[lt_file],
             ))
         return written
 
     def _add_single_monomer_units(
-        self, units: List[UnitSpec], dop1_counts: Dict[str, int]
+        self, units: List[UnitSpec], dop1_counts: Dict[tuple, int]
     ) -> None:
         """DOP=1 polymer chains pack as molecule-like units per variant."""
-        for variant_name, count in dop1_counts.items():
+        for (variant_name, role), count in dop1_counts.items():
             lt_file = f"{variant_name}.lt"
             units.append(UnitSpec(
-                id=variant_name,
+                id=variant_name if role == "film" else f"{variant_name}__{role}",
                 kind="molecule",
                 lt_file=lt_file,
                 count=count,
                 radius=DEFAULT_MOLECULE_RADIUS,
                 anchors={},
+                role=role,
                 monomer_files=[lt_file],
             ))

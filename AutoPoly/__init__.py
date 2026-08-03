@@ -53,6 +53,11 @@ __all__ = [
     "UnitLibrary",
     "UnitSpec",
     "PlacementStrategy",
+    "SubstrateSpec",
+    "CutAbove",
+    "CutBelow",
+    "Cylinder",
+    "BoxRegion",
     "register_strategy",
     "get_strategy",
     "mc",
@@ -78,7 +83,16 @@ try:
         UnitSpec,
         generate,
     )
-    from .packing import PlacementStrategy, register_strategy, get_strategy
+    from .packing import (
+        PlacementStrategy,
+        SubstrateSpec,
+        CutAbove,
+        CutBelow,
+        Cylinder,
+        BoxRegion,
+        register_strategy,
+        get_strategy,
+    )
     from . import mc
 except ImportError as e:
     import warnings

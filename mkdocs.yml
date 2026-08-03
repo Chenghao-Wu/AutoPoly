@@ -80,6 +80,7 @@ nav:
       - Polymers vs Molecules: guides/polymers-vs-molecules.md
       - Force Fields: guides/force-fields.md
       - "MC Placement & Chain Growth": guides/mc-placement.md
+      - Substrates & Films: guides/substrates.md
       - Bead-Spring (Coarse-Grained): guides/bead-spring.md
       - Output Files: guides/output-files.md
       - Troubleshooting: guides/troubleshooting.md

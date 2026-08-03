@@ -5,6 +5,37 @@ All notable changes to AutoPoly are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Physical substrates** — build a polymer/molecule film on top of a
+  substrate slab via `generate(..., substrate=SubstrateSpec(...))`:
+  - `SubstrateSpec(model=...)` packs a `Molecule`/`Polymer` into a slab of
+    given `thickness` at the bottom of the box (`packing="grid"` for an
+    ordered slab, `"mc"` for amorphous), with a `gap` to the film region.
+    The substrate is typed in-pipeline alongside the film models;
+    `UnitSpec.role` ("film"/"substrate") records the partition.
+  - `SubstrateSpec(lt_file=..., class_name=...)` instantiates a pre-built
+    external surface (e.g. an Au(111) or SiO2 slab) once, centered
+    laterally at the slab mid-plane.
+  - `count="auto"` derives a `Molecule` substrate's instance count from
+    slab volume × `density` (requires explicit lateral `box_dims`).
+- **New packing strategy `on_substrate`** (auto-selected when `substrate`
+  is passed): z-layered assembly — slab at the bottom, film MC-placed
+  above `slab_top + gap`, shared collision detector so film and slab
+  never interpenetrate. Box sides are set per axis with
+  `box_dims=(lx, ly, lz)` (any element `None` = auto;
+  `lz = thickness + gap + film thickness at monomer_density + vacuum`).
+- **Subtract (carve regions)** — whole-instance removal after placement,
+  no covalent bonds cut: `CutAbove`, `CutBelow`, `Cylinder`, `BoxRegion`
+  from `AutoPoly.packing`, passed as `generate(..., subtract=[...])`.
+  Each region has `apply_to` ("film"/"substrate"/"all") and an optional
+  `conservative=True` sphere-inflated boundary. Supported by the
+  `mc_random` and `on_substrate` strategies (e.g. carve a `Cylinder`
+  through a bulk melt to build a nanopore); removals are logged.
+- `BoxSpec.box_dims` for rectangular (non-cubic) boxes.
+
 ## [2.0.0] - 2026-07-30
 
 AutoPoly 2.0 is a ground-up rearchitecture of the generation pipeline. It is a

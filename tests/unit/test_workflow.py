@@ -44,9 +44,11 @@ class TestGenerateWiring:
         models = [MagicMock()]
         result = generate(mock_system, "peo", models, force_field="oplsaa")
 
-        # Stage 1: geometry built from the models
+        # Stage 1: geometry built from the models (no substrate models)
         stages["geometry_cls"].assert_called_once()
-        stages["geometry"].build.assert_called_once_with(models)
+        stages["geometry"].build.assert_called_once_with(
+            models, substrate_models=[]
+        )
 
         # Stage 2: typing runs on the stage-1 geometry dir with the force field
         stages["typer_cls"].assert_called_once_with(
@@ -82,6 +84,9 @@ class TestGenerateWiring:
             monomer_density=0.05,
             rng_seed=42,
             run_moltemplate=False,
+            substrate=None,
+            subtract=None,
+            box_dims=None,
         )
 
     def test_default_parameters(self, mock_system, stages):
@@ -96,6 +101,9 @@ class TestGenerateWiring:
             monomer_density=0.085,
             rng_seed=None,
             run_moltemplate=True,
+            substrate=None,
+            subtract=None,
+            box_dims=None,
         )
 
     def test_geometry_config_forwarded(self, mock_system, stages):

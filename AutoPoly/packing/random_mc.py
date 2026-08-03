@@ -33,10 +33,26 @@ from .base import (
     bounds_size,
     symmetric_bounds,
 )
+from .regions import PlacedItem, apply_carve_regions
 
 PACKING_FRACTION = 0.3
 CHAIN_LENGTH_SAFETY_FACTOR = 3.0
 GRID_FALLBACK_FACTOR = 2.5
+
+
+def unit_role(unit) -> str:
+    """Unit role ("film" default; manifests predate the role field)."""
+    return getattr(unit, "role", "film") or "film"
+
+
+def emit_lt_command(placer, item: PlacedItem) -> str:
+    """Materialize the moltemplate command for a kept PlacedItem."""
+    kind, payload = item.payload
+    if kind == "command":
+        return payload
+    if kind == "polymer":
+        return placer.generate_polymer_lt_commands([payload])[0]
+    return placer.generate_molecule_lt_commands([payload])[0]
 
 
 def compute_auto_box_size(ctx: PackingContext) -> float:
@@ -93,24 +109,31 @@ class RandomMCStrategy(PlacementStrategy):
             box_bounds, collision_detector, ctx.mc_max_attempts
         )
 
-        records = []
+        items = []
         polymer_index = 0
         molecule_index = 0
 
         for unit in ctx.units.units:
             if unit.kind == UNIT_KIND_POLYMER:
                 polymer_index += 1
-                record = self._place_polymer(
+                items.append(self._place_polymer(
                     placer, unit, polymer_index, half_box
-                )
-                records.append(record)
+                ))
             else:
                 for _ in range(unit.count):
                     molecule_index += 1
-                    record = self._place_molecule(
+                    items.append(self._place_molecule(
                         placer, unit, molecule_index, half_box
-                    )
-                    records.append(record)
+                    ))
+
+        kept = apply_carve_regions(items, ctx.subtract)
+        records = [
+            PlacementRecord(
+                item.unit_id, item.instance_name,
+                emit_lt_command(placer, item),
+            )
+            for item in kept
+        ]
 
         stats = placer.get_placement_stats()
         logger.info(
@@ -122,29 +145,30 @@ class RandomMCStrategy(PlacementStrategy):
 
     def _place_polymer(
         self, placer, unit, polymer_index: int, half_box: float
-    ) -> PlacementRecord:
+    ) -> PlacedItem:
         """Place one polymer chain; grid fallback on failure."""
         instance_name = f"polymer_{polymer_index}"
         placement = placer.place_polymer(
             poly_name=unit.class_name, radius=unit.radius
         )
         if placement is not None:
-            command = placer.generate_polymer_lt_commands([placement])[0]
-            return PlacementRecord(unit.id, instance_name, command)
+            return PlacedItem(
+                unit.id, instance_name, unit_role(unit),
+                placement.position, placement.radius,
+                ("polymer", placement),
+            )
 
         logger.warning(
             f"Failed to place polymer {polymer_index} ({unit.id}), "
             "using fallback grid position"
         )
-        command = self._fallback_command(
-            instance_name, unit.class_name, unit.radius,
-            polymer_index - 1, half_box
+        return self._fallback_item(
+            unit, instance_name, polymer_index - 1, half_box
         )
-        return PlacementRecord(unit.id, instance_name, command)
 
     def _place_molecule(
         self, placer, unit, molecule_index: int, half_box: float
-    ) -> PlacementRecord:
+    ) -> PlacedItem:
         """Place one molecule instance; grid fallback on failure."""
         instance_name = f"molecule_{molecule_index}"
         placement = placer.place_molecule(
@@ -153,28 +177,26 @@ class RandomMCStrategy(PlacementStrategy):
             instance_name=instance_name,
         )
         if placement is not None:
-            command = placer.generate_molecule_lt_commands([placement])[0]
-            return PlacementRecord(unit.id, instance_name, command)
+            return PlacedItem(
+                unit.id, instance_name, unit_role(unit),
+                placement.position, placement.radius,
+                ("molecule", placement),
+            )
 
         logger.warning(
             f"Failed to place molecule {molecule_index} ({unit.id}), "
             "using fallback grid position"
         )
-        command = self._fallback_command(
-            instance_name, unit.class_name, unit.radius,
-            molecule_index - 1, half_box
+        return self._fallback_item(
+            unit, instance_name, molecule_index - 1, half_box
         )
-        return PlacementRecord(unit.id, instance_name, command)
 
     @staticmethod
-    def _fallback_command(
-        instance_name: str,
-        class_name: str,
-        radius: float,
-        index: int,
-        half_box: float,
-    ) -> str:
+    def _fallback_item(
+        unit, instance_name: str, index: int, half_box: float
+    ) -> PlacedItem:
         """Deterministic 3D grid position used when MC placement fails."""
+        radius = unit.radius
         spacing = radius * GRID_FALLBACK_FACTOR
         grid_per_dim = max(1, int((2 * half_box - 2 * radius) / spacing))
         ix = index % grid_per_dim
@@ -183,7 +205,12 @@ class RandomMCStrategy(PlacementStrategy):
         pos_x = -half_box + radius + ix * spacing
         pos_y = -half_box + radius + iy * spacing
         pos_z = -half_box + radius + iz * spacing
-        return (
-            f"{instance_name} = new {class_name}"
+        command = (
+            f"{instance_name} = new {unit.class_name}"
             f".move({pos_x:.4f},{pos_y:.4f},{pos_z:.4f})"
+        )
+        return PlacedItem(
+            unit.id, instance_name, unit_role(unit),
+            (pos_x, pos_y, pos_z), radius,
+            ("command", command),
         )

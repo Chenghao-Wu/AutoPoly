@@ -13,9 +13,13 @@ Created on 2026-07-30
 """
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import ClassVar, List, Optional, Tuple
+from typing import TYPE_CHECKING, ClassVar, List, Optional, Tuple, Union
 
+from ..core.exceptions import ValidationError
 from ..pipeline.units import UnitLibrary
+
+if TYPE_CHECKING:
+    from .regions import CarveRegion
 
 # ((xmin, xmax), (ymin, ymax), (zmin, zmax))
 BoxBounds = Tuple[Tuple[float, float], Tuple[float, float], Tuple[float, float]]
@@ -40,8 +44,117 @@ class BoxSpec:
     Attributes:
         requested_box_size: Explicit cubic box side in Angstrom, or None
                             to let the strategy auto-size the box.
+        box_dims: Optional per-axis box sides (lx, ly, lz) in Angstrom.
+                  Any element may be None (strategy auto-sizes that axis).
+                  Takes precedence over requested_box_size per axis.
     """
     requested_box_size: Optional[float] = None
+    box_dims: Tuple[Optional[float], Optional[float], Optional[float]] = (
+        None, None, None,
+    )
+
+
+#: Valid slab packing modes for a model-built substrate.
+SUBSTRATE_PACKING_MODES = ("grid", "mc")
+
+#: Sentinel for deriving the substrate instance count from slab volume.
+AUTO_COUNT = "auto"
+
+
+@dataclass
+class SubstrateSpec:
+    """
+    Physical substrate specification for the "on_substrate" strategy.
+
+    The substrate is a slab of lateral size (lx, ly) sitting at the bottom
+    of the box (z in [zlo, zlo + thickness]); film units are placed above
+    it with a `gap` of empty space in between.
+
+    Exactly one source must be given:
+
+    - model: a Molecule or Polymer model, typed in-pipeline alongside the
+             film models. Its units carry role="substrate" and are packed
+             into the slab region ("grid" = ordered layers, "mc" =
+             amorphous MC placement).
+    - lt_file + class_name: a pre-built surface class (e.g. an Au(111) or
+             SiO2 slab built outside AutoPoly). The file is copied into the
+             moltemplate directory, imported in system.lt, and instantiated
+             once, centered laterally at zlo + thickness/2.
+
+    Attributes:
+        model: Molecule/Polymer model for an in-pipeline substrate.
+        lt_file: Path to an external pre-built substrate .lt file.
+        class_name: Moltemplate class name defined by lt_file.
+        thickness: Slab z-extent in Angstrom (must be > 0).
+        packing: Slab packing mode for model substrates: "grid" or "mc".
+        gap: Empty space in Angstrom between the slab top and the film.
+        count: None (use the model's own Count/chain_num), a positive int
+               override, or AUTO_COUNT to derive the instance count from
+               slab volume x density (Molecule models only; requires
+               explicit lateral box_dims at generate() time).
+        density: Particle density (particles/A^3) used with AUTO_COUNT.
+        vacuum: Extra empty space in Angstrom above the film (0 = fully
+                periodic slab model with the film filling the rest of z).
+    """
+    model: Optional[object] = None
+    lt_file: Optional[str] = None
+    class_name: Optional[str] = None
+    thickness: float = 10.0
+    packing: str = "grid"
+    gap: float = 3.0
+    count: Union[int, str, None] = None
+    density: float = 0.085
+    vacuum: float = 0.0
+
+    def __post_init__(self) -> None:
+        if (self.model is None) == (self.lt_file is None):
+            raise ValidationError(
+                "SubstrateSpec requires exactly one source: 'model' "
+                "(in-pipeline Molecule/Polymer) or 'lt_file' (external slab)"
+            )
+        if self.lt_file is not None and not self.class_name:
+            raise ValidationError(
+                "SubstrateSpec with lt_file requires 'class_name' "
+                "(the moltemplate class defined by that file)"
+            )
+        if self.thickness <= 0:
+            raise ValidationError(
+                f"SubstrateSpec thickness must be > 0, got {self.thickness}"
+            )
+        if self.gap < 0:
+            raise ValidationError(
+                f"SubstrateSpec gap must be >= 0, got {self.gap}"
+            )
+        if self.vacuum < 0:
+            raise ValidationError(
+                f"SubstrateSpec vacuum must be >= 0, got {self.vacuum}"
+            )
+        if self.packing not in SUBSTRATE_PACKING_MODES:
+            raise ValidationError(
+                f"SubstrateSpec packing must be one of "
+                f"{list(SUBSTRATE_PACKING_MODES)}, got '{self.packing}'"
+            )
+        if self.count is not None:
+            if isinstance(self.count, str):
+                if self.count != AUTO_COUNT:
+                    raise ValidationError(
+                        f"SubstrateSpec count must be None, a positive int, "
+                        f"or '{AUTO_COUNT}', got '{self.count}'"
+                    )
+            elif not (isinstance(self.count, int) and self.count > 0):
+                raise ValidationError(
+                    f"SubstrateSpec count must be a positive int, "
+                    f"got {self.count}"
+                )
+        if self.density <= 0:
+            raise ValidationError(
+                f"SubstrateSpec density must be > 0, got {self.density}"
+            )
+
+    @property
+    def is_external(self) -> bool:
+        """True for a pre-built external .lt slab (no in-pipeline model)."""
+        return self.lt_file is not None
 
 
 @dataclass
@@ -57,6 +170,11 @@ class PackingContext:
         offset: Nominal monomer-monomer spacing in Angstrom (grid layout,
                 chain-length box estimates).
         monomer_density: Target monomer density (monomers/A^3) for box sizing.
+        substrate: Optional SubstrateSpec (required by the "on_substrate"
+                   strategy; ignored otherwise).
+        subtract: Optional list of CarveRegion specs applied to placed
+                  instances before lt command emission (whole-instance
+                  removal; supported by "mc_random" and "on_substrate").
     """
     units: UnitLibrary
     box: BoxSpec = field(default_factory=BoxSpec)
@@ -64,6 +182,8 @@ class PackingContext:
     rng_seed: Optional[int] = None
     offset: float = 4.0
     monomer_density: float = 0.085
+    substrate: Optional[SubstrateSpec] = None
+    subtract: Optional[List["CarveRegion"]] = None
 
 
 @dataclass

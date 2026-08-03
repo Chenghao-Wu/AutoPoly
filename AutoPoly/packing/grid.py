@@ -18,6 +18,7 @@ Created on 2026-07-30
 """
 import numpy as np
 
+from ..core.exceptions import ValidationError
 from ..core.system import logger
 from ..pipeline.units import UNIT_KIND_POLYMER
 from .base import (
@@ -40,6 +41,17 @@ class GridStrategy(PlacementStrategy):
     name = "grid"
 
     def place(self, ctx: PackingContext) -> PlacementResult:
+        if ctx.substrate is not None:
+            raise ValidationError(
+                "Strategy 'grid' does not support substrates; "
+                "use strategy 'on_substrate'"
+            )
+        if ctx.subtract:
+            raise ValidationError(
+                "Strategy 'grid' does not support subtract regions; "
+                "use strategy 'mc_random' or 'on_substrate'"
+            )
+
         records = []
         polymer_index = 0
         molecule_index = 0

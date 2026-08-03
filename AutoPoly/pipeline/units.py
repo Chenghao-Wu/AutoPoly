@@ -32,6 +32,10 @@ UNIT_KIND_POLYMER = "polymer"
 UNIT_KIND_MOLECULE = "molecule"
 VALID_UNIT_KINDS = (UNIT_KIND_POLYMER, UNIT_KIND_MOLECULE)
 
+UNIT_ROLE_FILM = "film"
+UNIT_ROLE_SUBSTRATE = "substrate"
+VALID_UNIT_ROLES = (UNIT_ROLE_FILM, UNIT_ROLE_SUBSTRATE)
+
 
 @dataclass
 class UnitSpec:
@@ -51,6 +55,8 @@ class UnitSpec:
         anchors: Head/tail atom references for future grafting strategies,
                  e.g. {"head": "monomer[0]/C1", "tail": "monomer[49]/C2"}.
                  Populated by UnitTyper; not consumed by current strategies.
+        role: "film" (default) or "substrate". Substrate units are packed
+              into the slab region by the "on_substrate" strategy.
         monomer_files: Constituent monomer .lt files this unit depends on
                        (used for force-field subsetting).
     """
@@ -62,6 +68,7 @@ class UnitSpec:
     n_monomers: Optional[int] = None
     radius: float = 3.0
     anchors: Dict[str, str] = field(default_factory=dict)
+    role: str = UNIT_ROLE_FILM
     monomer_files: List[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
@@ -69,6 +76,11 @@ class UnitSpec:
             raise ValidationError(
                 f"Invalid unit kind '{self.kind}' for unit '{self.id}'. "
                 f"Must be one of: {list(VALID_UNIT_KINDS)}"
+            )
+        if self.role not in VALID_UNIT_ROLES:
+            raise ValidationError(
+                f"Invalid unit role '{self.role}' for unit '{self.id}'. "
+                f"Must be one of: {list(VALID_UNIT_ROLES)}"
             )
         if self.count < 1:
             raise ValidationError(
@@ -87,7 +99,7 @@ class UnitSpec:
     def from_dict(data: Dict[str, Any]) -> "UnitSpec":
         known = {
             "id", "kind", "lt_file", "count", "topology", "n_monomers",
-            "radius", "anchors", "monomer_files",
+            "radius", "anchors", "role", "monomer_files",
         }
         filtered = {k: v for k, v in data.items() if k in known}
         return UnitSpec(**filtered)
@@ -216,6 +228,14 @@ class UnitLibrary:
     @property
     def molecule_units(self) -> List[UnitSpec]:
         return [u for u in self.units if u.kind == UNIT_KIND_MOLECULE]
+
+    @property
+    def substrate_units(self) -> List[UnitSpec]:
+        return [u for u in self.units if u.role == UNIT_ROLE_SUBSTRATE]
+
+    @property
+    def film_units(self) -> List[UnitSpec]:
+        return [u for u in self.units if u.role == UNIT_ROLE_FILM]
 
     def total_particle_count(self) -> int:
         """Total monomers + molecule instances, used for density box sizing."""

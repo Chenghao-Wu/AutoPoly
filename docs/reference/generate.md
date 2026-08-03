@@ -6,4 +6,16 @@ directly when you need control between stages (e.g. typing one geometry
 under multiple force fields); use `generate()` for single-force-field
 one-shot runs.
 
+Beyond the bulk-melt default, `generate()` also accepts:
+
+- `substrate=SubstrateSpec(...)` — build a film on a physical substrate
+  slab (auto-selects the `on_substrate` strategy);
+- `subtract=[CutAbove(...) / Cylinder(...) / ...]` — whole-instance carve
+  regions applied after placement;
+- `box_dims=(lx, ly, lz)` — rectangular boxes (per-axis auto-sizing with
+  `None`).
+
+See the [Substrates & Films guide](../guides/substrates.md) for the full
+surface-simulation workflow.
+
 ::: AutoPoly.pipeline.workflow
