@@ -159,7 +159,7 @@ mix coarse-grained chains with other moltemplate objects.
 | `"saw"` (default) | Fast | Self-avoiding walk — overlap-free coils |
 | `"mc"` | Slow | Monte Carlo pre-equilibration (`MCConfig`) — relaxed starting configurations |
 
-The SAW generator shares its collision detector with the atomistic [MC placement engine](mc-placement.md); box size comes from the target bead density (default 0.85 beads/σ³).
+The SAW generator shares its collision detector with the atomistic [MC placement engine](mc-placement.md); box size comes from the target bead density (default 0.85 beads/σ³). If a chain fails to grow (crowded box, branched architecture), the whole-system generation is retried up to `SAWConfig.system_retries` times (default 3) before falling back to geometric placement; for branched chains at melt density, generate at a moderate density (~0.3–0.4) and compress with NPT.
 
 ## Output
 

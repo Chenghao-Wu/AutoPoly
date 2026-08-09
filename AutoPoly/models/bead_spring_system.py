@@ -291,12 +291,22 @@ class BeadSpringSystem:
             f"({self.n_species} species), box_size={box_size:.3f}"
         )
 
-        positions, chain_indices, stats = saw_generate_graphs(
-            architectures=chains,
-            bond_length=self.bond_length,
-            box_size=box_size,
-            config=config,
-        )
+        # Whole-system retries (see BeadSpringPolymer.saw_generate)
+        stats = {"success": False}
+        positions, chain_indices = None, None
+        for attempt in range(max(1, config.system_retries)):
+            positions, chain_indices, stats = saw_generate_graphs(
+                architectures=chains,
+                bond_length=self.bond_length,
+                box_size=box_size,
+                config=config,
+            )
+            if stats["success"]:
+                break
+            logger.info(
+                f"SAW attempt {attempt + 1}/{config.system_retries} failed "
+                f"({stats['failure_reason']}), retrying with fresh state"
+            )
 
         if not stats["success"]:
             logger.warning(

@@ -37,6 +37,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   species (`(architecture, n_chains)` pairs — e.g. rings + linear +
   combs) into one box and one LAMMPS data file with a shared bead-type
   table.
+- **SAW whole-system retries** — `SAWConfig.system_retries` (default 3)
+  retries the whole multi-chain SAW generation when a single crowded
+  chain fails, instead of immediately falling back to geometric
+  placement.
+- **Example: bead-spring with side groups** —
+  `examples/example_bead_spring_side_groups.py` demonstrates a comb with
+  single-bead side groups + branch angles, a graft copolymer with
+  oligomeric side chains, a comb built from an explicit
+  `MonomerTemplate`, and the moltemplate backend.
 - **Moltemplate backend for bead-spring models** — `generate_moltemplate()`
   on both `BeadSpringPolymer` and `BeadSpringSystem` emits
   `bead_spring.lt` (CG force field), `bead_<Type>.lt` monomer objects,

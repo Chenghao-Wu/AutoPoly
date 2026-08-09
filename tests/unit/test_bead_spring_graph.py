@@ -337,6 +337,65 @@ class TestBranchedMCMoves:
         assert n_ok >= 0.7 * len(bsp._bonds)
 
 
+class TestSAWRetries:
+    def test_system_retries_on_failure(self, mock_system, monkeypatch):
+        """Whole-system SAW retries until success (system_retries)."""
+        import AutoPoly.models.bead_spring as bs_module
+
+        calls = {"n": 0}
+        real_fn = bs_module.saw_generate_graphs
+
+        def flaky(*args, **kwargs):
+            calls["n"] += 1
+            if calls["n"] < 3:
+                return None, None, {
+                    "success": False,
+                    "chains_completed": 0,
+                    "total_backtracks": 0,
+                    "failure_reason": "chain_growth",
+                }
+            return real_fn(*args, **kwargs)
+
+        monkeypatch.setattr(bs_module, "saw_generate_graphs", flaky)
+
+        star = arch.star(center="A", arms=[("B", 5)] * 3)
+        bsp = BeadSpringPolymer(
+            name="t", system=mock_system, n_chains=1,
+            bead_types=[A, B], architecture=star,
+            box_size=10.0,
+            saw_config=SAWConfig(system_retries=5),
+        )
+        assert bsp.saw_generate()
+        assert calls["n"] == 3
+
+    def test_system_retries_exhausted(self, mock_system, monkeypatch):
+        """Returns False after all retries are exhausted."""
+        import AutoPoly.models.bead_spring as bs_module
+
+        calls = {"n": 0}
+
+        def always_fail(*args, **kwargs):
+            calls["n"] += 1
+            return None, None, {
+                "success": False,
+                "chains_completed": 0,
+                "total_backtracks": 0,
+                "failure_reason": "chain_growth",
+            }
+
+        monkeypatch.setattr(bs_module, "saw_generate_graphs", always_fail)
+
+        star = arch.star(center="A", arms=[("B", 5)] * 3)
+        bsp = BeadSpringPolymer(
+            name="t", system=mock_system, n_chains=1,
+            bead_types=[A, B], architecture=star,
+            box_size=10.0,
+            saw_config=SAWConfig(system_retries=2),
+        )
+        assert not bsp.saw_generate()
+        assert calls["n"] == 2
+
+
 # =============================================================================
 # Mixtures (BeadSpringSystem)
 # =============================================================================

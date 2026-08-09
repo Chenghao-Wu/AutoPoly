@@ -1,6 +1,6 @@
 # Tutorials
 
-Twelve runnable scripts live in the [`examples/`](https://github.com/WuGroup-XJTLU/AutoPoly/tree/v1.0/examples) directory of the repository. Each one writes LAMMPS input files (`system.data`, `system.in.init`, `system.in.settings`, `system.in.charges`) into a new output directory.
+Thirteen runnable scripts live in the [`examples/`](https://github.com/WuGroup-XJTLU/AutoPoly/tree/v1.0/examples) directory of the repository. Each one writes LAMMPS input files (`system.data`, `system.in.init`, `system.in.settings`, `system.in.charges`) into a new output directory.
 
 ## Running them
 
@@ -42,6 +42,7 @@ Output directories are git-ignored — just re-run a script to regenerate them.
 | Tutorial | Demonstrates |
 |---|---|
 | [Bead-Spring Models](bead-spring.md) | Homopolymer, diblock (FENE), ring with angles, MC equilibration, SAW generation — direct LAMMPS data files, no moltemplate |
+| `example_bead_spring_side_groups.py` | Comb with side groups, graft copolymer with oligomeric side chains, comb from an explicit `MonomerTemplate` (backbone + side-group beads), branch-point angles, moltemplate backend |
 
 ## Before you start
 

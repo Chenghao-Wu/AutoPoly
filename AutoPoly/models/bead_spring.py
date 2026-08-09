@@ -59,6 +59,7 @@ class SAWConfig:
     bond_angle_max: float = 180.0         # Max bond angle
     ring_closure_trials: int = 100        # Extra trials for ring closure
     ring_closure_tolerance: float = 0.2   # Distance tolerance for ring closure
+    system_retries: int = 3               # Whole-system retries when a chain fails
 
 
 @dataclass
@@ -2661,23 +2662,35 @@ class BeadSpringPolymer:
             f"{self.n_beads} beads each, box_size={box_size:.3f}"
         )
 
-        if self.topology in self.VALID_TOPOLOGIES:
-            # Legacy path for linear/ring (identical connectivity)
-            positions, chain_indices, stats = saw_generate_multi_chain(
-                n_chains=self.n_chains,
-                n_beads_per_chain=self.n_beads,
-                bond_length=self.bond_length,
-                box_size=box_size,
-                config=config,
-                topology=self.topology,
-            )
-        else:
-            # Graph path for arbitrary architectures (star, comb, ...)
-            positions, chain_indices, stats = saw_generate_graphs(
-                architectures=[self._architecture] * self.n_chains,
-                bond_length=self.bond_length,
-                box_size=box_size,
-                config=config,
+        # SAW success is stochastic per attempt (a single crowded chain
+        # fails the whole system), so retry the whole system a few times
+        # before giving up.
+        stats = {"success": False}
+        positions, chain_indices = None, None
+        for attempt in range(max(1, config.system_retries)):
+            if self.topology in self.VALID_TOPOLOGIES:
+                # Legacy path for linear/ring (identical connectivity)
+                positions, chain_indices, stats = saw_generate_multi_chain(
+                    n_chains=self.n_chains,
+                    n_beads_per_chain=self.n_beads,
+                    bond_length=self.bond_length,
+                    box_size=box_size,
+                    config=config,
+                    topology=self.topology,
+                )
+            else:
+                # Graph path for arbitrary architectures (star, comb, ...)
+                positions, chain_indices, stats = saw_generate_graphs(
+                    architectures=[self._architecture] * self.n_chains,
+                    bond_length=self.bond_length,
+                    box_size=box_size,
+                    config=config,
+                )
+            if stats["success"]:
+                break
+            logger.info(
+                f"SAW attempt {attempt + 1}/{config.system_retries} failed "
+                f"({stats['failure_reason']}), retrying with fresh state"
             )
 
         if not stats["success"]:
