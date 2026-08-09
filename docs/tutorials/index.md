@@ -42,7 +42,7 @@ Output directories are git-ignored — just re-run a script to regenerate them.
 | Tutorial | Demonstrates |
 |---|---|
 | [Bead-Spring Models](bead-spring.md) | Homopolymer, diblock (FENE), ring with angles, MC equilibration, SAW generation — direct LAMMPS data files, no moltemplate |
-| `example_bead_spring_side_groups.py` | Comb with side groups, graft copolymer with oligomeric side chains, comb from an explicit `MonomerTemplate` (backbone + side-group beads), branch-point angles, moltemplate backend |
+| `example_bead_spring_side_groups.py` | Comb with side groups, graft copolymer with oligomeric side chains, comb from an explicit `MonomerTemplate` (backbone + side-group beads), branch-point angles — via the standard moltemplate backend, plus the direct-writer alternative |
 
 ## Before you start
 

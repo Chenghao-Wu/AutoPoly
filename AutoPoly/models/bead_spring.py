@@ -2141,6 +2141,7 @@ class BeadSpringPolymer:
     VALID_BOND_STYLES = ["harmonic", "fene"]
     VALID_PAIR_STYLES = ["lj", "wca"]
     VALID_GENERATION_METHODS = ["geometric", "saw", "mc"]
+    VALID_BACKENDS = ["moltemplate", "direct"]
 
     def __init__(
         self,
@@ -2171,6 +2172,8 @@ class BeadSpringPolymer:
         # Generation method
         generation_method: str = "saw",  # "geometric", "saw", or "mc"
         saw_config: Optional[SAWConfig] = None,
+        # Output backend
+        backend: str = "moltemplate",  # "moltemplate" (default) or "direct"
         # MC equilibration (legacy, use generation_method="mc" instead)
         equilibrate: bool = False,
         mc_config: Optional[MCConfig] = None,
@@ -2215,6 +2218,13 @@ class BeadSpringPolymer:
                 - "saw": Self-Avoiding Random Walk (fast, overlap-free)
                 - "mc": Monte Carlo equilibration (slow, equilibrated)
             saw_config: SAW configuration. Uses defaults if None.
+            backend: Output backend used by :meth:`generate`:
+                - "moltemplate" (default): emit .lt files and run the bundled
+                  moltemplate -> moltemplate/system.data + system.in.*
+                  (standard AutoPoly output layout; mixable with other
+                  moltemplate objects).
+                - "direct": write polymer.data + in.polymer directly
+                  (lightweight; better for very large melts).
             equilibrate: Whether to run MC equilibration (legacy, use generation_method="mc").
             mc_config: Monte Carlo configuration. Uses defaults if None.
 
@@ -2241,6 +2251,8 @@ class BeadSpringPolymer:
             raise ValueError(f"Generation method must be one of: {self.VALID_GENERATION_METHODS}")
         if pair_style not in self.VALID_PAIR_STYLES:
             raise ValueError(f"Pair style must be one of: {self.VALID_PAIR_STYLES}")
+        if backend not in self.VALID_BACKENDS:
+            raise ValueError(f"Backend must be one of: {self.VALID_BACKENDS}")
         if not bead_types:
             raise ValueError("At least one bead type is required")
 
@@ -2305,6 +2317,9 @@ class BeadSpringPolymer:
         # Generation method parameters
         self._generation_method = generation_method
         self._saw_config = saw_config
+
+        # Output backend
+        self._backend = backend
 
         # MC equilibration parameters (legacy support)
         self._equilibrate = equilibrate
@@ -2715,8 +2730,34 @@ class BeadSpringPolymer:
         )
         return True
 
+    def generate(
+        self,
+        backend: Optional[str] = None,
+        run_moltemplate: bool = True,
+    ) -> None:
+        """
+        Generate LAMMPS input files using the configured output backend.
+
+        This is the standard entry point for producing simulation files.
+
+        Args:
+            backend: "moltemplate" (default; .lt files + moltemplate ->
+                moltemplate/system.data + system.in.*) or "direct"
+                (polymer.data + in.polymer written directly). Defaults to
+                the constructor's ``backend`` parameter.
+            run_moltemplate: Only for the moltemplate backend: run the
+                bundled moltemplate after writing .lt files.
+        """
+        backend = backend or self._backend
+        if backend not in self.VALID_BACKENDS:
+            raise ValueError(f"Backend must be one of: {self.VALID_BACKENDS}")
+        if backend == "moltemplate":
+            self.generate_moltemplate(run_moltemplate=run_moltemplate)
+        else:
+            self.generate_data_file()
+
     def generate_data_file(self) -> None:
-        """Generate LAMMPS data file for bead-spring polymer."""
+        """Generate LAMMPS data file for bead-spring polymer (direct backend)."""
         n_beads = self.n_beads
         # Bond/angle counts come from the chain graph edge/triplet lists
         # (a tree has N-1 bonds, a ring N, etc.)

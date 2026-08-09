@@ -37,6 +37,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   species (`(architecture, n_chains)` pairs — e.g. rings + linear +
   combs) into one box and one LAMMPS data file with a shared bead-type
   table.
+- **Moltemplate is now the default backend for bead-spring models** —
+  new unified `generate()` entry point on `BeadSpringPolymer` and
+  `BeadSpringSystem` dispatches to the moltemplate backend by default
+  (constructor `backend="moltemplate"`; override per call with
+  `generate(backend="direct")` for the lightweight direct writer, e.g.
+  very large melts). `generate_moltemplate()` and `generate_data_file()`
+  remain available for explicit control.
 - **SAW whole-system retries** — `SAWConfig.system_retries` (default 3)
   retries the whole multi-chain SAW generation when a single crowded
   chain fails, instead of immediately falling back to geometric

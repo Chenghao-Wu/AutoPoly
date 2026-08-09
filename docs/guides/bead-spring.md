@@ -1,6 +1,6 @@
 # Bead-Spring (Coarse-Grained)
 
-`BeadSpringPolymer` builds coarse-grained bead-spring polymer models — Kremer–Grest-style chains of Lennard-Jones beads — and writes LAMMPS data files **directly**, with no SMILES, no atom typing, and no moltemplate. Use it for large systems, long chains, and polymer physics studies where chemical detail is not the point.
+`BeadSpringPolymer` builds coarse-grained bead-spring polymer models — Kremer–Grest-style chains of Lennard-Jones beads — with no SMILES and no atom typing. Use it for large systems, long chains, and polymer physics studies where chemical detail is not the point. Coordinates are generated in Python (SAW / MC); the output files are then produced through the **moltemplate backend** (the standard backend for coarse-grained cases), with a lightweight direct writer available as an alternative.
 
 ```python
 from AutoPoly import System, BeadSpringPolymer, BeadType
@@ -18,7 +18,8 @@ bsp = BeadSpringPolymer(
     pair_style="lj",
     generation_method="saw",
 )
-bsp.generate_data_file()
+bsp.generate()                    # moltemplate backend (default)
+# bsp.generate(backend="direct")  # lightweight alternative, no moltemplate run
 ```
 
 ## Building blocks
@@ -123,27 +124,18 @@ bss = BeadSpringSystem(
 )
 bss.add_species(arch.ring([("A", 50)]), n_chains=20)
 bss.add_species(arch.linear([("A", 50)]), n_chains=20)
-bss.generate_data_file()
+bss.generate()    # moltemplate backend (default)
 ```
 
 All species share one bead-type table; chains of all species are placed
 collision-free with the graph-based SAW generator.
 
-## Moltemplate backend
+## Mixtures and the moltemplate backend
 
-`generate_moltemplate()` emits moltemplate `.lt` files mirroring the
-atomistic pipeline (`bead_spring.lt` force field, `bead_<Type>.lt`
-monomer objects, `chains.lt` with one object per chain at the generated
-coordinates, `system.lt`) and runs the bundled moltemplate to produce
-`system.data` + `system.in.init/settings`:
-
-```python
-bsp.generate_moltemplate(run_moltemplate=True)   # -> <out>/<name>/moltemplate/
-bss.generate_moltemplate(run_moltemplate=True)   # mixtures too
-```
-
-Use it when you want the standard moltemplate output layout or need to
-mix coarse-grained chains with other moltemplate objects.
+Mixtures use the same `generate()` entry point and backend selection;
+with the default moltemplate backend each chain becomes its own
+moltemplate object sharing one bead-type table, so mixed systems
+(rings + stars + combs + ...) land in one `system.data`.
 
 ## Potentials
 
@@ -161,9 +153,16 @@ mix coarse-grained chains with other moltemplate objects.
 
 The SAW generator shares its collision detector with the atomistic [MC placement engine](mc-placement.md); box size comes from the target bead density (default 0.85 beads/σ³). If a chain fails to grow (crowded box, branched architecture), the whole-system generation is retried up to `SAWConfig.system_retries` times (default 3) before falling back to geometric placement; for branched chains at melt density, generate at a moderate density (~0.3–0.4) and compress with NPT.
 
-## Output
+## Output backends
 
-`generate_data_file()` writes a complete LAMMPS data file (masses, pair/bond/angle coefficients, atoms, bonds, angles) under `<System out>/<name>/` — no `system.in.*` split files, since everything is self-contained in reduced units.
+`generate()` produces LAMMPS files through one of two backends (set the default with the constructor's `backend` parameter, override per call):
+
+| Backend | Call | Output | When to use |
+|---|---|---|---|
+| `"moltemplate"` (default) | `generate()` | `<out>/<name>/moltemplate/`: `system.data`, `system.in.init`, `system.in.settings`, `in.polymer` + the `.lt` sources (`bead_spring.lt`, `bead_<Type>.lt`, `chains.lt`, `system.lt`) | **Standard.** Same layout as the atomistic pipeline; the `.lt` files are inspectable/editable, and CG chains can be mixed with other moltemplate objects |
+| `"direct"` | `generate(backend="direct")` | `<out>/<name>/`: `polymer.data` + `in.polymer` (self-contained, reduced units) | Very large melts where the moltemplate build step is slow |
+
+Both backends consume the same generated coordinates and graph structure — the physics is identical. The lower-level methods `generate_moltemplate(run_moltemplate=...)` and `generate_data_file()` remain available for explicit control.
 
 ## See also
 

@@ -7,6 +7,7 @@ BeadSpringSystem mixtures.
 import numpy as np
 import pytest
 import tempfile
+from pathlib import Path
 
 from AutoPoly.models.bead_spring import (
     BeadSpringPolymer, BeadType, AngleType, MCConfig, SAWConfig,
@@ -335,6 +336,71 @@ class TestBranchedMCMoves:
             if abs(np.linalg.norm(dr) - 1.0) < 0.3:
                 n_ok += 1
         assert n_ok >= 0.7 * len(bsp._bonds)
+
+
+class TestBackendSelection:
+    def test_default_backend_is_moltemplate(self, mock_system, temp_dir):
+        bsp = BeadSpringPolymer(
+            name="t", system=mock_system, n_chains=1,
+            bead_types=[A], sequence=[("A", 5)], density=0.1,
+        )
+        assert bsp._backend == "moltemplate"
+        bsp.generate(run_moltemplate=False)
+        assert (Path(temp_dir) / "t" / "moltemplate" / "system.lt").exists()
+        # Direct-writer outputs are NOT produced by default
+        assert not (Path(temp_dir) / "t" / "polymer.data").exists()
+
+    def test_generate_with_direct_backend(self, mock_system, temp_dir):
+        bsp = BeadSpringPolymer(
+            name="t", system=mock_system, n_chains=1,
+            bead_types=[A], sequence=[("A", 5)], density=0.1,
+        )
+        bsp.generate(backend="direct")
+        assert (Path(temp_dir) / "t" / "polymer.data").exists()
+        assert not (Path(temp_dir) / "t" / "moltemplate").exists()
+
+    def test_constructor_direct_backend(self, mock_system, temp_dir):
+        bsp = BeadSpringPolymer(
+            name="t", system=mock_system, n_chains=1,
+            bead_types=[A], sequence=[("A", 5)], density=0.1,
+            backend="direct",
+        )
+        bsp.generate()
+        assert (Path(temp_dir) / "t" / "polymer.data").exists()
+
+    def test_invalid_backend_raises(self, mock_system):
+        with pytest.raises(ValueError, match="Backend"):
+            BeadSpringPolymer(
+                name="t", system=mock_system, n_chains=1,
+                bead_types=[A], sequence=[("A", 5)], backend="banana",
+            )
+
+    def test_generate_invalid_backend_raises(self, mock_system):
+        bsp = BeadSpringPolymer(
+            name="t", system=mock_system, n_chains=1,
+            bead_types=[A], sequence=[("A", 5)], density=0.1,
+        )
+        with pytest.raises(ValueError, match="Backend"):
+            bsp.generate(backend="banana")
+
+    def test_system_default_backend_is_moltemplate(self, mock_system, temp_dir):
+        bss = BeadSpringSystem(
+            name="m", system=mock_system, bead_types=[A], density=0.1,
+        )
+        assert bss._backend == "moltemplate"
+        bss.add_species(arch.linear([("A", 4)]), 1)
+        bss.generate(run_moltemplate=False)
+        assert (Path(temp_dir) / "m" / "moltemplate" / "system.lt").exists()
+        assert not (Path(temp_dir) / "m" / "polymer.data").exists()
+
+    def test_system_direct_backend(self, mock_system, temp_dir):
+        bss = BeadSpringSystem(
+            name="m", system=mock_system, bead_types=[A], density=0.1,
+            backend="direct",
+        )
+        bss.add_species(arch.linear([("A", 4)]), 1)
+        bss.generate()
+        assert (Path(temp_dir) / "m" / "polymer.data").exists()
 
 
 class TestSAWRetries:

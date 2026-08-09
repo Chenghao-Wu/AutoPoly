@@ -82,6 +82,8 @@ class BeadSpringSystem:
         generation_method: "geometric", "saw" (default), or "mc".
         saw_config: SAW configuration.
         mc_config: MC equilibration configuration.
+        backend: Output backend used by :meth:`generate`: "moltemplate"
+            (default) or "direct".
 
     Raises:
         ValueError: If parameters are invalid.
@@ -90,6 +92,7 @@ class BeadSpringSystem:
     VALID_BOND_STYLES = ["harmonic", "fene"]
     VALID_PAIR_STYLES = ["lj", "wca"]
     VALID_GENERATION_METHODS = ["geometric", "saw", "mc"]
+    VALID_BACKENDS = ["moltemplate", "direct"]
 
     def __init__(
         self,
@@ -111,7 +114,10 @@ class BeadSpringSystem:
         generation_method: str = "saw",
         saw_config: Optional[SAWConfig] = None,
         mc_config: Optional[MCConfig] = None,
+        backend: str = "moltemplate",
     ) -> None:
+        if backend not in self.VALID_BACKENDS:
+            raise ValueError(f"Backend must be one of: {self.VALID_BACKENDS}")
         if bond_style not in self.VALID_BOND_STYLES:
             raise ValueError(f"Bond style must be one of: {self.VALID_BOND_STYLES}")
         if pair_style not in self.VALID_PAIR_STYLES:
@@ -151,6 +157,9 @@ class BeadSpringSystem:
         self._generation_method = generation_method
         self._saw_config = saw_config
         self._mc_config = mc_config
+
+        # Output backend ("moltemplate" default, or "direct")
+        self._backend = backend
 
         # Species: list of (architecture, n_chains, species_name)
         self._species: List[Tuple[BeadArchitecture, int, str]] = []
@@ -394,8 +403,35 @@ class BeadSpringSystem:
             for arch in self._chain_architectures
         ]
 
+    def generate(
+        self,
+        backend: Optional[str] = None,
+        run_moltemplate: bool = True,
+    ) -> None:
+        """
+        Generate LAMMPS input files using the configured output backend.
+
+        This is the standard entry point for producing simulation files.
+
+        Args:
+            backend: "moltemplate" (default; .lt files + moltemplate ->
+                moltemplate/system.data + system.in.*) or "direct"
+                (polymer.data + in.polymer written directly). Defaults to
+                the constructor's ``backend`` parameter.
+            run_moltemplate: Only for the moltemplate backend: run the
+                bundled moltemplate after writing .lt files.
+        """
+        backend = backend or self._backend
+        if backend not in self.VALID_BACKENDS:
+            raise ValueError(f"Backend must be one of: {self.VALID_BACKENDS}")
+        if backend == "moltemplate":
+            self.generate_moltemplate(run_moltemplate=run_moltemplate)
+        else:
+            self.generate_data_file()
+
     def generate_data_file(self) -> None:
-        """Generate the LAMMPS data file (and input script) for the mixture."""
+        """Generate the LAMMPS data file (and input script) for the mixture
+        (direct backend)."""
         self._require_species()
 
         # Generate positions

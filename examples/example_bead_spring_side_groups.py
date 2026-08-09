@@ -15,11 +15,15 @@ architecture graph core (AutoPoly.models.architectures):
 - Example 3: Comb polymer assembled from an explicitly defined monomer
              (MonomerTemplate: backbone bead + side-group bead with
              head/tail/side connection points).
-- Example 4: Moltemplate backend (.lt files + system.data via the bundled
-             moltemplate) for the comb of Example 1.
+- Example 4: The direct writer backend (backend="direct") — a lightweight
+             alternative that writes polymer.data + in.polymer without
+             running moltemplate (useful for very large melts).
 
-Output files (per example): polymer.data + in.polymer (direct writer), or
-moltemplate/system.data + system.in.* (moltemplate backend, Example 4).
+All examples use the standard moltemplate backend via generate(): .lt
+files are emitted and the bundled moltemplate produces
+moltemplate/system.data + system.in.init/settings (the standard AutoPoly
+output layout). The direct writer is available through
+generate(backend="direct") and is demonstrated in Example 4.
 
 Requires: pip install -e .  (from the AutoPoly repo root)
 """
@@ -80,7 +84,7 @@ def example_1_comb_with_side_groups():
         # compress to melt density (~0.85) with NPT during equilibration
         density=0.4,
     )
-    polymer.generate_data_file()
+    polymer.generate()  # moltemplate backend (default)
 
     info = polymer.get_system_info()
     print(f"  Architecture: {info['architecture']} (branched: {info['is_branched']})")
@@ -90,7 +94,7 @@ def example_1_comb_with_side_groups():
     print(f"  Total atoms: {info['total_atoms']}")
     print(f"  Total bonds: {info['total_bonds']}")
     print(f"  Total angles: {info['total_angles']} (incl. branch-point triplets)")
-    print(f"  Output: {info['output_path']}")
+    print(f"  Output: {info['output_path']}/moltemplate")
 
     return polymer
 
@@ -132,7 +136,7 @@ def example_2_graft_copolymer():
         pair_style="wca",
         density=0.4,
     )
-    polymer.generate_data_file()
+    polymer.generate()  # moltemplate backend (default)
 
     info = polymer.get_system_info()
     print(f"  Architecture: {info['architecture']}")
@@ -141,7 +145,7 @@ def example_2_graft_copolymer():
           f"(30 backbone + 3 x 5 side-chain beads)")
     print(f"  Total atoms: {info['total_atoms']}")
     print(f"  Total bonds: {info['total_bonds']}")
-    print(f"  Output: {info['output_path']}")
+    print(f"  Output: {info['output_path']}/moltemplate")
 
     return polymer
 
@@ -200,7 +204,7 @@ def example_3_explicit_monomer():
         ],
         density=0.4,
     )
-    polymer.generate_data_file()
+    polymer.generate()  # moltemplate backend (default)
 
     info = polymer.get_system_info()
     print(f"  Architecture: {info['architecture']} (branched: {info['is_branched']})")
@@ -211,25 +215,25 @@ def example_3_explicit_monomer():
     print(f"  Total atoms: {info['total_atoms']}")
     print(f"  Total bonds: {info['total_bonds']}")
     print(f"  Total angles: {info['total_angles']}")
-    print(f"  Output: {info['output_path']}")
+    print(f"  Output: {info['output_path']}/moltemplate")
 
     return polymer
 
 
-def example_4_moltemplate_backend():
+def example_4_direct_backend():
     """
-    Example 4: Moltemplate backend for the comb polymer
-    ---------------------------------------------------
-    Emits moltemplate .lt files (bead_spring.lt force field, bead_A.lt /
-    bead_B.lt monomer objects, chains.lt, system.lt) and runs the bundled
-    moltemplate to produce system.data + system.in.init/settings — the
-    standard AutoPoly moltemplate output layout.
+    Example 4: Direct writer backend (lightweight alternative)
+    ----------------------------------------------------------
+    generate(backend="direct") writes polymer.data + in.polymer directly,
+    without the moltemplate build step. Use it for very large melts where
+    the moltemplate backend (default) is slow; the physics (coordinates,
+    bonds, angles) is identical.
     """
     print("\n" + "=" * 60)
-    print("Example 4: Moltemplate backend")
+    print("Example 4: Direct writer backend")
     print("=" * 60)
 
-    system = System(out="bead_spring_comb_moltemplate")
+    system = System(out="bead_spring_comb_direct")
 
     bead_A = BeadType(name="A", mass=1.0, epsilon=1.0, sigma=1.0)
     bead_B = BeadType(name="B", mass=1.0, epsilon=1.0, sigma=0.8)
@@ -237,7 +241,7 @@ def example_4_moltemplate_backend():
     comb = arch.comb(backbone=[("A", 20)], side="B", every=4)
 
     polymer = BeadSpringPolymer(
-        name="comb_mt",
+        name="comb_direct",
         system=system,
         n_chains=5,
         bead_types=[bead_A, bead_B],
@@ -248,12 +252,12 @@ def example_4_moltemplate_backend():
         angle_types=[AngleType(("A", "A", "B"), k=20.0, theta0=120.0)],
         density=0.4,
     )
-    mtd = polymer.generate_moltemplate(run_moltemplate=True)
+    polymer.generate(backend="direct")  # lightweight; no moltemplate run
 
-    print(f"  Moltemplate directory: {mtd}")
-    print(f"  Generated: system.data, system.in.init, system.in.settings,")
-    print(f"             in.polymer, bead_spring.lt, bead_A.lt, bead_B.lt,")
-    print(f"             chains.lt, system.lt")
+    info = polymer.get_system_info()
+    print(f"  Total atoms: {info['total_atoms']}")
+    print(f"  Total bonds: {info['total_bonds']}")
+    print(f"  Output: {info['output_path']} (polymer.data + in.polymer)")
 
     return polymer
 
@@ -267,21 +271,21 @@ def main():
     example_1_comb_with_side_groups()
     example_2_graft_copolymer()
     example_3_explicit_monomer()
-    example_4_moltemplate_backend()
+    example_4_direct_backend()
 
     print("\n" + "=" * 60)
     print("All examples completed successfully!")
     print("=" * 60)
     print("\nGenerated output directories:")
-    print("  - bead_spring_comb/")
-    print("  - bead_spring_graft/")
-    print("  - bead_spring_monomer_comb/")
-    print("  - bead_spring_comb_moltemplate/")
-    print("\nTo run a LAMMPS simulation (direct writer, examples 1-3):")
-    print("  cd <output_dir>/<name>")
+    print("  - bead_spring_comb/          (moltemplate backend)")
+    print("  - bead_spring_graft/         (moltemplate backend)")
+    print("  - bead_spring_monomer_comb/  (moltemplate backend)")
+    print("  - bead_spring_comb_direct/   (direct writer)")
+    print("\nTo run a LAMMPS simulation (moltemplate backend, examples 1-3):")
+    print("  cd <output_dir>/<name>/moltemplate")
     print("  lmp -in in.polymer")
-    print("\nTo run a LAMMPS simulation (moltemplate backend, example 4):")
-    print("  cd bead_spring_comb_moltemplate/comb_mt/moltemplate")
+    print("\nTo run a LAMMPS simulation (direct writer, example 4):")
+    print("  cd bead_spring_comb_direct/comb_direct")
     print("  lmp -in in.polymer")
 
 
