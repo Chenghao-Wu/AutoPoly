@@ -12,6 +12,7 @@ Features:
 - Monte Carlo pre-equilibration for initial configurations
 """
 
+from collections import deque
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Dict, Optional, Union, Tuple
@@ -20,6 +21,7 @@ import numpy as np
 
 from ..core.logger import setup_logger
 from ..mc.collision import CollisionDetector
+from .architectures import BeadArchitecture, linear as _linear_arch, ring as _ring_arch
 
 logger = setup_logger()
 
@@ -752,6 +754,207 @@ def mc_reptation_move(
     return new_positions, True
 
 
+def mc_tree_pivot_move(
+    positions: Union[List[np.ndarray], np.ndarray],
+    pivot_idx: int,
+    subtree_indices: List[int],
+    max_angle: float = 0.3,
+    box_size: Optional[float] = None,
+) -> Tuple[Union[List[np.ndarray], np.ndarray], bool]:
+    """
+    Rotate a subtree of beads around a random axis through the pivot bead.
+
+    This is the graph generalization of the pivot move for branched
+    architectures: cutting edge (pivot, q) splits the molecule; the subtree
+    on q's side (``subtree_indices``, must include q) is rotated rigidly.
+    Because the rotation axis passes through the pivot bead, the (pivot, q)
+    bond length and all internal subtree bonds are preserved exactly.
+
+    Parameters:
+        positions: List of position arrays or (N, 3) array.
+        pivot_idx: Index of the pivot bead (rotation axis passes through it).
+        subtree_indices: Indices of beads to rotate (the component beyond
+            the cut edge, including q).
+        max_angle: Maximum rotation angle (radians).
+        box_size: Box size for PBC wrapping.
+
+    Returns:
+        Tuple of (new_positions, is_valid).
+    """
+    if not subtree_indices:
+        return positions, False
+
+    if isinstance(positions, list):
+        new_positions = [p.copy() for p in positions]
+    else:
+        new_positions = positions.copy()
+
+    pivot_pos = np.array(positions[pivot_idx], dtype=float)
+    angle = np.random.uniform(-max_angle, max_angle)
+    R = _random_rotation_matrix(angle)
+
+    for idx in subtree_indices:
+        rel = np.array(positions[idx], dtype=float) - pivot_pos
+        new_positions[idx] = pivot_pos + R @ rel
+        if box_size is not None:
+            new_positions[idx] = _apply_pbc(new_positions[idx], box_size)
+
+    return new_positions, True
+
+
+def mc_segment_crankshaft_move(
+    positions: Union[List[np.ndarray], np.ndarray],
+    segment: List[int],
+    max_angle: float = 0.3,
+    box_size: Optional[float] = None,
+) -> Tuple[Union[List[np.ndarray], np.ndarray], bool]:
+    """
+    Crankshaft move along an explicit bead path (segment).
+
+    Graph generalization of :func:`mc_crankshaft_move` for branched
+    architectures: two beads i, j are chosen along the segment path (with at
+    least two path beads between them) and the path beads strictly between
+    them are rotated around the i-j axis. The segment must be a genuine bond
+    path so all rotated bonds are preserved.
+
+    Parameters:
+        positions: List of position arrays or (N, 3) array.
+        segment: Bead indices forming a connected path (length >= 4).
+        max_angle: Maximum rotation angle in radians.
+        box_size: Box size for PBC.
+
+    Returns:
+        Tuple of (new_positions, is_valid).
+    """
+    if len(segment) < 4:
+        return positions, False
+
+    a = np.random.randint(0, len(segment) - 3)
+    b = np.random.randint(a + 3, len(segment))
+
+    i = segment[a]
+    j = segment[b]
+
+    is_numpy = isinstance(positions, np.ndarray)
+    if is_numpy:
+        new_positions = positions.copy()
+    else:
+        new_positions = [p.copy() for p in positions]
+
+    pos_i = np.array(positions[i], dtype=float)
+    pos_j = np.array(positions[j], dtype=float)
+
+    axis = pos_j - pos_i
+    if np.linalg.norm(axis) < 1e-10:
+        return positions, False
+
+    angle = np.random.uniform(-max_angle, max_angle)
+    R = _rotation_matrix_around_axis(axis, angle)
+
+    for k in range(a + 1, b):
+        idx = segment[k]
+        rel_pos = np.array(positions[idx], dtype=float) - pos_i
+        new_positions[idx] = pos_i + R @ rel_pos
+        if box_size is not None:
+            new_positions[idx] = _apply_pbc(new_positions[idx], box_size)
+
+    return new_positions, True
+
+
+def _subtree_excluding(
+    adjacency: Dict[int, List[int]],
+    exclude: int,
+    start: int,
+) -> List[int]:
+    """Beads reachable from ``start`` without visiting ``exclude``."""
+    visited = {exclude, start}
+    queue = deque([start])
+    while queue:
+        x = queue.popleft()
+        for y in adjacency[x]:
+            if y not in visited:
+                visited.add(y)
+                queue.append(y)
+    visited.discard(exclude)
+    return sorted(visited)
+
+
+def _find_bridge_edges(
+    adjacency: Dict[int, List[int]],
+    edges: List[Tuple[int, int]],
+) -> List[Tuple[int, int]]:
+    """
+    Find bridge edges: edges whose removal disconnects the graph.
+
+    Tree-pivot moves may only rotate across bridges; rotating across a
+    cycle edge would break the other bond(s) of the cycle.
+    """
+    bridges = []
+    for u, v in edges:
+        # BFS from u without using edge (u, v)
+        visited = {u}
+        queue = deque([u])
+        while queue:
+            x = queue.popleft()
+            for y in adjacency[x]:
+                if (x == u and y == v) or (x == v and y == u):
+                    continue
+                if y not in visited:
+                    visited.add(y)
+                    queue.append(y)
+        if v not in visited:
+            bridges.append((u, v))
+    return bridges
+
+
+def build_chain_graph(
+    architecture: BeadArchitecture,
+    start: int,
+) -> Dict[str, any]:
+    """
+    Build per-chain graph metadata for branched MC moves.
+
+    Parameters:
+        architecture: The chain's BeadArchitecture.
+        start: Global index of the chain's first bead (bead i of the
+            architecture maps to global index ``start + i``).
+
+    Returns:
+        Dict with keys:
+            - "branched": True if any bead has degree > 2 or the graph is
+              not a simple path
+            - "adjacency": global-index adjacency dict
+            - "edges": global-index bond list
+            - "pivot_edges": bridge edges valid for tree-pivot moves
+            - "segments": linear bead paths valid for segment crankshaft
+    """
+    n = architecture.n_beads
+    adjacency: Dict[int, List[int]] = {start + i: [] for i in range(n)}
+    edges = [(start + i, start + j) for i, j in architecture.bonds]
+    for u, v in edges:
+        adjacency[u].append(v)
+        adjacency[v].append(u)
+
+    degrees = architecture.degrees()
+    # A simple path: exactly 2 ends (deg 1), all others deg 2, n-1 bonds
+    is_simple_path = (
+        architecture.n_bonds == n - 1
+        and sum(1 for d in degrees if d == 1) == 2
+        and all(d <= 2 for d in degrees)
+    )
+    branched = not is_simple_path
+
+    return {
+        "branched": branched,
+        "adjacency": adjacency,
+        "edges": edges,
+        "pivot_edges": _find_bridge_edges(adjacency, edges) if branched else [],
+        "segments": [
+            [start + i for i in seg] for seg in architecture.linear_segments()
+        ] if branched else [],
+    }
+
+
 # =============================================================================
 # Multi-Chain Functions
 # =============================================================================
@@ -1237,6 +1440,238 @@ def saw_generate_multi_chain(
 
 
 # =============================================================================
+# Graph-based SAW Generation (arbitrary architectures)
+# =============================================================================
+
+
+def saw_grow_graph(
+    architecture: BeadArchitecture,
+    bond_length: float,
+    start_position: np.ndarray,
+    collision_detector: CollisionDetector,
+    config: SAWConfig,
+    chain_id_offset: int = 0,
+) -> Tuple[Optional[List[np.ndarray]], int]:
+    """
+    Grow a single chain of arbitrary architecture using SAW with backtracking.
+
+    Beads are placed along the spanning-tree growth order of the architecture
+    (BFS from bead 0): each bead is placed at ``bond_length`` from its
+    already-placed parent. Cycle-closing edges (e.g. the ring closure) are
+    enforced as distance constraints when the second endpoint is placed.
+
+    Parameters:
+        architecture: BeadArchitecture defining bead connectivity.
+        bond_length: Distance between bonded beads.
+        start_position: Position of the root bead (bead 0).
+        collision_detector: CollisionDetector for checking overlaps.
+        config: SAWConfig with algorithm parameters.
+        chain_id_offset: Offset for bead IDs in collision detector.
+
+    Returns:
+        Tuple of (positions, backtracks_used); positions is None if failed.
+        ``positions[i]`` corresponds to bead ``i`` of the architecture.
+    """
+    n_beads = architecture.n_beads
+    if n_beads < 1:
+        return [], 0
+
+    order, parents, closing_edges = architecture.growth_order(root=0)
+
+    # Closing constraints per bead: list of already-placed neighbors that a
+    # bead must land within ring_closure_tolerance of bond_length from.
+    closing_neighbors: Dict[int, List[int]] = {}
+    for u, v in closing_edges:
+        closing_neighbors.setdefault(u, []).append(v)
+        closing_neighbors.setdefault(v, []).append(u)
+
+    positions: Dict[int, np.ndarray] = {0: start_position.copy()}
+    placed: List[int] = [0]  # placement stack in growth order
+    backtrack_count = 0
+    backtrack_depth = 1
+
+    collision_detector.add_monomer(
+        chain_id_offset, start_position, config.collision_sigma / 2
+    )
+
+    step = 1  # next index into order
+    while step < n_beads:
+        bead = order[step]
+        parent = parents[bead]
+        assert parent is not None
+        grandparent = parents[parent]
+        prev_direction = (
+            positions[parent] - positions[grandparent]
+            if grandparent is not None else None
+        )
+
+        # Beads with closing constraints get extra trials (like ring closure)
+        pending_closure = [
+            nbr for nbr in closing_neighbors.get(bead, []) if nbr in positions
+        ]
+        n_trials = config.ring_closure_trials if pending_closure else config.n_trials
+
+        trial_positions = _generate_trial_positions(
+            positions[parent],
+            bond_length,
+            n_trials,
+            prev_direction,
+            config.bond_angle_min,
+            config.bond_angle_max,
+        )
+        if len(trial_positions) > 0:
+            np.random.shuffle(trial_positions)
+
+        valid_position = None
+        exclude_set = {chain_id_offset + parent}
+        for trial_pos in trial_positions:
+            if collision_detector.check_collision(
+                trial_pos,
+                config.collision_sigma / 2,
+                exclude_ids=exclude_set,
+                tolerance=config.collision_tolerance,
+            ):
+                continue
+            # Enforce closing-edge distance constraints
+            closure_ok = True
+            for nbr in pending_closure:
+                dist = np.linalg.norm(trial_pos - positions[nbr])
+                if abs(dist - bond_length) > config.ring_closure_tolerance:
+                    closure_ok = False
+                    break
+            if closure_ok:
+                valid_position = trial_pos
+                break
+
+        if valid_position is not None:
+            positions[bead] = valid_position.copy()
+            placed.append(bead)
+            collision_detector.add_monomer(
+                chain_id_offset + bead, valid_position, config.collision_sigma / 2
+            )
+            step += 1
+            backtrack_depth = 1
+        else:
+            # Backtrack: remove the most recently placed beads (growth order)
+            if backtrack_count >= config.max_total_backtracks or len(placed) <= 1:
+                for b in placed:
+                    collision_detector.remove_monomer(chain_id_offset + b)
+                return None, backtrack_count
+
+            n_remove = min(backtrack_depth, len(placed) - 1,
+                           config.max_backtrack_depth)
+            for _ in range(n_remove):
+                b = placed.pop()
+                del positions[b]
+                collision_detector.remove_monomer(chain_id_offset + b)
+            # Resume from the first unplaced bead in growth order
+            placed_set = set(placed)
+            step = next(
+                i for i, b in enumerate(order) if b not in placed_set
+            )
+            backtrack_count += 1
+            backtrack_depth = min(backtrack_depth * 2, config.max_backtrack_depth)
+
+    return [positions[i] for i in range(n_beads)], backtrack_count
+
+
+def saw_generate_graphs(
+    architectures: List[BeadArchitecture],
+    bond_length: float,
+    box_size: float,
+    config: SAWConfig,
+    max_start_attempts: int = 100,
+) -> Tuple[Optional[List[np.ndarray]], Optional[List[Tuple[int, int]]], Dict[str, any]]:
+    """
+    Generate multiple chains of (possibly different) architectures using SAW.
+
+    This is the graph-based generalization of :func:`saw_generate_multi_chain`
+    and also the driver for mixtures: each chain may have its own
+    architecture.
+
+    Parameters:
+        architectures: One BeadArchitecture per chain to generate.
+        bond_length: Bond length between bonded beads.
+        box_size: Cubic box side length.
+        config: SAWConfig with algorithm parameters.
+        max_start_attempts: Max attempts to find valid starting position.
+
+    Returns:
+        Tuple of (all_positions, chain_indices, stats) or
+        (None, None, stats) if failed.
+    """
+    half_box = box_size / 2
+    box_bounds = ((-half_box, half_box), (-half_box, half_box), (-half_box, half_box))
+
+    cell_size = max(config.collision_sigma * 2, bond_length * 2)
+    collision_detector = CollisionDetector(box_bounds, cell_size)
+
+    all_positions: List[np.ndarray] = []
+    chain_indices: List[Tuple[int, int]] = []
+    total_backtracks = 0
+    chains_completed = 0
+
+    for chain_idx, architecture in enumerate(architectures):
+        chain_offset = len(all_positions)
+
+        # Find valid starting position
+        start_found = False
+        for attempt in range(max_start_attempts):
+            margin = config.collision_sigma * 2
+            start_pos = np.random.uniform(-half_box + margin, half_box - margin, 3)
+            if not collision_detector.check_collision(
+                start_pos,
+                config.collision_sigma / 2,
+                tolerance=config.collision_tolerance,
+            ):
+                start_found = True
+                break
+
+        if not start_found:
+            logger.warning(
+                f"SAW: Could not find valid start position for chain {chain_idx}"
+            )
+            return None, None, {
+                "success": False,
+                "chains_completed": chains_completed,
+                "total_backtracks": total_backtracks,
+                "failure_reason": "start_position",
+            }
+
+        chain_positions, backtracks = saw_grow_graph(
+            architecture,
+            bond_length,
+            start_pos,
+            collision_detector,
+            config,
+            chain_offset,
+        )
+
+        total_backtracks += backtracks
+
+        if chain_positions is None:
+            logger.warning(
+                f"SAW: Failed to grow chain {chain_idx} after {backtracks} backtracks"
+            )
+            return None, None, {
+                "success": False,
+                "chains_completed": chains_completed,
+                "total_backtracks": total_backtracks,
+                "failure_reason": "chain_growth",
+            }
+
+        all_positions.extend(chain_positions)
+        chain_indices.append((chain_offset, chain_offset + len(chain_positions)))
+        chains_completed += 1
+
+    return all_positions, chain_indices, {
+        "success": True,
+        "chains_completed": chains_completed,
+        "total_backtracks": total_backtracks,
+    }
+
+
+# =============================================================================
 # Main MC Equilibration Routine
 # =============================================================================
 
@@ -1244,6 +1679,7 @@ def mc_equilibrate(
     positions: Union[List[np.ndarray], np.ndarray],
     bonds: List[Tuple[int, int]],
     chain_indices: Optional[List[Tuple[int, int]]] = None,
+    chain_graphs: Optional[List[Dict[str, any]]] = None,
     n_steps: int = 10000,
     temperature: float = 1.0,
     move_weights: Optional[Dict[str, float]] = None,
@@ -1269,6 +1705,12 @@ def mc_equilibrate(
         bonds: List of (atom1_idx, atom2_idx) tuples (0-indexed).
         chain_indices: List of (start, end) tuples for each chain.
             If None, treats entire system as one chain.
+        chain_graphs: Optional per-chain graph metadata for branched
+            architectures (see :func:`build_chain_graph`). For chains marked
+            "branched", pivot moves become tree-pivots across bridge edges,
+            crankshaft moves are restricted to linear segments, and
+            reptation is disabled. Linear chains (or chain_graphs=None)
+            use the legacy path-based moves.
         n_steps: Number of MC steps.
         temperature: Reduced temperature.
         move_weights: Dict of move type probabilities.
@@ -1311,6 +1753,12 @@ def mc_equilibrate(
                 "pivot": 0.2,
                 "reptation": 0.15,
             }
+
+    # Reptation is a linear-chain move; drop it when all chains are branched
+    if chain_graphs is not None and chain_graphs:
+        if all(g.get("branched", False) for g in chain_graphs):
+            move_weights = {k: v for k, v in move_weights.items()
+                            if k != "reptation"}
 
     # Normalize weights
     total_weight = sum(move_weights.values())
@@ -1411,20 +1859,49 @@ def mc_equilibrate(
             new_positions = current_positions
             is_valid = False
 
+            graph = chain_graphs[chain_idx] if chain_graphs is not None else None
+            branched = graph is not None and graph.get("branched", False)
+
             if move_type == "crankshaft":
-                new_positions, is_valid = mc_crankshaft_move(
-                    current_positions, start, end, max_angle, box_size
-                )
+                if branched:
+                    segments = graph.get("segments", [])
+                    if segments:
+                        segment = segments[np.random.randint(len(segments))]
+                        new_positions, is_valid = mc_segment_crankshaft_move(
+                            current_positions, segment, max_angle, box_size
+                        )
+                else:
+                    new_positions, is_valid = mc_crankshaft_move(
+                        current_positions, start, end, max_angle, box_size
+                    )
 
             elif move_type == "pivot":
-                new_positions, is_valid = mc_pivot_move(
-                    current_positions, start, end, max_angle, box_size
-                )
+                if branched:
+                    pivot_edges = graph.get("pivot_edges", [])
+                    if pivot_edges:
+                        u, v = pivot_edges[np.random.randint(len(pivot_edges))]
+                        adjacency = graph["adjacency"]
+                        subtree_v = _subtree_excluding(adjacency, u, v)
+                        subtree_u = _subtree_excluding(adjacency, v, u)
+                        # Rotate the smaller side for efficiency
+                        if len(subtree_v) <= len(subtree_u):
+                            pivot_idx, subtree = u, subtree_v
+                        else:
+                            pivot_idx, subtree = v, subtree_u
+                        new_positions, is_valid = mc_tree_pivot_move(
+                            current_positions, pivot_idx, subtree,
+                            max_angle, box_size
+                        )
+                else:
+                    new_positions, is_valid = mc_pivot_move(
+                        current_positions, start, end, max_angle, box_size
+                    )
 
             elif move_type == "reptation":
-                new_positions, is_valid = mc_reptation_move(
-                    current_positions, start, end, bond_r0, box_size
-                )
+                if not branched:
+                    new_positions, is_valid = mc_reptation_move(
+                        current_positions, start, end, bond_r0, box_size
+                    )
 
             elif move_type == "chain_translation":
                 if box_size is not None:
@@ -1479,6 +1956,178 @@ def mc_equilibrate(
     return result_positions, acceptance_stats
 
 
+# =============================================================================
+# Shared helpers (used by BeadSpringPolymer and BeadSpringSystem)
+# =============================================================================
+
+
+def canonical_bead_triplet(t1: str, t2: str, t3: str) -> Tuple[str, str, str]:
+    """Return canonical triplet (smaller endpoint first alphabetically)."""
+    if t1 <= t3:
+        return (t1, t2, t3)
+    return (t3, t2, t1)
+
+
+def lb_pair_coeffs(
+    bead_types: List["BeadType"],
+) -> Dict[Tuple[int, int], Tuple[float, float]]:
+    """
+    Lorentz-Berthelot mixing for all bead type pairs.
+
+    Returns:
+        Dict mapping (type_i, type_j) (1-based) to (epsilon_ij, sigma_ij).
+    """
+    coeffs = {}
+    n_types = len(bead_types)
+    for i in range(n_types):
+        for j in range(i, n_types):
+            bt_i = bead_types[i]
+            bt_j = bead_types[j]
+            sigma_ij = (bt_i.sigma + bt_j.sigma) / 2
+            epsilon_ij = math.sqrt(bt_i.epsilon * bt_j.epsilon)
+            coeffs[(i + 1, j + 1)] = (epsilon_ij, sigma_ij)
+    return coeffs
+
+
+def resolve_angle_params(
+    triplet: Tuple[str, str, str],
+    angle_types: List["AngleType"],
+    default_k: float,
+    default_theta0: float,
+) -> Tuple[float, float]:
+    """Return (k, theta0) for a canonical triplet, using defaults if unset."""
+    for angle_type in angle_types:
+        if canonical_bead_triplet(*angle_type.triplet) == triplet:
+            return (angle_type.k, angle_type.theta0)
+    return (default_k, default_theta0)
+
+
+def build_angle_type_map(
+    chain_bead_types: List[List[str]],
+    chain_triplets: List[List[Tuple[int, int, int]]],
+) -> Dict[Tuple[str, str, str], int]:
+    """
+    Map canonical triplets to LAMMPS angle type IDs across all chains.
+
+    Args:
+        chain_bead_types: Bead type names per chain.
+        chain_triplets: Local (i, j, k) triplets per chain.
+
+    Returns:
+        Dict mapping canonical triplet to 1-based angle type ID.
+    """
+    unique_triplets = set()
+    for bead_types_seq, triplets in zip(chain_bead_types, chain_triplets):
+        for i, j, k in triplets:
+            unique_triplets.add(
+                canonical_bead_triplet(
+                    bead_types_seq[i], bead_types_seq[j], bead_types_seq[k]
+                )
+            )
+    sorted_triplets = sorted(unique_triplets)
+    return {triplet: i + 1 for i, triplet in enumerate(sorted_triplets)}
+
+
+def write_lammps_input_script(
+    path: str,
+    bead_types: List["BeadType"],
+    pair_coeffs: Dict[Tuple[int, int], Tuple[float, float]],
+    bond_style: str,
+    k_bond: float,
+    bond_length: float,
+    fene_r0: float,
+    pair_style: str,
+    use_angles: bool,
+    angle_type_map: Dict[Tuple[str, str, str], int],
+    angle_types: List["AngleType"],
+    default_k_angle: float,
+    default_theta0: float,
+) -> None:
+    """
+    Write the LAMMPS input script (in.polymer) for a bead-spring system.
+
+    Shared by BeadSpringPolymer (single species) and BeadSpringSystem
+    (mixtures).
+
+    Note: For Kremer-Grest polymers using FENE bonds, the WCA cutoff
+    (2^(1/6) * sigma ≈ 1.12246) should be used instead of full LJ cutoff
+    (pair_style="wca"). The equilibrium bond length of ~0.97 emerges from
+    the balance of FENE + WCA potentials - there is no explicit r0 in FENE.
+    """
+    max_sigma = max(bt.sigma for bt in bead_types)
+
+    if pair_style == 'wca':
+        cutoff = (2 ** (1/6)) * max_sigma
+        pair_modify = "pair_modify     shift yes\n"
+    else:
+        cutoff = 2.5 * max_sigma
+        pair_modify = ""
+
+    with open(f"{path}/in.polymer", 'w') as f:
+        f.write("# LAMMPS input script for bead-spring polymer\n")
+        f.write("# Auto-generated by AutoPoly BeadSpringPolymer\n\n")
+
+        f.write("units           lj\n")
+        f.write("atom_style      molecular\n")
+        f.write("boundary        p p p\n\n")
+
+        f.write("read_data       polymer.data\n\n")
+
+        f.write(f"pair_style      lj/cut {cutoff:.5f}\n")
+        for (i, j), (eps, sig) in sorted(pair_coeffs.items()):
+            f.write(f"pair_coeff      {i} {j} {eps:.4f} {sig:.4f}\n")
+        if pair_modify:
+            f.write(pair_modify)
+        f.write("\n")
+
+        if bond_style == "fene":
+            eps = bead_types[0].epsilon
+            sig = bead_types[0].sigma
+            f.write("bond_style      fene\n")
+            # FENE bond: K, R0, epsilon, sigma
+            # Note: No r0 parameter - equilibrium emerges from FENE+WCA
+            f.write(f"bond_coeff      1 {k_bond:.1f} {fene_r0:.4f} {eps:.4f} {sig:.4f}\n")
+            f.write("special_bonds   fene\n\n")
+        else:
+            f.write("bond_style      harmonic\n")
+            f.write(f"bond_coeff      1 {k_bond:.1f} {bond_length:.4f}\n\n")
+
+        if use_angles:
+            f.write("angle_style     harmonic\n")
+            for triplet, type_id in sorted(angle_type_map.items(), key=lambda x: x[1]):
+                k, theta0 = resolve_angle_params(
+                    triplet, angle_types, default_k_angle, default_theta0
+                )
+                triplet_str = "-".join(triplet)
+                f.write(f"angle_coeff     {type_id} {k:.4f} {theta0:.1f}  # {triplet_str}\n")
+            f.write("\n")
+
+        # Larger skin (2.0) for FENE to prevent lost atoms
+        f.write("neighbor        2.0 bin\n")
+        f.write("neigh_modify    every 2 delay 4 check yes\n\n")
+
+        f.write("thermo_style    custom step temp pe ke etotal press vol density\n")
+        f.write("thermo          1000\n\n")
+
+        f.write("dump            1 all custom 1000 dump.lammpstrj id type mol x y z\n")
+        f.write("dump_modify     1 sort id\n\n")
+
+        f.write("# Energy minimization\n")
+        f.write("minimize        1.0e-4 1.0e-6 1000 10000\n")
+        f.write("write_restart   min.restart\n")
+        f.write("write_data      min.data\n")
+        f.write("reset_timestep  0\n\n")
+
+        # Timestep: 0.001 is standard for Kremer-Grest with FENE bonds
+        f.write("# Production MD\n")
+        f.write("timestep        0.001\n")
+        # Tdamp = 0.1 (100x timestep) for proper temperature control
+        f.write("fix             1 all nvt temp 1.0 1.0 0.1 tchain 3\n")
+        f.write("run             100000\n")
+        f.write("write_restart   prod.restart\n")
+        f.write("write_data      prod.data\n")
+
+
 class BeadSpringPolymer:
     """
     Bead-spring polymer model generator for LAMMPS simulations.
@@ -1498,8 +2147,10 @@ class BeadSpringPolymer:
         system: object,
         n_chains: int,
         bead_types: List[BeadType],
-        sequence: Union[List[str], List[Tuple[str, int]], str],
+        sequence: Optional[Union[List[str], List[Tuple[str, int]], str]] = None,
         topology: str = "linear",
+        # Architecture (alternative to sequence/topology)
+        architecture: Optional[BeadArchitecture] = None,
         # Bond parameters
         bond_length: float = 1.0,
         bond_style: str = "harmonic",
@@ -1512,6 +2163,7 @@ class BeadSpringPolymer:
         default_k_angle: float = 10.0,
         default_theta0: float = 180.0,
         angle_types: Optional[List[AngleType]] = None,
+        include_branch_angles: bool = True,
         # Box sizing
         density: Optional[float] = None,
         box_size: Optional[float] = None,
@@ -1531,7 +2183,14 @@ class BeadSpringPolymer:
             n_chains: Number of polymer chains.
             bead_types: List of BeadType objects defining bead parameters.
             sequence: Chain structure as block pattern, explicit list, or string.
-            topology: "linear" or "ring".
+                Mutually exclusive with ``architecture``.
+            topology: "linear" or "ring" (only used with ``sequence``).
+            architecture: BeadArchitecture describing an arbitrary chain
+                graph (star, comb, graft, tadpole, dendrimer, custom...).
+                Mutually exclusive with ``sequence``/``topology``. Build one
+                with the factories in ``AutoPoly.models.architectures``
+                (``linear``, ``ring``, ``star``, ``comb``, ``graft``,
+                ``tadpole``, ``dendrimer``, ``custom``).
             bond_length: Equilibrium bond length.
             bond_style: "harmonic" or "fene".
             k_bond: Bond force constant.
@@ -1543,6 +2202,11 @@ class BeadSpringPolymer:
             default_k_angle: Default angle force constant for unspecified triplets.
             default_theta0: Default equilibrium angle for unspecified triplets.
             angle_types: List of AngleType objects for specific triplet parameters.
+            include_branch_angles: Whether to include angle triplets centered
+                on branch points (beads with degree > 2, e.g. comb graft
+                points and star centers). Their stiffness is configured like
+                any other triplet via ``angle_types``/``default_k_angle``.
+                Only relevant for branched architectures.
             density: Target bead density (beads/sigma^3). If set, box size is calculated.
             box_size: Explicit box size. Overrides density if both are set.
             generation_method: Method for generating initial configurations:
@@ -1562,8 +2226,14 @@ class BeadSpringPolymer:
             the balance of FENE (attractive, wants r→0) + WCA (repulsive, prevents r<~1.0).
             LAMMPS FENE syntax: bond_coeff * K R0 epsilon sigma
         """
-        if topology not in self.VALID_TOPOLOGIES:
+        if architecture is None and topology not in self.VALID_TOPOLOGIES:
             raise ValueError(f"Topology must be one of: {self.VALID_TOPOLOGIES}")
+        if architecture is not None and (sequence is not None or topology != "linear"):
+            raise ValueError(
+                "Pass either 'architecture' or 'sequence'/'topology', not both"
+            )
+        if architecture is None and sequence is None:
+            raise ValueError("Either 'sequence' or 'architecture' is required")
         if bond_style not in self.VALID_BOND_STYLES:
             raise ValueError(f"Bond style must be one of: {self.VALID_BOND_STYLES}")
         if generation_method not in self.VALID_GENERATION_METHODS:
@@ -1577,16 +2247,31 @@ class BeadSpringPolymer:
         self.system = system
         self.path = f"{self.system.get_folder_path()}/{self.name}" if system else f"./{name}"
         self.n_chains = n_chains
-        self.topology = topology
 
         # Store bead types
         self.bead_types = bead_types
         self._bead_type_map: Dict[str, BeadType] = {bt.name: bt for bt in bead_types}
         self._bead_type_id: Dict[str, int] = {bt.name: i + 1 for i, bt in enumerate(bead_types)}
 
-        # Parse and validate sequence
-        self._sequence = self._parse_sequence(sequence)
-        self._validate()
+        # Build the chain graph (the single internal representation)
+        if architecture is not None:
+            architecture.validate(
+                known_bead_types=[bt.name for bt in bead_types]
+            )
+            self._architecture = architecture
+            self.topology = architecture.name
+            self._sequence = architecture.bead_types
+        else:
+            self.topology = topology
+            # Parse and validate sequence
+            self._sequence = self._parse_sequence(sequence)
+            self._validate()
+            self._architecture = (
+                _ring_arch(self._sequence) if topology == "ring"
+                else _linear_arch(self._sequence)
+            )
+        if architecture is not None:
+            self._validate()
 
         # Bond parameters
         self.bond_length = bond_length
@@ -1602,6 +2287,15 @@ class BeadSpringPolymer:
         self.default_k_angle = default_k_angle
         self.default_theta0 = default_theta0
         self._angle_types = angle_types or []
+        self.include_branch_angles = include_branch_angles
+
+        # Graph-derived bond/angle structure (local bead indices per chain)
+        self._bonds_local: List[Tuple[int, int]] = list(self._architecture.bonds)
+        self._angle_triplets_local: List[Tuple[int, int, int]] = (
+            self._architecture.angle_triplets(
+                include_branch=self.include_branch_angles
+            )
+        )
 
         # Box sizing parameters
         self.density = density
@@ -1626,6 +2320,7 @@ class BeadSpringPolymer:
 
         # Build internal maps
         self._pair_coeffs = self._build_pair_coeffs()
+        self._angle_type_map: Dict[Tuple[str, str, str], int] = {}
         if self.use_angles:
             self._angle_type_map = self._build_angle_type_map()
 
@@ -1634,7 +2329,7 @@ class BeadSpringPolymer:
 
         logger.info(
             f"Initialized bead-spring polymer: {n_chains} chains, "
-            f"{len(self._sequence)} beads each, {topology} topology, "
+            f"{len(self._sequence)} beads each, {self.topology} architecture, "
             f"{len(bead_types)} bead type(s)"
         )
 
@@ -1690,9 +2385,7 @@ class BeadSpringPolymer:
         Returns:
             Canonical triplet tuple.
         """
-        if t1 <= t3:
-            return (t1, t2, t3)
-        return (t3, t2, t1)
+        return canonical_bead_triplet(t1, t2, t3)
 
     def _build_pair_coeffs(self) -> Dict[Tuple[int, int], Tuple[float, float]]:
         """
@@ -1701,21 +2394,7 @@ class BeadSpringPolymer:
         Returns:
             Dict mapping (type_i, type_j) to (epsilon_ij, sigma_ij).
         """
-        coeffs = {}
-        n_types = len(self.bead_types)
-
-        for i in range(n_types):
-            for j in range(i, n_types):
-                bt_i = self.bead_types[i]
-                bt_j = self.bead_types[j]
-
-                sigma_ij = (bt_i.sigma + bt_j.sigma) / 2
-                epsilon_ij = math.sqrt(bt_i.epsilon * bt_j.epsilon)
-
-                # Store with 1-based indices
-                coeffs[(i + 1, j + 1)] = (epsilon_ij, sigma_ij)
-
-        return coeffs
+        return lb_pair_coeffs(self.bead_types)
 
     def _build_angle_type_map(self) -> Dict[Tuple[str, str, str], int]:
         """
@@ -1724,31 +2403,18 @@ class BeadSpringPolymer:
         Returns:
             Dict mapping canonical triplet to angle type ID.
         """
-        # Collect all unique canonical triplets from the sequence
+        # Collect all unique canonical triplets from the chain graph.
+        # For linear/ring architectures this reproduces the legacy
+        # path-based enumeration (including ring wrap-arounds) exactly;
+        # branched architectures additionally contribute their triplets
+        # (branch-point triplets only if include_branch_angles is True).
         unique_triplets = set()
 
-        for i in range(len(self._sequence) - 2):
+        for i, j, k in self._angle_triplets_local:
             triplet = self._get_canonical_triplet(
                 self._sequence[i],
-                self._sequence[i + 1],
-                self._sequence[i + 2]
-            )
-            unique_triplets.add(triplet)
-
-        # For ring topology, add wrap-around triplets
-        if self.topology == "ring" and len(self._sequence) >= 3:
-            # Last two beads + first bead
-            triplet = self._get_canonical_triplet(
-                self._sequence[-2],
-                self._sequence[-1],
-                self._sequence[0]
-            )
-            unique_triplets.add(triplet)
-            # Last bead + first two beads
-            triplet = self._get_canonical_triplet(
-                self._sequence[-1],
-                self._sequence[0],
-                self._sequence[1]
+                self._sequence[j],
+                self._sequence[k]
             )
             unique_triplets.add(triplet)
 
@@ -1767,11 +2433,10 @@ class BeadSpringPolymer:
         Returns:
             Tuple of (k, theta0).
         """
-        for angle_type in self._angle_types:
-            canonical = self._get_canonical_triplet(*angle_type.triplet)
-            if canonical == triplet:
-                return (angle_type.k, angle_type.theta0)
-        return (self.default_k_angle, self.default_theta0)
+        return resolve_angle_params(
+            triplet, self._angle_types,
+            self.default_k_angle, self.default_theta0,
+        )
 
     def _calculate_box_size(self) -> float:
         """
@@ -1833,7 +2498,7 @@ class BeadSpringPolymer:
 
         for chain in range(self.n_chains):
             chain_pos = []
-            if self.topology == "ring":
+            if self.topology == "ring" and not self._architecture.is_branched:
                 radius = self.bond_length * n_beads / (2 * np.pi)
                 for bead in range(n_beads):
                     angle = 2 * np.pi * bead / n_beads
@@ -1843,6 +2508,17 @@ class BeadSpringPolymer:
                         0.0
                     ])
                     chain_pos.append(pos)
+            elif self._architecture.is_branched or self._architecture.is_cyclic:
+                # Generic graph: grow along the spanning tree with random
+                # directions (may contain overlaps; SAW/MC can relax it)
+                order, parents, _ = self._architecture.growth_order(root=0)
+                pos_map = {0: np.zeros(3)}
+                for bead in order[1:]:
+                    parent = parents[bead]
+                    direction = np.random.normal(size=3)
+                    direction /= np.linalg.norm(direction)
+                    pos_map[bead] = pos_map[parent] + direction * self.bond_length
+                chain_pos = [pos_map[i] for i in range(n_beads)]
             else:
                 # Linear chain
                 for bead in range(n_beads):
@@ -1899,14 +2575,11 @@ class BeadSpringPolymer:
                 end_idx = len(self._positions)
                 self._chain_indices.append((start_idx, end_idx))
 
-        # Generate bonds (0-indexed for internal use)
+        # Generate bonds from the chain graph (0-indexed for internal use)
         self._bonds = []
         for start, end in self._chain_indices:
-            chain_len = end - start
-            for i in range(chain_len - 1):
-                self._bonds.append((start + i, start + i + 1))
-            if self.topology == "ring":
-                self._bonds.append((end - 1, start))
+            for i, j in self._bonds_local:
+                self._bonds.append((start + i, start + j))
 
     def equilibrate(self, mc_config: Optional[MCConfig] = None) -> None:
         """
@@ -1934,10 +2607,18 @@ class BeadSpringPolymer:
             f"T={config.temperature}, box_size={box_size:.3f}"
         )
 
+        # Per-chain graph metadata enables branched MC moves (tree-pivot,
+        # segment crankshaft); linear chains use the legacy moves.
+        chain_graphs = [
+            build_chain_graph(self._architecture, start)
+            for start, _ in self._chain_indices
+        ]
+
         self._positions, acceptance_stats = mc_equilibrate(
             positions=self._positions,
             bonds=self._bonds,
             chain_indices=self._chain_indices,
+            chain_graphs=chain_graphs,
             n_steps=config.n_steps,
             temperature=config.temperature,
             move_weights=config.move_weights,
@@ -1980,14 +2661,24 @@ class BeadSpringPolymer:
             f"{self.n_beads} beads each, box_size={box_size:.3f}"
         )
 
-        positions, chain_indices, stats = saw_generate_multi_chain(
-            n_chains=self.n_chains,
-            n_beads_per_chain=self.n_beads,
-            bond_length=self.bond_length,
-            box_size=box_size,
-            config=config,
-            topology=self.topology,
-        )
+        if self.topology in self.VALID_TOPOLOGIES:
+            # Legacy path for linear/ring (identical connectivity)
+            positions, chain_indices, stats = saw_generate_multi_chain(
+                n_chains=self.n_chains,
+                n_beads_per_chain=self.n_beads,
+                bond_length=self.bond_length,
+                box_size=box_size,
+                config=config,
+                topology=self.topology,
+            )
+        else:
+            # Graph path for arbitrary architectures (star, comb, ...)
+            positions, chain_indices, stats = saw_generate_graphs(
+                architectures=[self._architecture] * self.n_chains,
+                bond_length=self.bond_length,
+                box_size=box_size,
+                config=config,
+            )
 
         if not stats["success"]:
             logger.warning(
@@ -2000,14 +2691,11 @@ class BeadSpringPolymer:
         self._positions = positions
         self._chain_indices = chain_indices
 
-        # Generate bonds (0-indexed)
+        # Generate bonds from the chain graph (0-indexed)
         self._bonds = []
         for start, end in self._chain_indices:
-            chain_len = end - start
-            for i in range(chain_len - 1):
-                self._bonds.append((start + i, start + i + 1))
-            if self.topology == "ring":
-                self._bonds.append((end - 1, start))
+            for i, j in self._bonds_local:
+                self._bonds.append((start + i, start + j))
 
         logger.info(
             f"SAW generation complete. Backtracks: {stats['total_backtracks']}"
@@ -2017,10 +2705,12 @@ class BeadSpringPolymer:
     def generate_data_file(self) -> None:
         """Generate LAMMPS data file for bead-spring polymer."""
         n_beads = self.n_beads
-        n_bonds_per_chain = n_beads - 1 if self.topology == "linear" else n_beads
+        # Bond/angle counts come from the chain graph edge/triplet lists
+        # (a tree has N-1 bonds, a ring N, etc.)
+        n_bonds_per_chain = len(self._bonds_local)
         n_angles_per_chain = 0
         if self.use_angles:
-            n_angles_per_chain = n_beads - 2 if self.topology == "linear" else n_beads
+            n_angles_per_chain = len(self._angle_triplets_local)
 
         total_atoms = self.n_chains * n_beads
         total_bonds = self.n_chains * n_bonds_per_chain
@@ -2046,8 +2736,10 @@ class BeadSpringPolymer:
         if self._generation_method == "mc" or self._equilibrate:
             self.equilibrate(self._mc_config)
 
-        # Use stored positions for writing
-        use_stored_positions = self._positions is not None
+        # Positions are always available at this point (both SAW and
+        # geometric placement populate self._positions)
+        if self._positions is None:
+            self._generate_initial_positions()
 
         with open(f"{self.path}/polymer.data", 'w') as f:
             # Header
@@ -2079,126 +2771,100 @@ class BeadSpringPolymer:
             f.write("Atoms  # molecular\n\n")
             atom_id = 1
 
-            if use_stored_positions:
-                # Use equilibrated/placed positions
-                for chain_idx, (start, end) in enumerate(self._chain_indices):
-                    for local_bead, global_idx in enumerate(range(start, end)):
-                        pos = self._positions[global_idx]
-                        bead_name = self._sequence[local_bead]
-                        type_id = self._bead_type_id[bead_name]
-                        f.write(f"{atom_id} {chain_idx + 1} {type_id} {pos[0]:.3f} {pos[1]:.3f} {pos[2]:.3f}\n")
-                        atom_id += 1
-            else:
-                # Original position generation (fallback for compatibility)
-                if self.topology == "ring":
-                    radius = self.bond_length * n_beads / (2 * np.pi)
-                    n_per_dim = int(np.ceil(np.cbrt(self.n_chains)))
-                    spacing = radius * 3
+            for chain_idx, (start, end) in enumerate(self._chain_indices):
+                for local_bead, global_idx in enumerate(range(start, end)):
+                    pos = self._positions[global_idx]
+                    bead_name = self._sequence[local_bead]
+                    type_id = self._bead_type_id[bead_name]
+                    f.write(f"{atom_id} {chain_idx + 1} {type_id} {pos[0]:.3f} {pos[1]:.3f} {pos[2]:.3f}\n")
+                    atom_id += 1
 
-                for chain in range(self.n_chains):
-                    if self.topology == "ring":
-                        ix = chain % n_per_dim
-                        iy = (chain // n_per_dim) % n_per_dim
-                        iz = chain // (n_per_dim * n_per_dim)
-
-                        center_x = (ix - n_per_dim / 2 + 0.5) * spacing
-                        center_y = (iy - n_per_dim / 2 + 0.5) * spacing
-                        center_z = (iz - n_per_dim / 2 + 0.5) * spacing
-
-                        theta = np.random.uniform(0, np.pi)
-                        phi = np.random.uniform(0, 2 * np.pi)
-
-                        Rx = np.array([
-                            [1, 0, 0],
-                            [0, np.cos(theta), -np.sin(theta)],
-                            [0, np.sin(theta), np.cos(theta)]
-                        ])
-                        Rz = np.array([
-                            [np.cos(phi), -np.sin(phi), 0],
-                            [np.sin(phi), np.cos(phi), 0],
-                            [0, 0, 1]
-                        ])
-                        R = Rz @ Rx
-
-                        for bead in range(n_beads):
-                            angle = 2 * np.pi * bead / n_beads
-                            pos = np.array([
-                                radius * np.cos(angle),
-                                radius * np.sin(angle),
-                                0.0
-                            ])
-                            pos = R @ pos + np.array([center_x, center_y, center_z])
-
-                            bead_name = self._sequence[bead]
-                            type_id = self._bead_type_id[bead_name]
-                            f.write(f"{atom_id} {chain + 1} {type_id} {pos[0]:.3f} {pos[1]:.3f} {pos[2]:.3f}\n")
-                            atom_id += 1
-                    else:
-                        for bead in range(n_beads):
-                            x = bead * self.bond_length
-                            y = chain * self.bond_length * 2
-                            z = 0.0
-
-                            bead_name = self._sequence[bead]
-                            type_id = self._bead_type_id[bead_name]
-                            f.write(f"{atom_id} {chain + 1} {type_id} {x:.3f} {y:.3f} {z:.3f}\n")
-                            atom_id += 1
-
-            # Bonds
+            # Bonds (from the chain graph edge list)
             f.write("\nBonds\n\n")
             bond_id = 1
             for chain in range(self.n_chains):
                 start_id = chain * n_beads + 1
-                for bead in range(n_beads - 1):
-                    f.write(f"{bond_id} 1 {start_id + bead} {start_id + bead + 1}\n")
-                    bond_id += 1
-                if self.topology == "ring":
-                    f.write(f"{bond_id} 1 {start_id + n_beads - 1} {start_id}\n")
+                for i_local, j_local in self._bonds_local:
+                    f.write(f"{bond_id} 1 {start_id + i_local} {start_id + j_local}\n")
                     bond_id += 1
 
-            # Angles
+            # Angles (from the chain graph triplet list)
             if self.use_angles:
                 f.write("\nAngles\n\n")
                 angle_id = 1
                 for chain in range(self.n_chains):
                     start_id = chain * n_beads + 1
 
-                    # Internal angles
-                    for bead in range(n_beads - 2):
+                    for i_local, j_local, k_local in self._angle_triplets_local:
                         triplet = self._get_canonical_triplet(
-                            self._sequence[bead],
-                            self._sequence[bead + 1],
-                            self._sequence[bead + 2]
+                            self._sequence[i_local],
+                            self._sequence[j_local],
+                            self._sequence[k_local]
                         )
                         angle_type_id = self._angle_type_map[triplet]
-                        f.write(f"{angle_id} {angle_type_id} {start_id + bead} {start_id + bead + 1} {start_id + bead + 2}\n")
-                        angle_id += 1
-
-                    # Wrap-around angles for ring
-                    if self.topology == "ring" and n_beads >= 3:
-                        # n-2, n-1, 0
-                        triplet = self._get_canonical_triplet(
-                            self._sequence[-2],
-                            self._sequence[-1],
-                            self._sequence[0]
-                        )
-                        angle_type_id = self._angle_type_map[triplet]
-                        f.write(f"{angle_id} {angle_type_id} {start_id + n_beads - 2} {start_id + n_beads - 1} {start_id}\n")
-                        angle_id += 1
-
-                        # n-1, 0, 1
-                        triplet = self._get_canonical_triplet(
-                            self._sequence[-1],
-                            self._sequence[0],
-                            self._sequence[1]
-                        )
-                        angle_type_id = self._angle_type_map[triplet]
-                        f.write(f"{angle_id} {angle_type_id} {start_id + n_beads - 1} {start_id} {start_id + 1}\n")
+                        f.write(f"{angle_id} {angle_type_id} {start_id + i_local} {start_id + j_local} {start_id + k_local}\n")
                         angle_id += 1
 
         # Generate LAMMPS input script
         self._generate_input_script()
         logger.info(f"Generated bead-spring polymer files in {self.path}")
+
+    def generate_moltemplate(self, run_moltemplate: bool = True) -> Path:
+        """
+        Generate moltemplate .lt files (and optionally run moltemplate) for
+        this bead-spring polymer.
+
+        Mirrors the atomistic pipeline layout under
+        ``<path>/moltemplate/``: bead_spring.lt (CG force field),
+        bead_<Type>.lt monomer objects, chains.lt (one object per chain
+        with generated coordinates, explicit bond list, typed angle list),
+        and system.lt. Works for any architecture, since bonds and angles
+        come from the chain graph.
+
+        Args:
+            run_moltemplate: Run the bundled moltemplate after writing
+                files (produces system.data, system.in.init/settings).
+
+        Returns:
+            Path to the moltemplate directory.
+        """
+        from .bead_spring_lt import generate_moltemplate_files
+
+        # Ensure positions exist (same logic as generate_data_file)
+        if self._positions is None:
+            if self._generation_method == "saw":
+                success = self.saw_generate(self._saw_config)
+                if not success:
+                    logger.warning("SAW failed, falling back to geometric placement")
+                    self._generate_initial_positions()
+            else:
+                self._generate_initial_positions()
+
+        if self._generation_method == "mc" or self._equilibrate:
+            self.equilibrate(self._mc_config)
+
+        box_size = self._calculate_box_size()
+
+        return generate_moltemplate_files(
+            path=self.path,
+            bead_types=self.bead_types,
+            chain_architectures=[self._architecture] * self.n_chains,
+            positions=self._positions,
+            chain_indices=self._chain_indices,
+            box_size=box_size,
+            pair_coeffs=self._pair_coeffs,
+            bond_style=self.bond_style,
+            k_bond=self.k_bond,
+            bond_length=self.bond_length,
+            fene_r0=self.fene_r0,
+            pair_style=self._pair_style,
+            use_angles=self.use_angles,
+            angle_type_map=self._angle_type_map if self.use_angles else {},
+            resolve_angle_params=self._get_angle_params,
+            include_branch_angles=self.include_branch_angles,
+            canonical_triplet=canonical_bead_triplet,
+            run_moltemplate=run_moltemplate,
+        )
 
     def _generate_input_script(self) -> None:
         """Generate LAMMPS input script for the bead-spring polymer.
@@ -2209,90 +2875,21 @@ class BeadSpringPolymer:
         The equilibrium bond length of ~0.97 emerges from the balance of
         FENE + WCA potentials - there is no explicit r0 parameter in FENE.
         """
-        # Determine cutoff from max sigma
-        max_sigma = max(bt.sigma for bt in self.bead_types)
-
-        # Use WCA cutoff if pair_style is 'wca', otherwise use full LJ
-        # For Kremer-Grest melts at P=0, WCA (purely repulsive) is correct
-        if hasattr(self, '_pair_style') and self._pair_style == 'wca':
-            # WCA cutoff: 2^(1/6) * sigma
-            cutoff = (2 ** (1/6)) * max_sigma
-            pair_modify = "pair_modify     shift yes\n"
-        else:
-            cutoff = 2.5 * max_sigma
-            pair_modify = ""
-
-        with open(f"{self.path}/in.polymer", 'w') as f:
-            f.write("# LAMMPS input script for bead-spring polymer\n")
-            f.write("# Auto-generated by AutoPoly BeadSpringPolymer\n\n")
-
-            # Simulation settings
-            f.write("units           lj\n")
-            f.write("atom_style      molecular\n")
-            f.write("boundary        p p p\n\n")
-
-            f.write("read_data       polymer.data\n\n")
-
-            # Pair style and coefficients
-            f.write(f"pair_style      lj/cut {cutoff:.5f}\n")
-            for (i, j), (eps, sig) in sorted(self._pair_coeffs.items()):
-                f.write(f"pair_coeff      {i} {j} {eps:.4f} {sig:.4f}\n")
-            if pair_modify:
-                f.write(pair_modify)
-            f.write("\n")
-
-            # Bond style and coefficients
-            if self.bond_style == "fene":
-                # For FENE, use the first bead type's parameters for the attractive LJ part
-                eps = self.bead_types[0].epsilon
-                sig = self.bead_types[0].sigma
-                f.write("bond_style      fene\n")
-                # FENE bond: K, R0, epsilon, sigma
-                # Note: No r0 parameter - equilibrium distance emerges from FENE+WCA balance
-                f.write(f"bond_coeff      1 {self.k_bond:.1f} {self.fene_r0:.4f} {eps:.4f} {sig:.4f}\n")
-                f.write("special_bonds   fene\n\n")
-            else:
-                f.write("bond_style      harmonic\n")
-                f.write(f"bond_coeff      1 {self.k_bond:.1f} {self.bond_length:.4f}\n\n")
-
-            # Angle style and coefficients
-            if self.use_angles:
-                f.write("angle_style     harmonic\n")
-                for triplet, type_id in sorted(self._angle_type_map.items(), key=lambda x: x[1]):
-                    k, theta0 = self._get_angle_params(triplet)
-                    triplet_str = "-".join(triplet)
-                    f.write(f"angle_coeff     {type_id} {k:.4f} {theta0:.1f}  # {triplet_str}\n")
-                f.write("\n")
-
-            # Neighbor settings - CRITICAL for FENE bonds
-            # Use larger skin (2.0) for FENE to prevent lost atoms
-            f.write("neighbor        2.0 bin\n")
-            f.write("neigh_modify    every 2 delay 4 check yes\n\n")
-
-            # Output settings
-            f.write("thermo_style    custom step temp pe ke etotal press vol density\n")
-            f.write("thermo          1000\n\n")
-
-            # Trajectory output
-            f.write("dump            1 all custom 1000 dump.lammpstrj id type mol x y z\n")
-            f.write("dump_modify     1 sort id\n\n")
-
-            # Minimization
-            f.write("# Energy minimization\n")
-            f.write("minimize        1.0e-4 1.0e-6 1000 10000\n")
-            f.write("write_restart   min.restart\n")
-            f.write("write_data      min.data\n")
-            f.write("reset_timestep  0\n\n")
-
-            # MD settings
-            # Timestep: 0.001 is standard for Kremer-Grest with FENE bonds
-            f.write("# Production MD\n")
-            f.write("timestep        0.001\n")
-            # Thermostat: Tdamp = 0.1 (100x timestep) for proper control
-            f.write("fix             1 all nvt temp 1.0 1.0 0.1 tchain 3\n")
-            f.write("run             100000\n")
-            f.write("write_restart   prod.restart\n")
-            f.write("write_data      prod.data\n")
+        write_lammps_input_script(
+            path=self.path,
+            bead_types=self.bead_types,
+            pair_coeffs=self._pair_coeffs,
+            bond_style=self.bond_style,
+            k_bond=self.k_bond,
+            bond_length=self.bond_length,
+            fene_r0=self.fene_r0,
+            pair_style=self._pair_style,
+            use_angles=self.use_angles,
+            angle_type_map=self._angle_type_map,
+            angle_types=self._angle_types,
+            default_k_angle=self.default_k_angle,
+            default_theta0=self.default_theta0,
+        )
 
     def get_system_info(self) -> dict:
         """
@@ -2302,10 +2899,10 @@ class BeadSpringPolymer:
             Dictionary containing system properties.
         """
         n_beads = self.n_beads
-        n_bonds_per_chain = n_beads - 1 if self.topology == "linear" else n_beads
+        n_bonds_per_chain = len(self._bonds_local)
         n_angles_per_chain = 0
         if self.use_angles:
-            n_angles_per_chain = n_beads - 2 if self.topology == "linear" else n_beads
+            n_angles_per_chain = len(self._angle_triplets_local)
 
         total_atoms = self.n_chains * n_beads
         total_bonds = self.n_chains * n_bonds_per_chain
@@ -2316,6 +2913,8 @@ class BeadSpringPolymer:
             'n_chains': self.n_chains,
             'n_beads_per_chain': n_beads,
             'topology': self.topology,
+            'architecture': self._architecture.name,
+            'is_branched': self._architecture.is_branched,
             'total_atoms': total_atoms,
             'total_bonds': total_bonds,
             'total_angles': total_angles,

@@ -9,6 +9,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Bead-spring architectures (graph core)** — bead-spring chains are now
+  built on an explicit graph representation (`BeadArchitecture`: nodes =
+  beads, edges = bonds) instead of an implicit linear path, so arbitrary
+  topologies are supported uniformly:
+  - New module `AutoPoly.models.architectures` with factories `linear`,
+    `ring`, `star` (incl. miktoarm/asymmetric arms), `comb`, `graft`
+    (explicit graft points / side groups), `tadpole` (ring + tail),
+    `dendrimer`, and `custom` (explicit bead + bond lists).
+  - `MonomerTemplate` + `BeadArchitecture.from_monomers(...)` for
+    explicitly defined multi-bead monomers (backbone bead, side-group
+    bead) with named connection points (`head`/`tail`/`side`).
+  - Copolymer sequence generators: `block_sequence`,
+    `alternating_sequence`, `random_sequence` (seeded, weighted),
+    `gradient_sequence`; usable in any sequence slot.
+  - `BeadSpringPolymer(..., architecture=...)` accepts any architecture;
+    legacy `sequence=`/`topology=` remain fully backward compatible.
+  - Branch-aware angles: triplets centered on branch points are included
+    by default with their own canonical triplet types (configurable via
+    `AngleType`); disable with `include_branch_angles=False`.
+  - Graph-based SAW generation (`saw_grow_graph`, `saw_generate_graphs`):
+    DFS spanning-tree growth with cycle-closing constraints.
+  - Branched MC equilibration: tree-pivot moves across bridge edges
+    (`mc_tree_pivot_move`) and segment crankshaft
+    (`mc_segment_crankshaft_move`); reptation is linear-only.
+- **Bead-spring mixtures** — new `BeadSpringSystem` packs multiple
+  species (`(architecture, n_chains)` pairs — e.g. rings + linear +
+  combs) into one box and one LAMMPS data file with a shared bead-type
+  table.
+- **Moltemplate backend for bead-spring models** — `generate_moltemplate()`
+  on both `BeadSpringPolymer` and `BeadSpringSystem` emits
+  `bead_spring.lt` (CG force field), `bead_<Type>.lt` monomer objects,
+  `chains.lt` (one object per chain at generated coordinates, explicit
+  bond list, typed angle list), and `system.lt`, then optionally runs the
+  bundled moltemplate to produce `system.data` + `system.in.init/settings`.
+
 - **Physical substrates** — build a polymer/molecule film on top of a
   substrate slab via `generate(..., substrate=SubstrateSpec(...))`:
   - `SubstrateSpec(model=...)` packs a `Molecule`/`Polymer` into a slab of

@@ -41,10 +41,18 @@ __all__ = [
     "Molecule",
     "generate",
     "BeadSpringPolymer",
+    "BeadSpringSystem",
     "BeadType",
     "AngleType",
     "MCConfig",
     "SAWConfig",
+    "BeadArchitecture",
+    "MonomerTemplate",
+    "architectures",
+    "block_sequence",
+    "alternating_sequence",
+    "random_sequence",
+    "gradient_sequence",
     "MonomerGenerator",
     "GeometryBuilder",
     "GeometryConfig",
@@ -68,6 +76,16 @@ __all__ = [
 # Always available imports (no rdkit dependency)
 from .core.system import System
 from .models.bead_spring import BeadSpringPolymer, BeadType, AngleType, MCConfig, SAWConfig
+from .models.bead_spring_system import BeadSpringSystem
+from .models.architectures import (
+    BeadArchitecture,
+    MonomerTemplate,
+    block_sequence,
+    alternating_sequence,
+    random_sequence,
+    gradient_sequence,
+)
+from .models import architectures
 
 # Optional imports that require rdkit
 try:
