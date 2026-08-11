@@ -34,6 +34,7 @@ import shutil
 from pathlib import Path
 from typing import Set, Dict, List, Tuple, Optional
 from ..core.system import logger
+from ..core.conf import FORCE_FIELD_REGISTRY
 from ..core.exceptions import GenerationError
 from ..monomers.monomer_processing import (
     collect_monomer_files,
@@ -438,9 +439,23 @@ class GAFFAnalyzer:
                                 dihedral_coeff_lines: List[str],
                                 dihedral_def_lines: List[str],
                                 used_dihedral_types: Set[str]) -> Tuple[List[str], List[str]]:
-        """Filter dihedral coefficients and definitions.
+        """Filter dihedral coefficients and definitions with wildcard support.
 
-        Keep dihedral if it's in the used_dihedral_types set.
+        GAFF states most torsions with wildcard end atoms, e.g.
+        '@dihedral:X-ca-ca-X @atom:* @atom:ca @atom:ca @atom:*' -- 634 of the
+        2112 dihedral definitions in gaff2.lt are of this form, and for many
+        molecules (benzene, every c3-c3 backbone) they are the *only* torsions
+        available. Exact string matching drops them all, so the subset must
+        match patterns the same way the improper filter does.
+
+        Dihedrals also read the same forwards and backwards: the pattern
+        'ca-ca-os-p5' describes the same torsion as 'p5-os-ca-ca'. Each
+        candidate is therefore tested against the inferred type and its
+        reverse.
+
+        Line order from gaff2.lt is preserved, so wildcard and specific rules
+        reach moltemplate in their original relative order and resolve exactly
+        as they would against the unfiltered file.
 
         Args:
             dihedral_coeff_lines: Lines from dihedral_coeff In Settings section
@@ -450,10 +465,34 @@ class GAFFAnalyzer:
         Returns:
             Tuple of (filtered_coeff_lines, filtered_def_lines)
         """
-        return self._filter_section_by_topology(
-            dihedral_coeff_lines, dihedral_def_lines, used_dihedral_types,
-            '@dihedral:', self._normalize_dihedral_type
-        )
+        # Parse used dihedral types into lists for wildcard matching
+        used_dihedral_lists = [t.split('-') for t in used_dihedral_types]
+
+        # Identify which references to keep
+        keep_refs = set()
+
+        for line in dihedral_def_lines:
+            if '@dihedral:' in line and '@atom:' in line:
+                pattern_types = self._extract_atom_types(line)
+
+                # Check if this pattern matches any inferred dihedral type,
+                # in either direction
+                for actual_types in used_dihedral_lists:
+                    if (self._matches_with_wildcards(pattern_types, actual_types)
+                            or self._matches_with_wildcards(
+                                pattern_types, actual_types[::-1])):
+                        ref_name = self._extract_reference_name(line, '@dihedral:')
+                        if ref_name:
+                            keep_refs.add(ref_name)
+                        break  # Found a match, no need to check more
+
+        # Filter using the common filtering logic
+        filtered_coeffs = self._filter_lines_by_reference(
+            dihedral_coeff_lines, keep_refs, '@dihedral:')
+        filtered_defs = self._filter_lines_by_reference(
+            dihedral_def_lines, keep_refs, '@dihedral:')
+
+        return filtered_coeffs, filtered_defs
 
     def _matches_with_wildcards(self, pattern_types: List[str], actual_types: List[str]) -> bool:
         """Check if actual atom types match a pattern that may contain wildcards.
@@ -777,6 +816,59 @@ class GAFFAnalyzer:
                 continue
             f.write(f"{line}")
 
+    # Class name declared by the source parameter file (gaff2.lt).
+    SOURCE_CLASS_NAME = "GAFF2"
+
+    def _install_full_fallback(self, gaff_src: str) -> None:
+        """Install the unfiltered parameter file when subsetting is not possible.
+
+        The fallback has to satisfy the same contract the monomer .lt files were
+        written against (see write_lt_header / FORCE_FIELD_REGISTRY): a
+        force_field="gaff" monomer says 'import "gaff.lt"' and 'inherits GAFF'.
+        Neither matches the source, because gaff2.lt is used for both GAFF and
+        GAFF2 (atom typing uses GAFF2 types) and it declares "GAFF2 {". Copying
+        it under its own name leaves the build unable to resolve the import or
+        the class, so the file is written under the name the monomers import
+        with its class declaration renamed to the one they inherit.
+
+        Args:
+            gaff_src: Path to the full source parameter file (gaff2.lt).
+
+        Raises:
+            GenerationError: If the source file is missing.
+        """
+        if not Path(gaff_src).exists():
+            raise GenerationError(
+                f"GAFF force field file not found: {gaff_src}. "
+                f"Please ensure {Path(gaff_src).name} is installed in moltemplate/"
+            )
+
+        entry = FORCE_FIELD_REGISTRY[self.force_field]
+        dst = Path(self.path_cwd) / entry["lt_file"]
+        dst_class = entry["inherits"]
+
+        # A previous run can leave this name as a symlink to gaff_subset.lt;
+        # copying onto it would write through the link instead of replacing it.
+        if dst.is_symlink() or dst.exists():
+            dst.unlink()
+
+        if dst_class == self.SOURCE_CLASS_NAME:
+            shutil.copy(gaff_src, str(dst))
+        else:
+            open_brace = f"{self.SOURCE_CLASS_NAME} {{"
+            close_comment = f"}} # {self.SOURCE_CLASS_NAME}"
+            with open(gaff_src, 'r') as fin, open(dst, 'w') as fout:
+                for line in fin:
+                    if line.startswith(open_brace):
+                        line = line.replace(
+                            open_brace, f"{dst_class} {{", 1)
+                    elif line.startswith(close_comment):
+                        line = f"}} # {dst_class}\n"
+                    fout.write(line)
+
+        logger.info(f"  Installed full parameter set as {dst.name} "
+                    f"(class {dst_class})")
+
     def create_gaff_subset(self, model=None, monomer_files: Optional[List[str]] = None) -> None:
         """Create a subset of GAFF parameters based on the models.
 
@@ -799,11 +891,12 @@ class GAFFAnalyzer:
             monomer_files: Explicit list of monomer .lt file paths (takes
                 precedence over model-derived paths)
         """
-        try:
-            # Determine source file based on force field
-            # Use GAFF2 for both "gaff" and "gaff2" force fields since atom typing uses GAFF2 types
-            gaff_src = str(Path(self.path_master) / "moltemplate" / "force_fields" / "gaff2.lt")
+        # Determine source file based on force field
+        # Use GAFF2 for both "gaff" and "gaff2" force fields since atom typing uses GAFF2 types
+        # (assigned outside the try so the fallback handler can always read it)
+        gaff_src = str(Path(self.path_master) / "moltemplate" / "force_fields" / "gaff2.lt")
 
+        try:
             # Use gaff_subset.lt as output for both (symlink will handle naming)
             gaff_dst = str(Path(self.path_cwd) / "gaff_subset.lt")
 
@@ -824,7 +917,7 @@ class GAFFAnalyzer:
             if not monomer_files:
                 logger.warning("  No monomer files found!")
                 logger.warning(f"  Falling back to full {Path(gaff_src).name}")
-                shutil.copy(gaff_src, str(Path(self.path_cwd) / Path(gaff_src).name))
+                self._install_full_fallback(gaff_src)
                 return
 
             logger.info(f"  Found {len(monomer_files)} monomer files")
@@ -837,7 +930,7 @@ class GAFFAnalyzer:
             if not atom_types:
                 logger.warning("  No atom types found in monomers!")
                 logger.warning(f"  Falling back to full {Path(gaff_src).name}")
-                shutil.copy(gaff_src, str(Path(self.path_cwd) / Path(gaff_src).name))
+                self._install_full_fallback(gaff_src)
                 return
 
             # Step 3: Extract bond types from monomers and add inter-monomer possibilities
@@ -1036,5 +1129,9 @@ class GAFFAnalyzer:
             logger.error(f"Error in create_gaff_subset: {str(e)}")
             import traceback
             traceback.print_exc()
+            if not Path(gaff_src).exists():
+                # Nothing to fall back to; let the real error surface instead of
+                # masking it with a copy failure.
+                raise
             logger.warning(f"Falling back to full {Path(gaff_src).name}")
-            shutil.copy(gaff_src, str(Path(self.path_cwd) / Path(gaff_src).name))
+            self._install_full_fallback(gaff_src)
