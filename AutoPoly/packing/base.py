@@ -80,6 +80,12 @@ class SubstrateSpec:
              SiO2 slab built outside AutoPoly). The file is copied into the
              moltemplate directory, imported in system.lt, and instantiated
              once, centered laterally at zlo + thickness/2.
+    - builder: a built-in surface builder ("alpha_quartz" or
+             "beta_cristobalite"). A hydroxylated crystalline SiO2 slab
+             is generated at pack time (AutoPoly.surfaces builders),
+             written as a self-contained .lt, and instantiated once like
+             an external slab. Requires explicit lateral box_dims; the
+             box sides are snapped to integer surface cells.
 
     Attributes:
         model: Molecule/Polymer model for an in-pipeline substrate.
@@ -95,6 +101,19 @@ class SubstrateSpec:
         density: Particle density (particles/A^3) used with AUTO_COUNT.
         vacuum: Extra empty space in Angstrom above the film (0 = fully
                 periodic slab model with the film filling the rest of z).
+        builder: Built-in slab builder name ("alpha_quartz") or None.
+        oh_density: Target top-surface silanol density (sites/nm^2) for
+                builder slabs (default 4.6, after Zhuravlev).
+        slab_ff: Slab force field: "interface" (INTERFACE FF v1.5, Emami
+                et al. 2014), "clayff" (Cygan et al. 2004), or "custom"
+                (requires slab_types + slab_charges + slab_lj covering
+                the roles "Si", "OB", "OH", "HO").
+        slab_types: Optional per-role moltemplate @atom type-name override.
+        slab_charges: Optional per-role charge (e) override.
+        slab_lj: Optional per-role (epsilon kcal/mol, sigma A) override.
+        hydroxylate_bottom: Cap bottom-face dangling oxygens with H
+                (default True; both faces are exposed when vacuum=0).
+        slab_seed: RNG seed for the silanol bridge pairing.
     """
     model: Optional[object] = None
     lt_file: Optional[str] = None
@@ -105,13 +124,52 @@ class SubstrateSpec:
     count: Union[int, str, None] = None
     density: float = 0.085
     vacuum: float = 0.0
+    builder: Optional[str] = None
+    oh_density: float = 4.6
+    slab_ff: str = "interface"
+    slab_types: Optional[dict] = None
+    slab_charges: Optional[dict] = None
+    slab_lj: Optional[dict] = None
+    hydroxylate_bottom: bool = True
+    slab_seed: int = 42
 
     def __post_init__(self) -> None:
-        if (self.model is None) == (self.lt_file is None):
+        n_sources = sum(
+            s is not None for s in (self.model, self.lt_file, self.builder)
+        )
+        if n_sources != 1:
             raise ValidationError(
                 "SubstrateSpec requires exactly one source: 'model' "
-                "(in-pipeline Molecule/Polymer) or 'lt_file' (external slab)"
+                "(in-pipeline Molecule/Polymer), 'lt_file' (external "
+                "slab), or 'builder' (built-in surface builder)"
             )
+        if self.builder is not None:
+            from ..surfaces import SLAB_BUILDERS
+            if self.builder not in SLAB_BUILDERS:
+                raise ValidationError(
+                    f"Unknown substrate builder '{self.builder}'; "
+                    f"available: {sorted(SLAB_BUILDERS)}"
+                )
+            if self.slab_ff not in ("interface", "clayff", "custom"):
+                raise ValidationError(
+                    f"Unknown slab_ff '{self.slab_ff}'; choose "
+                    "'interface', 'clayff', or 'custom'"
+                )
+            if self.slab_ff == "custom":
+                from ..surfaces.ff_tables import SLAB_ROLES
+                for name, table in (("slab_types", self.slab_types),
+                                    ("slab_charges", self.slab_charges),
+                                    ("slab_lj", self.slab_lj)):
+                    if table is None or any(
+                            r not in table for r in SLAB_ROLES):
+                        raise ValidationError(
+                            f"slab_ff='custom' requires {name} covering "
+                            f"all roles {SLAB_ROLES}"
+                        )
+            if self.oh_density < 0:
+                raise ValidationError(
+                    f"oh_density must be >= 0, got {self.oh_density}"
+                )
         if self.lt_file is not None and not self.class_name:
             raise ValidationError(
                 "SubstrateSpec with lt_file requires 'class_name' "
@@ -155,6 +213,11 @@ class SubstrateSpec:
     def is_external(self) -> bool:
         """True for a pre-built external .lt slab (no in-pipeline model)."""
         return self.lt_file is not None
+
+    @property
+    def is_builder(self) -> bool:
+        """True for a built-in surface builder slab (e.g. alpha_quartz)."""
+        return self.builder is not None
 
 
 @dataclass

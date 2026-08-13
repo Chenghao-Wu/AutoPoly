@@ -1,4 +1,12 @@
-recursive-include AutoPoly/extern/ *
-recursive-include AutoPoly/extern/moltemplate/ *
-recursive-include AutoPoly/extern/Monomer_bank/ *
-recursive-include AutoPoly/extern/rdlt_data/ *
+# Bundled external resources required at runtime:
+#  - extern/moltemplate: moltemplate scripts, .lt force-field files, .prm files
+#  - extern/rdlt_data:   .fdefn SMARTS files, atom-type dicts (.pkl)
+recursive-include AutoPoly/extern *
+
+# Docs / metadata in the sdist
+include README.md license.md CHANGELOG.md
+
+# Never ship bytecode or test artifacts
+global-exclude __pycache__
+global-exclude *.py[co]
+global-exclude .DS_Store

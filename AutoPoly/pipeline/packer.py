@@ -143,9 +143,12 @@ class BoxPacker:
         # 4. moltemplate + validation + post-processing
         if self.run_moltemplate:
             self._run_moltemplate_and_validate(units.force_field)
+            self._patch_in_init_styles()
             logger.info("Processing output files")
             get_rid_of_lj_cut_coul_long(self.moltemplate_dir)
             mv_files(self.moltemplate_dir)
+            if self.substrate is not None:
+                self._write_run_script(result)
 
         logger.info("Successfully completed polymer generation")
         return result
@@ -204,6 +207,96 @@ class BoxPacker:
                     f"External substrate lt_file not found: {src}"
                 )
             shutil.copy2(src, self.moltemplate_dir / src.name)
+
+        # Built-in substrate slab: generate the .lt at pack time
+        if self.substrate is not None and self.substrate.is_builder:
+            self._build_substrate_slab(units.force_field)
+
+    def _film_bond_substyle(self, force_field: str) -> Optional[str]:
+        """'harmonic' if the film force field uses a hybrid bond style."""
+        entry = FORCE_FIELD_REGISTRY[force_field]
+        ff_lt = Path(self.path_master) / "moltemplate" / "force_fields" / entry["lt_file"]
+        for line in ff_lt.read_text().splitlines():
+            ls = line.strip()
+            if ls.startswith("bond_style") and not ls.startswith("#"):
+                return "harmonic" if "hybrid" in ls else None
+        return None
+
+    def _film_pair_substyle(self, force_field: str) -> Optional[str]:
+        """
+        LAMMPS pair sub-style the slab's pair_coeff lines must carry.
+
+        Read from the film force field's .lt pair_style line: with a
+        hybrid pair style every pair_coeff needs a sub-style (the LJ
+        one); with a plain pair style, None.  Class2 force fields store
+        pair coefficients in the data file, which the slab writers do
+        not support.
+        """
+        entry = FORCE_FIELD_REGISTRY[force_field]
+        ff_lt = Path(self.path_master) / "moltemplate" / "force_fields" / entry["lt_file"]
+        pair_style = ""
+        for line in ff_lt.read_text().splitlines():
+            ls = line.strip()
+            if ls.startswith("pair_style") and not ls.startswith("#"):
+                pair_style = ls
+                break
+        if "class2" in pair_style:
+            raise WorkflowError(
+                f"Built-in substrate builders do not support class2 "
+                f"force fields ({force_field}); build the slab outside "
+                "AutoPoly and use SubstrateSpec(lt_file=..., ...) instead"
+            )
+        if "hybrid" in pair_style:
+            for token in pair_style.split()[1:]:
+                if token.startswith("lj/"):
+                    return token
+            raise WorkflowError(
+                f"Could not find an LJ sub-style in the pair_style line "
+                f"of {entry['lt_file']}: '{pair_style}'"
+            )
+        return None
+
+    def _build_substrate_slab(self, force_field: str = "gaff") -> None:
+        """
+        Materialize a built-in substrate slab (SubstrateSpec.builder=...).
+
+        Requires explicit lateral box_dims (the slab must be laterally
+        periodic with the box); the box lateral sides are snapped to
+        integer surface cells by the on_substrate strategy.  Writes the
+        slab .lt into the moltemplate dir and stashes the SurfaceSlab
+        on the spec (``spec._built_slab``) for the strategy.
+        """
+        from ..surfaces import SLAB_BUILDERS
+
+        spec = self.substrate
+        dims = self.box_dims or (None, None, None)
+        if dims[0] is None or dims[1] is None:
+            raise WorkflowError(
+                "Builder substrates require explicit lateral box_dims "
+                "(box_dims=(lx, ly, lz); lz may be None) so the slab can "
+                "be built to match the box"
+            )
+        if spec.builder not in SLAB_BUILDERS:
+            raise WorkflowError(
+                f"Unknown substrate builder '{spec.builder}'"
+            )
+        builder = SLAB_BUILDERS[spec.builder](
+            lx_target=dims[0],
+            ly_target=dims[1],
+            thickness=spec.thickness,
+            oh_density=spec.oh_density,
+            hydroxylate_bottom=spec.hydroxylate_bottom,
+            slab_ff=spec.slab_ff,
+            slab_types=spec.slab_types,
+            slab_charges=spec.slab_charges,
+            slab_lj=spec.slab_lj,
+            seed=spec.slab_seed,
+            pair_substyle=self._film_pair_substyle(force_field),
+            bond_substyle=self._film_bond_substyle(force_field),
+        )
+        slab = builder.build()
+        slab.write_lt(self.moltemplate_dir)
+        spec._built_slab = slab
 
     # ------------------------------------------------------------------
     # Step 2: force-field files
@@ -278,6 +371,12 @@ class BoxPacker:
                 slab_lt = Path(self.substrate.lt_file).name
                 if slab_lt not in seen:
                     f.write(f'import "{slab_lt}"\n')
+
+            # Built-in substrate slab (generated into this directory)
+            if self.substrate is not None and self.substrate.is_builder:
+                built = getattr(self.substrate, "_built_slab", None)
+                if built is not None and built.lt_filename not in seen:
+                    f.write(f'import "{built.lt_filename}"\n')
             f.write("\n")
 
             for record in result.records:
@@ -292,6 +391,108 @@ class BoxPacker:
             f.write("}\n")
 
         return output
+
+    def _write_run_script(self, result: PlacementResult) -> None:
+        """
+        Write a ready-to-run in.run for film-on-substrate systems.
+
+        The substrate is frozen (fix setforce) and the film runs NVT at
+        300 K with a film-only temperature compute: the default
+        whole-system temperature would be biased low by the frozen slab.
+        The slab molecule(s) are the first records (placed before the
+        film), so molecule IDs 1..N_slab are the substrate.
+        """
+        n_slab = sum(
+            1 for r in result.records
+            if r.instance_name.startswith("substrate")
+        )
+        n_slab = max(n_slab, 1)
+        slab_ids = " ".join(str(i) for i in range(1, n_slab + 1))
+        script = f"""# AutoPoly film-on-substrate run script (generated)
+# Frozen substrate + film NVT 300 K.  Edit as needed for production runs.
+boundary        p p p
+
+include         system.in.init
+read_data       system.data
+include         system.in.settings
+
+# substrate = molecule(s) {slab_ids} (placed first in the data file)
+group           slab molecule {slab_ids}
+group           film subtract all slab
+
+neighbor        2.0 bin
+neigh_modify    delay 0 every 1 check yes
+
+# freeze the substrate (built slabs carry no force-bearing bonded terms)
+fix             freeze slab setforce 0.0 0.0 0.0
+
+minimize        1.0e-4 1.0e-6 1000 10000
+
+velocity        film create 300.0 12345 dist gaussian
+# film-only temperature: the frozen slab has zero kinetic energy and
+# would bias the default whole-system temperature in the log
+compute         tfilm film temp
+fix             nvt film nvt temp 300.0 300.0 100.0
+fix_modify      nvt temp tfilm
+
+timestep        1.0
+thermo          500
+thermo_style    custom step c_tfilm pe ke etotal press
+thermo_modify   temp tfilm
+
+dump            d1 all custom 2000 dump.film.lammpstrj id mol type x y z
+
+run             10000
+"""
+        out = self.project_dir / "in.run"
+        out.write_text(script)
+        logger.info(f"Run script written to {out}")
+
+    # ------------------------------------------------------------------
+    # Step 4a: in.init style patching (zero-count hybrid styles)
+    # ------------------------------------------------------------------
+    _STYLE_KINDS = (
+        ("bond", "bond_style"),
+        ("angle", "angle_style"),
+        ("dihedral", "dihedral_style"),
+        ("improper", "improper_style"),
+    )
+
+    def _patch_in_init_styles(self) -> None:
+        """
+        Replace hybrid bond/angle/dihedral/improper styles with their
+        'none' form when system.data contains zero records of that kind.
+
+        LAMMPS aborts when a hybrid sub-style is unused (e.g.
+        'Improper hybrid sub-style cvff is not used'), which happens for
+        any improper-free system (e.g. polyethylene films) because the
+        force-field .lt always declares hybrid styles.
+        """
+        data_path = self.moltemplate_dir / "system.data"
+        init_path = self.moltemplate_dir / "system.in.init"
+        if not data_path.is_file() or not init_path.is_file():
+            return
+        counts = {}
+        for line in data_path.read_text().splitlines()[:60]:
+            parts = line.split()
+            if len(parts) == 2 and parts[0].isdigit():
+                counts[parts[1]] = int(parts[0])
+        lines = init_path.read_text().splitlines()
+        changed = False
+        for k, line in enumerate(lines):
+            stripped = line.strip()
+            for kind, style_cmd in self._STYLE_KINDS:
+                if (stripped.startswith(style_cmd)
+                        and "hybrid" in stripped
+                        and counts.get(kind + "s", 1) == 0):
+                    logger.info(
+                        f"system.data has 0 {kind}s: patching "
+                        f"'{stripped}' -> '{style_cmd} none'"
+                    )
+                    lines[k] = f"{style_cmd}  none"
+                    changed = True
+        if changed:
+            init_path.write_text("\n".join(lines) + "\n")
 
     # ------------------------------------------------------------------
     # Step 4: moltemplate + validation + post-processing

@@ -46,6 +46,10 @@ generate(
 
 ## Choosing the substrate source
 
+Three sources are available: an in-pipeline `model`, a built-in
+crystalline `builder` (alpha-quartz silica), or an external pre-built
+`.lt` surface.
+
 ### In-pipeline model: `SubstrateSpec(model=...)`
 
 Any `Molecule` or `Polymer` works. It flows through the same three pipeline
@@ -73,6 +77,100 @@ SubstrateSpec(
     `density` here is *particles* per Å³ (whole molecules), not the
     `monomer_density` used for film sizing. For a small-molecule liquid,
     ~0.01/Å³ is a typical magnitude — 0.085 would be atomic density.
+
+### Built-in crystalline silica: `SubstrateSpec(builder=...)`
+
+Two hydroxylated crystalline SiO2 slabs can be generated at pack time —
+no external files needed:
+
+| `builder` | Surface | Termination | Silanol density | Surface cell (A) |
+|---|---|---|---|---|
+| `"alpha_quartz"` | alpha-quartz (0001) | geminal Q2 | ~9.6/nm² (intrinsic) | 4.9019 × 8.4903 |
+| `"beta_cristobalite"` | beta-cristobalite (111) | isolated Q3 | ~4.5/nm² (matches Zhuravlev) | 10.1258 × 17.5383 |
+
+For a target silanol density near the experimental value for amorphous
+silica (4.6/nm², Zhuravlev 2000), use `"beta_cristobalite"`. Example
+with alpha-quartz:
+
+```python
+substrate = SubstrateSpec(
+    builder="alpha_quartz",
+    thickness=12.0,       # slab envelope (A), incl. hydroxyl coatings
+    gap=3.0,
+    slab_ff="interface",  # "interface" (INTERFACE FF v1.5) or "clayff"
+)
+
+generate(
+    system, "pe_on_quartz", [film],
+    force_field="gaff",
+    substrate=substrate,
+    box_dims=(30.0, 34.0, 40.0),   # lateral dims are required
+)
+```
+
+The slab is built from published crystal structures (alpha-quartz:
+P3121, COD 1526860; beta-cristobalite: Fd-3m average structure, COD
+1010944 with oxygens displaced off the Si-Si axis to physical 1.61 A
+bonds and 148.7° Si-O-Si angles), cleaved along the natural cleavage
+plane (chosen automatically as the cut that breaks the fewest bonds
+while keeping every Si tetrahedrally coordinated), and hydroxylated on
+**both** faces. `oh_density` accepts a target density and the builder
+attempts to reach it by forming Si-O-Si bridges between dangling
+oxygens (mbuild-style); note that on both supported faces the surface
+silicons are too far apart for bridging, so the surface stays at its
+intrinsic density — a warning is logged when the target cannot be met.
+Set `hydroxylate_bottom=False` to leave the bottom face bare.
+
+Practical consequences of the crystalline slab:
+
+- **Lateral `box_dims` are required** (lz may still be `None`), and the
+  box is *snapped* to integer surface cells (see the table above) so the
+  slab is seamlessly periodic. The snap is logged.
+- `thickness` is an **envelope**: the Si core occupies roughly
+  `thickness - 5.4 A`; the physical slab (with –OH caps) always fits
+  inside `[zlo, zlo + thickness]`.
+- The slab is a single self-typed `.lt` class (not SMILES-typed through
+  the pipeline) with LJ + charges plus a **zero-force-constant bond
+  topology** (`bond_coeff ... 0.0`): the bonds add no forces, but they
+  make `special_bonds` exclude intra-slab 1-2/1-3/1-4 nonbonded terms —
+  without them, bonded O-H pairs (0.945 A) would contribute enormous
+  spurious LJ/Coulomb energies. The slab is meant to be held
+  rigid/frozen in MD (`fix rigid` or freeze the slab atoms, e.g.
+  `fix freeze slab setforce 0.0 0.0 0.0`). The `pair_coeff`/`bond_coeff`
+  lines automatically carry the sub-style required by the film force
+  field (hybrid vs plain styles).
+- Slab charges sum to zero; mixing with the film force field follows
+  LAMMPS mixing rules (`pair_modify mix ...`).
+
+The film keeps its own force field; the slab's is chosen independently:
+
+| `slab_ff` | Types (roles Si/OB/OH/HO) | Charges (Si, OB, OH, HO) | Reference |
+|---|---|---|---|
+| `"interface"` (default) | `i15_sc4`, `i15_oc23`, `i15_oc24`, `i15_hoy` | +1.10, −0.55, −0.675, +0.40 | Emami et al., *Chem. Mater.* 2014 (INTERFACE FF v1.5) |
+| `"clayff"` | `cff_st`, `cff_ob`, `cff_oh`, `cff_ho` | +2.10, −1.05, −0.95, +0.425 | Cygan et al., *J. Phys. Chem. B* 2004 (CLAYFF) |
+| `"custom"` | user-provided | user-provided | — |
+
+With `"custom"` (or to override individual entries of a built-in table),
+pass per-role maps covering the roles `"Si"` (tetrahedral Si), `"OB"`
+(bridging O), `"OH"` (silanol O), `"HO"` (silanol H):
+
+```python
+SubstrateSpec(
+    builder="alpha_quartz", thickness=12.0,
+    slab_ff="custom",
+    slab_types={"Si": "si_q", "OB": "ob_q", "OH": "oh_q", "HO": "ho_q"},
+    slab_charges={"Si": 1.5, "OB": -0.75, "OH": -0.85, "HO": 0.35},
+    slab_lj={"Si": (0.093, 3.697), "OB": (0.054, 3.091),
+             "OH": (0.122, 3.091), "HO": (0.015, 0.967)},  # (eps kcal/mol, sigma A)
+)
+```
+
+!!! warning "Mixing rules"
+    INTERFACE FF and CLAYFF both assume arithmetic-sigma/geometric-epsilon
+    mixing (`pair_modify mix arithmetic`), which also matches GAFF/AMBER
+    conventions. OPLS films expect geometric mixing. Check your
+    `system.in.settings` and set the mixing rule appropriate for your
+    combination.
 
 ### External pre-built surface: `SubstrateSpec(lt_file=..., class_name=...)`
 
@@ -111,6 +209,21 @@ With the default `vacuum=0` the film fills the rest of the box, giving the
 usual fully periodic slab model (film touches the slab's periodic image —
 that's the second interface). Set `vacuum > 0` if you plan to run with
 `boundary p p f`.
+
+## Running the system in LAMMPS
+
+When `substrate=` is used, `generate()` also writes a ready-to-run
+**`in.run`** into the project directory: frozen slab
+(`fix ... setforce 0`), film NVT at 300 K with a film-only temperature
+compute (`compute tfilm film temp` — the default whole-system
+temperature would be biased low by the frozen slab). Review and edit it
+for production runs.
+
+Note: AutoPoly also patches `system.in.init` after moltemplate — hybrid
+bond/angle/dihedral/improper styles with zero records in `system.data`
+(e.g. `improper_style hybrid cvff` for an improper-free polyethylene
+film) are replaced with their `none` form, since LAMMPS aborts on
+unused hybrid sub-styles.
 
 ## Subtract: carving after placement
 

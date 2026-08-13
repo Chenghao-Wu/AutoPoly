@@ -23,6 +23,7 @@ Created on 2026-07-30
 import numpy as np
 
 from ..core.system import logger
+from ..core.exceptions import ValidationError
 from ..pipeline.units import UNIT_KIND_POLYMER
 from ..mc import CollisionDetector, MolecularPlacementMC, calculate_box_size
 from .base import (
@@ -99,9 +100,22 @@ class RandomMCStrategy(PlacementStrategy):
         if ctx.rng_seed is not None:
             np.random.seed(ctx.rng_seed)
 
-        box_size = ctx.box.requested_box_size or compute_auto_box_size(ctx)
-        box_bounds = symmetric_bounds(box_size)
-        half_box = box_size / 2.0
+        dims = ctx.box.box_dims or (None, None, None)
+        if any(d is not None for d in dims):
+            # explicit per-axis box: auto-size only the unspecified axes
+            auto = compute_auto_box_size(ctx)
+            lx, ly, lz = (
+                float(d) if d is not None else auto for d in dims
+            )
+            box_bounds = ((-lx / 2, lx / 2), (-ly / 2, ly / 2),
+                          (-lz / 2, lz / 2))
+            half_box = min(lx, ly, lz) / 2.0
+            box_size = max(lx, ly, lz)
+        else:
+            box_size = (ctx.box.requested_box_size
+                        or compute_auto_box_size(ctx))
+            box_bounds = symmetric_bounds(box_size)
+            half_box = box_size / 2.0
 
         cell_size = max(5.0, box_size / 20)
         collision_detector = CollisionDetector(box_bounds, cell_size)
@@ -195,10 +209,24 @@ class RandomMCStrategy(PlacementStrategy):
     def _fallback_item(
         unit, instance_name: str, index: int, half_box: float
     ) -> PlacedItem:
-        """Deterministic 3D grid position used when MC placement fails."""
+        """
+        Deterministic 3D grid position used when MC placement fails.
+
+        The grid guarantees non-overlapping bounding spheres; if it
+        cannot hold one more instance this is a hard error (silently
+        wrapping the index would stack instances on identical positions
+        and produce atom clashes in the data file).
+        """
         radius = unit.radius
         spacing = radius * GRID_FALLBACK_FACTOR
         grid_per_dim = max(1, int((2 * half_box - 2 * radius) / spacing))
+        if index >= grid_per_dim ** 3:
+            raise ValidationError(
+                f"Failed to place instance {instance_name} ({unit.id}) "
+                f"and the fallback grid is full ({grid_per_dim}^3 = "
+                f"{grid_per_dim ** 3} positions for radius "
+                f"{radius:.2f} A). Use a larger box or fewer units."
+            )
         ix = index % grid_per_dim
         iy = (index // grid_per_dim) % grid_per_dim
         iz = (index // (grid_per_dim * grid_per_dim)) % grid_per_dim

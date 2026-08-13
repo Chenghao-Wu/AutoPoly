@@ -191,7 +191,7 @@ def _resolve_substrate_models(
     volume x density (Molecule substrates only, explicit lateral box_dims
     required). External .lt substrates contribute no models.
     """
-    if substrate is None or substrate.is_external:
+    if substrate is None or substrate.is_external or substrate.is_builder:
         return []
 
     model = substrate.model

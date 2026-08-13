@@ -31,12 +31,20 @@ Output directories are git-ignored — just re-run a script to regenerate them.
 | `example_peo_all_forcefields.py` | PEO | all 6 | Force field comparison (oplsaa, lopls, gaff, gaff2, dreiding, compass) |
 | `example_peo_mc_placement.py` | PEO | OPLS-AA | Placement methods: grid vs MC random vs MC chain growth |
 | `example_film_on_substrate.py` | PE film on ethanol slab | GAFF | **Surfaces:** physical substrate (`SubstrateSpec`), `box_dims`, carve subtract (`Cylinder`) |
+| `example_film_on_quartz.py` | PE film on alpha-quartz(0001) | GAFF | **Built-in silica:** `builder="alpha_quartz"`, hydroxylated Q2 slab, INTERFACE FF |
+| `example_film_on_cristobalite.py` | PE film on beta-cristobalite(111) | GAFF | **Built-in silica:** `builder="beta_cristobalite"`, Q3 silanols, CLAYFF option |
 
 ### Pipeline API
 
 | Script | Demonstrates |
 |---|---|
 | `example_three_stage_pipeline.py` | Stage-level API: `GeometryBuilder` → `UnitTyper` → `BoxPacker`; one geometry typed under multiple force fields |
+
+### Reactive MD
+
+| Script | System | Demonstrates |
+|---|---|---|
+| `example_reactor_polyester.py` | EG + adipic acid melt | `Reactor`: reaction detection, `fix bond/react` templates, `in.bond_react` |
 
 ### Molecules and mixtures
 
@@ -52,6 +60,7 @@ Output directories are git-ignored — just re-run a script to regenerate them.
 | Script | Demonstrates |
 |---|---|
 | `example_bead_spring.py` | Homopolymer, diblock (FENE), ring with angle potentials, MC equilibration, SAW generation — direct LAMMPS data files, no moltemplate |
+| `example_bead_spring_side_groups.py` | **Graph architectures:** comb with single-bead side groups, graft copolymer with oligomeric side chains, `MonomerTemplate` multi-bead monomer, moltemplate vs direct backends |
 
 ## Understanding Complement SMILES (pSMILES)
 

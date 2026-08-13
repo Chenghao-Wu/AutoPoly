@@ -9,6 +9,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **LAMMPS run script for substrate systems** — `generate()` with
+  `substrate=` now writes a ready-to-run `in.run` (frozen slab via
+  `fix setforce`, film NVT 300 K with a film-only temperature compute,
+  so the logged temperature is not biased by the frozen slab).
+- **Early film-density warning** — the `on_substrate` strategy warns at
+  placement time when the film units' bounding-sphere volume exceeds
+  30% of the film region (whole-chain MC placement is then likely to
+  fail).
+- **Regression tests** for the issues exposed by running built
+  film-on-substrate systems through LAMMPS.
+
+### Fixed
+
+- **Spurious intra-slab nonbonded interactions** — built substrate
+  slabs now emit their Si-O/O-H bond topology with zero-force-coefficient
+  bond terms, so `special_bonds` excludes intra-slab 1-2/1-3/1-4
+  nonbonded interactions (bonded O-H pairs at 0.945 A previously
+  contributed ~1e7 kcal/mol of spurious LJ/Coulomb energy). The
+  `pair_coeff`/`bond_coeff` lines automatically carry the sub-style
+  required by the film force field's hybrid pair/bond styles.
+- **LAMMPS crash on unused hybrid styles** — `system.in.init` is
+  patched after moltemplate: hybrid bond/angle/dihedral/improper styles
+  with zero records in `system.data` are replaced with their `none`
+  form (e.g. `improper_style hybrid cvff` for polyethylene).
+- **Silent instance stacking in placement fallbacks** — both the
+  `mc_random` and `on_substrate` fallback grids now raise
+  `ValidationError` when full instead of placing instances on identical
+  coordinates (produced atom clashes in the data file). Note: several
+  pre-existing tests had unknowingly relied on the silent stacking.
+- **`mc_random` ignored `box_dims`** — explicit per-axis boxes are now
+  honored (per-axis auto-size for unspecified axes), as documented on
+  `BoxSpec`.
+
+- **Built-in crystalline silica substrates** — `SubstrateSpec` gains a
+  third source, `builder=`: a hydroxylated crystalline SiO2 slab is
+  generated at pack time (`AutoPoly.surfaces`, following the mBuild
+  carve-and-functionalize recipe adapted to crystalline bulk), written
+  as a self-contained moltemplate `.lt` class and instantiated once like
+  an external slab. Two surfaces are available:
+  `builder="alpha_quartz"` — alpha-quartz(0001), geminal Q2 silanols
+  (~9.6/nm^2 intrinsic); and `builder="beta_cristobalite"` —
+  beta-cristobalite(111), isolated Q3 silanols (~4.5/nm^2, matching the
+  Zhuravlev density of amorphous silica). The cleavage plane is chosen
+  automatically (fewest broken bonds, full Si coordination); both faces
+  are hydroxylated; the lateral box snaps to integer surface cells. The
+  slab is self-typed with LJ + charges only (rigid-slab model), with
+  built-in INTERFACE FF v1.5 (Emami et al. 2014) and CLAYFF (Cygan et
+  al. 2004) tables selected via `slab_ff=`, plus per-role overrides
+  (`slab_types`/`slab_charges`/`slab_lj`) and a full `"custom"` mode.
+  See the substrates guide, `examples/example_film_on_quartz.py` and
+  `examples/example_film_on_cristobalite.py`.
+
 - **Bead-spring architectures (graph core)** — bead-spring chains are now
   built on an explicit graph representation (`BeadArchitecture`: nodes =
   beads, edges = bonds) instead of an implicit linear path, so arbitrary
@@ -59,7 +111,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `chains.lt` (one object per chain at generated coordinates, explicit
   bond list, typed angle list), and `system.lt`, then optionally runs the
   bundled moltemplate to produce `system.data` + `system.in.init/settings`.
-
+- **Reactor** (`AutoPoly.reactor`) — AutoREACTER-style reactive-MD
+  preparation for LAMMPS `fix bond/react`:
+  - `Reactor(project_dir, monomers=...)` scans the packed monomers for
+    reactive functional groups, enumerates step-growth polymerization
+    reactions from a built-in reaction-SMARTS library
+    (polyesterification, polyamidation, polyurethane formation,
+    polyanhydride/polythioester condensation), and builds the full
+    `fix bond/react` input set via `reactor.build()`.
+  - Writes per-reaction pre/post molecule templates and the superimpose
+    map file (including a `_with_delete_ids.map` variant for
+    condensation byproducts such as water), typed with the system's force
+    field. Numeric types reuse the ids already present in `system.data`
+    (by-example matching); genuinely new interactions (cross-monomer bonds,
+    rehybridized atoms, byproducts) get fresh ids with coefficients taken
+    from the force-field tables into `reactor/system.in.settings.reactor`.
+  - Writes a ready-to-run `in.bond_react` reaction-stage script that
+    includes `system.in.init/.settings/.charges`, reads `system.data` with
+    the extra per-atom topology slots, and thermostats the non-reacting
+    group (`statted_grp_REACT`).
+  - Stage-level helpers are public: `detect_monomer_roles`,
+    `detect_reactions`, `prepare_reactions`, plus `ForceFieldTables` /
+    `SystemData` parsers and the `TemplateBuilder`. Custom functional-group
+    and reaction libraries are supported.
+  - Exported at the top level as `Reactor` / `ReactorResult`; see
+    `examples/example_reactor_polyester.py` and `docs/guides/reactor.md`.
 - **Physical substrates** — build a polymer/molecule film on top of a
   substrate slab via `generate(..., substrate=SubstrateSpec(...))`:
   - `SubstrateSpec(model=...)` packs a `Molecule`/`Polymer` into a slab of

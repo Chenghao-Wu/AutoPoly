@@ -11,7 +11,9 @@ AutoPoly generates polymer structures and prepares them for molecular dynamics s
 - **Block Copolymers** - Explicit sequence control for any block arrangement
 - **Complement SMILES** - Unique format for precise positional control
 - **Small Molecules** - Built-in support for solvents and additives
-- **Substrates & Films** - Polymer films on physical slabs, with lithography-style carve subtract
+- **Substrates & Films** - Polymer films on physical slabs — in-pipeline, external, or built-in crystalline silica — with lithography-style carve subtract
+- **Reactive MD (Reactor)** - AutoREACTER-style `fix bond/react` templates so monomers polymerize during MD
+- **CG Bead-Spring Models** - Graph-based architectures: linear, ring, star, comb, graft, tadpole, dendrimer, custom — plus multi-species mixtures
 - **Ring & Linear** - Both topologies supported
 - **SAW Placement** - Monte Carlo self-avoiding walk for realistic initial configurations
 - **Automatic Setup** - Generates complete LAMMPS input files
@@ -289,6 +291,37 @@ generate(
 For a crystalline surface built elsewhere, point at its moltemplate class
 instead: `SubstrateSpec(lt_file="au111.lt", class_name="Au111", thickness=12.0)`.
 
+**Built-in silica substrates:** pass `builder=` to generate a hydroxylated
+crystalline SiO2 slab at pack time (`AutoPoly.surfaces`) — no external
+surface files needed:
+
+```python
+substrate = SubstrateSpec(
+    builder="alpha_quartz",       # or "beta_cristobalite"
+    thickness=12.0,               # slab envelope (Å), incl. hydroxyl coatings
+    gap=3.0,
+    slab_ff="interface",          # INTERFACE FF v1.5; "clayff" also built in
+)
+
+generate(system, "pe_on_quartz", [film], force_field="gaff",
+         substrate=substrate, box_dims=(54.0, 51.0, 57.0))
+```
+
+- `builder="alpha_quartz"` — alpha-quartz(0001), geminal Q2 silanols
+  (~9.6/nm² intrinsic); `builder="beta_cristobalite"` —
+  beta-cristobalite(111), isolated Q3 silanols (~4.5/nm², the Zhuravlev
+  density of amorphous silica). The cleavage plane is chosen automatically
+  and both faces are hydroxylated (`hydroxylate_bottom=False` to leave the
+  bottom bare).
+- The lateral box snaps to integer surface cells (pass explicit lateral
+  `box_dims`); the slab is self-typed with LJ + charges only (rigid-slab
+  model — freeze or `fix rigid` the slab atoms in MD).
+- Slab force fields: `slab_ff="interface"` (INTERFACE FF v1.5) or
+  `"clayff"` built in, per-role overrides via
+  `slab_types`/`slab_charges`/`slab_lj`, and a full `"custom"` mode.
+
+[Examples: example_film_on_quartz.py →](examples/example_film_on_quartz.py) · [example_film_on_cristobalite.py →](examples/example_film_on_cristobalite.py)
+
 **Subtract (carve):** remove whole instances after placement — chains and
 molecules are removed intact, so **no covalent bonds are ever cut**:
 
@@ -312,18 +345,112 @@ you have a nanopore.
 
 [Full example: examples/example_film_on_substrate.py →](examples/example_film_on_substrate.py) · [Guide: Substrates & Films →](https://wugroup-xjtlu.github.io/AutoPoly/guides/substrates/)
 
+### Reactive MD (Reactor)
+
+The **Reactor** prepares LAMMPS `fix bond/react` inputs so monomers packed
+into a box **react during MD** (step-growth polymerization). Build a monomer
+melt, then let the reactor detect the polymerization and write the reaction
+templates + input script:
+
+```python
+from AutoPoly import System, Molecule, generate, Reactor
+
+system = System(out="reactor_out")
+eg     = Molecule(Count=20, Smiles="OCCO", Name="eg")
+adipic = Molecule(Count=20, Smiles="O=C(O)CCCCC(=O)O", Name="adipic")
+
+generate(system, "melt", [eg, adipic], force_field="gaff2")
+
+reactor = Reactor(system.get_folder_path() + "/melt", monomers=[eg, adipic])
+reactor.detect_reactions()          # -> polyesterification (diol + diacid)
+result = reactor.build()            # writes reactor/ + in.bond_react
+```
+
+This detects the diol + diacid polyesterification, builds the pre/post
+reaction templates and map file (typed with the same force field), writes
+supplementary parameters for the types the reaction creates (ester linkage,
+water byproduct), and emits a ready-to-run script:
+
+```bash
+cd reactor_out/melt && lmp -in in.bond_react
+```
+
+Supported reaction families include polyesterification, polyamidation,
+polyurethane formation, and polyanhydride/polythioester condensation, with a
+custom reaction/functional-group library API. Inspired by
+[AutoREACTER](https://github.com/NanoCIPHER-Lab/AutoREACTER).
+
+[Full example: examples/example_reactor_polyester.py →](examples/example_reactor_polyester.py) · [Guide: Reactive MD →](https://wugroup-xjtlu.github.io/AutoPoly/guides/reactor/)
+
+### Coarse-Grained Bead-Spring Models
+
+For coarse-grained work, `BeadSpringPolymer` builds bead-spring chains on an
+explicit **graph architecture** (`AutoPoly.models.architectures`), so
+arbitrary topologies are supported uniformly — no rdkit required:
+
+```python
+from AutoPoly import System, BeadSpringPolymer, BeadType
+from AutoPoly.models import architectures as arch
+
+system = System(out="cg_comb")
+bead_A = BeadType(name="A", mass=1.0, epsilon=1.0, sigma=1.0)  # backbone
+bead_B = BeadType(name="B", mass=1.0, epsilon=1.0, sigma=1.0)  # side group
+
+comb = arch.comb(
+    backbone=[("A", 40)],  # 40 backbone beads
+    side="B",              # one side-group bead per graft point
+    every=4,               # graft every 4 backbone beads
+)
+
+polymer = BeadSpringPolymer(
+    name="comb", system=system, n_chains=10,
+    bead_types=[bead_A, bead_B],
+    architecture=comb,
+    bond_style="fene", pair_style="wca",
+    use_angles=True, density=0.4,
+)
+polymer.generate()  # moltemplate backend (default) -> system.data + system.in.*
+```
+
+- **Architecture factories:** `linear`, `ring`, `star` (incl. miktoarm),
+  `comb`, `graft` (explicit graft points / side groups), `tadpole`,
+  `dendrimer`, and `custom` (explicit bead + bond lists). Legacy
+  `sequence=`/`topology=` inputs remain fully backward compatible.
+- **Multi-bead monomers:** `MonomerTemplate` +
+  `BeadArchitecture.from_monomers(...)` define monomers with backbone +
+  side-group beads and named connection points (`head`/`tail`/`side`).
+- **Copolymer sequences:** `block_sequence`, `alternating_sequence`,
+  `random_sequence` (seeded, weighted), `gradient_sequence`.
+- **Branch-aware angles:** triplets centered on branch points get their own
+  canonical angle types (`include_branch_angles=False` to disable).
+- **Mixtures:** `BeadSpringSystem` packs multiple species
+  (`add_species(architecture, n_chains)` — e.g. rings + linear + combs) into
+  one box and one data file with a shared bead-type table.
+- **Backends:** `generate()` dispatches to the **moltemplate** backend by
+  default (standard AutoPoly output layout); use `generate(backend="direct")`
+  for the lightweight direct writer (e.g. very large melts).
+- **Growth & equilibration:** graph-based SAW (DFS spanning-tree growth with
+  cycle-closing constraints; `SAWConfig.system_retries` retries crowded
+  systems) and branched MC moves (tree-pivot, segment crankshaft).
+
+[Examples: example_bead_spring.py →](examples/example_bead_spring.py) · [example_bead_spring_side_groups.py →](examples/example_bead_spring_side_groups.py)
+
 ### More Examples
 
-The [examples directory](examples/) contains 13 runnable scripts covering:
+The [examples directory](examples/) contains 18 runnable scripts covering:
 
 - **Beginner tutorial** — PMMA step by step ([example_pmma_linear.py](examples/example_pmma_linear.py))
 - **Film on substrate** — PE film on a slab + carve subtract ([example_film_on_substrate.py](examples/example_film_on_substrate.py))
+- **Built-in silica substrates** — films on alpha-quartz(0001) and beta-cristobalite(111) ([example_film_on_quartz.py](examples/example_film_on_quartz.py), [example_film_on_cristobalite.py](examples/example_film_on_cristobalite.py))
+- **Reactive MD** — monomer melt → `fix bond/react` polyesterification ([example_reactor_polyester.py](examples/example_reactor_polyester.py))
+- **Three-stage pipeline** — GeometryBuilder → UnitTyper → BoxPacker, one geometry typed under multiple force fields ([example_three_stage_pipeline.py](examples/example_three_stage_pipeline.py))
 - **Condensation polymers** — PLA with GAFF ([example_pla_condensation.py](examples/example_pla_condensation.py))
 - **Polymer solutions** — PEO in explicit water ([example_peo_solution.py](examples/example_peo_solution.py))
 - **Batch generation** — 10 commodity polymers ([example_commodity_polymers_10.py](examples/example_commodity_polymers_10.py))
 - **Force field comparison** — all 6 force fields on PEO ([example_peo_all_forcefields.py](examples/example_peo_all_forcefields.py))
 - **Placement methods** — grid vs MC random vs MC chain growth ([example_peo_mc_placement.py](examples/example_peo_mc_placement.py))
 - **Bead-spring models** — coarse-grained homo/block/ring polymers ([example_bead_spring.py](examples/example_bead_spring.py))
+- **Bead-spring architectures** — comb/graft with side groups, MonomerTemplate, moltemplate backend ([example_bead_spring_side_groups.py](examples/example_bead_spring_side_groups.py))
 
 [See the full list with descriptions →](examples/README.md)
 
@@ -455,7 +582,7 @@ lmp -in your_run.in   # with: include system.in.init / system.in.settings
 - 🧬 [Complement SMILES Guide](https://wugroup-xjtlu.github.io/AutoPoly/guides/complement-smiles/) - Deep dive on SMILES format
 - ⚙️ [Force Field Guide](https://wugroup-xjtlu.github.io/AutoPoly/guides/force-fields/) - Detailed comparison of all 6 force fields
 - 🐛 [Troubleshooting](https://wugroup-xjtlu.github.io/AutoPoly/guides/troubleshooting/) - Solutions to common issues
-- 📝 [Examples Directory](examples/) - 12 working examples
+- 📝 [Examples Directory](examples/) - 18 working examples
 
 **Quick links:**
 - [Installation details](https://wugroup-xjtlu.github.io/AutoPoly/guides/troubleshooting/#installation-issues)

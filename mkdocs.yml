@@ -81,6 +81,7 @@ nav:
       - Force Fields: guides/force-fields.md
       - "MC Placement & Chain Growth": guides/mc-placement.md
       - Substrates & Films: guides/substrates.md
+      - Reactive MD (Reactor): guides/reactor.md
       - Bead-Spring (Coarse-Grained): guides/bead-spring.md
       - Output Files: guides/output-files.md
       - Troubleshooting: guides/troubleshooting.md

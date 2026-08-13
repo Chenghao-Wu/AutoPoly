@@ -68,6 +68,8 @@ __all__ = [
     "BoxRegion",
     "register_strategy",
     "get_strategy",
+    "Reactor",
+    "ReactorResult",
     "mc",
     "__version__",
     "__author__",
@@ -111,6 +113,7 @@ try:
         register_strategy,
         get_strategy,
     )
+    from .reactor import Reactor, ReactorResult
     from . import mc
 except ImportError as e:
     import warnings
@@ -123,4 +126,6 @@ except ImportError as e:
     Molecule = None
     MonomerGenerator = None
     generate = None
+    Reactor = None
+    ReactorResult = None
     mc = None

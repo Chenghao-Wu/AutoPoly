@@ -105,7 +105,8 @@ class TestCopolymerEndToEnd:
         to silently replace the styrene middles with ethylene."""
         system = System(out=str(tmp_path / "aba"))
         poly = Polymer(chain_num=2, sequence=ABA_SEQUENCE, tacticity="atactic")
-        generate(system, "aba", [poly], force_field="oplsaa")
+        generate(system, "aba", [poly], force_field="oplsaa",
+                 box_dims=(40.0, 40.0, 40.0))
 
         masses, atoms, bonds = _parse_data_file(tmp_path / "aba" / "aba" / "system.data")
         comps, adj = _chains(atoms, bonds)

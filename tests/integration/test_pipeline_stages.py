@@ -41,15 +41,21 @@ def _parse_counts(data_path):
 
 
 def _run_pipeline(out_dir, models, ff="oplsaa", geom_seed=99, pack_seed=77,
-                  strategy="mc_random"):
-    """Run the three stages with fixed seeds; return the project dir."""
+                  strategy="mc_random", box_dims=(40.0, 40.0, 40.0)):
+    """Run the three stages with fixed seeds; return the project dir.
+
+    An explicit box is used: whole-sphere MC placement needs room for
+    the chain bounding spheres, which the auto-sized box cannot always
+    provide for multi-chain systems.
+    """
     system = System(out=str(out_dir))
     geom = GeometryBuilder(
         system, "proj",
         GeometryConfig(use_mc_chain_growth=True, rng_seed=geom_seed),
     ).build(models)
     units = UnitTyper(geom.dir, ff).type()
-    BoxPacker(system, "proj", strategy=strategy, rng_seed=pack_seed).pack(units)
+    BoxPacker(system, "proj", strategy=strategy, rng_seed=pack_seed,
+              box_dims=box_dims).pack(units)
     return Path(out_dir) / "proj"
 
 

@@ -178,6 +178,7 @@ class TestBoxPacker:
         result = BoxPacker(
             system, "proj", strategy="mc_random",
             rng_seed=5, run_moltemplate=False,
+            box_dims=(40.0, 40.0, 40.0),
         ).pack(library)
 
         moltemplate_dir = tmp_path / "out" / "proj" / "moltemplate"

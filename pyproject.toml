@@ -1,0 +1,82 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "AutoPoly"
+version = "2.0.0"
+description = "Automated polymer generation and LAMMPS data-file preparation for molecular dynamics simulations"
+readme = "README.md"
+license = "MIT"
+license-files = ["license.md"]
+authors = [
+    {name = "Zhenghao Wu", email = "zhenghao.wu95@gmail.com"},
+]
+maintainers = [
+    {name = "Zhenghao Wu", email = "zhenghao.wu95@gmail.com"},
+]
+keywords = [
+    "python",
+    "molecular dynamics",
+    "LAMMPS",
+    "polymer",
+    "moltemplate",
+    "force field",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "numpy>=1.8.0",
+    "rdkit>=2022.09.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.10.0",
+    "build>=1.0.0",
+]
+docs = [
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.26.0",
+    "pymdown-extensions>=10.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/WuGroup-XJTLU/AutoPoly"
+Documentation = "https://wugroup-xjtlu.github.io/AutoPoly/"
+Source = "https://github.com/WuGroup-XJTLU/AutoPoly"
+Issues = "https://github.com/WuGroup-XJTLU/AutoPoly/issues"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["AutoPoly*"]
+namespaces = false
+
+# Ship the bundled moltemplate scripts/force fields and the rdlt_data
+# SMARTS/parameter files that the pipeline locates relative to __file__.
+# include-package-data pulls in everything matched by MANIFEST.in; these
+# globs are a belt-and-braces fallback for builds that ignore MANIFEST.in.
+[tool.setuptools.package-data]
+AutoPoly = [
+    "extern/*",
+    "extern/*/*",
+    "extern/*/*/*",
+    "extern/*/*/*/*",
+]
