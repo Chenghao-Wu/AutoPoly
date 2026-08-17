@@ -177,7 +177,7 @@ class TemplateBuilder:
 
     def _charge_of(self, atom_type: str, atom) -> float:
         """Per-atom charge mirroring UnitTyper's policy."""
-        if self.typer.force_field == "gaff":
+        if self.typer.force_field in ("gaff", "gaff2"):
             try:
                 charge = float(atom.GetProp("_GasteigerCharge"))
                 if charge != charge or charge in (float("inf"), float("-inf")):
@@ -467,6 +467,18 @@ class TemplateBuilder:
         # Type both molecules with full chemical environment
         pre_types = self._type_molecule(reactant)
         post_types = self._type_molecule(product)
+
+        # GAFF/GAFF2 have no charge table: Gasteiger charges on both sides
+        # of the reaction (mirrors UnitTyper's full-molecule policy).
+        if self.typer.force_field in ("gaff", "gaff2"):
+            for side, m in (("reactant", reactant), ("product", product)):
+                try:
+                    AllChem.ComputeGasteigerCharges(m)
+                except Exception as e:
+                    logger.error(
+                        f"Failed to compute Gasteiger charges for {side} "
+                        f"of reaction {rid}: {e}"
+                    )
 
         # Embed coordinates (product constrained onto reactant frame)
         product = _embed_reactant_product(reactant, product, r_to_p, seed=seed)

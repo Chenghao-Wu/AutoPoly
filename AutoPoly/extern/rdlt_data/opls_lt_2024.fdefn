@@ -1037,3 +1037,47 @@ EndFeature
 DefineFeature @atom:185 [$([#1][CD4][OD2])]
 Family 104HC_PEO
 EndFeature
+
+# ---------------------------------------------------------------------------
+# Aryl esters and diaryl carbonates (added for BPA-polycarbonate).
+# The stock 465/466/467 ester patterns require an aliphatic C on the -O-, so an
+# Ar-O-C(=O)- group types as nothing at all. OPLS-AA types: 471 C~ (aryl ester
+# carbonyl C), 472 CA (Cipso), 473 OS (-OAr). Family >= 200 to outrank the
+# generic aryl-ether type 199 (family 2CA) and the alkyl-ester families.
+# ---------------------------------------------------------------------------
+DefineFeature @atom:473 [$([OD2](c)[CD3]=[OD1])]
+Family 200OS_ARYLESTER
+EndFeature
+
+DefineFeature @atom:472 [$(c[OD2][CD3]=[OD1])]
+Family 201CA_ARYLESTER_CIPSO
+EndFeature
+
+DefineFeature @atom:471 [$([CD3](=[OD1])[OD2]c)]
+Family 202C_ARYLESTER
+EndFeature
+
+DefineFeature @atom:466 [$([OD1]=[CD3][OD2]c)]
+Family 203O_ARYLESTER
+EndFeature
+
+# ---------------------------------------------------------------------------
+# Group-neutrality fixes (see neutrality_patch.py).
+# Family >= 210 so these outrank the PEO ether patterns (family 103/104) and
+# the generic benzene CA (family 11CA).
+# ---------------------------------------------------------------------------
+# Ester methoxy C: OPLS 468 (+0.160), not the methyl-ether 181 (+0.110).
+DefineFeature @atom:468 [$([CH3D4][OD2][CD3]=[OD1])]
+Family 210CT_ESTER_OME
+EndFeature
+
+# ...and its hydrogens: OPLS 469 (alkoxy H in esters).
+DefineFeature @atom:469 [$([#1][CD4][OD2][CD3]=[OD1])]
+Family 211HC_ESTER_OME
+EndFeature
+
+# Aromatic C bonded to a carbon that bridges two aryl rings (bisphenol-A,
+# diphenylmethane): OPLS 1004 Cipso (-0.0575), not benzene CA 145 (-0.115).
+DefineFeature @atom:1004 [$(c[CX4]c)]
+Family 220CA_DIPHENYLMETHANE_IPSO
+EndFeature
