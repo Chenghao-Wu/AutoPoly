@@ -225,3 +225,60 @@ class TestBoxPacker:
         os.remove(victim)
         with pytest.raises(ValidationError, match="missing"):
             BoxPacker(system, "proj", run_moltemplate=False).pack(library)
+
+
+class TestPrepareMoltemplateDir:
+    """Regression tests for _prepare_moltemplate_dir with read-only sources.
+
+    Artifact stores (e.g. m3flow) restage build/<ff>/ files read-only, and a
+    small molecule is listed both in monomer_files and as a unit — the copy
+    loops must not re-copy onto a read-only destination, and working copies
+    must be writable for downstream in-place processing.
+    """
+
+    @staticmethod
+    def _molecule_library():
+        return UnitLibrary(
+            force_field="oplsaa",
+            units=[UnitSpec(id="ethanol", kind="molecule", lt_file="ethanol.lt",
+                            count=500, radius=3.0)],
+            # a molecule appears in both lists (monomer for the FF subset,
+            # unit for placement)
+            monomer_files=["ethanol.lt"],
+            build_config={},
+        )
+
+    @staticmethod
+    def _readonly_build_dir(tmp_path):
+        build_dir = tmp_path / "build" / "oplsaa"
+        build_dir.mkdir(parents=True)
+        src = build_dir / "ethanol.lt"
+        src.write_text('Ethanol inherits OPLSAA {\n}\n')
+        src.chmod(0o444)
+        return build_dir
+
+    def test_readonly_molecule_lt_copied_once_writable(self, tmp_path):
+        system = System(out=str(tmp_path / "out"))
+        library = self._molecule_library()
+        build_dir = self._readonly_build_dir(tmp_path)
+        packer = BoxPacker(system, "proj", strategy="grid", run_moltemplate=False)
+
+        # Must not raise PermissionError re-copying onto the read-only copy
+        packer._prepare_moltemplate_dir(library, build_dir)
+
+        dst = packer.moltemplate_dir / "ethanol.lt"
+        assert dst.is_file()
+        assert dst.read_text() == (build_dir / "ethanol.lt").read_text()
+        assert dst.stat().st_mode & 0o200  # owner-writable working copy
+
+    def test_reprepare_after_failed_pack(self, tmp_path):
+        # Box-expansion retry re-prepares the dir; leftover copies must not
+        # break the second attempt.
+        system = System(out=str(tmp_path / "out"))
+        library = self._molecule_library()
+        build_dir = self._readonly_build_dir(tmp_path)
+        packer = BoxPacker(system, "proj", strategy="grid", run_moltemplate=False)
+
+        packer._prepare_moltemplate_dir(library, build_dir)
+        packer._prepare_moltemplate_dir(library, build_dir)
+        assert (packer.moltemplate_dir / "ethanol.lt").is_file()
