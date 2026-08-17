@@ -192,12 +192,21 @@ class BoxPacker:
             return
 
         units.validate(build_dir)
+        # Source .lt files may be read-only (e.g. restaged from an immutable
+        # artifact store); copy2 preserves that mode, so force each working
+        # copy writable, and skip unit files already copied as monomer files
+        # (a molecule is listed in both) — re-copying onto the read-only
+        # destination would fail with EACCES.
         for rel in units.monomer_files:
-            shutil.copy2(build_dir / rel, self.moltemplate_dir / rel)
+            dst = self.moltemplate_dir / rel
+            shutil.copy2(build_dir / rel, dst)
+            dst.chmod(0o644)
         for unit in units.units:
             src = build_dir / unit.lt_file
-            if src.is_file():
-                shutil.copy2(src, self.moltemplate_dir / unit.lt_file)
+            dst = self.moltemplate_dir / unit.lt_file
+            if src.is_file() and not dst.exists():
+                shutil.copy2(src, dst)
+                dst.chmod(0o644)
 
         # External substrate slab: user-supplied .lt, imported as-is
         if self.substrate is not None and self.substrate.is_external:
@@ -206,7 +215,9 @@ class BoxPacker:
                 raise WorkflowError(
                     f"External substrate lt_file not found: {src}"
                 )
-            shutil.copy2(src, self.moltemplate_dir / src.name)
+            dst = self.moltemplate_dir / src.name
+            shutil.copy2(src, dst)
+            dst.chmod(0o644)
 
         # Built-in substrate slab: generate the .lt at pack time
         if self.substrate is not None and self.substrate.is_builder:
