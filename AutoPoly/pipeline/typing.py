@@ -9,8 +9,8 @@ Force-field assignment on top of stored geometry:
 
 Typing is graph-based: the full chain molecule is rebuilt from the stored
 mapped SMILES (no coordinates needed), typed with priority-based SMARTS
-matching, and charges are assigned (Gasteiger on the full chain for GAFF,
-.fdefn charge tables otherwise). Every stored variant atom carries its
+matching, and charges are assigned (Gasteiger for GAFF/GAFF2 — computed on
+the full chain, and on each small molecule — .fdefn charge tables otherwise). Every stored variant atom carries its
 chain atom-map number, so types/charges transfer by lookup — variant atoms
 *are* chain atoms.
 
@@ -23,6 +23,7 @@ Created on 2026-07-30
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
+import numpy as np
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
@@ -40,7 +41,25 @@ from ..monomers.monomer_processing import read_lt_end_atoms
 from .units import UnitLibrary, UnitSpec
 
 BUILD_DIRNAME = "build"
-DEFAULT_MOLECULE_RADIUS = 3.0
+
+# Collision radius derivation for molecule-like units: bounding sphere over
+# the embedded coords (max |r - center|) plus padding, with a floor for
+# (near-)single-atom species.
+MOLECULE_RADIUS_PADDING = 1.0
+MIN_MOLECULE_RADIUS = 1.5
+
+
+def molecule_radius(atoms: List[Dict[str, Any]]) -> float:
+    """
+    Collision radius from stored atom coords: max |r - center| + padding.
+
+    Replaces a fixed default so small molecules (water) don't waste volume
+    and large solvents don't silently overlap during MC placement.
+    """
+    coords = np.asarray([a["coords"] for a in atoms], dtype=float)
+    center = coords.mean(axis=0)
+    max_dist = float(np.linalg.norm(coords - center, axis=1).max())
+    return max(max_dist + MOLECULE_RADIUS_PADDING, MIN_MOLECULE_RADIUS)
 
 
 def mol_from_mapped_smiles(smiles_mapped: str) -> Chem.Mol:
@@ -179,8 +198,8 @@ class UnitTyper:
                 ) from e
 
             # Gasteiger charges on the FULL chain (before any splitting),
-            # matching the legacy behavior for GAFF.
-            if self.force_field == "gaff":
+            # matching the legacy behavior for GAFF/GAFF2.
+            if self.force_field in ("gaff", "gaff2"):
                 try:
                     AllChem.ComputeGasteigerCharges(mol)
                 except Exception as e:
@@ -263,8 +282,8 @@ class UnitTyper:
             return f"@atom:{element.lower()}"
 
     def _atom_charge(self, atom, atom_type: str) -> float:
-        """Per-atom charge: Gasteiger (gaff) or .fdefn charge table."""
-        if self.force_field == "gaff":
+        """Per-atom charge: Gasteiger (gaff/gaff2) or .fdefn charge table."""
+        if self.force_field in ("gaff", "gaff2"):
             try:
                 charge = float(atom.GetProp("_GasteigerCharge"))
                 if charge != charge or charge in (float("inf"), float("-inf")):
@@ -440,6 +459,17 @@ class UnitTyper:
                     f"(force field {self.force_field}): {e}"
                 ) from e
 
+            # GAFF/GAFF2 have no charge table — Gasteiger on the molecule,
+            # mirroring the full-chain policy for polymers.
+            if self.force_field in ("gaff", "gaff2"):
+                try:
+                    AllChem.ComputeGasteigerCharges(mol)
+                except Exception as e:
+                    logger.error(
+                        f"Failed to compute Gasteiger charges for molecule "
+                        f"'{name}': {e}"
+                    )
+
             lookup = {
                 atom.GetAtomMapNum(): atom.GetIdx()
                 for atom in mol.GetAtoms() if atom.GetAtomMapNum() > 0
@@ -454,10 +484,7 @@ class UnitTyper:
                     )
                 atom = mol.GetAtomWithIdx(idx)
                 atom_type = self._atom_type(atom, a["element"])
-                # Molecule charges come from the .fdefn charge table for all
-                # force fields (legacy behavior; GAFF molecules need
-                # user-supplied charges — see the GAFF charges warning).
-                charge = self.typer.charge_dict.get(atom_type, 0.0)
+                charge = self._atom_charge(atom, atom_type)
                 rows.append({
                     "atom_id": f"{a['element']}{i + 1}",
                     "atom_type": atom_type,
@@ -473,7 +500,7 @@ class UnitTyper:
                 kind="molecule",
                 lt_file=lt_file,
                 count=entry["count"],
-                radius=DEFAULT_MOLECULE_RADIUS,
+                radius=molecule_radius(entry["atoms"]),
                 anchors={},
                 role=entry.get("role", "film"),
                 monomer_files=[lt_file],
@@ -491,7 +518,7 @@ class UnitTyper:
                 kind="molecule",
                 lt_file=lt_file,
                 count=count,
-                radius=DEFAULT_MOLECULE_RADIUS,
+                radius=molecule_radius(self.geometry["variants"][variant_name]["atoms"]),
                 anchors={},
                 role=role,
                 monomer_files=[lt_file],

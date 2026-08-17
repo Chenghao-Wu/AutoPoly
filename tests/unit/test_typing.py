@@ -101,6 +101,34 @@ class TestTyping:
         assert any(abs(q) > 1e-6 for q in charges)
         assert sum(charges) == pytest.approx(0.0, abs=0.05)
 
+    def test_gaff2_gasteiger_charges(self, tmp_path):
+        """GAFF2 typing writes Gasteiger charges computed on the full chain."""
+        geom = _build_geometry(tmp_path)
+        UnitTyper(geom.dir, "gaff2").type()
+
+        build_dir = Path(geom.dir).parent / "build" / "gaff2"
+        rows = _lt_atom_types(build_dir / "monomer_0_1i.lt")
+        charges = [r[2] for r in rows]
+        assert any(abs(q) > 1e-6 for q in charges)
+        assert sum(charges) == pytest.approx(0.0, abs=0.05)
+
+    @pytest.mark.parametrize("ff", ["gaff", "gaff2"])
+    def test_gaff_molecule_gasteiger_charges(self, tmp_path, ff):
+        """Small molecules under GAFF/GAFF2 get Gasteiger charges (no table)."""
+        system = System(out=str(tmp_path / "out"))
+        water = Molecule(Count=2, Smiles="O", Name="water")
+        geom = GeometryBuilder(
+            system, "sol", GeometryConfig(use_mc_chain_growth=False)
+        ).build([water])
+        UnitTyper(geom.dir, ff).type()
+
+        build_dir = Path(geom.dir).parent / "build" / ff
+        rows = _lt_atom_types(build_dir / "water.lt")
+        charges = [r[2] for r in rows]
+        # Water: negative O, positive Hs, neutral overall (4-decimal output)
+        assert any(abs(q) > 1e-6 for q in charges)
+        assert sum(charges) == pytest.approx(0.0, abs=1e-3)
+
     def test_oplsaa_charges_from_charge_dict(self, tmp_path):
         geom = _build_geometry(tmp_path)
         UnitTyper(geom.dir, "oplsaa").type()
@@ -151,6 +179,38 @@ class TestTyping:
         assert water_units[0].count == 4
         build_dir = Path(geom.dir).parent / "build" / "oplsaa"
         assert (build_dir / "water.lt").is_file()
+
+    def test_molecule_radius_derived_from_geometry(self, tmp_path):
+        """Collision radius comes from conformer size, not a fixed default."""
+        system = System(out=str(tmp_path / "out"))
+        water = Molecule(Count=1, Smiles="O", Name="water")
+        benzene = Molecule(Count=1, Smiles="c1ccccc1", Name="benzene")
+        geom = GeometryBuilder(
+            system, "sol", GeometryConfig(use_mc_chain_growth=False)
+        ).build([water, benzene])
+        library = UnitTyper(geom.dir, "oplsaa").type()
+
+        radii = {u.id: u.radius for u in library.units}
+        # Small molecule: tighter than the legacy fixed 3.0 A default
+        assert 1.5 <= radii["water"] < 3.0
+        # Larger molecule: sphere grows beyond the old default to fit
+        assert radii["benzene"] > 3.0
+        assert radii["benzene"] > radii["water"]
+
+    def test_dop1_radius_derived_from_geometry(self, tmp_path):
+        """DOP=1 chains packing as molecule-like units get derived radii."""
+        system = System(out=str(tmp_path / "out"))
+        butane = Polymer(chain_num=2, sequence=["CCCC"])
+        geom = GeometryBuilder(
+            system, "dop1", GeometryConfig(use_mc_chain_growth=False)
+        ).build([butane])
+        library = UnitTyper(geom.dir, "oplsaa").type()
+
+        assert len(library.units) > 0
+        for u in library.units:
+            assert u.kind == "molecule"
+            # Butane spans ~4 A end-to-end: beyond the legacy 3.0 A default
+            assert u.radius > 3.0
 
     def test_invalid_force_field_raises(self, tmp_path):
         geom = _build_geometry(tmp_path)

@@ -690,7 +690,7 @@ class ChainSplitter:
         # Preserve Gasteiger charges through fragmentation
         # FragmentOnBonds() loses atom properties, so we need to manually track them
         gasteiger_charges_by_map_num = {}
-        if force_field.lower() == 'gaff':
+        if force_field.lower() in ('gaff', 'gaff2'):
             for atom in chain_mol.GetAtoms():
                 map_num = atom.GetAtomMapNum()
                 if map_num > 0:
@@ -1421,7 +1421,7 @@ class LTWriter:
             # Get charge - try Gasteiger property first (calculated on full chain),
             # then fallback to charge_dict for OPLS or legacy behavior
             charge = 0.0
-            if self.force_field.lower() == 'gaff':
+            if self.force_field.lower() in ('gaff', 'gaff2'):
                 try:
                     raw_charge = atom.GetProp('_GasteigerCharge')
                     charge = float(raw_charge)
@@ -1578,7 +1578,7 @@ class MonomerGenerator:
         chain_mol = self.atom_typer.assign_atom_types(chain_mol)
 
         # 3. Calculate Gasteiger charges on FULL chain (before splitting!)
-        if self.force_field.lower() == 'gaff':
+        if self.force_field.lower() in ('gaff', 'gaff2'):
             try:
                 # Assign map numbers to all atoms for tracking
                 for i, atom in enumerate(chain_mol.GetAtoms()):
@@ -1633,7 +1633,7 @@ class MonomerGenerator:
         chain_mol = self.atom_typer.assign_atom_types(chain_mol)
 
         # 2. Calculate Gasteiger charges on FULL chain (before splitting!)
-        if self.force_field.lower() == 'gaff':
+        if self.force_field.lower() in ('gaff', 'gaff2'):
             try:
                 # Assign map numbers to all atoms for tracking
                 for i, atom in enumerate(chain_mol.GetAtoms()):
@@ -1738,7 +1738,16 @@ class MonomerGenerator:
         
         # Assign atom types
         mol = self.atom_typer.assign_atom_types(mol)
-        
+
+        # GAFF/GAFF2 have no charge table: Gasteiger charges on the molecule
+        if self.force_field.lower() in ('gaff', 'gaff2'):
+            try:
+                AllChem.ComputeGasteigerCharges(mol)
+                if self.verbose:
+                    logger.info("Calculated Gasteiger charges on molecule")
+            except Exception as e:
+                logger.error(f"Failed to compute Gasteiger charges on molecule: {e}")
+
         # Generate conformer
         mol = self.conformer_gen.generate_conformer(mol)
         
@@ -1837,8 +1846,19 @@ class MonomerGenerator:
                     atom_type = atom.GetProp('AtomType')
                 except KeyError:
                     atom_type = f"@atom:{atom.GetSymbol().lower()}"
-                
-                charge = self.lt_writer.charge_dict.get(atom_type, 0.0)
+
+                if self.force_field.lower() in ('gaff', 'gaff2'):
+                    # Gasteiger charge computed in from_single_molecule()
+                    try:
+                        charge = float(atom.GetProp('_GasteigerCharge'))
+                        if (charge == float('inf') or
+                            charge == float('-inf') or
+                                charge != charge):  # NaN check
+                            charge = 0.0
+                    except (KeyError, ValueError):
+                        charge = 0.0
+                else:
+                    charge = self.lt_writer.charge_dict.get(atom_type, 0.0)
                 
                 if conf is not None:
                     pos = conf.GetAtomPosition(atom_idx)
